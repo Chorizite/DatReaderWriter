@@ -1,6 +1,6 @@
 ﻿namespace ACDatReader.Options {
     /// <summary>
-    /// <see cref="ACDatReader.DatDatabase"/> Options
+    /// <see cref="ACDatReader.DatDatabaseReader"/> Options
     /// </summary>
     public class DatDatabaseOptions {
         /// <summary>

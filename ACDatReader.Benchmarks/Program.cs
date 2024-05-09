@@ -8,7 +8,8 @@ using BenchmarkDotNet.Running;
 namespace ACDatReader.Benchmarks {
     public class Program {
         static void Main() {
-            BenchmarkRunner.Run<DatFileEntryCaching>();
+            //BenchmarkRunner.Run<DatFileEntryCaching>();
+            BenchmarkRunner.Run<PortalDatFileFetchingNoCache>();
         }
     }
 
@@ -26,17 +27,46 @@ namespace ACDatReader.Benchmarks {
 
         [Benchmark]
         public void CacheDatMemMap() {
-            _ = new DatDatabase(null, new MemoryMappedDatBlockReader(Path.Combine(DatDirectory, $"client_{DatFile}.dat")));
+            _ = new DatDatabaseReader(null, new MemoryMappedDatBlockReader(Path.Combine(DatDirectory, $"client_{DatFile}.dat")));
         }
 
         [Benchmark]
         public void CacheDatStream() {
-            _ = new DatDatabase(null, new FileStreamDatBlockReader(Path.Combine(DatDirectory, $"client_{DatFile}.dat")));
+            _ = new DatDatabaseReader(null, new FileStreamDatBlockReader(Path.Combine(DatDirectory, $"client_{DatFile}.dat")));
         }
 
         [Benchmark]
         public void CacheDatACE() {
             _ = new ACE.DatLoader.DatDatabase(Path.Combine(DatDirectory, $"client_{DatFile}.dat"), true);
+        }
+    }
+
+    [MemoryDiagnoser]
+    [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
+    public class PortalDatFileFetchingNoCache {
+        private const string PortalFile = @"C:\Turbine\Asheron's Call\client_portal.dat";
+
+        [Params(0x01000001u, 0x06007569u, 0x0A00001Au)]
+        public uint FileId { get; set; }
+
+        [Benchmark]
+        public void FetchMemMap() {
+            using var db = new DatDatabaseReader((options) => {
+                options.CacheDirectories = false;
+                options.PreloadFileEntries = false;
+            }, new MemoryMappedDatBlockReader(PortalFile));
+
+            _ = db.TryGetFileBytes(FileId, out _);
+        }
+
+        [Benchmark]
+        public void FetchStream() {
+            using var db = new DatDatabaseReader((options) => {
+                options.CacheDirectories = false;
+                options.PreloadFileEntries = false;
+            }, new FileStreamDatBlockReader(PortalFile));
+
+            _ = db.TryGetFileBytes(FileId, out _);
         }
     }
 }

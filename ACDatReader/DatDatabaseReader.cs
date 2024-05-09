@@ -3,22 +3,14 @@ using ACDatReader.IO.BlockReaders;
 using ACDatReader.Options;
 using System;
 using System.Buffers;
-using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Data.Common;
-using System.Diagnostics;
-using System.IO;
-using System.IO.MemoryMappedFiles;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ACDatReader {
     /// <summary>
-    /// Provides access to a dat database
+    /// Provides read access to a dat database
     /// </summary>
-    public class DatDatabase : IDisposable {
+    public class DatDatabaseReader : IDisposable {
         private readonly static ArrayPool<byte> sharedBytes = ArrayPool<byte>.Shared;
 
         private readonly Dictionary<uint, DatFileEntry> _fileEntryCache = [];
@@ -52,13 +44,78 @@ namespace ACDatReader {
         /// </summary>
         /// <param name="options">Options configuration action</param>
         /// <param name="blockReader">Block reader instance to use</param>
-        public DatDatabase(Action<DatDatabaseOptions>? options = null, IDatBlockReader? blockReader = null) {
+        public DatDatabaseReader(Action<DatDatabaseOptions>? options = null, IDatBlockReader? blockReader = null) {
             Options = new DatDatabaseOptions();
             options?.Invoke(Options);
 
             _blockReader = blockReader ?? new MemoryMappedDatBlockReader(Options.FilePath);
 
             Init();
+        }
+
+        /// <summary>
+        /// Try to get the byte contents of a file
+        /// </summary>
+        /// <param name="fileId">The id of the file to get</param>
+        /// <param name="bytes">The bytes that were found, if any.</param>
+        /// <returns>True if the file bytes were found, false otherwise</returns>
+        public bool TryGetFileBytes(uint fileId, out byte[]? bytes) {
+            if (TryGetFileEntry(fileId, out var fileEntry)) {
+                bytes = new byte[fileEntry.Size];
+                _blockReader.ReadBlocks(ref bytes, fileEntry.Offset, Header.BlockSize);
+                return true;
+            }
+
+            bytes = null;
+            return false;
+        }
+
+        /// <summary>
+        /// Try to get a file entry
+        /// </summary>
+        /// <param name="fileId">The id of the file</param>
+        /// <param name="fileEntry">The file entry, if it exists</param>
+        /// <returns>True if a file entry with the specific <paramref name="fileId"/> was found, false otherwise</returns>
+        public bool TryGetFileEntry(uint fileId, out DatFileEntry fileEntry) {
+            if (_fileEntryCache.TryGetValue(fileId, out fileEntry)) {
+                return true;
+            }
+
+            var buffer = sharedBytes.Rent(DatDirectoryEntry.SIZE);
+
+            // @paradox logic
+            uint node = Header.RootBlock;
+            while (node != 0 && node != 0xcdcdcdcd) {
+                DatDirectoryEntry de = GetDirectoryEntry(node, ref buffer);
+
+                int l = 0;
+                int r = de.EntryCount - 1;
+                int i = 0;
+
+                while (l <= r) {
+                    i = (l + r) / 2;
+                    fileEntry = de.Entries![i];
+
+                    if (fileId == fileEntry.Id) {
+                        sharedBytes.Return(buffer);
+                        return true;
+                    }
+                    else if (fileId < fileEntry.Id)
+                        r = i - 1;
+                    else
+                        l = i + 1;
+                }
+
+                if (de.IsLeaf)
+                    break;
+
+                if (fileId > de.Entries![i].Id)
+                    i++;
+
+                node = de.Branches![i];
+            }
+
+            return false;
         }
 
         private void Init() {
@@ -109,18 +166,27 @@ namespace ACDatReader {
             }
         }
 
-        private void PreloadFileEntries(uint directoryOffset, ref byte[] buffer) {
-            var dirEntry = new DatDirectoryEntry {
-                Offset = directoryOffset
+        private DatDirectoryEntry GetDirectoryEntry(uint offset, ref byte[] buffer) {
+            if (Options.CacheDirectories && _directoryCache.TryGetValue(offset, out var dirEntry)) {
+                return dirEntry;
+            }
+
+            dirEntry = new DatDirectoryEntry {
+                Offset = offset
             };
 
-            _blockReader.ReadBlocks(ref buffer, directoryOffset, Header.BlockSize);
-
+            _blockReader.ReadBlocks(ref buffer, offset, Header.BlockSize);
             dirEntry.Unpack(buffer);
 
             if (Options.CacheDirectories) {
-                _directoryCache.Add(directoryOffset, dirEntry);
+                _directoryCache.Add(offset, dirEntry);
             }
+
+            return dirEntry;
+        }
+
+        private void PreloadFileEntries(uint directoryOffset, ref byte[] buffer) {
+            var dirEntry = GetDirectoryEntry(directoryOffset, ref buffer);
 
             if (dirEntry.Entries is not null) {
                 foreach (var entry in dirEntry.Entries) {

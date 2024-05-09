@@ -65,10 +65,19 @@ namespace ACDatReader.Tests.Lib {
 
         public string? GetDisplayName(MethodInfo methodInfo, object?[]? data) {
             if (data is not null) {
-                return string.Format(CultureInfo.CurrentCulture, "{0} ({1})", [ methodInfo.Name, string.Join(",", data) ]);
+                var parameters = methodInfo.GetParameters();
+                return string.Format(CultureInfo.CurrentCulture, "{0} ({1})", [ methodInfo.Name, string.Join(",", data.Select((d, i) => {
+                    return $"{parameters[i].Name}={GetDisplayName(d)}";
+                })) ]);
             }
 
             return null;
+        }
+
+        private object GetDisplayName(object d) {
+            if (d is null) return "null";
+            if (d is uint du) return $"0x{du:X8}";
+            return d.ToString() ?? string.Empty;
         }
     }
 }

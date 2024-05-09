@@ -53,7 +53,7 @@ namespace ACDatReader.Tests.Lib {
             }
         }
 
-        internal static void AssertGoodCaches(DatDatabase db) {
+        internal static void AssertGoodCaches(DatDatabaseReader db) {
             switch (db.Header.Type) {
                 case DatDatabaseType.Portal:
                     if (db.Header.SubSet == 0) { // portal

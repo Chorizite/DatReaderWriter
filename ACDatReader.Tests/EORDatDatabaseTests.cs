@@ -33,12 +33,33 @@ namespace ACDatReader.Tests {
             [DataValues(BlockReaderType.MemoryMapped, BlockReaderType.FileStream)] BlockReaderType blockReader
             ) {
 
-            using var dat = new DatDatabase(options => {
+            using var dat = new DatDatabaseReader(options => {
                 options.PreloadFileEntries = true;
             }, GetReaderInstance(blockReader, Path.Combine(DatDirectory, $"client_{datPath}.dat")));
 
             EORCommonData.AssertGoodHeader(dat.Header);
             EORCommonData.AssertGoodCaches(dat);
+        }
+
+        [TestMethod]
+        [CombinatorialData]
+        public void CanGetPortalFileBytes(
+            [DataValues(BlockReaderType.MemoryMapped, BlockReaderType.FileStream)] BlockReaderType blockReader,
+            [DataValues(0x06007569u, 0x01000001u, 0x0A00001Au)] uint fileId,
+            [DataValues(true, false)] bool preloadFileEntries
+            ) {
+
+            using var dat = new DatDatabaseReader(options => {
+                options.PreloadFileEntries = preloadFileEntries;
+            }, GetReaderInstance(blockReader, Path.Combine(DatDirectory, $"client_portal.dat")));
+
+
+            var foundBytes = dat.TryGetFileBytes(fileId, out var bytes);
+
+            Assert.IsTrue(foundBytes);
+            Assert.IsNotNull(bytes);
+            Assert.IsTrue(bytes.Length > 0);
+            // TODO: contents checks
         }
     }
 }

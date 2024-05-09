@@ -18,22 +18,22 @@ namespace ACDatReader {
         /// <summary>
         /// Portal dat database
         /// </summary>
-        public DatDatabase Portal { get; }
+        public DatDatabaseReader Portal { get; }
 
         /// <summary>
         /// Cell dat database
         /// </summary>
-        public DatDatabase Cell { get; }
+        public DatDatabaseReader Cell { get; }
 
         /// <summary>
         /// Language dat database
         /// </summary>
-        public DatDatabase Language { get; }
+        public DatDatabaseReader Language { get; }
 
         /// <summary>
         /// HighRes dat database
         /// </summary>
-        public DatDatabase HighRes { get; }
+        public DatDatabaseReader HighRes { get; }
 
         /// <summary>
         /// Create a new datmanager
@@ -43,25 +43,25 @@ namespace ACDatReader {
         public DatManager(Action<DatManagerOptions>? options = null, IDatBlockReader? blockReader = null) {
             options?.Invoke(Options);
 
-            Portal = new DatDatabase(portalOptions => {
+            Portal = new DatDatabaseReader(portalOptions => {
                 portalOptions.FilePath = Options.PortalDatPath;
                 portalOptions.PreloadFileEntries = Options.PreloadPortalFileEntries;
                 portalOptions.CacheDirectories = Options.CachePortalDirectories;
             }, blockReader);
 
-            Cell = new DatDatabase(cellOptions => {
+            Cell = new DatDatabaseReader(cellOptions => {
                 cellOptions.FilePath = Options.PortalDatPath;
                 cellOptions.PreloadFileEntries = Options.PreloadPortalFileEntries;
                 cellOptions.CacheDirectories = Options.CacheCellDirectories;
             }, blockReader);
 
-            Language = new DatDatabase(languageOptions => {
+            Language = new DatDatabaseReader(languageOptions => {
                 languageOptions.FilePath = Options.PortalDatPath;
                 languageOptions.PreloadFileEntries = Options.PreloadPortalFileEntries;
                 languageOptions.CacheDirectories = Options.CacheLanguageDirectories;
             }, blockReader);
 
-            HighRes = new DatDatabase(highResOptions => {
+            HighRes = new DatDatabaseReader(highResOptions => {
                 highResOptions.FilePath = Options.HighResDatPath;
                 highResOptions.PreloadFileEntries = Options.PreloadHighResFileEntries;
                 highResOptions.CacheDirectories = Options.CacheHighResDirectories;
