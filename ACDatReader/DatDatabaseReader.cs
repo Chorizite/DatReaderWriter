@@ -83,36 +83,38 @@ namespace ACDatReader {
 
             var buffer = sharedBytes.Rent(DatDirectoryEntry.SIZE);
 
+            Span<uint> node = [Header.RootBlock];
+            Span<int> track = [0, 0, 0];
+
             // @paradox logic
-            uint node = Header.RootBlock;
-            while (node != 0 && node != 0xcdcdcdcd) {
-                DatDirectoryEntry de = GetDirectoryEntry(node, ref buffer);
+            while (node[0] != 0 && node[0] != 0xcdcdcdcd) {
+                DatDirectoryEntry de = GetDirectoryEntry(node[0], ref buffer);
 
-                int l = 0;
-                int r = de.EntryCount - 1;
-                int i = 0;
+                track[0] = 0; // left
+                track[1] = de.EntryCount - 1; // right
+                track[2] = 0; // i
 
-                while (l <= r) {
-                    i = (l + r) / 2;
-                    fileEntry = de.Entries![i];
+                while (track[0] <= track[1]) {
+                    track[2] = (track[0] + track[1]) / 2;
+                    fileEntry = de.Entries![track[2]];
 
                     if (fileId == fileEntry.Id) {
                         sharedBytes.Return(buffer);
                         return true;
                     }
                     else if (fileId < fileEntry.Id)
-                        r = i - 1;
+                        track[1] = track[2] - 1;
                     else
-                        l = i + 1;
+                        track[0] = track[2] + 1;
                 }
 
                 if (de.IsLeaf)
                     break;
 
-                if (fileId > de.Entries![i].Id)
-                    i++;
+                if (fileId > de.Entries![track[2]].Id)
+                    track[2]++;
 
-                node = de.Branches![i];
+                node[0] = de.Branches![track[2]];
             }
 
             return false;

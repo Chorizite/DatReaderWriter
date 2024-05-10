@@ -56,6 +56,8 @@ namespace ACDatReader.Tests {
 
             var foundBytes = dat.TryGetFileBytes(fileId, out var bytes);
 
+            Console.WriteLine($"{fileId} bytes len is {bytes.Length / 1024:N2}KB");
+
             Assert.IsTrue(foundBytes);
             Assert.IsNotNull(bytes);
             Assert.IsTrue(bytes.Length > 0);
