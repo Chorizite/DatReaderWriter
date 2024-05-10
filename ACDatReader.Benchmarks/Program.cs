@@ -1,5 +1,4 @@
-﻿using ACDatReader.Benchmarks.Lib;
-using ACDatReader.IO;
+﻿using ACDatReader.IO;
 using ACDatReader.IO.BlockReaders;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
@@ -50,7 +49,7 @@ namespace ACDatReader.Benchmarks {
         [Params(0x01000001u, 0x06007569u, 0x0A00001Au)]
         public uint FileId { get; set; }
 
-        private DatDatabaseReader db = new DatDatabaseReader((options) => {
+        private readonly DatDatabaseReader db = new ((options) => {
             options.CacheDirectories = false;
             options.PreloadFileEntries = false;
         }, new MemoryMappedDatBlockReader(PortalFile));
