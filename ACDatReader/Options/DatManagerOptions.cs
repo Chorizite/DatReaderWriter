@@ -15,15 +15,10 @@ namespace ACDatReader.Options {
         private string? _languagePath;
         private string? _highResPath;
 
-        private bool? _preloadPortalFileEntries;
-        private bool? _preloadCelllFileEntries;
-        private bool? _preloadLanguageFileEntries;
-        private bool? _preloadHighResFileEntries;
-
-        private bool? _cachePortalDirectories;
-        private bool? _cacheCellDirectories;
-        private bool? _cacheLanguageDirectories;
-        private bool? _cacheHighResDirectories;
+        private IndexCachingStrategy? _portalIndexCachingStrategy;
+        private IndexCachingStrategy? _cellIndexCachingStrategy;
+        private IndexCachingStrategy? _languageIndexCachingStrategy;
+        private IndexCachingStrategy? _highresIndexCachingStrategy;
 
         /// <summary>
         /// The directory to read dats from.
@@ -50,82 +45,47 @@ namespace ACDatReader.Options {
         /// </summary>
         public string HighResDatFileName { get; set; } = @"client_highres.dat";
 
-        /// <inheritdoc cref="DatDatabaseOptions.PreloadFileEntries"/>
-        public bool PreloadFileEntries { get; set; } = true;
+        /// <inheritdoc cref="DatDatabaseOptions.IndexCachingStrategy"/>
+        public IndexCachingStrategy IndexCachingStrategy { get; set; } = IndexCachingStrategy.OnDemand;
 
-        /// <inheritdoc cref="DatDatabaseOptions.CacheDirectories"/>
-        public bool CacheDirectories { get; set; } = false;
-
-        /// <summary>
-        /// Set this option to non-null to override the default value of <see cref="PreloadFileEntries"/>
-        /// when loading the portal dat file.
-        /// </summary>
-        public bool PreloadPortalFileEntries {
-            get => _preloadPortalFileEntries ?? PreloadFileEntries;
-            set => _preloadPortalFileEntries = value;
+        /// <inheritdoc cref="DatDatabaseOptions.IndexCachingStrategy"/>
+        /// <remarks>
+        /// This overrides the file location index caching strategy for the portal dat file loaded
+        /// by the manager. If not set, defaults to using <see cref="IndexCachingStrategy"/>
+        /// </remarks>
+        public IndexCachingStrategy? PortalIndexCachingStrategy {
+            get => _portalIndexCachingStrategy ?? IndexCachingStrategy;
+            set => _portalIndexCachingStrategy = value;
         }
 
-        /// <summary>
-        /// Set this option to non-null to override the default value of <see cref="PreloadFileEntries"/>
-        /// when loading the cell dat file.
-        /// </summary>
-        public bool PreloadCellFileEntries {
-            get => _preloadCelllFileEntries ?? PreloadFileEntries;
-            set => _preloadCelllFileEntries = value;
+        /// <inheritdoc cref="DatDatabaseOptions.IndexCachingStrategy"/>
+        /// <remarks>
+        /// This overrides the file location index caching strategy for the cell dat file loaded
+        /// by the manager. If not set, defaults to using <see cref="IndexCachingStrategy"/>
+        /// </remarks>
+        public IndexCachingStrategy? CellIndexCachingStrategy {
+            get => _cellIndexCachingStrategy ?? IndexCachingStrategy;
+            set => _cellIndexCachingStrategy = value;
         }
 
-        /// <summary>
-        /// Set this option to non-null to override the default value of <see cref="PreloadFileEntries"/>
-        /// when loading the language dat file.
-        /// </summary>
-        public bool PreloadLanguageFileEntries {
-            get => _preloadLanguageFileEntries ?? PreloadFileEntries;
-            set => _preloadLanguageFileEntries = value;
+        /// <inheritdoc cref="DatDatabaseOptions.IndexCachingStrategy"/>
+        /// <remarks>
+        /// This overrides the file location index caching strategy for the language dat file loaded
+        /// by the manager. If not set, defaults to using <see cref="IndexCachingStrategy"/>
+        /// </remarks>
+        public IndexCachingStrategy? LanguageIndexCachingStratgey {
+            get => _languageIndexCachingStrategy ?? IndexCachingStrategy;
+            set => _languageIndexCachingStrategy = value;
         }
 
-        /// <summary>
-        /// Set this option to non-null to override the default value of <see cref="PreloadFileEntries"/>
-        /// when loading the highres dat file.
-        /// </summary>
-        public bool PreloadHighResFileEntries {
-            get => _preloadHighResFileEntries ?? PreloadFileEntries;
-            set => _preloadHighResFileEntries = value;
-        }
-
-        /// <summary>
-        /// Set this option to non-null to override the default value of <see cref="CacheDirectories"/>
-        /// when loading the portal dat file.
-        /// </summary>
-        public bool CachePortalDirectories {
-            get => _cachePortalDirectories ?? CacheDirectories;
-            set => _cachePortalDirectories = value;
-        }
-
-        /// <summary>
-        /// Set this option to non-null to override the default value of <see cref="CacheDirectories"/>
-        /// when loading the cell dat file.
-        /// </summary>
-        public bool CacheCellDirectories {
-            get => _cacheCellDirectories ?? CacheDirectories;
-            set => _cacheCellDirectories = value;
-        }
-
-        /// <summary>
-        /// Set this option to non-null to override the default value of <see cref="CacheDirectories"/>
-        /// when loading the language dat file.
-        /// </summary>
-        public bool CacheLanguageDirectories {
-            get => _cacheLanguageDirectories ?? CacheDirectories;
-            set => _cacheLanguageDirectories = value;
-        }
-
-        /// <summary>
-        /// Set this option to non-null to override the default value of <see cref="CacheDirectories"/>
-        /// when loading the highres dat file.
-        /// </summary>
-        public bool CacheHighResDirectories {
-            get => _cacheHighResDirectories ?? CacheDirectories;
-            set => _cacheHighResDirectories = value;
+        /// <inheritdoc cref="DatDatabaseOptions.IndexCachingStrategy"/>
+        /// <remarks>
+        /// This overrides the file location index caching strategy for the highres dat file loaded
+        /// by the manager. If not set, defaults to using <see cref="IndexCachingStrategy"/>
+        /// </remarks>
+        public IndexCachingStrategy? HighResIndexCachingStrategy {
+            get => _highresIndexCachingStrategy ?? IndexCachingStrategy;
+            set => _highresIndexCachingStrategy = value;
         }
 
         /// <summary>

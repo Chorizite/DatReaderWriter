@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -16,10 +17,10 @@ namespace ACDatReader.IO {
         public static readonly int SIZE = 400;
 
         /// <summary>
-        /// Version
+        /// Version string. Seems to be empty in all the dats.
         /// </summary>
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 256)]
-        public byte[] Version;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
+        public string Version;
 
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
         public byte[] Transactions;
@@ -47,19 +48,20 @@ namespace ACDatReader.IO {
         public DatDatabaseType Type;
 
         /// <summary>
-        /// Specific subset of the database <see cref="Type"/>
+        /// Specific subset of the database <see cref="Type"/>. For <see cref="DatDatabaseType.Cell"/>
+        /// databases this is the region id
         /// </summary>
-        public int SubSet;
+        public uint SubSet;
 
         /// <summary>
         /// The offset of the first free block in this file
         /// </summary>
-        public uint FirstFreeBlock;
+        public int FirstFreeBlock;
 
         /// <summary>
         /// The offset of the last free block in this file
         /// </summary>
-        public uint LastFreeBlock;
+        public int LastFreeBlock;
 
         /// <summary>
         /// The number of free blocks in this file
@@ -69,32 +71,31 @@ namespace ACDatReader.IO {
         /// <summary>
         /// The root block. This is where traversal starts.
         /// </summary>
-        public uint RootBlock;
+        public int RootBlock;
 
-        public uint NewLRU;
-        public uint OldLRU;
-        public uint UseLRU;
+        public int NewLRU;
+        public int OldLRU;
+        public bool UseLRU;
 
         /// <summary>
         /// The file id of the MasterMap
         /// </summary>
-        public uint MasterMapId;
+        public int MasterMapId;
 
         /// <summary>
         /// Engine Version
         /// </summary>
-        public uint EngineVersion;
+        public int EngineVersion;
 
         /// <summary>
         /// Game Version
         /// </summary>
-        public uint GameVersion;
+        public int GameVersion;
 
         /// <summary>
         /// Major Version
         /// </summary>
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
-        public byte[] MajorVersion;
+        public Guid MajorVersion;
 
         /// <summary>
         /// Minor Version
@@ -108,7 +109,7 @@ namespace ACDatReader.IO {
             var str = new StringBuilder();
 
             str.AppendLine($"Database Header:");
-            str.AppendLine($"\t Version: [{(Version is null ? "" : string.Join(" ", Version.Select(b => b.ToString("X2"))))}]");
+            str.AppendLine($"\t Version: {Version}");
             str.AppendLine($"\t Transactions: [{(Transactions is null ? "" : string.Join(" ", Transactions.Select(b => b.ToString("X2"))))}]");
             str.AppendLine($"\t Magic: {Magic:X8}");
             str.AppendLine($"\t BlockSize: {BlockSize}");
@@ -125,7 +126,7 @@ namespace ACDatReader.IO {
             str.AppendLine($"\t MasterMapId: {MasterMapId:X8}");
             str.AppendLine($"\t EngineVersion: {EngineVersion}");
             str.AppendLine($"\t GameVersion: {GameVersion}");
-            str.AppendLine($"\t MajorVersion: [{(MajorVersion is null ? "" : string.Join(" ", MajorVersion.Select(b => b.ToString("X2"))))}]");
+            str.AppendLine($"\t MajorVersion: {MajorVersion}");
             str.AppendLine($"\t MinorVersion: {MinorVersion}");
 
             return str.ToString();

@@ -1,7 +1,7 @@
 ﻿
 using System;
 using System.IO;
-using ACDatReader.IO;
+using ACDatReader.IO.BlockReaders;
 using ACDatReader.Options;
 
 namespace ACDatReader {
@@ -45,26 +45,22 @@ namespace ACDatReader {
 
             Portal = new DatDatabaseReader(portalOptions => {
                 portalOptions.FilePath = Options.PortalDatPath;
-                portalOptions.PreloadFileEntries = Options.PreloadPortalFileEntries;
-                portalOptions.CacheDirectories = Options.CachePortalDirectories;
+                portalOptions.IndexCachingStrategy = Options.IndexCachingStrategy;
             }, blockReader);
 
             Cell = new DatDatabaseReader(cellOptions => {
                 cellOptions.FilePath = Options.PortalDatPath;
-                cellOptions.PreloadFileEntries = Options.PreloadPortalFileEntries;
-                cellOptions.CacheDirectories = Options.CacheCellDirectories;
+                cellOptions.IndexCachingStrategy = Options.IndexCachingStrategy;
             }, blockReader);
 
             Language = new DatDatabaseReader(languageOptions => {
                 languageOptions.FilePath = Options.PortalDatPath;
-                languageOptions.PreloadFileEntries = Options.PreloadPortalFileEntries;
-                languageOptions.CacheDirectories = Options.CacheLanguageDirectories;
+                languageOptions.IndexCachingStrategy = Options.IndexCachingStrategy;
             }, blockReader);
 
             HighRes = new DatDatabaseReader(highResOptions => {
                 highResOptions.FilePath = Options.HighResDatPath;
-                highResOptions.PreloadFileEntries = Options.PreloadHighResFileEntries;
-                highResOptions.CacheDirectories = Options.CacheHighResDirectories;
+                highResOptions.IndexCachingStrategy = Options.IndexCachingStrategy;
             }, blockReader);
         }
 

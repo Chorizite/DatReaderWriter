@@ -1,7 +1,8 @@
 using ACDatReader.Enums;
-using ACDatReader.IO;
 using ACDatReader.IO.BlockReaders;
+using ACDatReader.Options;
 using ACDatReader.Tests.Lib;
+using System.Text;
 
 namespace ACDatReader.Tests {
     [TestClass]
@@ -34,8 +35,10 @@ namespace ACDatReader.Tests {
             ) {
 
             using var dat = new DatDatabaseReader(options => {
-                options.PreloadFileEntries = true;
+                options.IndexCachingStrategy = IndexCachingStrategy.Upfront;
             }, GetReaderInstance(blockReader, Path.Combine(DatDirectory, $"client_{datPath}.dat")));
+
+            Console.WriteLine(dat.Header);
 
             EORCommonData.AssertGoodHeader(dat.Header);
             EORCommonData.AssertGoodCaches(dat);
@@ -46,17 +49,14 @@ namespace ACDatReader.Tests {
         public void CanGetPortalFileBytes(
             [DataValues(BlockReaderType.MemoryMapped, BlockReaderType.FileStream)] BlockReaderType blockReader,
             [DataValues(0x06007569u, 0x01000001u, 0x0A00001Au)] uint fileId,
-            [DataValues(true, false)] bool preloadFileEntries
+            [DataValues(IndexCachingStrategy.Never, IndexCachingStrategy.OnDemand, IndexCachingStrategy.Upfront)] IndexCachingStrategy lookupCachingStrategy
             ) {
 
             using var dat = new DatDatabaseReader(options => {
-                options.PreloadFileEntries = preloadFileEntries;
+                options.IndexCachingStrategy = lookupCachingStrategy;
             }, GetReaderInstance(blockReader, Path.Combine(DatDirectory, $"client_portal.dat")));
 
-
             var foundBytes = dat.TryGetFileBytes(fileId, out var bytes);
-
-            Console.WriteLine($"{fileId} bytes len is {bytes.Length / 1024:N2}KB");
 
             Assert.IsTrue(foundBytes);
             Assert.IsNotNull(bytes);

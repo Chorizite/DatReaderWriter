@@ -18,33 +18,33 @@ namespace ACDatReader.Tests.Lib {
                     if (header.SubSet == 0) { // portal
                         Assert.AreEqual(0x00005442, header.Magic);
                         Assert.AreEqual(1024, header.BlockSize);
-                        Assert.AreEqual(110u, header.EngineVersion);
+                        Assert.AreEqual(110, header.EngineVersion);
                         Assert.AreEqual(6657u, header.MinorVersion);
-                        Assert.AreEqual(0, header.SubSet);
+                        Assert.AreEqual(0u, header.SubSet);
                     }
                     else { // highres
                         Assert.AreEqual(0x00005442, header.Magic);
                         Assert.AreEqual(1024, header.BlockSize);
-                        Assert.AreEqual(110u, header.EngineVersion);
+                        Assert.AreEqual(110, header.EngineVersion);
                         Assert.AreEqual(6657u, header.MinorVersion);
-                        Assert.AreEqual(1766222152, header.SubSet);
+                        Assert.AreEqual(1766222152u, header.SubSet);
                     }
                     break;
 
                 case DatDatabaseType.Cell:
                     Assert.AreEqual(0x00005442, header.Magic);
                     Assert.AreEqual(256, header.BlockSize);
-                    Assert.AreEqual(22u, header.EngineVersion);
+                    Assert.AreEqual(22, header.EngineVersion);
                     Assert.AreEqual(6657u, header.MinorVersion);
-                    Assert.AreEqual(1, header.SubSet);
+                    Assert.AreEqual(1u, header.SubSet);
                     break;
 
                 case DatDatabaseType.Language:
                     Assert.AreEqual(0x00005442, header.Magic);
                     Assert.AreEqual(1024, header.BlockSize);
-                    Assert.AreEqual(110u, header.EngineVersion);
+                    Assert.AreEqual(110, header.EngineVersion);
                     Assert.AreEqual(6657u, header.MinorVersion);
-                    Assert.AreEqual(1, header.SubSet);
+                    Assert.AreEqual(1u, header.SubSet);
                     break;
 
                 default:

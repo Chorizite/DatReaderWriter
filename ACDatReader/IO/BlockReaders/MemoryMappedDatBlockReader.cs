@@ -32,13 +32,13 @@ namespace ACDatReader.IO.BlockReaders {
             _view.SafeMemoryMappedViewHandle.AcquirePointer(ref _viewPtr);
         }
 
-        /// <inheritdoc cref="IDatBlockReader.ReadBytes(ref byte[], uint, int)"/>
-        public void ReadBytes(ref byte[] buffer, uint blockOffset, int numBytes) {
+        /// <inheritdoc cref="IDatBlockReader.ReadBytes(byte[], int, int)"/>
+        public void ReadBytes(byte[] buffer, int blockOffset, int numBytes) {
             new ReadOnlySpan<byte>(_viewPtr + blockOffset, numBytes).CopyTo(buffer);
         }
 
-        /// <inheritdoc cref="IDatBlockReader.ReadBlocks(ref byte[], uint, int)"/>
-        public void ReadBlocks(ref byte[] buffer, uint startingBlock, int blockSize) {
+        /// <inheritdoc cref="IDatBlockReader.ReadBlocks(byte[], int, int)"/>
+        public void ReadBlocks(byte[] buffer, int startingBlock, int blockSize) {
             var nextBlockBuffer = stackalloc byte[4];
             Span<int> bufferStatsSpan = [0, 0];
 
@@ -53,7 +53,7 @@ namespace ACDatReader.IO.BlockReaders {
                 }
 
                 Buffer.MemoryCopy(_viewPtr + startingBlock, nextBlockBuffer, 4, 4);
-                startingBlock = BinaryPrimitives.ReadUInt32LittleEndian(new ReadOnlySpan<byte>(nextBlockBuffer, 4));
+                startingBlock = BinaryPrimitives.ReadInt32LittleEndian(new ReadOnlySpan<byte>(nextBlockBuffer, 4));
 
                 bufferStatsSpan[0] += bufferStatsSpan[1];
             }

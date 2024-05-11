@@ -19,12 +19,12 @@ namespace ACDatReader.IO {
         /// <summary>
         /// The offset in the dat
         /// </summary>
-        public uint Offset;
+        public int Offset;
 
         /// <summary>
         /// Directory branches, if any
         /// </summary>
-        public uint[]? Branches;
+        public int[]? Branches;
 
         /// <summary>
         /// Number of File entries directly in this directory
@@ -47,16 +47,16 @@ namespace ACDatReader.IO {
         /// <param name="buffer">The buffer to unpack from</param>
         /// <returns>True if successfull</returns>
         unsafe public bool Unpack(ReadOnlySpan<byte> buffer) {
-            Span<uint> branches = stackalloc uint[62];
+            Span<int> branches = stackalloc int[62];
             Span<int> iSpan = stackalloc int[1];
             for (iSpan[0] = 0; iSpan[0] < 62; iSpan[0]++) {
-                branches[iSpan[0]] = BinaryPrimitives.ReadUInt32LittleEndian(buffer.Slice(iSpan[0] * 4, 4));
+                branches[iSpan[0]] = BinaryPrimitives.ReadInt32LittleEndian(buffer.Slice(iSpan[0] * 4, 4));
             }
 
             EntryCount = BinaryPrimitives.ReadInt32LittleEndian(buffer.Slice(248, 4));
 
             if (branches[0] != 0) {
-                Branches = new uint[EntryCount + 1];
+                Branches = new int[EntryCount + 1];
                 branches.Slice(0, EntryCount + 1).CopyTo(Branches);
             }
 

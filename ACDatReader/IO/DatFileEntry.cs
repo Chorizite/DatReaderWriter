@@ -27,7 +27,7 @@ namespace ACDatReader.IO {
         /// <summary>
         /// The offset in the dat file of the first block containing this files data
         /// </summary>
-        public uint Offset;
+        public int Offset;
 
         /// <summary>
         /// The total size of this file data. If greater than DatHeader.BlockSize - 4 then
@@ -38,12 +38,12 @@ namespace ACDatReader.IO {
         /// <summary>
         /// The dat this was last updated (maybe added?) in unix timestamp format
         /// </summary>
-        public uint Date;
+        public int Date;
 
         /// <summary>
         /// The iteration of this file entry
         /// </summary>
-        public uint Iteration;
+        public int Iteration;
 
         /// <summary>
         /// debug string output

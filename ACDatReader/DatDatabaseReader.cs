@@ -14,7 +14,7 @@ namespace ACDatReader {
         private readonly static ArrayPool<byte> sharedBytes = ArrayPool<byte>.Shared;
 
         private readonly Dictionary<uint, DatFileEntry> _fileEntryCache = [];
-        private readonly Dictionary<uint, DatDirectoryEntry> _directoryCache = [];
+        private readonly Dictionary<int, DatDirectoryEntry> _directoryCache = [];
         private readonly IDatBlockReader _blockReader;
 
         /// <summary>
@@ -27,7 +27,7 @@ namespace ACDatReader {
         /// will be null unless <see cref="DatDatabaseOptions.CacheDirectories"/> was
         /// set to true.
         /// </summary>
-        public IReadOnlyDictionary<uint, DatDirectoryEntry>? DirectoryCache => _directoryCache;
+        public IReadOnlyDictionary<int, DatDirectoryEntry>? DirectoryCache => _directoryCache;
 
         /// <summary>
         /// All dat file entries currently in the cache. Key is the file id.
@@ -62,7 +62,7 @@ namespace ACDatReader {
         public bool TryGetFileBytes(uint fileId, out byte[]? bytes) {
             if (TryGetFileEntry(fileId, out var fileEntry)) {
                 bytes = new byte[fileEntry.Size];
-                _blockReader.ReadBlocks(ref bytes, fileEntry.Offset, Header.BlockSize);
+                _blockReader.ReadBlocks(bytes, fileEntry.Offset, Header.BlockSize);
                 return true;
             }
 
@@ -77,13 +77,13 @@ namespace ACDatReader {
         /// <param name="fileEntry">The file entry, if it exists</param>
         /// <returns>True if a file entry with the specific <paramref name="fileId"/> was found, false otherwise</returns>
         public bool TryGetFileEntry(uint fileId, out DatFileEntry fileEntry) {
-            if (_fileEntryCache.TryGetValue(fileId, out fileEntry)) {
+            if (Options.IndexCachingStrategy >= IndexCachingStrategy.OnDemand && _fileEntryCache.TryGetValue(fileId, out fileEntry)) {
                 return true;
             }
 
             var buffer = sharedBytes.Rent(DatDirectoryEntry.SIZE);
 
-            Span<uint> node = [Header.RootBlock];
+            Span<int> node = [Header.RootBlock];
             Span<int> track = [0, 0, 0];
 
             // @paradox logic
@@ -117,13 +117,15 @@ namespace ACDatReader {
                 node[0] = de.Branches![track[2]];
             }
 
+            sharedBytes.Return(buffer);
+            fileEntry = new();
             return false;
         }
 
         private void Init() {
             InitHeader();
 
-            if (Options.PreloadFileEntries) {
+            if (Options.IndexCachingStrategy == IndexCachingStrategy.Upfront) {
                 var buffer = sharedBytes.Rent(DatDirectoryEntry.SIZE);
                 PreloadFileEntries(Header.RootBlock, ref buffer);
                 sharedBytes.Return(buffer);
@@ -132,7 +134,7 @@ namespace ACDatReader {
 
         unsafe private void InitHeader() {
             var buffer = sharedBytes.Rent(DatHeader.SIZE);
-            _blockReader.ReadBytes(ref buffer, 0, DatHeader.SIZE);
+            _blockReader.ReadBytes(buffer, 0, DatHeader.SIZE);
 
             fixed (byte* pData = &buffer[0]) {
                 Header = Marshal.PtrToStructure<DatHeader>((nint)pData);
@@ -142,34 +144,30 @@ namespace ACDatReader {
         }
 
         private void InitCaches() {
-            if (Options.CacheDirectories) {
-                // todo: what's a good size here...
-                _directoryCache.EnsureCapacity(256);
-            }
+            // todo: what's a good size here...
+            _directoryCache.EnsureCapacity(256);
 
-            if (Options.PreloadFileEntries) {
-                // init cache size smartly, based on dat type
-                switch (Header.Type) {
-                    case DatDatabaseType.Portal:
-                        if (Header.SubSet == 0) { // portal
-                            _fileEntryCache.EnsureCapacity(80000);
-                        }
-                        else { // highres
-                            _fileEntryCache.EnsureCapacity(3000);
-                        }
-                        break;
-                    case DatDatabaseType.Cell:
-                        _fileEntryCache.EnsureCapacity(806000);
-                        break;
-                    default: // language
-                        _fileEntryCache.EnsureCapacity(150);
-                        break;
-                }
+            // init cache size smartly, based on dat type
+            switch (Header.Type) {
+                case DatDatabaseType.Portal:
+                    if (Header.SubSet == 0) { // portal
+                        _fileEntryCache.EnsureCapacity(80000);
+                    }
+                    else { // highres
+                        _fileEntryCache.EnsureCapacity(3000);
+                    }
+                    break;
+                case DatDatabaseType.Cell:
+                    _fileEntryCache.EnsureCapacity(806000);
+                    break;
+                default: // language
+                    _fileEntryCache.EnsureCapacity(150);
+                    break;
             }
         }
 
-        private DatDirectoryEntry GetDirectoryEntry(uint offset, ref byte[] buffer) {
-            if (Options.CacheDirectories && _directoryCache.TryGetValue(offset, out var dirEntry)) {
+        private DatDirectoryEntry GetDirectoryEntry(int offset, ref byte[] buffer) {
+            if (Options.IndexCachingStrategy >= IndexCachingStrategy.OnDemand && _directoryCache.TryGetValue(offset, out var dirEntry)) {
                 return dirEntry;
             }
 
@@ -177,24 +175,24 @@ namespace ACDatReader {
                 Offset = offset
             };
 
-            _blockReader.ReadBlocks(ref buffer, offset, Header.BlockSize);
+            _blockReader.ReadBlocks(buffer, offset, Header.BlockSize);
             dirEntry.Unpack(buffer);
 
-            if (Options.CacheDirectories) {
+            if (Options.IndexCachingStrategy >= IndexCachingStrategy.OnDemand) {
                 _directoryCache.Add(offset, dirEntry);
+
+                if (dirEntry.Entries is not null) {
+                    foreach (var entry in dirEntry.Entries) {
+                        _fileEntryCache.Add(entry.Id, entry);
+                    }
+                }
             }
 
             return dirEntry;
         }
 
-        private void PreloadFileEntries(uint directoryOffset, ref byte[] buffer) {
+        private void PreloadFileEntries(int directoryOffset, ref byte[] buffer) {
             var dirEntry = GetDirectoryEntry(directoryOffset, ref buffer);
-
-            if (dirEntry.Entries is not null) {
-                foreach (var entry in dirEntry.Entries) {
-                    _fileEntryCache.Add(entry.Id, entry);
-                }
-            }
 
             if (!dirEntry.IsLeaf && dirEntry.Branches is not null) {
                 foreach (var branch in dirEntry.Branches) {
