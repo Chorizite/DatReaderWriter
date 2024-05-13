@@ -76,13 +76,23 @@ namespace ACDatReader.IO {
         /// </summary>
         public int RootBlock;
 
+        /// <summary>
+        /// Something to do with LastRecentlyUsed cache.
+        /// Currently unsupported.
+        /// </summary>
         public int NewLRU;
+
+        /// <summary>
+        /// Something to do with LastRecentlyUsed cache.
+        /// Currently unsupported.
+        /// </summary>
         public int OldLRU;
 
         /// <summary>
         /// Wether to use the LastRecentlyUsed cache. I think when this is enabled,
         /// the underlying dat file is of a fixed size and should not be expanded.
         /// So you must replace oldest files when writing new ones.
+        /// Currently unsupported.
         /// </summary>
         public int UseLRU;
 

@@ -16,7 +16,7 @@ namespace ACDatReader.IO {
         public int Offset => _offset;
 
         /// <summary>
-        /// Create a new instance of this DatFileReader
+        /// Create a new instance
         /// </summary>
         /// <param name="data">The file data being parsed</param>
         public DatFileReader(ReadOnlyMemory<byte> data) {
@@ -37,7 +37,7 @@ namespace ACDatReader.IO {
         }
 
         /// <summary>
-        /// Read the specified number of bytes
+        /// Read the specified number of bytes and advance the buffer position accordingly
         /// </summary>
         /// <param name="count">The number of bytes to read</param>
         /// <returns>The bytes that were read</returns>

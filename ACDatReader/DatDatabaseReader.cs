@@ -36,17 +36,6 @@ namespace ACDatReader {
         }
 
         /// <summary>
-        /// Try to get the byte contents of a file
-        /// </summary>
-        /// <param name="fileId">The id of the file to get</param>
-        /// <param name="bytes">The bytes that were found, if any.</param>
-        /// <returns>True if the file bytes were found, false otherwise</returns>
-        public bool TryGetFileBytes(uint fileId, out byte[]? bytes) {
-            bytes = null;
-            return false;
-        }
-
-        /// <summary>
         /// Dispose
         /// </summary>
         public void Dispose() {

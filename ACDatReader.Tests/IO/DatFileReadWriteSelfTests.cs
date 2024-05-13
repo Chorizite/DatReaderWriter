@@ -40,7 +40,6 @@ namespace ACDatReader.Tests.IO {
             writer.Skip(4);
             writer.WriteUInt32(1);
             writer.WriteInt32(-1);
-            var bSpan = new Span<byte>(bytes);
 
             var reader = new DatFileReader(bytes);
             reader.Skip(4);

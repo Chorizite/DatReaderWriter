@@ -50,7 +50,6 @@ namespace ACDatReader.IO {
             BinaryPrimitives.WriteInt32LittleEndian(GetSpanAndAdvanceOffset(4), value);
         }
 
-
         /// <summary>
         /// Write an uint32 and advance the buffer position accordingly
         /// </summary>
