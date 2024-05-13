@@ -108,7 +108,7 @@ namespace ACDatReader.Tests.IO.BlockAllocators {
             allocator.WriteBytes(bytes, 0, bytes.Length);
 
             var readBuffer = new byte[bytes.Length];
-            allocator.ReadBytes(readBuffer, 0, readBuffer.Length);
+            allocator.ReadBytes(readBuffer, 0, 0, readBuffer.Length);
             CollectionAssert.AreEqual(bytes, readBuffer);
 
             allocator.Dispose();
@@ -118,8 +118,43 @@ namespace ACDatReader.Tests.IO.BlockAllocators {
                 AccessType = Options.DatAccessType.Read
             });
 
-            allocator.ReadBytes(readBuffer, 0, readBuffer.Length);
+            allocator.ReadBytes(readBuffer, 0, 0, readBuffer.Length);
             CollectionAssert.AreEqual(bytes, readBuffer);
+
+            allocator.Dispose();
+
+            File.Delete(file);
+        }
+
+        [TestMethod]
+        [CombinatorialData]
+        public void CanAllocateEmptyBlocks(
+            [DataValues(256, 1024)] int blockSize,
+            [DataValues(1, 2, 1_000, 10_000)] int numBlocksToAllocate
+            ) {
+            var file = Path.GetTempFileName();
+            var allocator = new MemoryMappedBlockAllocator(new Options.DatDatabaseOptions() {
+                FilePath = file,
+                AccessType = Options.DatAccessType.ReadWrite
+            });
+
+            Assert.IsFalse(allocator.HasHeaderData);
+            allocator.InitNew(DatDatabaseType.Portal, 0, blockSize, 0);
+
+            Assert.AreEqual(0, allocator.Header.FreeBlockCount);
+
+            allocator.AllocateEmptyBlocks(numBlocksToAllocate);
+
+            Assert.AreEqual(numBlocksToAllocate, allocator.Header.FreeBlockCount);
+
+            allocator.Dispose();
+
+            allocator = new MemoryMappedBlockAllocator(new Options.DatDatabaseOptions() {
+                FilePath = file,
+                AccessType = Options.DatAccessType.Read
+            });
+
+            Assert.AreEqual(numBlocksToAllocate, allocator.Header.FreeBlockCount);
 
             allocator.Dispose();
 

@@ -70,7 +70,7 @@ namespace ACDatReader.IO.BlockAllocators {
         /// </summary>
         protected void TryReadHeader() {
             var buffer = SharedBytes.Rent(DatHeader.SIZE);
-            ReadBytes(buffer, 0, DatHeader.SIZE);
+            ReadBytes(buffer, 0, 0, DatHeader.SIZE);
             Header.Unpack(new DatFileReader(buffer));
             SharedBytes.Return(buffer);
 
@@ -144,7 +144,7 @@ namespace ACDatReader.IO.BlockAllocators {
         public abstract int WriteBlock(byte[] buffer, int numBytes, int startingBlock = -1);
 
         /// <inheritdoc/>
-        public abstract void ReadBytes(byte[] buffer, int byteOffset, int numBytes);
+        public abstract void ReadBytes(byte[] buffer, int bufferOffset, int byteOffset, int numBytes);
 
         /// <inheritdoc/>
         public abstract void ReadBlock(byte[] buffer, int startingBlock);

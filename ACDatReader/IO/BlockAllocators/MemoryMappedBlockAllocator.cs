@@ -44,7 +44,7 @@ namespace ACDatReader.IO.BlockAllocators {
         }
 
         /// <inheritdoc/>
-        public override int WriteBlock(byte[] buffer, int numBytes, int startingBlock = -1) {
+        public override int WriteBlock(byte[] buffer, int numBytes, int startingBlock = 0) {
             startingBlock = startingBlock > 0 ? startingBlock : ReserveBlock();
 
             var currentBlockBuffer = stackalloc byte[4];
@@ -76,8 +76,8 @@ namespace ACDatReader.IO.BlockAllocators {
         }
 
         /// <inheritdoc/>
-        public override void ReadBytes(byte[] buffer, int byteOffset, int numBytes) {
-            new ReadOnlySpan<byte>(_viewPtr + byteOffset, numBytes).CopyTo(buffer);
+        public override void ReadBytes(byte[] buffer, int bufferOffset, int byteOffset, int numBytes) {
+            new ReadOnlySpan<byte>(_viewPtr + byteOffset, numBytes).CopyTo(buffer.AsSpan().Slice(bufferOffset, numBytes));
         }
 
         /// <inheritdoc/>

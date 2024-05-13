@@ -52,22 +52,24 @@ namespace ACDatReader.IO.BlockAllocators {
         void WriteBytes(byte[] buffer, int byteOffset, int numBytes);
 
         /// <summary>
-        /// Write a buffers contents to unused block space, or optionally
-        /// provide a starting block.
+        /// Write a buffers contents to unused block space, optionally
+        /// providing a starting block. If the provided starting block is
+        /// &lt;= 0 (default) a new block will be found or allocated automatically.
         /// </summary>
         /// <param name="buffer">The buffer to write</param>
         /// <param name="numBytes">The number of bytes to write</param>
         /// <param name="startingBlock">The starting block to use, or -1 to find an empty block</param>
         /// <returns>The offset of the newly written starting block</returns>
-        int WriteBlock(byte[] buffer, int numBytes, int startingBlock = -1);
+        int WriteBlock(byte[] buffer, int numBytes, int startingBlock = 0);
 
         /// <summary>
-        /// Read contiguous bytes directly from a dat file
+        /// Fills a buffer with contiguous data from a dat file.
         /// </summary>
         /// <param name="buffer">The buffer to read into</param>
-        /// <param name="byteOffset">The starting byte offset in the dat file</param>
+        /// <param name="bufferOffset">The offset into the buffer to start writing</param>
+        /// <param name="datOffset">The starting byte offset in the dat file to read from</param>
         /// <param name="numBytes">The number of bytes to read</param>
-        void ReadBytes(byte[] buffer, int byteOffset, int numBytes);
+        void ReadBytes(byte[] buffer, int bufferOffset, int datOffset, int numBytes);
 
         /// <summary>
         /// Read a block's data into a buffer

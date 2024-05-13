@@ -28,6 +28,14 @@ namespace ACDatReader.IO {
         }
 
         /// <summary>
+        /// Advance the buffer position without writing any data
+        /// </summary>
+        /// <param name="numBytes">The number of bytes to skip</param>
+        public void Skip(int numBytes) {
+            _offset += numBytes;
+        }
+
+        /// <summary>
         /// Write the specified number of bytes and advance the buffer position accordingly
         /// </summary>
         public void WriteBytes(byte[] buffer, int numBytes) {
