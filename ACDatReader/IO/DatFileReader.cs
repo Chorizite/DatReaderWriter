@@ -11,6 +11,11 @@ namespace ACDatReader.IO {
         private int _offset;
 
         /// <summary>
+        /// The current offset into the buffer
+        /// </summary>
+        public int Offset => _offset;
+
+        /// <summary>
         /// Create a new instance of this DatFileReader
         /// </summary>
         /// <param name="data">The file data being parsed</param>

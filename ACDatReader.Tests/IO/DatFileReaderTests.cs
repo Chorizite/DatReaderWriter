@@ -20,9 +20,16 @@ namespace ACDatReader.Tests.IO {
 
             var reader = new DatFileReader(bytes);
 
+            Assert.AreEqual(0, reader.Offset);
+
             Assert.AreEqual(1u, reader.ReadUInt32());
+            Assert.AreEqual(4, reader.Offset);
+
             Assert.AreEqual(-1, reader.ReadInt32());
+            Assert.AreEqual(8, reader.Offset);
+
             Assert.AreEqual(0u, reader.ReadUInt32());
+            Assert.AreEqual(12, reader.Offset);
         }
 
         [TestMethod]
@@ -34,9 +41,17 @@ namespace ACDatReader.Tests.IO {
             BinaryPrimitives.WriteUInt32LittleEndian(bSpan.Slice(8), 0);
 
             var reader = new DatFileReader(bytes);
+
+            Assert.AreEqual(0, reader.Offset);
+
             reader.Skip(4);
+            Assert.AreEqual(4, reader.Offset);
+
             Assert.AreEqual(-1, reader.ReadInt32());
+            Assert.AreEqual(8, reader.Offset);
+
             Assert.AreEqual(0u, reader.ReadUInt32());
+            Assert.AreEqual(12, reader.Offset);
         }
 
         [TestMethod]
@@ -46,8 +61,10 @@ namespace ACDatReader.Tests.IO {
             BinaryPrimitives.WriteUInt32LittleEndian(bytes, number);
 
             var reader = new DatFileReader(bytes);
+            Assert.AreEqual(0, reader.Offset);
 
             Assert.AreEqual(number, reader.ReadUInt32());
+            Assert.AreEqual(4, reader.Offset);
         }
 
         [TestMethod]
@@ -57,8 +74,10 @@ namespace ACDatReader.Tests.IO {
             BinaryPrimitives.WriteInt32LittleEndian(bytes, number);
 
             var reader = new DatFileReader(bytes);
+            Assert.AreEqual(0, reader.Offset);
 
             Assert.AreEqual(number, reader.ReadInt32());
+            Assert.AreEqual(4, reader.Offset);
         }
 
         [TestMethod]
@@ -67,7 +86,10 @@ namespace ACDatReader.Tests.IO {
             Random.Shared.NextBytes(bytes);
 
             var reader = new DatFileReader(bytes);
+            Assert.AreEqual(0, reader.Offset);
+
             var readBytes = reader.ReadBytes(bytes.Length);
+            Assert.AreEqual(bytes.Length, reader.Offset);
 
             CollectionAssert.AreEqual(bytes, readBytes);
         }

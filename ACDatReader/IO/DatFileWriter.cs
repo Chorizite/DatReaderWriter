@@ -10,9 +10,9 @@ namespace ACDatReader.IO {
         private int _offset;
 
         /// <summary>
-        /// The length of the buffer that was used, in bytes
+        /// The current offset into the buffer
         /// </summary>
-        public int Length => _offset;
+        public int Offset => _offset;
 
         /// <summary>
         /// Create a new instance of this DatFileWriter
@@ -22,7 +22,7 @@ namespace ACDatReader.IO {
             _data = data;
         }
 
-        unsafe private Span<byte> GetAndAdvanceOffset(int numBytes) {
+        unsafe private Span<byte> GetSpanAndAdvanceOffset(int numBytes) {
             _offset += numBytes;
             return _data.Span.Slice(_offset - numBytes, numBytes);
         }
@@ -39,7 +39,7 @@ namespace ACDatReader.IO {
         /// Write the specified number of bytes and advance the buffer position accordingly
         /// </summary>
         public void WriteBytes(byte[] buffer, int numBytes) {
-            buffer.AsSpan().Slice(0, numBytes).CopyTo(GetAndAdvanceOffset(numBytes));
+            buffer.AsSpan().Slice(0, numBytes).CopyTo(GetSpanAndAdvanceOffset(numBytes));
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace ACDatReader.IO {
         /// </summary>
         /// <returns></returns>
         public void WriteInt32(int value) {
-            BinaryPrimitives.WriteInt32LittleEndian(GetAndAdvanceOffset(4), value);
+            BinaryPrimitives.WriteInt32LittleEndian(GetSpanAndAdvanceOffset(4), value);
         }
 
 
@@ -56,7 +56,7 @@ namespace ACDatReader.IO {
         /// </summary>
         /// <returns></returns>
         public void WriteUInt32(uint value) {
-            BinaryPrimitives.WriteUInt32LittleEndian(GetAndAdvanceOffset(4), value);
+            BinaryPrimitives.WriteUInt32LittleEndian(GetSpanAndAdvanceOffset(4), value);
         }
     }
 }

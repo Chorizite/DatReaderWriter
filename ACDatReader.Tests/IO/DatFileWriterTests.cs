@@ -19,16 +19,16 @@ namespace ACDatReader.Tests.IO {
             var randomBytes = new byte[4];
             Random.Shared.NextBytes(randomBytes);
 
-            Assert.AreEqual(writer.Length, 0);
+            Assert.AreEqual(0, writer.Offset);
 
             writer.WriteUInt32(1);
-            Assert.AreEqual(writer.Length, 4);
+            Assert.AreEqual(4, writer.Offset);
 
             writer.WriteInt32(-1);
-            Assert.AreEqual(writer.Length, 8);
+            Assert.AreEqual(8, writer.Offset);
 
             writer.WriteBytes(randomBytes, 4);
-            Assert.AreEqual(writer.Length, 12);
+            Assert.AreEqual(12, writer.Offset);
 
             var bSpan = new Span<byte>(bytes);
 
@@ -42,16 +42,16 @@ namespace ACDatReader.Tests.IO {
             var bytes = new byte[12];
 
             var writer = new DatFileWriter(bytes);
-            Assert.AreEqual(writer.Length, 0);
+            Assert.AreEqual(0, writer.Offset);
 
             writer.Skip(4);
-            Assert.AreEqual(writer.Length, 4);
+            Assert.AreEqual(4, writer.Offset);
 
             writer.WriteUInt32(1);
-            Assert.AreEqual(writer.Length, 8);
+            Assert.AreEqual(8, writer.Offset);
 
             writer.WriteInt32(-1);
-            Assert.AreEqual(writer.Length, 12);
+            Assert.AreEqual(12, writer.Offset);
 
             var bSpan = new Span<byte>(bytes);
 
@@ -65,9 +65,9 @@ namespace ACDatReader.Tests.IO {
             var bytes = new byte[4];
             var writer = new DatFileWriter(bytes);
 
-            Assert.AreEqual(writer.Length, 0);
+            Assert.AreEqual(0, writer.Offset);
             writer.WriteUInt32(number);
-            Assert.AreEqual(writer.Length, 4);
+            Assert.AreEqual(4, writer.Offset);
 
             Assert.AreEqual(number, BinaryPrimitives.ReadUInt32LittleEndian(bytes));
         }
@@ -78,9 +78,9 @@ namespace ACDatReader.Tests.IO {
             var bytes = new byte[4];
             var writer = new DatFileWriter(bytes);
 
-            Assert.AreEqual(writer.Length, 0);
+            Assert.AreEqual(0, writer.Offset);
             writer.WriteInt32(number);
-            Assert.AreEqual(writer.Length, 4);
+            Assert.AreEqual(4, writer.Offset);
 
             Assert.AreEqual(number, BinaryPrimitives.ReadInt32LittleEndian(bytes));
         }
@@ -93,9 +93,9 @@ namespace ACDatReader.Tests.IO {
 
             var writer = new DatFileWriter(randomBytes);
 
-            Assert.AreEqual(writer.Length, 0);
-            writer.WriteBytes(bytes, 100);
-            Assert.AreEqual(writer.Length, 100);
+            Assert.AreEqual(0, writer.Offset);
+            writer.WriteBytes(bytes, randomBytes.Length);
+            Assert.AreEqual(randomBytes.Length, writer.Offset);
 
             CollectionAssert.AreEqual(randomBytes, bytes);
         }
