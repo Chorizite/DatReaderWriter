@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ACDatReader.Options {
+﻿namespace ACDatReader.Options {
     /// <summary>
     /// The strategy for caching file indexes
     /// </summary>

@@ -1,4 +1,4 @@
-﻿using ACDatReader.IO.BlockReaders;
+﻿
 using ACDatReader.Options;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
@@ -8,16 +8,18 @@ using BenchmarkDotNet.Running;
 namespace ACDatReader.Benchmarks {
     public class Program {
         static void Main() {
-            BenchmarkRunner.Run<DatFileEntryCaching>();
+            //BenchmarkRunner.Run<DatFileEntryCaching>();
             //BenchmarkRunner.Run<PortalDatFileFetching>();
             //BenchmarkRunner.Run<CellDatFileFetching>();
         }
     }
+
     public enum BlockReaderType {
         MemoryMapped,
         FileStream
     }
 
+    /*
     [MemoryDiagnoser]
     [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
     public class DatFileEntryCaching {
@@ -115,4 +117,5 @@ namespace ACDatReader.Benchmarks {
             }
         }
     }
+    */
 }

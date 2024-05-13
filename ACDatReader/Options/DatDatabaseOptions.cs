@@ -1,6 +1,6 @@
 ﻿namespace ACDatReader.Options {
     /// <summary>
-    /// <see cref="ACDatReader.DatDatabaseReader"/> Options
+    /// <see cref="ACDatReader.IO.BlockAllocators.BaseBlockAllocator"/> Options
     /// </summary>
     public class DatDatabaseOptions {
         /// <summary>
@@ -12,5 +12,10 @@
         /// The file location index caching strategy to use.
         /// </summary>
         public IndexCachingStrategy IndexCachingStrategy { get; set; } = IndexCachingStrategy.OnDemand;
+
+        /// <summary>
+        /// The type of access to use when opening the dat file.
+        /// </summary>
+        public DatAccessType AccessType { get; set; } = DatAccessType.Read;
     }
 }

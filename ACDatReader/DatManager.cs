@@ -1,7 +1,6 @@
 ﻿
 using System;
-using System.IO;
-using ACDatReader.IO.BlockReaders;
+using ACDatReader.IO.BlockAllocators;
 using ACDatReader.Options;
 
 namespace ACDatReader {
@@ -39,29 +38,29 @@ namespace ACDatReader {
         /// Create a new datmanager
         /// </summary>
         /// <param name="options">Options configuration action</param>
-        /// <param name="blockReader">An instance of a block reader to use</param>
-        public DatManager(Action<DatManagerOptions>? options = null, IDatBlockReader? blockReader = null) {
+        /// <param name="blockAllocator">An instance of a block allocator to use</param>
+        public DatManager(Action<DatManagerOptions>? options = null, IDatBlockAllocator? blockAllocator = null) {
             options?.Invoke(Options);
 
             Portal = new DatDatabaseReader(portalOptions => {
                 portalOptions.FilePath = Options.PortalDatPath;
                 portalOptions.IndexCachingStrategy = Options.IndexCachingStrategy;
-            }, blockReader);
+            }, blockAllocator);
 
             Cell = new DatDatabaseReader(cellOptions => {
                 cellOptions.FilePath = Options.PortalDatPath;
                 cellOptions.IndexCachingStrategy = Options.IndexCachingStrategy;
-            }, blockReader);
+            }, blockAllocator);
 
             Language = new DatDatabaseReader(languageOptions => {
                 languageOptions.FilePath = Options.PortalDatPath;
                 languageOptions.IndexCachingStrategy = Options.IndexCachingStrategy;
-            }, blockReader);
+            }, blockAllocator);
 
             HighRes = new DatDatabaseReader(highResOptions => {
                 highResOptions.FilePath = Options.HighResDatPath;
                 highResOptions.IndexCachingStrategy = Options.IndexCachingStrategy;
-            }, blockReader);
+            }, blockAllocator);
         }
 
         /// <summary>

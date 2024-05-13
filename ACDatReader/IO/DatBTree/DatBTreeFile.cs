@@ -1,13 +1,12 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
 using System.Text;
 
-namespace ACDatReader.IO {
+namespace ACDatReader.IO.DatBTree {
     /// <summary>
     /// A dat file entry. This points to where dat files are stored in the dat,
     /// as well as some other meta data.
     /// </summary>
-    [StructLayout(LayoutKind.Sequential)]
-    public struct DatFileEntry {
+    public class DatBTreeFile : IComparable, IPackable, IUnpackable {
         /// <summary>
         /// The size of this struct
         /// </summary>
@@ -16,38 +15,65 @@ namespace ACDatReader.IO {
         /// <summary>
         /// Some kind of flags?
         /// </summary>
-        public uint Flags;
+        public uint Flags { get; set; }
 
         /// <summary>
         /// The id of the file this entry points to. These are dat file ids like
         /// 0x05000001 for textures as an example.
         /// </summary>
-        public uint Id;
+        public uint Id { get; set; }
 
         /// <summary>
         /// The offset in the dat file of the first block containing this files data
         /// </summary>
-        public int Offset;
+        public int Offset { get; set; }
 
         /// <summary>
         /// The total size of this file data. If greater than DatHeader.BlockSize - 4 then
         /// this spans `ceil(Size / (DatHeader.BlockSize - 4))` blocks.
         /// </summary>
-        public uint Size;
+        public uint Size { get; set; }
 
         /// <summary>
         /// The dat this was last updated (maybe added?) in unix timestamp format
         /// </summary>
-        public int Date;
+        public int Date { get; set; }
 
         /// <summary>
         /// The iteration of this file entry
         /// </summary>
-        public int Iteration;
+        public int Iteration { get; set; }
 
-        /// <summary>
-        /// debug string output
-        /// </summary>
+        /// <inheritdoc/>
+        public int CompareTo(object? obj) {
+            return Id.CompareTo(obj);
+        }
+
+        /// <inheritdoc/>
+        public bool Unpack(DatFileReader reader) {
+            Flags = reader.ReadUInt32();
+            Id = reader.ReadUInt32();
+            Offset = reader.ReadInt32();
+            Size = reader.ReadUInt32();
+            Date = reader.ReadInt32();
+            Iteration = reader.ReadInt32();
+
+            return true;
+        }
+
+        /// <inheritdoc/>
+        public bool Pack(DatFileWriter writer) {
+            writer.WriteUInt32(Flags);
+            writer.WriteUInt32(Id);
+            writer.WriteInt32(Offset);
+            writer.WriteUInt32(Size);
+            writer.WriteInt32(Date);
+            writer.WriteInt32(Iteration);
+
+            return true;
+        }
+
+        /// <inheritdoc/>
         public override string ToString() {
             var str = new StringBuilder();
 
