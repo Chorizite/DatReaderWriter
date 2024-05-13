@@ -33,7 +33,7 @@ namespace ACDatReader.Tests.IO {
         }
 
         [TestMethod]
-        public void CanSkipAndWrite() {
+        public void CanSkipAndWriteRead() {
             var bytes = new byte[12];
 
             var writer = new DatFileWriter(bytes);
@@ -50,7 +50,7 @@ namespace ACDatReader.Tests.IO {
 
         [TestMethod]
         [CombinatorialData]
-        public void CanWriteUInt32([DataValues(1234u, 5678u, 0u, 1u, 0xFFFFFFFFu)] uint number) {
+        public void CanWriteReadUInt32([DataValues(1234u, 5678u, 0u, 1u, 0xFFFFFFFFu)] uint number) {
             var bytes = new byte[4];
             var writer = new DatFileWriter(bytes);
             writer.WriteUInt32(number);
@@ -61,7 +61,7 @@ namespace ACDatReader.Tests.IO {
 
         [TestMethod]
         [CombinatorialData]
-        public void CanWriteInt32([DataValues(-1234, 5678, 0, 1, unchecked((int)0xFFFFFFFF))] int number) {
+        public void CanWriteReadInt32([DataValues(-1234, 5678, 0, 1, unchecked((int)0xFFFFFFFF))] int number) {
             var bytes = new byte[4];
             var writer = new DatFileWriter(bytes);
             writer.WriteInt32(number);
@@ -71,7 +71,7 @@ namespace ACDatReader.Tests.IO {
         }
 
         [TestMethod]
-        public void CanWriteBytes() {
+        public void CanWriteReadBytes() {
             var bytes = new byte[100];
             var randomBytes = new byte[100];
             Random.Shared.NextBytes(randomBytes);
