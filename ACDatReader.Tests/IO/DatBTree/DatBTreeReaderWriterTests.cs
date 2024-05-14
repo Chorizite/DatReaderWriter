@@ -12,7 +12,6 @@ namespace ACDatReader.Tests.IO.DatBTree {
     [TestClass]
     public class DatBTreeReaderWriterTests {
         [TestMethod]
-        [TestCategory("EOR")]
         [CombinatorialData]
         public void CanAddLotsOfFileEntries([DataValues(1, 10, 100, 1000)] int entryCount) {
             var datFilePath = Path.GetTempFileName();
