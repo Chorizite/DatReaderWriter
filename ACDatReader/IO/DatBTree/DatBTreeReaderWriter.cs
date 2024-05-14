@@ -21,9 +21,9 @@ namespace ACDatReader.IO.DatBTree {
         public IDatBlockAllocator BlockAllocator { get; }
 
         /// <summary>
-        /// The "degree" of this BTree. Dat files have a degree of 30.
-        /// This means at max nodes can have (30 * 2) + 1 file entries,
-        /// or at a minimum they can have (30 - 1) file entries.
+        /// The "degree" of this BTree. Dat files have a degree of 31.
+        /// This means at max nodes can have (31 * 2) - 1 file entries,
+        /// or at a minimum they can have (31 - 1) file entries.
         /// </summary>
         public int Degree { get; } = 31;
 
@@ -81,7 +81,7 @@ namespace ACDatReader.IO.DatBTree {
 
         private bool TryGetFileInternal(uint fileId, int startingBlock, [MaybeNullWhen(false)] out DatBTreeFile file) {
             // 0 and 0xCDCDCDCD are invalid node offsets
-            while (startingBlock != 0 && startingBlock != unchecked((int)0xcdcdcdcd)) {
+            while (startingBlock != 0 && startingBlock != unchecked((int)0xCDCDCDCD)) {
                 if (TryGetNode(startingBlock, out var node)) {
                     var left = 0;
                     var right = node.Files.Count - 1;

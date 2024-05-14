@@ -11,13 +11,9 @@ namespace ACDatReader.Tests.Lib {
         }
 
         public static IList<T> Shuffle<T>(this IEnumerable<T> sequence, Random randomNumberGenerator) {
-            if (sequence == null) {
-                throw new ArgumentNullException(nameof(sequence));
-            }
+            ArgumentNullException.ThrowIfNull(sequence);
 
-            if (randomNumberGenerator == null) {
-                throw new ArgumentNullException(nameof(randomNumberGenerator));
-            }
+            ArgumentNullException.ThrowIfNull(randomNumberGenerator);
 
             T swapTemp;
             List<T> values = sequence.ToList();
