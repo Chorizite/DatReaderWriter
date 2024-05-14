@@ -1,19 +1,13 @@
 ﻿using ACDatReader.IO.BlockAllocators;
 using ACDatReader.IO.DatBTree;
 using ACDatReader.Tests.Lib;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ACDatReader.Tests.IO.DatBTree {
     [TestClass]
     public class DatBTreeReaderWriterTests {
         [TestMethod]
         [CombinatorialData]
-        public void CanAddLotsOfFileEntries([DataValues(1, 10, 100, 1000)] int entryCount) {
+        public void CanInsertFileEntries([DataValues(1, 10, 100, 1000)] int entryCount) {
             var datFilePath = Path.GetTempFileName();
             var allocator = new MemoryMappedBlockAllocator(new Options.DatDatabaseOptions() {
                 FilePath = datFilePath,
