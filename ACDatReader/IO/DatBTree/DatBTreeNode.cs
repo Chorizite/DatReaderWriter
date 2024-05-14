@@ -1,5 +1,11 @@
-﻿using System;
+﻿using Microsoft.VisualBasic;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ACDatReader.IO.DatBTree {
     /// <summary>
@@ -12,6 +18,11 @@ namespace ACDatReader.IO.DatBTree {
         public static readonly int SIZE = 1720;
 
         /// <summary>
+        /// The offset in the dat file of this node
+        /// </summary>
+        public int Offset { get; internal set; }
+
+        /// <summary>
         /// A list of branches / child node ids directly contained in this node.
         /// Except on leaf nodes, Branches.Count must always be equal to Files.Count - 1.
         /// </summary>
@@ -22,12 +33,20 @@ namespace ACDatReader.IO.DatBTree {
         /// Except for root nodes, this must be between <see cref="DatBTreeReaderWriter.MinItems"/>
         /// and <see cref="DatBTreeReaderWriter.MaxItems"/> in length.
         /// </summary>
-        public List<int> Keys { get; } = [];
+        public List<DatBTreeFile> Files { get; } = [];
 
         /// <summary>
         /// Wether this is a leaf node. Leaf nodes have no branches, only files.
         /// </summary>
         public bool IsLeaf => Branches.Count == 0;
+
+        /// <summary>
+        /// Create a new node
+        /// </summary>
+        /// <param name="blockOffset">The offset of this node</param>
+        internal DatBTreeNode(int blockOffset = 0) {
+            Offset = blockOffset;
+        }
 
         /// <inheritdoc/>
         unsafe public bool Unpack(DatFileReader reader) {
@@ -43,9 +62,9 @@ namespace ACDatReader.IO.DatBTree {
             Span<int> entryCountSpan = [0, reader.ReadInt32()];
             for (entryCountSpan[0] = 0; entryCountSpan[0] < entryCountSpan[1]; entryCountSpan[0]++) {
                 var file = new DatBTreeFile();
-                reader.Skip(4);
-                Keys.Add(reader.ReadInt32());
-                reader.Skip(DatBTreeFile.SIZE - 8);
+                file.Parent = this;
+                file.Unpack(reader);
+                Files.Add(file);
             }
 
             return true;
@@ -57,7 +76,7 @@ namespace ACDatReader.IO.DatBTree {
                 if (Branches.Count > i) {
                     writer.WriteInt32(Branches[i]);
                 }
-                else if (Keys.Count == 0) {
+                else if (Files.Count == 0) {
                     writer.WriteInt32(0);
                 }
                 else {
@@ -65,13 +84,27 @@ namespace ACDatReader.IO.DatBTree {
                 }
             }
 
-            writer.WriteInt32(Keys.Count);
-            foreach (var file in Keys) {
-                throw new NotImplementedException();
-                //file.Pack(writer);
+            writer.WriteInt32(Files.Count);
+            foreach (var file in Files) {
+                file.Pack(writer);
             }
 
             return true;
+        }
+
+        /// <inheritdoc/>
+        public override string ToString() {
+            var str = new StringBuilder();
+
+            str.AppendLine($"DatBTreeNode @ 0x{Offset:X8}:");
+            str.AppendLine($"Branches: [{string.Join(" ", Branches.Select(b => b.ToString("X8")))}]");
+            str.AppendLine($"Files: [");
+
+            foreach (var file in Files) {
+                str.AppendLine("\t" + file.ToString().TrimEnd('\n').Replace("\n", "\n\t"));
+            }
+            str.AppendLine("]");
+            return str.ToString();
         }
     }
 }

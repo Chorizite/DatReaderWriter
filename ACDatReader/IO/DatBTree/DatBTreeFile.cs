@@ -6,7 +6,7 @@ namespace ACDatReader.IO.DatBTree {
     /// A dat file entry. This points to where dat files are stored in the dat,
     /// as well as some other meta data.
     /// </summary>
-    public class DatBTreeFile : IComparable, IPackable, IUnpackable {
+    public class DatBTreeFile : IPackable, IUnpackable {
         /// <summary>
         /// The size of this struct
         /// </summary>
@@ -44,10 +44,10 @@ namespace ACDatReader.IO.DatBTree {
         /// </summary>
         public int Iteration { get; set; }
 
-        /// <inheritdoc/>
-        public int CompareTo(object? obj) {
-            return Id.CompareTo(obj);
-        }
+        /// <summary>
+        /// The parent node of this file entry
+        /// </summary>
+        public DatBTreeNode? Parent { get; internal set; }
 
         /// <inheritdoc/>
         public bool Unpack(DatFileReader reader) {

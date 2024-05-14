@@ -104,12 +104,8 @@ namespace ACDatReader.IO.BlockAllocators {
             WriteHeader();
         }
 
-        /// <summary>
-        /// Reserve a block from the empty block pool. This will resize the dat
-        /// as neccesary to allocate new blocks.
-        /// </summary>
-        /// <returns>The offset of the newly reserved block</returns>
-        protected int ReserveBlock() {
+        /// <inheritdoc/>
+        public int ReserveBlock() {
             if (Header.FreeBlockCount > 0) {
                 var freeBlockOffset = Header.FirstFreeBlock;
                 Header.FirstFreeBlock += Header.BlockSize;
@@ -135,6 +131,12 @@ namespace ACDatReader.IO.BlockAllocators {
             Header.Pack(new DatFileWriter(headerBuffer));
             WriteBytes(headerBuffer, 0, DatHeader.SIZE);
             SharedBytes.Return(headerBuffer);
+        }
+
+        /// <inheritdoc/>
+        public void SetRootBlock(int offset) {
+            Header.RootBlock = offset;
+            WriteHeader();
         }
 
         /// <inheritdoc/>

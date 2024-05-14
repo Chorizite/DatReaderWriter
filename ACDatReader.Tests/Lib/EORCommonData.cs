@@ -64,31 +64,31 @@ namespace ACDatReader.Tests.Lib {
         }
 
         internal static void AssertGoodRootNode(DatBTreeReaderWriter tree) {
-            //Console.WriteLine($"Branches: {string.Join(", ", tree.Root?.Branches.Select(b => $"0x{b:X8}"))}");
-            //Console.WriteLine($"Keys: {string.Join(", ", tree.Root?.Keys.Select(b => $"0x{b:X8}"))}");
+            Console.WriteLine($"Branches: {string.Join(", ", tree.Root?.Branches?.Select(b => $"0x{b:X8}") ?? [])}");
+            Console.WriteLine($"Keys: {string.Join(", ", tree.Root?.Files?.Select(f => f.Id).ToList().Select(b => $"0x{b:X8}") ?? [])}");
 
             switch (GetDBType(tree)) {
                 case EORDBType.Portal:
                     CollectionAssert.AreEqual(new List<int>() { 0x00000C00, 0x001F1400 }, tree.Root?.Branches);
-                    CollectionAssert.AreEqual(new List<int>() { 0x05001B9C }, tree.Root?.Keys);
+                    CollectionAssert.AreEqual(new List<uint>() { 0x05001B9C }, tree.Root?.Files.Select(f => f.Id).ToList());
                     break;
                 case EORDBType.HighRes:
                     CollectionAssert.AreEqual(new List<int>() { 0x0034FC00, 0x06812000 }, tree.Root?.Branches);
-                    CollectionAssert.AreEqual(new List<int>() { 0x060043BE }, tree.Root?.Keys);
+                    CollectionAssert.AreEqual(new List<uint>() { 0x060043BE }, tree.Root?.Files.Select(f => f.Id).ToList());
                     break;
 
                 case EORDBType.Cell:
                     CollectionAssert.AreEqual(new List<int>() {
                         0x000E8B00, 0x10046C00, 0x10F87800, 0x11F49800, 0x01B77B00, 0x0284E100, 0x0341AE00, 0x04180700, 0x04D77500, 0x05924A00, 0x06403A00, 0x06E95E00, 0x07B3D800, 0x086C6D00, 0x09256900, 0x09F08500, 0x0AB48300, 0x0C48BD00, 0x0D173600, 0x0DDDDE00, 0x0E826E00, 0x12D8BA00, 0x12D8BA00
                     }, tree.Root?.Branches);
-                    CollectionAssert.AreEqual(new List<int>() {
-                        0x003A044F, 0x006D019B, 0x00B20199, 0x00F904EA, 0x014101B4, 0x01960386, 0x01EF03C2, 0x028301A9, 0x02C902E3, 0x0336013B, 0x1FF8FFFF, 0x52530120, 0x545C03B6, 0x5775014C, 0x5C4F075E, 0x604B028E, 0x7900025E, unchecked((int)0x8402016D), unchecked((int)0x8D0001EC), unchecked((int)0x9BD80106), unchecked((int)0xC95B0159)
-                    }, tree.Root?.Keys);
+                    CollectionAssert.AreEqual(new List<uint>() {
+                        0x003A044F, 0x006D019B, 0x00B20199, 0x00F904EA, 0x014101B4, 0x01960386, 0x01EF03C2, 0x028301A9, 0x02C902E3, 0x0336013B, 0x1FF8FFFF, 0x52530120, 0x545C03B6, 0x5775014C, 0x5C4F075E, 0x604B028E, 0x7900025E, 0x8402016D, 0x8D0001EC, 0x9BD80106, 0xC95B0159
+                    }, tree.Root?.Files.Select(f => f.Id).ToList());
                     break;
 
                 case EORDBType.Language:
                     CollectionAssert.AreEqual(new List<int>() { 0x00000400, 0x0002B800, 0x000D9000 }, tree.Root?.Branches);
-                    CollectionAssert.AreEqual(new List<int>() { 0x21000026, 0x21000045 }, tree.Root?.Keys);
+                    CollectionAssert.AreEqual(new List<uint>() { 0x21000026, 0x21000045 }, tree.Root?.Files.Select(f => f.Id).ToList());
                     break;
                 default:
                     Assert.Fail($"Dat Header type {tree.BlockAllocator.Header.Type} was of an unknown type");
