@@ -27,7 +27,7 @@ namespace ACDatReader.Tests.IO.DatBTree {
                     Flags = 0,
                     Iteration = i,
                     Size = (uint)i * 2,
-                    Id = (uint)i + 1
+                    Id = (uint)(i + 1) * 3
                 });
             }
 
@@ -37,14 +37,24 @@ namespace ACDatReader.Tests.IO.DatBTree {
                 tree.Insert(file);
             }
 
-            for (var i = 0; i < entryCount; i++) {
-                var result = tree.TryGetFile((uint)i + 1, out var retrievedFile);
+            var enumeratedFileIds = new List<uint>();
+            foreach (var fileEntry in tree) {
+                enumeratedFileIds.Add(fileEntry.Id);
+            }
 
-                Assert.IsTrue(result, $"Result {i + 1} was false");
+            var sortedInsertedFiles = files.Select(f => f.Id).ToList();
+            sortedInsertedFiles.Sort((a, b) => a.CompareTo(b));
+
+            CollectionAssert.AreEqual(sortedInsertedFiles, enumeratedFileIds);
+
+            for (var i = 0; i < entryCount; i++) {
+                var result = tree.TryGetFile((uint)(i + 1) * 3, out var retrievedFile);
+
+                Assert.IsTrue(result, $"Result {(i + 1) * 3} was false");
                 Assert.IsNotNull(retrievedFile);
                 Assert.AreEqual(i, retrievedFile.Date);
                 Assert.AreEqual(0u, retrievedFile.Flags);
-                Assert.AreEqual((uint)i + 1, retrievedFile.Id);
+                Assert.AreEqual((uint)(i + 1) * 3, retrievedFile.Id);
                 Assert.AreEqual(i, retrievedFile.Iteration);
                 Assert.AreEqual((uint)i * 2, retrievedFile.Size);
             }

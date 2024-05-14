@@ -154,7 +154,7 @@ namespace ACDatReader.IO.DatBTree {
 
         private void InsertNonFull(DatBTreeNode node, DatBTreeFile file) {
             int positionToInsert = node.Files.TakeWhile(entry => file.Id.CompareTo(entry.Id) >= 0).Count();
-            
+
             if (node.IsLeaf) {
                 node.Files.Insert(positionToInsert, file);
                 WriteNode(node);
@@ -177,6 +177,41 @@ namespace ACDatReader.IO.DatBTree {
             }
 
             InsertNonFull(child, file);
+        }
+
+        private IEnumerable<DatBTreeFile> GetFilesRecursive(DatBTreeNode? node) {
+            if (node is not null) {
+                if (node.IsLeaf) {
+                    foreach (var fileEntry in node.Files) {
+                        yield return fileEntry;
+                    }
+                }
+                else {
+                    for (var i = 0; i < node.Branches.Count; i++) {
+                        if (TryGetNode(node.Branches[i], out var branch)) {
+                            if (i > 0) {
+                                yield return node.Files[i - 1];
+                            }
+                            foreach (DatBTreeFile fileEntry in GetFilesRecursive(branch)) {
+                                yield return fileEntry;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Get an enumerator that yields all <see cref="DatBTreeFile"/> entries in
+        /// this tree recursively in order
+        /// </summary>
+        /// <returns>An enumerator</returns>
+        public IEnumerator<DatBTreeFile> GetEnumerator() {
+            if (Root is not null) {
+                foreach (var fileEntry in GetFilesRecursive(Root)) {
+                    yield return fileEntry;
+                }
+            }
         }
 
         /// <summary>
