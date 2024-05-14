@@ -74,7 +74,7 @@ namespace ACDatReader.Tests.Lib {
             return null;
         }
 
-        private object GetDisplayName(object d) {
+        private object GetDisplayName(object? d) {
             if (d is null) return "null";
             if (d is uint du) return $"0x{du:X8}";
             return d.ToString() ?? string.Empty;
