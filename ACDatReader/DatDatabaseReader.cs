@@ -35,18 +35,14 @@ namespace ACDatReader {
             _blockAllocator = blockAllocator ?? new MemoryMappedBlockAllocator(Options);
         }
 
-        /// <summary>
-        /// Dispose
-        /// </summary>
+        /// <inheritdoc/>
         public void Dispose() {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
 
 
-        /// <summary>
-        /// Dispose
-        /// </summary>
+        /// <inheritdoc/>
         protected virtual void Dispose(bool disposing) {
             if (disposing) {
                 _blockAllocator?.Dispose();

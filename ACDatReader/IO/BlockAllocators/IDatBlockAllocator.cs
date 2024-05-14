@@ -84,5 +84,18 @@ namespace ACDatReader.IO.BlockAllocators {
         /// </summary>
         /// <param name="numBlocksToAllocate"></param>
         void AllocateEmptyBlocks(int numBlocksToAllocate);
+
+        /// <summary>
+        /// Reserve a block from the empty block pool. This will resize the dat
+        /// as neccesary to allocate new blocks.
+        /// </summary>
+        /// <returns>The offset of the newly reserved block</returns>
+        public int ReserveBlock();
+
+        /// <summary>
+        /// Set a new root node for this dat
+        /// </summary>
+        /// <param name="offset">The offset in the dat of the new root node</param>
+        void SetRootBlock(int offset);
     }
 }
