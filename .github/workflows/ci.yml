@@ -8,9 +8,11 @@ jobs:
       - uses: actions/checkout@v3         # checkout the repo
       - run: dotnet restore               # install packages
       - run: dotnet build --no-restore    # build
-      - run: dotnet test --no-build --verbosity normal --filter TestCategory!=EOR -l:trx;LogFileName=TestResults.xml # run tests
+      - run: 'dotnet test --no-build --verbosity normal --filter TestCategory!=EOR --logger "trx;LogFileName=test-results.trx"' # run tests
+      - run: 'echo ${{ github.workspace }}'
+      - run: 'cp "${{ github.workspace }}/ACDatReader.Tests/TestResults/test-results.trx" "${{ github.workspace }}/test-results.xml" '
       - uses: actions/upload-artifact@v3  # upload test results
         if: success() || failure()        # run this step even if previous step failed
         with:
           name: test-results
-          path: TestResults.xml
+          path: 'test-results.xml'
