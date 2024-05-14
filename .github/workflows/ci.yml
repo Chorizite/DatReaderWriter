@@ -1,0 +1,16 @@
+name: 'CI'
+on:
+  pull_request:
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3         # checkout the repo
+      - run: dotnet restore               # install packages
+      - run: dotnet build --no-restore    # build
+      - run: dotnet test --no-build --verbosity normal --filter TestCategory!=EOR -l:trx;LogFileName=TestResults.xml # run tests
+      - uses: actions/upload-artifact@v3  # upload test results
+        if: success() || failure()        # run this step even if previous step failed
+        with:
+          name: test-results
+          path: TestResults.xml
