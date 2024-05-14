@@ -61,8 +61,9 @@ namespace ACDatReader.IO.DatBTree {
 
             Span<int> entryCountSpan = [0, reader.ReadInt32()];
             for (entryCountSpan[0] = 0; entryCountSpan[0] < entryCountSpan[1]; entryCountSpan[0]++) {
-                var file = new DatBTreeFile();
-                file.Parent = this;
+                var file = new DatBTreeFile {
+                    Parent = this
+                };
                 file.Unpack(reader);
                 Files.Add(file);
             }
