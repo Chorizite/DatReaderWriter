@@ -66,6 +66,7 @@ namespace ACDatReader.Tests.IO.DatBTree {
 
             File.Delete(datFilePath);
         }
+
         [TestMethod]
         [CombinatorialData]
         public void CanDeleteFileEntries([DataValues(1, 10, 100, 1000)] int entryCount) {
