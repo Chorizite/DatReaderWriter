@@ -39,6 +39,12 @@ namespace ACDatReader {
             _tree = new DatBTreeReaderWriter(_blockAllocator);
         }
 
+        /// <summary>
+        /// Get the raw bytes of a file entry
+        /// </summary>
+        /// <param name="fileId">The id of the file to get</param>
+        /// <param name="bytes">The raw bytes</param>
+        /// <returns>True if the file was found, false otherwise</returns>
         public bool TryGetFileBytes(uint fileId, [MaybeNullWhen(false)] out byte[] bytes) {
             if (_tree.TryGetFile(fileId, out var fileEntry)) {
                 bytes = new byte[fileEntry.Size];

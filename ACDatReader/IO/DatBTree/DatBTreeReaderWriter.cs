@@ -180,35 +180,6 @@ namespace ACDatReader.IO.DatBTree {
 
             InsertNonFull(child, file);
         }
-        public void CountNodes(ref int nodeCount, ref int fileCount, ref uint lowestOffset) {
-            if (Root is not null) {
-                CountNodes2(Root, ref nodeCount, ref fileCount, ref lowestOffset);
-            }
-        }
-
-        public void CountNodes2(DatBTreeNode? node, ref int nodeCount, ref int fileCount, ref uint lowestOffset) {
-            if (node is not null) {
-                if ((uint)node.Offset < lowestOffset) lowestOffset = (uint)node.Offset;
-
-                nodeCount++;
-                int i;
-                for (i = 0; i < node.Files.Count; i++) {
-                    if (!node.IsLeaf) {
-                        if (TryGetNode(node.Branches[i], out var branch)) {
-                            CountNodes2(branch, ref nodeCount, ref fileCount, ref lowestOffset);
-                        }
-                    }
-
-                    fileCount++;
-                }
-
-                if (!node.IsLeaf) {
-                    if (TryGetNode(node.Branches[i], out var branch)) {
-                        CountNodes2(branch, ref nodeCount, ref fileCount, ref lowestOffset);
-                    }
-                }
-            }
-        }
 
         private IEnumerable<DatBTreeFile> GetFilesRecursive(DatBTreeNode? node) {
             if (node is not null) {
@@ -234,28 +205,6 @@ namespace ACDatReader.IO.DatBTree {
                         }
                     }
                 }
-                /*
-                if (node.IsLeaf) {
-                    Console.WriteLine($"LEAF: {node}");
-                    foreach (var fileEntry in node.Files) {
-                        yield return fileEntry;
-                    }
-                }
-                else {
-                    Console.WriteLine($"BRANCH: {node}");
-                    for (var i = 0; i < node.Branches.Count; i++) {
-                        if (TryGetNode(node.Branches[i], out var branch)) {
-                            Console.WriteLine($"CHILD BRANCH: {node}");
-                            if (i > 0 && i - 1 < node.Files.Count) {
-                                yield return node.Files[i - 1];
-                            }
-                            foreach (DatBTreeFile fileEntry in GetFilesRecursive(branch)) {
-                                yield return fileEntry;
-                            }
-                        }
-                    }
-                }
-                */
             }
         }
 
@@ -300,7 +249,6 @@ namespace ACDatReader.IO.DatBTree {
         public DatBTreeFile? Insert(DatBTreeFile file) {
             // check if file already exists
             if (TryGetFile(file.Id, out var foundFile)) {
-                Console.WriteLine($"INSERTING EXISTING FILE!!!!");
                 file.Parent = foundFile.Parent;
 
                 if (foundFile.Parent is not null) {

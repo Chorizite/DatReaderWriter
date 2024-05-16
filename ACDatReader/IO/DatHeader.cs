@@ -126,6 +126,7 @@ namespace ACDatReader.IO {
         /// </summary>
         internal DatHeader() {
             Transactions = new byte[64];
+            WriteEmptyTransaction();
         }
 
         /// <summary>
@@ -152,6 +153,12 @@ namespace ACDatReader.IO {
             MinorVersion = minorVersion;
 
             Transactions = new byte[64];
+            WriteEmptyTransaction();
+        }
+
+        internal void WriteEmptyTransaction() {
+            var writer = new DatFileWriter(Transactions);
+            writer.WriteBytes([0x00, 0x50, 0x4C, 0x00], 4);
         }
 
         /// <returns>True if successful (the magic was good)</returns>

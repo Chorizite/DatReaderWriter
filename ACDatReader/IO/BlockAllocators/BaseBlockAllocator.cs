@@ -46,7 +46,12 @@ namespace ACDatReader.IO.BlockAllocators {
             Header.FileSize = DatHeader.SIZE;
             Header.Magic = DatHeader.RETAIL_MAGIC;
 
-            AllocateEmptyBlocks(numBlocksToAllocate);
+            if (numBlocksToAllocate > 0) {
+                AllocateEmptyBlocks(numBlocksToAllocate);
+            }
+
+            Header.WriteEmptyTransaction();
+            WriteHeader();
 
             HasHeaderData = true;
         }
@@ -91,7 +96,7 @@ namespace ACDatReader.IO.BlockAllocators {
                 Header.LastFreeBlock = firstBlockOffset;
                 Header.FileSize = firstBlockOffset;
             }
-            
+
             var offset = Header.FileSize;
             Expand(Header.FileSize + (numBlocksToAllocate * Header.BlockSize));
             
@@ -118,7 +123,7 @@ namespace ACDatReader.IO.BlockAllocators {
             else {
                 // todo: we should maybe expand by num bytes or something instead
                 // of block size?
-                AllocateEmptyBlocks(1024);
+                AllocateEmptyBlocks(2048);
                 return ReserveBlock();
             }
         }
