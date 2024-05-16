@@ -236,6 +236,35 @@ namespace ACDatReader.Tests.IO.BlockAllocators {
 
         [TestMethod]
         [CombinatorialData]
+        public void UpdatingBlockContentsReusesAllocatedBlocks([DataValues(256, 1024)] int blockSize) {
+            var file = Path.GetTempFileName();
+            var allocator = new MemoryMappedBlockAllocator(new Options.DatDatabaseOptions() {
+                FilePath = file,
+                AccessType = Options.DatAccessType.ReadWrite
+            });
+
+            Assert.IsFalse(allocator.HasHeaderData);
+            allocator.InitNew(DatDatabaseType.Portal, 0, blockSize, 10);
+
+            var fileBytes = new byte[(blockSize - 4) * 4];
+            Random.Shared.NextBytes(fileBytes.AsSpan());
+
+            var blockOffset = allocator.WriteBlock(fileBytes, fileBytes.Length);
+            var freeBlocks = allocator.Header.FreeBlockCount;
+
+            // rewriting the block should use the same allocated blocks
+            var newOffset = allocator.WriteBlock(fileBytes, fileBytes.Length, blockOffset);
+
+            Assert.AreEqual(blockOffset, newOffset);
+            Assert.AreEqual(freeBlocks, allocator.Header.FreeBlockCount);
+
+            allocator.Dispose();
+
+            File.Delete(file);
+        }
+
+        [TestMethod]
+        [CombinatorialData]
         public void CanExpandDatToWriteBlocks([DataValues(256, 1024)] int blockSize) {
             var file = Path.GetTempFileName();
             var allocator = new MemoryMappedBlockAllocator(new Options.DatDatabaseOptions() {
@@ -323,8 +352,6 @@ namespace ACDatReader.Tests.IO.BlockAllocators {
             allocator.InitNew(DatDatabaseType.Portal, 0, blockSize, allocatedBlockCount);
 
             Assert.AreEqual(allocatedBlockCount, allocator.Header.FreeBlockCount);
-
-            var startingFileSize = allocator.Header.FileSize;
 
             var firstFree = allocator.Header.FirstFreeBlock;
             for (var i = 0; i < blocksToReserve; i++) {

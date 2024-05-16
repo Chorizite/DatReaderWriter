@@ -1,4 +1,6 @@
-﻿using ACDatReader.IO.BlockAllocators;
+﻿using ACDatReader.Enums;
+using ACDatReader.IO;
+using ACDatReader.IO.BlockAllocators;
 using ACDatReader.IO.DatBTree;
 using ACDatReader.Options;
 
@@ -17,7 +19,6 @@ namespace ACDatPacker {
             using var sourceDat = new DatBTreeReaderWriter(new MemoryMappedBlockAllocator(new DatDatabaseOptions() {
                 FilePath = sourceDatPath
             }));
-            Console.WriteLine($"\tSource block size: {sourceDat.BlockAllocator.Header.BlockSize} Free: {sourceDat.BlockAllocator.Header.FreeBlockCount}");
 
 
             //Console.WriteLine(sourceDat);
@@ -35,20 +36,14 @@ namespace ACDatPacker {
             using var packedDat = new DatBTreeReaderWriter(blockAllocator);
             packedDat.BlockAllocator.SetVersion("", sourceDat.BlockAllocator.Header.EngineVersion, sourceDat.BlockAllocator.Header.GameVersion, sourceDat.BlockAllocator.Header.MajorVersion, sourceDat.BlockAllocator.Header.MinorVersion);
 
-            packedDat.BlockAllocator.Header.Transactions = sourceDat.BlockAllocator.Header.Transactions;
             packedDat.BlockAllocator.Header.MasterMapId = sourceDat.BlockAllocator.Header.MasterMapId;
 
             var bytes = new byte[20_000_000];
             var sourceFileCount = 0;
             foreach (var fileEntry in sourceDat) {
-
                 sourceDat.BlockAllocator.ReadBlock(bytes, fileEntry.Offset);
                 sourceFileCount++;
 
-                var wantedBlocks = (int)Math.Ceiling((float)fileEntry.Size / (sourceDat.BlockAllocator.Header.BlockSize - 4)) - packedDat.BlockAllocator.Header.FreeBlockCount;
-                if (wantedBlocks > 0) {
-                    //packedDat.BlockAllocator.AllocateEmptyBlocks(wantedBlocks + 3);
-                }
                 var newFileOffset = packedDat.BlockAllocator.WriteBlock(bytes, (int)fileEntry.Size);
                 packedDat.Insert(new DatBTreeFile() {
                     Offset = newFileOffset,
@@ -59,26 +54,16 @@ namespace ACDatPacker {
                     Iteration = fileEntry.Iteration
                 });
             }
-            Console.WriteLine($"\tDest block size: {packedDat.BlockAllocator.Header.BlockSize} Free: {packedDat.BlockAllocator.Header.FreeBlockCount}");
 
             var destFileCount = 0;
             foreach (var fileEntry in packedDat) {
                 destFileCount++;
             }
+
+            Console.WriteLine($"\tSource block size: {sourceDat.BlockAllocator.Header.BlockSize} Free: {sourceDat.BlockAllocator.Header.FreeBlockCount}");
+            Console.WriteLine($"\tDest block size: {packedDat.BlockAllocator.Header.BlockSize} Free: {packedDat.BlockAllocator.Header.FreeBlockCount}");
             Console.WriteLine($"\tSourceFileCount: {sourceFileCount}\n\tDestFileCount:{destFileCount}");
-
-            var sourceNodeCount = 0;
-            var sourceEntryCount = 0;
-            var sourceLowestOffset = uint.MaxValue;
-            var destNodeCount = 0;
-            var destEntryCount = 0;
-            var destLowestOffset = uint.MaxValue;
-
-            sourceDat.CountNodes(ref sourceNodeCount, ref sourceEntryCount, ref sourceLowestOffset);
-            packedDat.CountNodes(ref destNodeCount, ref destEntryCount, ref destLowestOffset);
-
-            Console.WriteLine($"\tSourceNodes: {sourceNodeCount} / {sourceEntryCount} entries. Lowest: {sourceLowestOffset:X8}");
-            Console.WriteLine($"\tDestNodes: {destNodeCount} / {destEntryCount} entries. Lowest: {destLowestOffset:X8}");
+            Console.WriteLine(packedDat.BlockAllocator.Header);
         }
     }
 }

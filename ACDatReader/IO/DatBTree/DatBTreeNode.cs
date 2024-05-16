@@ -110,14 +110,6 @@ namespace ACDatReader.IO.DatBTree {
             str.AppendLine($"Files: [{string.Join(" ", Files.Select(b => b.Id.ToString("X8")))}]");
 
             return str.ToString();
-
-            str.AppendLine($"Files: [");
-
-            foreach (var file in Files) {
-                str.AppendLine("\t" + file.ToString().TrimEnd('\n').Replace("\n", "\n\t"));
-            }
-            str.AppendLine("]");
-            return str.ToString();
         }
     }
 }
