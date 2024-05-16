@@ -30,7 +30,7 @@ namespace ACDatReader.IO.DatBTree {
 
         /// <summary>
         /// The total size of this file data. If greater than DatHeader.BlockSize - 4 then
-        /// this spans `ceil(Size / (DatHeader.BlockSize - 4))` blocks.
+        /// this spans <c>ceil(Size / (DatHeader.BlockSize - 4))</c> blocks.
         /// </summary>
         public uint Size { get; set; }
 

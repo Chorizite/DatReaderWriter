@@ -270,5 +270,74 @@ namespace ACDatReader.Tests.IO.BlockAllocators {
 
             File.Delete(file);
         }
+
+        [TestMethod]
+        [CombinatorialData]
+        public void UsesCorrectNumberOfBlocksWhenWritingFiles(
+            [DataValues(256, 1024)] int blockSize,
+            [DataValues(252, 1020, 200, 800, 1000, 10_000, 10_000_000)] int fileSize
+            ) {
+            var file = Path.GetTempFileName();
+            var allocator = new MemoryMappedBlockAllocator(new Options.DatDatabaseOptions() {
+                FilePath = file,
+                AccessType = Options.DatAccessType.ReadWrite
+            });
+
+            var allocatedBlockCount = (fileSize + (blockSize * 100)) / (blockSize - 4);
+
+            Assert.IsFalse(allocator.HasHeaderData);
+            allocator.InitNew(DatDatabaseType.Portal, 0, blockSize, allocatedBlockCount);
+
+            Assert.AreEqual(allocatedBlockCount, allocator.Header.FreeBlockCount);
+
+            var startingFileSize = allocator.Header.FileSize;
+
+            var fileBytes = new byte[fileSize];
+            allocator.WriteBlock(fileBytes, fileBytes.Length);
+
+            var expectedBlockUsage = Math.Ceiling(fileSize / (float)(blockSize - 4));
+
+            Assert.AreEqual(startingFileSize, allocator.Header.FileSize);
+            Assert.AreEqual(allocatedBlockCount - expectedBlockUsage, allocator.Header.FreeBlockCount);
+
+            allocator.Dispose();
+
+            File.Delete(file);
+        }
+
+        [TestMethod]
+        [CombinatorialData]
+        public void ReservingBlocksAllocatesBlocksAndUpdatesHeader(
+            [DataValues(256, 1024)] int blockSize,
+            [DataValues(1, 10, 100, 1000)] int blocksToReserve
+            ) {
+            var file = Path.GetTempFileName();
+            var allocator = new MemoryMappedBlockAllocator(new Options.DatDatabaseOptions() {
+                FilePath = file,
+                AccessType = Options.DatAccessType.ReadWrite
+            });
+
+            var allocatedBlockCount = 50;
+
+            Assert.IsFalse(allocator.HasHeaderData);
+            allocator.InitNew(DatDatabaseType.Portal, 0, blockSize, allocatedBlockCount);
+
+            Assert.AreEqual(allocatedBlockCount, allocator.Header.FreeBlockCount);
+
+            var startingFileSize = allocator.Header.FileSize;
+
+            var firstFree = allocator.Header.FirstFreeBlock;
+            for (var i = 0; i < blocksToReserve; i++) {
+                allocator.ReserveBlock();
+
+                var exp = firstFree + ((i + 1) * allocator.Header.BlockSize);
+                var cFree = allocator.Header.FirstFreeBlock;
+                Assert.AreEqual(exp, cFree, $"Expected {exp:X8} to be same as free: {cFree:X8}");
+            }
+
+            allocator.Dispose();
+
+            File.Delete(file);
+        }
     }
 }

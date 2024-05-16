@@ -1,9 +1,11 @@
 ﻿using ACDatReader.IO;
 using ACDatReader.IO.BlockAllocators;
+using ACDatReader.IO.DatBTree;
 using ACDatReader.Options;
 using System;
 using System.Buffers;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 namespace ACDatReader {
@@ -12,6 +14,7 @@ namespace ACDatReader {
     /// </summary>
     public class DatDatabaseReader : IDisposable {
         private readonly IDatBlockAllocator _blockAllocator;
+        private readonly DatBTreeReaderWriter _tree;
 
         /// <summary>
         /// Database Options
@@ -33,6 +36,18 @@ namespace ACDatReader {
             options?.Invoke(Options);
 
             _blockAllocator = blockAllocator ?? new MemoryMappedBlockAllocator(Options);
+            _tree = new DatBTreeReaderWriter(_blockAllocator);
+        }
+
+        public bool TryGetFileBytes(uint fileId, [MaybeNullWhen(false)] out byte[] bytes) {
+            if (_tree.TryGetFile(fileId, out var fileEntry)) {
+                bytes = new byte[fileEntry.Size];
+                _blockAllocator.ReadBlock(bytes, fileEntry.Offset);
+                return true;
+            }
+
+            bytes = null;
+            return false;
         }
 
         /// <inheritdoc/>

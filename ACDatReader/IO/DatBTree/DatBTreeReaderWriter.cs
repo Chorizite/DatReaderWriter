@@ -6,6 +6,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection.PortableExecutable;
 using System.Text;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Xml.Linq;
 
 /*
  *  Heavily based on https://github.com/rsdcastro/btree-dotnet/ and https://github.com/msambol/dsa/blob/master/trees/b_tree.py
@@ -154,7 +156,7 @@ namespace ACDatReader.IO.DatBTree {
 
         private void InsertNonFull(DatBTreeNode node, DatBTreeFile file) {
             int positionToInsert = node.Files.TakeWhile(entry => file.Id.CompareTo(entry.Id) >= 0).Count();
-            
+
             if (node.IsLeaf) {
                 node.Files.Insert(positionToInsert, file);
                 WriteNode(node);
@@ -177,6 +179,97 @@ namespace ACDatReader.IO.DatBTree {
             }
 
             InsertNonFull(child, file);
+        }
+        public void CountNodes(ref int nodeCount, ref int fileCount, ref uint lowestOffset) {
+            if (Root is not null) {
+                CountNodes2(Root, ref nodeCount, ref fileCount, ref lowestOffset);
+            }
+        }
+
+        public void CountNodes2(DatBTreeNode? node, ref int nodeCount, ref int fileCount, ref uint lowestOffset) {
+            if (node is not null) {
+                if ((uint)node.Offset < lowestOffset) lowestOffset = (uint)node.Offset;
+
+                nodeCount++;
+                int i;
+                for (i = 0; i < node.Files.Count; i++) {
+                    if (!node.IsLeaf) {
+                        if (TryGetNode(node.Branches[i], out var branch)) {
+                            CountNodes2(branch, ref nodeCount, ref fileCount, ref lowestOffset);
+                        }
+                    }
+
+                    fileCount++;
+                }
+
+                if (!node.IsLeaf) {
+                    if (TryGetNode(node.Branches[i], out var branch)) {
+                        CountNodes2(branch, ref nodeCount, ref fileCount, ref lowestOffset);
+                    }
+                }
+            }
+        }
+
+        private IEnumerable<DatBTreeFile> GetFilesRecursive(DatBTreeNode? node) {
+            if (node is not null) {
+                int i;
+                for (i = 0; i < node.Files.Count; i++) {
+                    if (!node.IsLeaf) {
+                        if (TryGetNode(node.Branches[i], out var branch)) {
+                            var files = GetFilesRecursive(branch);
+                            foreach (var file in files) {
+                                yield return file;
+                            }
+                        }
+                    }
+
+                    yield return node.Files[i];
+                }
+
+                if (!node.IsLeaf) {
+                    if (TryGetNode(node.Branches[i], out var branch)) {
+                        var files2 = GetFilesRecursive(branch);
+                        foreach (var file in files2) {
+                            yield return file;
+                        }
+                    }
+                }
+                /*
+                if (node.IsLeaf) {
+                    Console.WriteLine($"LEAF: {node}");
+                    foreach (var fileEntry in node.Files) {
+                        yield return fileEntry;
+                    }
+                }
+                else {
+                    Console.WriteLine($"BRANCH: {node}");
+                    for (var i = 0; i < node.Branches.Count; i++) {
+                        if (TryGetNode(node.Branches[i], out var branch)) {
+                            Console.WriteLine($"CHILD BRANCH: {node}");
+                            if (i > 0 && i - 1 < node.Files.Count) {
+                                yield return node.Files[i - 1];
+                            }
+                            foreach (DatBTreeFile fileEntry in GetFilesRecursive(branch)) {
+                                yield return fileEntry;
+                            }
+                        }
+                    }
+                }
+                */
+            }
+        }
+
+        /// <summary>
+        /// Get an enumerator that yields all <see cref="DatBTreeFile"/> entries in
+        /// this tree recursively in order
+        /// </summary>
+        /// <returns>An enumerator</returns>
+        public IEnumerator<DatBTreeFile> GetEnumerator() {
+            if (Root is not null) {
+                foreach (var fileEntry in GetFilesRecursive(Root)) {
+                    yield return fileEntry;
+                }
+            }
         }
 
         /// <summary>
@@ -207,6 +300,7 @@ namespace ACDatReader.IO.DatBTree {
         public DatBTreeFile? Insert(DatBTreeFile file) {
             // check if file already exists
             if (TryGetFile(file.Id, out var foundFile)) {
+                Console.WriteLine($"INSERTING EXISTING FILE!!!!");
                 file.Parent = foundFile.Parent;
 
                 if (foundFile.Parent is not null) {
@@ -220,7 +314,7 @@ namespace ACDatReader.IO.DatBTree {
                 return foundFile;
             }
 
-            // if root is empty, create a new root node and add the file there
+            // if root is null, create a new root node and add the file there
             if (Root is null) {
                 var rootBlock = new DatBTreeNode(BlockAllocator.ReserveBlock());
                 rootBlock.Files.Add(file);

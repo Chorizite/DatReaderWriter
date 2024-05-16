@@ -1,5 +1,6 @@
 ﻿using ACDatReader.IO.BlockAllocators;
 using ACDatReader.IO.DatBTree;
+using ACDatReader.Options;
 using ACDatReader.Tests.Lib;
 
 namespace ACDatReader.Tests.IO.DatBTree {
@@ -27,7 +28,7 @@ namespace ACDatReader.Tests.IO.DatBTree {
                     Flags = 0,
                     Iteration = i,
                     Size = (uint)i * 2,
-                    Id = (uint)i + 1
+                    Id = (uint)(i + 1) * 3
                 });
             }
 
@@ -37,14 +38,24 @@ namespace ACDatReader.Tests.IO.DatBTree {
                 tree.Insert(file);
             }
 
-            for (var i = 0; i < entryCount; i++) {
-                var result = tree.TryGetFile((uint)i + 1, out var retrievedFile);
+            var enumeratedFileIds = new List<uint>();
+            foreach (var fileEntry in tree) {
+                enumeratedFileIds.Add(fileEntry.Id);
+            }
 
-                Assert.IsTrue(result, $"Result {i + 1} was false");
+            var sortedInsertedFiles = files.Select(f => f.Id).ToList();
+            sortedInsertedFiles.Sort((a, b) => a.CompareTo(b));
+
+            CollectionAssert.AreEqual(sortedInsertedFiles, enumeratedFileIds);
+
+            for (var i = 0; i < entryCount; i++) {
+                var result = tree.TryGetFile((uint)(i + 1) * 3, out var retrievedFile);
+
+                Assert.IsTrue(result, $"Result {(i + 1) * 3} was false");
                 Assert.IsNotNull(retrievedFile);
                 Assert.AreEqual(i, retrievedFile.Date);
                 Assert.AreEqual(0u, retrievedFile.Flags);
-                Assert.AreEqual((uint)i + 1, retrievedFile.Id);
+                Assert.AreEqual((uint)(i + 1) * 3, retrievedFile.Id);
                 Assert.AreEqual(i, retrievedFile.Iteration);
                 Assert.AreEqual((uint)i * 2, retrievedFile.Size);
             }
@@ -196,6 +207,48 @@ namespace ACDatReader.Tests.IO.DatBTree {
             Assert.AreEqual(0xF18E000, file.Offset);
             Assert.AreEqual(1117236872, file.Date);
             Assert.AreEqual(252u, file.Size);
+        }
+
+        [TestMethod]
+        [TestCategory("EOR")]
+        [CombinatorialData]
+        public void CanIterateOverEORDatsInSortedFileOrder(
+            [DataValues(EORDBType.Portal, EORDBType.Cell, EORDBType.Language, EORDBType.HighRes)] EORDBType dbType
+            ) {
+
+            using var tree = new DatBTreeReaderWriter(new MemoryMappedBlockAllocator(new Options.DatDatabaseOptions() {
+                FilePath = EORCommonData.GetDatPath(dbType)
+            }));
+
+            var fileCount = 0;
+            var lastFile = 0u;
+            foreach (var fileEntry in tree) {
+                Assert.IsTrue(lastFile < fileEntry.Id, $"Current file {fileEntry.Id:X8} should be less than previous file {lastFile:X8}");
+
+                lastFile = fileEntry.Id;
+                fileCount++;
+            }
+
+            EORCommonData.AssertGoodFileEntryCount(dbType, fileCount);
+        }
+
+        [TestMethod]
+        [TestCategory("EOR")]
+        [CombinatorialData]
+        public void CanIterateOverRetailDatsWithoutDoubleEntryReading(
+            [DataValues(EORDBType.Portal, EORDBType.Cell, EORDBType.Language, EORDBType.HighRes)] EORDBType dbType
+            ) {
+
+            using var tree = new DatBTreeReaderWriter(new MemoryMappedBlockAllocator(new Options.DatDatabaseOptions() {
+                FilePath = EORCommonData.GetDatPath(dbType)
+            }));
+
+            var knownFiles = new Dictionary<uint, bool>();
+            foreach (var fileEntry in tree) {
+                Assert.IsFalse(knownFiles.ContainsKey(fileEntry.Id), $"Current file {fileEntry.Id:X8} was already iterated over");
+
+                knownFiles.Add(fileEntry.Id, true);
+            }
         }
         #endregion
     }
