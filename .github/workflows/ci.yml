@@ -40,8 +40,8 @@ jobs:
         if: success() || failure()        # run this step even if previous step failed
         with:
           name: packages
-          path: "${{ github.workspace }}/ACDatReader/bin/Release/ACClientLib.DatReader.${{ env.GitVersion_FullSemVer }}.nupkg"
+          path: "${{ github.workspace }}/ACDatReader/bin/Release/ACClientLib.DatReaderWriter.${{ env.GitVersion_FullSemVer }}.nupkg"
 
       - run: dotnet nuget add source --username USERNAME --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/ACClientLib/index.json"
   
-      - run: dotnet nuget push "${{ github.workspace }}/ACDatReader/bin/Release/ACClientLib.DatReader.${{ env.GitVersion_FullSemVer }}.nupkg" --source "github"
+      - run: dotnet nuget push "${{ github.workspace }}/ACDatReader/bin/Release/ACClientLib.DatReaderWriter.${{ env.GitVersion_FullSemVer }}.nupkg" --source "github"
