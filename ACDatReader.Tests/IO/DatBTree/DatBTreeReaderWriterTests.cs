@@ -66,6 +66,74 @@ namespace ACDatReader.Tests.IO.DatBTree {
 
             File.Delete(datFilePath);
         }
+        [TestMethod]
+        [CombinatorialData]
+        public void CanDeleteFileEntries([DataValues(1, 10, 100, 1000)] int entryCount) {
+            var datFilePath = Path.GetTempFileName();
+            var allocator = new MemoryMappedBlockAllocator(new Options.DatDatabaseOptions() {
+                FilePath = datFilePath,
+                AccessType = Options.DatAccessType.ReadWrite
+            });
+
+            allocator.InitNew(DatDatabaseType.Portal, 0);
+
+            var tree = new DatBTreeReaderWriter(allocator);
+
+            Assert.AreEqual(0, allocator.Header.RootBlock);
+
+            var files = new List<DatBTreeFile>();
+            for (var i = 0; i < entryCount; i++) {
+                files.Add(new DatBTreeFile() {
+                    Date = i,
+                    Flags = 0,
+                    Iteration = i,
+                    Size = (uint)i * 2,
+                    Id = (uint)(i + 1) * 3
+                });
+            }
+
+            files.Shuffle();
+
+            foreach (var file in files) {
+                tree.Insert(file);
+            }
+
+            var enumeratedFileIds = new List<uint>();
+            foreach (var fileEntry in tree) {
+                enumeratedFileIds.Add(fileEntry.Id);
+            }
+
+            var sortedInsertedFiles = files.Select(f => f.Id).ToList();
+            sortedInsertedFiles.Sort((a, b) => a.CompareTo(b));
+
+            CollectionAssert.AreEqual(sortedInsertedFiles, enumeratedFileIds);
+
+            for (var i = 0; i < entryCount; i++) {
+                var id = (uint)(i + 1) * 3;
+                var result = tree.TryDelete(id, out var deletedFile);
+
+                Assert.IsTrue(result, $"Result {id} was false");
+                Assert.IsNotNull(deletedFile);
+                Assert.AreEqual(i, deletedFile.Date);
+                Assert.AreEqual(0u, deletedFile.Flags);
+                Assert.AreEqual((uint)(i + 1) * 3, deletedFile.Id);
+                Assert.AreEqual(i, deletedFile.Iteration);
+                Assert.AreEqual((uint)i * 2, deletedFile.Size);
+
+                Assert.IsFalse(tree.HasFile(id));
+            }
+
+            var newFileCount = 0;
+            foreach (var file in tree) {
+                newFileCount++;
+            }
+
+            Assert.AreEqual(0, newFileCount);
+
+            tree.Dispose();
+
+            File.Delete(datFilePath);
+        }
 
         [TestMethod]
         public void CanAddFileEntryWithNoExistingRoot() {
