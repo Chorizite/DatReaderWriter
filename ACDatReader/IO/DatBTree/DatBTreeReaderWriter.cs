@@ -8,6 +8,7 @@ using System.Reflection.PortableExecutable;
 using System.Text;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Xml.Linq;
+using System.Diagnostics;
 
 /*
  *  Heavily based on https://github.com/rsdcastro/btree-dotnet/ and https://github.com/msambol/dsa/blob/master/trees/b_tree.py
@@ -154,33 +155,6 @@ namespace ACDatReader.IO.DatBTree {
             WriteNode(parent);
         }
 
-        private void InsertNonFull(DatBTreeNode node, DatBTreeFile file) {
-            int positionToInsert = node.Files.TakeWhile(entry => file.Id.CompareTo(entry.Id) >= 0).Count();
-
-            if (node.IsLeaf) {
-                node.Files.Insert(positionToInsert, file);
-                WriteNode(node);
-                return;
-            }
-
-            if (!TryGetNode(node.Branches[positionToInsert], out var child)) {
-                throw new Exception("Could not look up child node during insertion!");
-            }
-
-            if (child.Files.Count == MaxItems) {
-                SplitChild(node, child);
-                if (file.Id.CompareTo(node.Files[positionToInsert].Id) > 0) {
-                    positionToInsert++;
-
-                    if (!TryGetNode(node.Branches[positionToInsert], out child)) {
-                        throw new Exception("Could not look up child node during insertion!");
-                    }
-                }
-            }
-
-            InsertNonFull(child, file);
-        }
-
         private IEnumerable<DatBTreeFile> GetFilesRecursive(DatBTreeNode? node) {
             if (node is not null) {
                 int i;
@@ -284,6 +258,281 @@ namespace ACDatReader.IO.DatBTree {
             InsertNonFull(Root, file);
 
             return null;
+        }
+
+        private void InsertNonFull(DatBTreeNode node, DatBTreeFile file) {
+            int positionToInsert = node.Files.TakeWhile(entry => file.Id.CompareTo(entry.Id) >= 0).Count();
+
+            if (node.IsLeaf) {
+                node.Files.Insert(positionToInsert, file);
+                WriteNode(node);
+                return;
+            }
+
+            if (!TryGetNode(node.Branches[positionToInsert], out var child)) {
+                throw new Exception("Could not look up child node during insertion!");
+            }
+
+            if (child.Files.Count == MaxItems) {
+                SplitChild(node, child);
+                if (file.Id.CompareTo(node.Files[positionToInsert].Id) > 0) {
+                    positionToInsert++;
+
+                    if (!TryGetNode(node.Branches[positionToInsert], out child)) {
+                        throw new Exception("Could not look up child node during insertion!");
+                    }
+                }
+            }
+
+            InsertNonFull(child, file);
+        }
+
+        /// <summary>
+        /// Delete a file entry from the tree
+        /// </summary>
+        /// <param name="fileId">Key to be deleted.</param>
+        /// <param name="fileEntry">The file entry that was deleted</param>
+        /// <returns>True if file was deleted, false otherwise (not found)</returns>
+        public bool TryDelete(uint fileId, [MaybeNullWhen(false)] out DatBTreeFile fileEntry) {
+            if (Root is null) {
+                fileEntry = null;
+                return false;
+            }
+
+            if (!TryGetFile(fileId, out fileEntry)) {
+                return false;
+            }
+
+            DeleteInternal(Root, fileId);
+
+            // if root's last entry was moved to a child node, remove it
+            if (Root.Files.Count == 0 && !Root.IsLeaf && TryGetNode(Root.Branches[0], out var branch)) {
+                SetNewRoot(branch);
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Internal method to delete keys from the BTree
+        /// </summary>
+        /// <param name="node">Node to use to start search for the key.</param>
+        /// <param name="fileId">The id of the file to delete</param>
+        private void DeleteInternal(DatBTreeNode node, uint fileId) {
+            int i = node.Files.TakeWhile(entry => fileId.CompareTo(entry.Id) > 0).Count();
+
+            // found key in node, so delete if from it
+            if (i < node.Files.Count && node.Files[i].Id.CompareTo(fileId) == 0) {
+                DeleteKeyFromNode(node, fileId, i);
+            }
+
+            // delete key from subtree
+            else if (!node.IsLeaf) {
+                DeleteKeyFromSubtree(node, fileId, i);
+            }
+        }
+
+        /// <summary>
+        /// Helper method that deletes a key from a subtree.
+        /// </summary>
+        /// <param name="parentNode">Parent node used to start search for the key.</param>
+        /// <param name="keyToDelete">Key to be deleted.</param>
+        /// <param name="subtreeIndexInNode">Index of subtree node in the parent node.</param>
+        private void DeleteKeyFromSubtree(DatBTreeNode parentNode, uint keyToDelete, int subtreeIndexInNode) {
+            if (!TryGetNode(parentNode.Branches[subtreeIndexInNode], out var childNode)) {
+                Debug.Assert(false, "Unable to lookup child node!");
+                return;
+            }
+
+            // node has reached min # of entries, and removing any from it will break the btree property,
+            // so this block makes sure that the "child" has at least "degree" # of nodes by moving an 
+            // entry from a sibling node or merging nodes
+            if (childNode.Files.Count == MinItems) {
+                int leftIndex = subtreeIndexInNode - 1;
+                int rightIndex = subtreeIndexInNode + 1;
+                DatBTreeNode? leftSibling = null;
+                DatBTreeNode? rightSibling = null;
+
+                if (subtreeIndexInNode > 0) {
+                    if (!TryGetNode(parentNode.Branches[leftIndex], out leftSibling)) {
+                        Debug.Assert(false, "Unable to lookup leftSibling node!");
+                        return;
+                    }
+                }
+                if (subtreeIndexInNode < parentNode.Branches.Count - 1) {
+                    if (!TryGetNode(parentNode.Branches[rightIndex], out rightSibling)) {
+                        Debug.Assert(false, "Unable to lookup rightSibling node!");
+                        return;
+                    }
+                }
+
+                if (leftSibling is not null && leftSibling.Files.Count > Degree - 1) {
+                    // left sibling has a node to spare, so this moves one node from left sibling 
+                    // into parent's node and one node from parent into this current node ("child")
+                    childNode.Files.Insert(0, parentNode.Files[subtreeIndexInNode]);
+                    parentNode.Files[subtreeIndexInNode] = leftSibling.Files.Last();
+                    leftSibling.Files.RemoveAt(leftSibling.Files.Count - 1);
+
+                    if (!leftSibling.IsLeaf) {
+                        childNode.Branches.Insert(0, leftSibling.Branches.Last());
+                        leftSibling.Branches.RemoveAt(leftSibling.Branches.Count - 1);
+                    }
+
+                    WriteNode(childNode);
+                    WriteNode(parentNode);
+                    WriteNode(leftSibling);
+                }
+                else if (rightSibling != null && rightSibling.Files.Count > Degree - 1) {
+                    // right sibling has a node to spare, so this moves one node from right sibling 
+                    // into parent's node and one node from parent into this current node ("child")
+                    childNode.Files.Add(parentNode.Files[subtreeIndexInNode]);
+                    parentNode.Files[subtreeIndexInNode] = rightSibling.Files.First();
+                    rightSibling.Files.RemoveAt(0);
+
+                    if (!rightSibling.IsLeaf) {
+                        childNode.Branches.Add(rightSibling.Branches.First());
+                        rightSibling.Branches.RemoveAt(0);
+                    }
+
+                    WriteNode(childNode);
+                    WriteNode(parentNode);
+                    WriteNode(rightSibling);
+                }
+                else {
+                    // this block merges either left or right sibling into the current node "child"
+                    if (leftSibling != null) {
+                        childNode.Files.Insert(0, parentNode.Files[subtreeIndexInNode]);
+                        var oldEntries = childNode.Files;
+                        childNode.Files = leftSibling.Files;
+                        childNode.Files.AddRange(oldEntries);
+                        if (!leftSibling.IsLeaf) {
+                            var oldChildren = childNode.Branches;
+                            childNode.Branches = leftSibling.Branches;
+                            childNode.Branches.AddRange(oldChildren);
+                        }
+
+                        parentNode.Branches.RemoveAt(leftIndex);
+                        parentNode.Files.RemoveAt(subtreeIndexInNode);
+
+                        WriteNode(childNode);
+                        WriteNode(parentNode);
+                    }
+                    else {
+                        Debug.Assert(rightSibling != null, "Node should have at least one sibling");
+                        childNode.Files.Add(parentNode.Files[subtreeIndexInNode]);
+                        childNode.Files.AddRange(rightSibling.Files);
+                        if (!rightSibling.IsLeaf) {
+                            childNode.Branches.AddRange(rightSibling.Branches);
+                        }
+
+                        parentNode.Branches.RemoveAt(rightIndex);
+                        parentNode.Files.RemoveAt(subtreeIndexInNode);
+
+                        WriteNode(childNode);
+                        WriteNode(parentNode);
+                    }
+                }
+            }
+
+            // at this point, we know that "child" has at least "degree" nodes, so we can
+            // move on - this guarantees that if any node needs to be removed from it to
+            // guarantee BTree's property, we will be fine with that
+            DeleteInternal(childNode, keyToDelete);
+        }
+
+        /// <summary>
+        /// Helper method that deletes key from a node that contains it, be this
+        /// node a leaf node or an internal node.
+        /// </summary>
+        /// <param name="node">Node that contains the key.</param>
+        /// <param name="keyToDelete">Key to be deleted.</param>
+        /// <param name="keyIndexInNode">Index of key within the node.</param>
+        private void DeleteKeyFromNode(DatBTreeNode node, uint keyToDelete, int keyIndexInNode) {
+            // if leaf, just remove it from the list of entries (we're guaranteed to have
+            // at least "degree" # of entries, to BTree property is maintained
+            if (node.IsLeaf) {
+                node.Files.RemoveAt(keyIndexInNode);
+                WriteNode(node);
+                return;
+            }
+
+
+            if (!TryGetNode(node.Branches[keyIndexInNode], out var predecessorChild)) {
+                Debug.Assert(false, "Unable to lookup predecessorChild node!");
+                return;
+            }
+
+            if (predecessorChild.Files.Count >= Degree) {
+                var predecessor = DeletePredecessor(predecessorChild);
+                node.Files[keyIndexInNode] = predecessor;
+                WriteNode(node);
+            }
+            else {
+                if (!TryGetNode(node.Branches[keyIndexInNode + 1], out var successorChild)) {
+                    Debug.Assert(false, "Unable to lookup successorChild node!");
+                    return;
+                }
+                
+                if (successorChild.Files.Count >= Degree) {
+                    var successor = this.DeleteSuccessor(predecessorChild);
+                    node.Files[keyIndexInNode] = successor;
+                    WriteNode(node);
+                }
+                else {
+                    predecessorChild.Files.Add(node.Files[keyIndexInNode]);
+                    predecessorChild.Files.AddRange(successorChild.Files);
+                    predecessorChild.Branches.AddRange(successorChild.Branches);
+
+                    node.Files.RemoveAt(keyIndexInNode);
+                    node.Branches.RemoveAt(keyIndexInNode + 1);
+
+                    WriteNode(node);
+                    WriteNode(predecessorChild);
+
+                    this.DeleteInternal(predecessorChild, keyToDelete);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Helper method that deletes a predecessor key (i.e. rightmost key) for a given node.
+        /// </summary>
+        /// <param name="node">Node for which the predecessor will be deleted.</param>
+        /// <returns>Predecessor entry that got deleted.</returns>
+        private DatBTreeFile DeletePredecessor(DatBTreeNode node) {
+            if (node.IsLeaf) {
+                var result = node.Files[node.Files.Count - 1];
+                node.Files.RemoveAt(node.Files.Count - 1);
+                WriteNode(node);
+
+                return result;
+            }
+
+
+            if (!TryGetNode(node.Branches.Last(), out var predecessor)) {
+                throw new Exception($"Failed to look up predecessor");
+            }
+
+            return DeletePredecessor(predecessor);
+        }
+
+        /// <summary>
+        /// Helper method that deletes a successor key (i.e. leftmost key) for a given node.
+        /// </summary>
+        /// <param name="node">Node for which the successor will be deleted.</param>
+        /// <returns>Successor entry that got deleted.</returns>
+        private DatBTreeFile DeleteSuccessor(DatBTreeNode node) {
+            if (node.IsLeaf) {
+                var result = node.Files[0];
+                node.Files.RemoveAt(0);
+                WriteNode(node);
+                return result;
+            }
+
+            if (!TryGetNode(node.Branches.First(), out var predecessor)) {
+                throw new Exception($"Failed to look up predecessor");
+            }
+            return DeletePredecessor(predecessor);
         }
 
         /// <inheritdoc/>

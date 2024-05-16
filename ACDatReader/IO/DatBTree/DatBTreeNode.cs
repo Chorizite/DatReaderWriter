@@ -26,14 +26,14 @@ namespace ACDatReader.IO.DatBTree {
         /// A list of branches / child node ids directly contained in this node.
         /// Except on leaf nodes, Branches.Count must always be equal to Files.Count - 1.
         /// </summary>
-        public List<int> Branches { get; } = [];
+        public List<int> Branches { get; set; } = [];
 
         /// <summary>
         /// A list of file ids (keys) directly contained in this node.
         /// Except for root nodes, this must be between <see cref="DatBTreeReaderWriter.MinItems"/>
         /// and <see cref="DatBTreeReaderWriter.MaxItems"/> in length.
         /// </summary>
-        public List<DatBTreeFile> Files { get; } = [];
+        public List<DatBTreeFile> Files { get; set; } = [];
 
         /// <summary>
         /// Wether this is a leaf node. Leaf nodes have no branches, only files.

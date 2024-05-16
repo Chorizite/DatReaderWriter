@@ -20,9 +20,6 @@ namespace ACDatPacker {
                 FilePath = sourceDatPath
             }));
 
-
-            //Console.WriteLine(sourceDat);
-
             if (File.Exists(outDatPath)) {
                 File.Delete(outDatPath);
             }
