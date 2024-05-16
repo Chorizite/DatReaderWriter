@@ -61,7 +61,14 @@ namespace ACDatReader.IO.BlockAllocators {
 
                     var oldOffset = currentBlockSpan[0];
                     if (bufferIndex < numBytes) {
-                        currentBlockSpan[0] = ReserveBlock();
+                        Buffer.MemoryCopy(_viewPtr + currentBlockSpan[0], currentBlockBuffer, 4, 4);
+                        var nextBlock = BinaryPrimitives.ReadInt32LittleEndian(new Span<byte>(currentBlockBuffer, 4));
+                        if (nextBlock <= 0) {
+                            currentBlockSpan[0] = ReserveBlock();
+                        }
+                        else {
+                            currentBlockSpan[0] = nextBlock;
+                        }
                     }
                     else {
                         currentBlockSpan[0] = 0;

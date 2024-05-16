@@ -1,5 +1,6 @@
 ﻿using ACDatReader.IO.BlockAllocators;
 using ACDatReader.IO.DatBTree;
+using ACDatReader.Options;
 using ACDatReader.Tests.Lib;
 
 namespace ACDatReader.Tests.IO.DatBTree {
@@ -206,6 +207,48 @@ namespace ACDatReader.Tests.IO.DatBTree {
             Assert.AreEqual(0xF18E000, file.Offset);
             Assert.AreEqual(1117236872, file.Date);
             Assert.AreEqual(252u, file.Size);
+        }
+
+        [TestMethod]
+        [TestCategory("EOR")]
+        [CombinatorialData]
+        public void CanIterateOverEORDatsInSortedFileOrder(
+            [DataValues(EORDBType.Portal, EORDBType.Cell, EORDBType.Language, EORDBType.HighRes)] EORDBType dbType
+            ) {
+
+            using var tree = new DatBTreeReaderWriter(new MemoryMappedBlockAllocator(new Options.DatDatabaseOptions() {
+                FilePath = EORCommonData.GetDatPath(dbType)
+            }));
+
+            var fileCount = 0;
+            var lastFile = 0u;
+            foreach (var fileEntry in tree) {
+                Assert.IsTrue(lastFile < fileEntry.Id, $"Current file {fileEntry.Id:X8} should be less than previous file {lastFile:X8}");
+
+                lastFile = fileEntry.Id;
+                fileCount++;
+            }
+
+            EORCommonData.AssertGoodFileEntryCount(dbType, fileCount);
+        }
+
+        [TestMethod]
+        [TestCategory("EOR")]
+        [CombinatorialData]
+        public void CanIterateOverRetailDatsWithoutDoubleEntryReading(
+            [DataValues(EORDBType.Portal, EORDBType.Cell, EORDBType.Language, EORDBType.HighRes)] EORDBType dbType
+            ) {
+
+            using var tree = new DatBTreeReaderWriter(new MemoryMappedBlockAllocator(new Options.DatDatabaseOptions() {
+                FilePath = EORCommonData.GetDatPath(dbType)
+            }));
+
+            var knownFiles = new Dictionary<uint, bool>();
+            foreach (var fileEntry in tree) {
+                Assert.IsFalse(knownFiles.ContainsKey(fileEntry.Id), $"Current file {fileEntry.Id:X8} was already iterated over");
+
+                knownFiles.Add(fileEntry.Id, true);
+            }
         }
         #endregion
     }

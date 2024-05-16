@@ -52,14 +52,22 @@ namespace ACDatReader.IO.DatBTree {
         unsafe public bool Unpack(DatFileReader reader) {
             Span<int> branchSpan = stackalloc int[1];
             Span<int> iSpan = [0];
+
+            bool didFindEnd = false;
             for (iSpan[0] = 0; iSpan[0] < 62; iSpan[0]++) {
                 branchSpan[0] = reader.ReadInt32();
-                if (branchSpan[0] != 0 && branchSpan[0] != unchecked((int)0xCDCDCDCD)) {
+
+                if (branchSpan[0] == 0 || branchSpan[0] == unchecked((int)0xCDCDCDCD)) {
+                    didFindEnd = true;
+                }
+
+                if (!didFindEnd) {
                     Branches.Add(branchSpan[0]);
                 }
             }
 
             Span<int> entryCountSpan = [0, reader.ReadInt32()];
+
             for (entryCountSpan[0] = 0; entryCountSpan[0] < entryCountSpan[1]; entryCountSpan[0]++) {
                 var file = new DatBTreeFile {
                     Parent = this
@@ -99,6 +107,10 @@ namespace ACDatReader.IO.DatBTree {
 
             str.AppendLine($"DatBTreeNode @ 0x{Offset:X8}:");
             str.AppendLine($"Branches: [{string.Join(" ", Branches.Select(b => b.ToString("X8")))}]");
+            str.AppendLine($"Files: [{string.Join(" ", Files.Select(b => b.Id.ToString("X8")))}]");
+
+            return str.ToString();
+
             str.AppendLine($"Files: [");
 
             foreach (var file in Files) {
