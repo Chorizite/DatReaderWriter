@@ -501,7 +501,7 @@ namespace ACDatReader.IO.DatBTree {
         /// <returns>Predecessor entry that got deleted.</returns>
         private DatBTreeFile DeletePredecessor(DatBTreeNode node) {
             if (node.IsLeaf) {
-                var result = node.Files[node.Files.Count - 1];
+                var result = node.Files[^1];
                 node.Files.RemoveAt(node.Files.Count - 1);
                 WriteNode(node);
 

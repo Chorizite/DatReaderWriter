@@ -6,7 +6,7 @@ using ACDatReader.Options;
 
 namespace ACDatPacker {
     internal class Program {
-        static void Main(string[] args) {
+        static void Main() {
             PackDat(@"C:\Turbine\Asheron's Call\client_highres.dat", @"C:\Turbine\Asheron's Call - Copy\client_highres.dat");
             PackDat(@"C:\Turbine\Asheron's Call\client_local_English.dat", @"C:\Turbine\Asheron's Call - Copy\client_local_English.dat");
             PackDat(@"C:\Turbine\Asheron's Call\client_portal.dat", @"C:\Turbine\Asheron's Call - Copy\client_portal.dat");
