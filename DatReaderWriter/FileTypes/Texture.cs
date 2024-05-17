@@ -1,5 +1,5 @@
-﻿using ACClientLIb.DatReaderWriter.Enums;
-using ACClientLIb.DatReaderWriter.IO;
+﻿using ACClientLib.DatReaderWriter.Enums;
+using ACClientLib.DatReaderWriter.IO;
 using System;
 using System.Collections.Generic;
 using System.Linq;

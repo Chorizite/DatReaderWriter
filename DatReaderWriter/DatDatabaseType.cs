@@ -1,4 +1,4 @@
-﻿namespace ACClientLIb.DatReaderWriter {
+﻿namespace ACClientLib.DatReaderWriter {
 
     /// <summary>
     /// Dat database types. HighRes dat uses the <see cref="Portal"/> type

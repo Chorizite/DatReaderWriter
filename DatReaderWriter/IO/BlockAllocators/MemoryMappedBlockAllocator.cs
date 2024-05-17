@@ -1,10 +1,10 @@
-﻿using ACClientLIb.DatReaderWriter.Options;
+﻿using ACClientLib.DatReaderWriter.Options;
 using System;
 using System.Buffers.Binary;
 using System.IO;
 using System.IO.MemoryMappedFiles;
 
-namespace ACClientLIb.DatReaderWriter.IO.BlockAllocators {
+namespace ACClientLib.DatReaderWriter.IO.BlockAllocators {
     /// <summary>
     /// A block allocator that uses a Memory Mapped file.
     /// </summary>

@@ -1,4 +1,4 @@
-﻿namespace ACClientLIb.DatReaderWriter.Options {
+﻿namespace ACClientLib.DatReaderWriter.Options {
     /// <summary>
     /// The strategy for caching file indexes
     /// </summary>

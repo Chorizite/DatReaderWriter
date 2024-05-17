@@ -1,9 +1,9 @@
 ﻿
 using System;
-using ACClientLIb.DatReaderWriter.IO.BlockAllocators;
-using ACClientLIb.DatReaderWriter.Options;
+using ACClientLib.DatReaderWriter.IO.BlockAllocators;
+using ACClientLib.DatReaderWriter.Options;
 
-namespace ACClientLIb.DatReaderWriter {
+namespace ACClientLib.DatReaderWriter {
 
     /// <summary>
     /// A configurable dat manager implementation that loads up all of the dat files

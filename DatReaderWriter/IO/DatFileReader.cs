@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Buffers.Binary;
 
-namespace ACClientLIb.DatReaderWriter.IO {
+namespace ACClientLib.DatReaderWriter.IO {
     /// <summary>
     /// Reads / parses dat file bytes. This expects that the raw data buffer
     /// passed already has its blocks followed, and is a contiguous chunk of memory.

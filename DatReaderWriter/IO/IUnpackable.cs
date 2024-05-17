@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ACClientLIb.DatReaderWriter.IO {
+namespace ACClientLib.DatReaderWriter.IO {
     /// <summary>
     /// Can be unpacked from a dat file
     /// </summary>

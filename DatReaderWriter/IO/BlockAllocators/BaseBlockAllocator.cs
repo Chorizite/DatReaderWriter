@@ -1,10 +1,10 @@
-﻿using ACClientLIb.DatReaderWriter.Options;
+﻿using ACClientLib.DatReaderWriter.Options;
 using System;
 using System.Buffers;
 using System.Buffers.Binary;
 using System.Text;
 
-namespace ACClientLIb.DatReaderWriter.IO.BlockAllocators {
+namespace ACClientLib.DatReaderWriter.IO.BlockAllocators {
     /// <summary>
     /// Base block allocator class.
     /// </summary>

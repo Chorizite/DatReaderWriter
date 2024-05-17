@@ -1,4 +1,4 @@
-﻿namespace ACClientLIb.DatReaderWriter.Enums {
+﻿namespace ACClientLib.DatReaderWriter.Enums {
     /// <summary>
     /// Pixel format storage type
     /// </summary>

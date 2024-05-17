@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace ACClientLIb.DatReaderWriter.Options {
+namespace ACClientLib.DatReaderWriter.Options {
     /// <summary>
     /// Options for <see cref="DatManager"/>
     /// </summary>
