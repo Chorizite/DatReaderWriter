@@ -1,10 +1,10 @@
 name: 'CI'
 on:
-  pull_request:
+  push:
     branches:
     - master
 jobs:
-  build-test:
+  build-test-release:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -30,3 +30,15 @@ jobs:
         with:
           name: test-results
           path: 'test-results.xml'
+
+      - run: dotnet pack -c Release --no-restore
+  
+      - uses: actions/upload-artifact@v4  # upload test results
+        if: success() || failure()        # run this step even if previous step failed
+        with: 
+          name: packages
+          path: "${{ github.workspace }}/DatReaderWriter/bin/Release/ACClientLib.DatReaderWriter.${{ env.GitVersion_FullSemVer }}.nupkg"
+
+      - run: dotnet nuget add source --username USERNAME --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/ACClientLib/index.json"
+ 
+      - run: dotnet nuget push "${{ github.workspace }}/DatReaderWriter/bin/Release/ACClientLib.DatReaderWriter.${{ env.GitVersion_FullSemVer }}.nupkg" --api-key ${{ secrets.CI_NUGET_API_KEY }} --source "github"
