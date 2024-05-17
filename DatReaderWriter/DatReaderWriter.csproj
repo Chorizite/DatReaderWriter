@@ -13,11 +13,13 @@
   </PropertyGroup>
 
   <PropertyGroup>
+    <Title>ACClientLib.DatReaderWriter</Title>
+    <Product>ACClientLib.DatReaderWriter</Product>
     <PackageId>ACClientLib.DatReaderWriter</PackageId>
     <Authors>ACClientLib</Authors>
     <Company>ACClientLib</Company>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageDescription>ACClientLib.DatReaderWriter is an open-source library for reading and writing .dat files used by the game Asheron's Call.</PackageDescription>
+    <Description>ACClientLib.DatReaderWriter is an open-source library for reading and writing .dat files used by the game Asheron's Call.</Description>
     <RepositoryUrl>https://github.com/ACClientLib/DatReaderWriter/</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageReadmeFile>README.md</PackageReadmeFile>
