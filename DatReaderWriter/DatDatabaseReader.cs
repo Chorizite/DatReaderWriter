@@ -1,14 +1,14 @@
-﻿using ACClientLIb.DatReaderWriter.IO;
-using ACClientLIb.DatReaderWriter.IO.BlockAllocators;
-using ACClientLIb.DatReaderWriter.IO.DatBTree;
-using ACClientLIb.DatReaderWriter.Options;
+﻿using ACClientLib.DatReaderWriter.IO;
+using ACClientLib.DatReaderWriter.IO.BlockAllocators;
+using ACClientLib.DatReaderWriter.IO.DatBTree;
+using ACClientLib.DatReaderWriter.Options;
 using System;
 using System.Buffers;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
-namespace ACClientLIb.DatReaderWriter {
+namespace ACClientLib.DatReaderWriter {
     /// <summary>
     /// Provides read access to a dat database
     /// </summary>

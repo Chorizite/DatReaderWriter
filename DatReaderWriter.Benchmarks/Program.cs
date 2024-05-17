@@ -1,11 +1,11 @@
 ﻿
-using ACClientLIb.DatReaderWriter.Options;
+using ACClientLib.DatReaderWriter.Options;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Running;
 
-namespace ACClientLIb.DatReaderWriter.Benchmarks {
+namespace ACClientLib.DatReaderWriter.Benchmarks {
     public class Program {
         static void Main() {
             //BenchmarkRunner.Run<DatFileEntryCaching>();

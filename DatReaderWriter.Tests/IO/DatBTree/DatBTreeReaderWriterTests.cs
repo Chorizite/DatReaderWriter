@@ -1,11 +1,11 @@
-﻿using ACClientLIb.DatReaderWriter.Enums;
-using ACClientLIb.DatReaderWriter.IO;
-using ACClientLIb.DatReaderWriter.IO.BlockAllocators;
-using ACClientLIb.DatReaderWriter.IO.DatBTree;
-using ACClientLIb.DatReaderWriter.Options;
-using ACClientLIb.DatReaderWriter.Tests.Lib;
+﻿using ACClientLib.DatReaderWriter.Enums;
+using ACClientLib.DatReaderWriter.IO;
+using ACClientLib.DatReaderWriter.IO.BlockAllocators;
+using ACClientLib.DatReaderWriter.IO.DatBTree;
+using ACClientLib.DatReaderWriter.Options;
+using ACClientLib.DatReaderWriter.Tests.Lib;
 
-namespace ACClientLIb.DatReaderWriter.Tests.IO.DatBTree {
+namespace ACClientLib.DatReaderWriter.Tests.IO.DatBTree {
     [TestClass]
     public class DatBTreeReaderWriterTests {
         [TestMethod]

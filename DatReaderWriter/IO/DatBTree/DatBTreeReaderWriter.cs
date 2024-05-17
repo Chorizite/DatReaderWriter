@@ -1,5 +1,5 @@
-﻿using ACClientLIb.DatReaderWriter.IO.BlockAllocators;
-using ACClientLIb.DatReaderWriter.Options;
+﻿using ACClientLib.DatReaderWriter.IO.BlockAllocators;
+using ACClientLib.DatReaderWriter.Options;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -13,7 +13,7 @@ using System.Diagnostics;
 /*
  *  Heavily based on https://github.com/rsdcastro/btree-dotnet/ and https://github.com/msambol/dsa/blob/master/trees/b_tree.py
  */
-namespace ACClientLIb.DatReaderWriter.IO.DatBTree {
+namespace ACClientLib.DatReaderWriter.IO.DatBTree {
     /// <summary>
     /// A dat BTree reader / writer.
     /// </summary>

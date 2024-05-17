@@ -1,5 +1,5 @@
-﻿using ACClientLIb.DatReaderWriter.IO;
-using ACClientLIb.DatReaderWriter.Tests.Lib;
+﻿using ACClientLib.DatReaderWriter.IO;
+using ACClientLib.DatReaderWriter.Tests.Lib;
 using System;
 using System.Buffers.Binary;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace ACClientLIb.DatReaderWriter.Tests.IO {
+namespace ACClientLib.DatReaderWriter.Tests.IO {
     [TestClass]
     public class DatFileReadWriteSelfTests {
         [TestMethod]

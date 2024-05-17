@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Buffers.Binary;
 
-namespace ACClientLIb.DatReaderWriter.IO {
+namespace ACClientLib.DatReaderWriter.IO {
     /// <summary>
     /// A dat file writer. Used for writing dat block contents to a buffer.
     /// </summary>

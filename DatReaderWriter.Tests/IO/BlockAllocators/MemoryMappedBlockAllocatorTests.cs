@@ -1,6 +1,6 @@
-﻿using ACClientLIb.DatReaderWriter.IO;
-using ACClientLIb.DatReaderWriter.IO.BlockAllocators;
-using ACClientLIb.DatReaderWriter.Tests.Lib;
+﻿using ACClientLib.DatReaderWriter.IO;
+using ACClientLib.DatReaderWriter.IO.BlockAllocators;
+using ACClientLib.DatReaderWriter.Tests.Lib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +8,7 @@ using System.Reflection.PortableExecutable;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ACClientLIb.DatReaderWriter.Tests.IO.BlockAllocators {
+namespace ACClientLib.DatReaderWriter.Tests.IO.BlockAllocators {
     [TestClass]
     public class MemoryMappedBlockAllocatorTests {
         [TestMethod]

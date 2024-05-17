@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace ACClientLIb.DatReaderWriter.IO.DatBTree {
+namespace ACClientLib.DatReaderWriter.IO.DatBTree {
     /// <summary>
     /// A dat file entry. This points to where dat files are stored in the dat,
     /// as well as some other meta data.

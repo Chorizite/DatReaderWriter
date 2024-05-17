@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text;
 
-namespace ACClientLIb.DatReaderWriter.IO {
+namespace ACClientLib.DatReaderWriter.IO {
 
     /// <summary>
     /// The header of a dat file

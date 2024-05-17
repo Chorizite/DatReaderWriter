@@ -1,4 +1,4 @@
-﻿namespace ACClientLIb.DatReaderWriter.Options {
+﻿namespace ACClientLib.DatReaderWriter.Options {
     /// <summary>
     /// Dat access type.
     /// </summary>
