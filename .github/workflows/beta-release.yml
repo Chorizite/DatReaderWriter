@@ -1,4 +1,4 @@
-name: 'CI'
+name: 'Beta Release'
 on:
   push:
     branches:
