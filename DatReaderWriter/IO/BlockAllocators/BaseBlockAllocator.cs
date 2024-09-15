@@ -2,6 +2,7 @@
 using System;
 using System.Buffers;
 using System.Buffers.Binary;
+using System.Collections.Generic;
 using System.Text;
 
 namespace ACClientLib.DatReaderWriter.IO.BlockAllocators {
@@ -155,6 +156,9 @@ namespace ACClientLib.DatReaderWriter.IO.BlockAllocators {
 
         /// <inheritdoc/>
         public abstract void ReadBlock(byte[] buffer, int startingBlock);
+
+        /// <inheritdoc/>
+        public abstract bool TryGetBlockOffsets(int startingBlock, out List<int> fileBlocks);
 
         /// <summary>
         /// Expand the dat file size.

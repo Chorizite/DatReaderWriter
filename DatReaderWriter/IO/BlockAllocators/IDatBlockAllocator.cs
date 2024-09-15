@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace ACClientLib.DatReaderWriter.IO.BlockAllocators {
     /// <summary>
@@ -77,6 +78,14 @@ namespace ACClientLib.DatReaderWriter.IO.BlockAllocators {
         /// <param name="buffer">The buffer to read into</param>
         /// <param name="startingBlock">The starting block offset</param>
         void ReadBlock(byte[] buffer, int startingBlock);
+
+        /// <summary>
+        /// Get a list of all offsets that a block is using
+        /// </summary>
+        /// <param name="startingBlock">The block offset to start with</param>
+        /// <param name="fileBlocks">The block offsets contained in this block, including <paramref name="startingBlock"/></param>
+        /// <returns>True if the starting block was found, false otherwise (out of bounds, probably)</returns>
+        bool TryGetBlockOffsets(int startingBlock, out List<int> fileBlocks);
 
         /// <summary>
         /// Allocate empty blocks in the dat file.

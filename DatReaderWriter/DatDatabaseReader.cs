@@ -13,8 +13,8 @@ namespace ACClientLib.DatReaderWriter {
     /// Provides read access to a dat database
     /// </summary>
     public class DatDatabaseReader : IDisposable {
-        private readonly IDatBlockAllocator _blockAllocator;
-        private readonly DatBTreeReaderWriter _tree;
+        public readonly IDatBlockAllocator BlockAllocator;
+        public readonly DatBTreeReaderWriter Tree;
 
         /// <summary>
         /// Database Options
@@ -24,7 +24,7 @@ namespace ACClientLib.DatReaderWriter {
         /// <summary>
         /// Dat header
         /// </summary>
-        public DatHeader Header => _blockAllocator.Header;
+        public DatHeader Header => BlockAllocator.Header;
 
         /// <summary>
         /// Create a new DatDatabase
@@ -35,8 +35,8 @@ namespace ACClientLib.DatReaderWriter {
             Options = new DatDatabaseOptions();
             options?.Invoke(Options);
 
-            _blockAllocator = blockAllocator ?? new MemoryMappedBlockAllocator(Options);
-            _tree = new DatBTreeReaderWriter(_blockAllocator);
+            BlockAllocator = blockAllocator ?? new MemoryMappedBlockAllocator(Options);
+            Tree = new DatBTreeReaderWriter(BlockAllocator);
         }
 
         /// <summary>
@@ -45,15 +45,46 @@ namespace ACClientLib.DatReaderWriter {
         /// <param name="fileId">The id of the file to get</param>
         /// <param name="bytes">The raw bytes</param>
         /// <returns>True if the file was found, false otherwise</returns>
-        public bool TryGetFileBytes(uint fileId, [MaybeNullWhen(false)] out byte[] bytes) {
-            if (_tree.TryGetFile(fileId, out var fileEntry)) {
+#if (NET8_0_OR_GREATER)
+            public bool TryGetFileBytes(uint fileId, [MaybeNullWhen(false)] out byte[] bytes) {
+#else
+        public bool TryGetFileBytes(uint fileId, out byte[] bytes) {
+#endif
+            if (Tree.TryGetFile(fileId, out var fileEntry)) {
                 bytes = new byte[fileEntry.Size];
-                _blockAllocator.ReadBlock(bytes, fileEntry.Offset);
+                BlockAllocator.ReadBlock(bytes, fileEntry.Offset);
                 return true;
             }
 
-            bytes = null;
+            bytes = null!;
             return false;
+        }
+
+        /// <summary>
+        /// Read a dat file
+        /// </summary>
+        /// <typeparam name="T">The dat file type</typeparam>
+        /// <param name="fileId">The id of the file to get</param>
+        /// <param name="value">The unpacked file</param>
+        /// <returns></returns>
+#if (NET8_0_OR_GREATER)
+            public bool TryReadFile<T>(uint fileId, [MaybeNullWhen(false)] out T value) where T : IUnpackable {
+#else
+        public bool TryReadFile<T>(uint fileId, out T value) where T : IUnpackable {
+#endif
+            if (!TryGetFileBytes(fileId, out var bytes)) {
+                value = default!;
+                return false;
+            }
+
+            value = (T)Activator.CreateInstance(typeof(T));
+
+            if (!value.Unpack(new DatFileReader(bytes))) {
+                value = default!;
+                return false;
+            }
+
+            return true;
         }
 
         /// <inheritdoc/>
@@ -66,7 +97,7 @@ namespace ACClientLib.DatReaderWriter {
         /// <inheritdoc/>
         protected virtual void Dispose(bool disposing) {
             if (disposing) {
-                _blockAllocator?.Dispose();
+                BlockAllocator?.Dispose();
             }
         }
     }

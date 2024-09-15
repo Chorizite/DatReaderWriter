@@ -48,12 +48,12 @@ namespace ACClientLib.DatReaderWriter {
             }, blockAllocator);
 
             Cell = new DatDatabaseReader(cellOptions => {
-                cellOptions.FilePath = Options.PortalDatPath;
+                cellOptions.FilePath = Options.CellDatPath;
                 cellOptions.IndexCachingStrategy = Options.IndexCachingStrategy;
             }, blockAllocator);
 
             Language = new DatDatabaseReader(languageOptions => {
-                languageOptions.FilePath = Options.PortalDatPath;
+                languageOptions.FilePath = Options.LanguageDatPath;
                 languageOptions.IndexCachingStrategy = Options.IndexCachingStrategy;
             }, blockAllocator);
 
