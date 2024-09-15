@@ -4,9 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Reflection.PortableExecutable;
 using System.Text;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Xml.Linq;
 using System.Diagnostics;
 
@@ -58,7 +56,11 @@ namespace ACClientLib.DatReaderWriter.IO.DatBTree {
             }
         }
 
+#if (NET8_0_OR_GREATER)
         private bool TryGetNode(int blockOffset, [MaybeNullWhen(false)] out DatBTreeNode result) {
+#else
+        private bool TryGetNode(int blockOffset, out DatBTreeNode result) {
+#endif
             var buffer = BaseBlockAllocator.SharedBytes.Rent(DatBTreeNode.SIZE);
 
             BlockAllocator.ReadBlock(buffer, blockOffset);
@@ -82,7 +84,11 @@ namespace ACClientLib.DatReaderWriter.IO.DatBTree {
             BaseBlockAllocator.SharedBytes.Return(buffer);
         }
 
-        private bool TryGetFileInternal(uint fileId, int startingBlock, [MaybeNullWhen(false)] out DatBTreeFile file) {
+#if (NET8_0_OR_GREATER)
+            private bool TryGetFileInternal(uint fileId, int startingBlock, [MaybeNullWhen(false)] out DatBTreeFile file) {
+#else
+        private bool TryGetFileInternal(uint fileId, int startingBlock, out DatBTreeFile file) {
+#endif
             // 0 and 0xCDCDCDCD are invalid node offsets
             while (startingBlock != 0 && startingBlock != unchecked((int)0xCDCDCDCD)) {
                 if (TryGetNode(startingBlock, out var node)) {
@@ -201,7 +207,11 @@ namespace ACClientLib.DatReaderWriter.IO.DatBTree {
         /// <param name="fileId">The file id to search for</param>
         /// <param name="file">The file, or null if not found</param>
         /// <returns>true if the file was found, false otherwise</returns>
-        public bool TryGetFile(uint fileId, [MaybeNullWhen(false)] out DatBTreeFile file) {
+#if (NET8_0_OR_GREATER)
+            public bool TryGetFile(uint fileId, [MaybeNullWhen(false)] out DatBTreeFile file) {
+#else
+        public bool TryGetFile(uint fileId, out DatBTreeFile file) {
+#endif
             return TryGetFileInternal(fileId, BlockAllocator.Header.RootBlock, out file);
         }
 
@@ -293,7 +303,11 @@ namespace ACClientLib.DatReaderWriter.IO.DatBTree {
         /// <param name="fileId">Key to be deleted.</param>
         /// <param name="fileEntry">The file entry that was deleted</param>
         /// <returns>True if file was deleted, false otherwise (not found)</returns>
-        public bool TryDelete(uint fileId, [MaybeNullWhen(false)] out DatBTreeFile fileEntry) {
+#if (NET8_0_OR_GREATER)
+            public bool TryDelete(uint fileId, [MaybeNullWhen(false)] out DatBTreeFile fileEntry) {
+#else
+        public bool TryDelete(uint fileId, out DatBTreeFile fileEntry) {
+#endif
             if (Root is null) {
                 fileEntry = null;
                 return false;
@@ -501,7 +515,7 @@ namespace ACClientLib.DatReaderWriter.IO.DatBTree {
         /// <returns>Predecessor entry that got deleted.</returns>
         private DatBTreeFile DeletePredecessor(DatBTreeNode node) {
             if (node.IsLeaf) {
-                var result = node.Files[^1];
+                var result = node.Files[node.Files.Count - 1];
                 node.Files.RemoveAt(node.Files.Count - 1);
                 WriteNode(node);
 

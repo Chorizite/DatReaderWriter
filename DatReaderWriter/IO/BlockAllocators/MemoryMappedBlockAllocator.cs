@@ -1,6 +1,7 @@
 ﻿using ACClientLib.DatReaderWriter.Options;
 using System;
 using System.Buffers.Binary;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.MemoryMappedFiles;
 
@@ -107,6 +108,20 @@ namespace ACClientLib.DatReaderWriter.IO.BlockAllocators {
 
                 bufferStatsSpan[0] += bufferStatsSpan[1];
             }
+        }
+
+
+        /// <inheritdoc/>
+        public override bool TryGetBlockOffsets(int startingBlock, out List<int> fileBlocks) {
+            fileBlocks = [];
+            var nextBlockBuffer = stackalloc byte[4];
+
+            while (startingBlock != 0) {
+                Buffer.MemoryCopy(_viewPtr + startingBlock, nextBlockBuffer, 4, 4);
+                startingBlock = BinaryPrimitives.ReadInt32LittleEndian(new ReadOnlySpan<byte>(nextBlockBuffer, 4));
+            }
+
+            return true;
         }
 
         /// <inheritdoc/>

@@ -76,14 +76,17 @@ namespace ACClientLib.DatReaderWriter.IO.DatBTree {
         /// <inheritdoc/>
         public override string ToString() {
             var str = new StringBuilder();
+            
+            DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+            dateTime = dateTime.AddSeconds(Date).ToLocalTime();
 
             str.AppendLine($"DatFileEntry:");
             str.AppendLine($"\t Id: {Id:X8}");
             str.AppendLine($"\t Flags: {Flags:X8}");
             str.AppendLine($"\t Offset: {Offset:X8}");
             str.AppendLine($"\t Size: {Size:N0}");
-            str.AppendLine($"\t Date: {Date:X8}");
-            str.AppendLine($"\t Iteration: {Iteration:X8}");
+            str.AppendLine($"\t Date: {dateTime}");
+            str.AppendLine($"\t Iteration: {Iteration}");
 
             return str.ToString();
         }
