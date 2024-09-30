@@ -29,7 +29,7 @@ namespace ACClientLib.DatReaderWriter.IO.BlockAllocators {
                 }
             }
             else {
-                _datStream = File.Open(options.FilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                _datStream = File.Open(options.FilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             }
 
             UpdateViewPtr(out _mappedFile, out _view, out _viewPtr);
