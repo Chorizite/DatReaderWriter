@@ -70,7 +70,7 @@ namespace ACClientLib.DatReaderWriter {
 #if (NET8_0_OR_GREATER)
             public bool TryReadFile<T>(uint fileId, [MaybeNullWhen(false)] out T value) where T : IUnpackable {
 #else
-        public bool TryReadFile<T>(uint fileId, out T value) where T : IUnpackable {
+        public bool TryReadFile<T>(uint fileId, out T value) where T : IDatFileType {
 #endif
             if (!TryGetFileBytes(fileId, out var bytes)) {
                 value = default!;
@@ -87,17 +87,47 @@ namespace ACClientLib.DatReaderWriter {
             return true;
         }
 
+        /// <summary>
+        /// Try and write a <see cref="IDatFileType"/> to the dat.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="fileId">The file id to write to</param>
+        /// <param name="value">The value to write</param>
+        /// <returns>True if successful, false otherwise</returns>
+        public bool TryWriteFile<T>(T value) where T : IDatFileType {
+            int startingBlockId = 0;
+            if (Tree.TryGetFile(value.Id, out var existingFile)) {
+                startingBlockId = existingFile.Offset;
+            }
+
+            var buffer = BaseBlockAllocator.SharedBytes.Rent(value.GetSize());
+            var writer = new DatFileWriter(buffer);
+
+            value.Pack(writer);
+
+            startingBlockId = Tree.BlockAllocator.WriteBlock(buffer, buffer.Length);
+            Tree.Insert(new DatBTreeFile() {
+                Flags = 0,
+                Id = value.Id,
+                Size = (uint)buffer.Length,
+                Offset = startingBlockId
+            });
+
+            BaseBlockAllocator.SharedBytes.Return(buffer);
+
+            return true;
+        }
+
         /// <inheritdoc/>
         public void Dispose() {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
 
-
         /// <inheritdoc/>
         protected virtual void Dispose(bool disposing) {
             if (disposing) {
-                BlockAllocator?.Dispose();
+                Tree?.Dispose();
             }
         }
     }

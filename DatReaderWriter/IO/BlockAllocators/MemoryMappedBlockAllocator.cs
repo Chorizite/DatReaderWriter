@@ -146,6 +146,7 @@ namespace ACClientLib.DatReaderWriter.IO.BlockAllocators {
                 _view.SafeMemoryMappedViewHandle.ReleasePointer();
                 _viewPtr = (byte*)0;
                 _view.Dispose();
+                _view = null;
             }
 
             _mappedFile?.Dispose();
@@ -177,7 +178,10 @@ namespace ACClientLib.DatReaderWriter.IO.BlockAllocators {
                 DestroyMappedFile();
 
                 if (CanWrite) {
-                    _datStream.Flush(true);
+                    try {
+                        _datStream.Flush(true);
+                    }
+                    catch { }
                 }
                 _datStream.Dispose();
             }

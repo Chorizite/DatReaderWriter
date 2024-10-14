@@ -44,7 +44,7 @@ namespace ACClientLib.DatReaderWriter.IO.BlockAllocators {
             Header.SubSet = subset;
             Header.BlockSize = blockSize;
             Header.RootBlock = 0;
-            Header.FileSize = DatHeader.SIZE;
+            Header.FileSize = Header.GetSize();
             Header.Magic = DatHeader.RETAIL_MAGIC;
 
             if (numBlocksToAllocate > 0) {

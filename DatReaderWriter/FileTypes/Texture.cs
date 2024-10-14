@@ -8,16 +8,48 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace ACDatReader.FileTypes {
-    public class Texture : IUnpackable {
-        private uint Id;
+    /// <summary>
+    /// A texture
+    /// </summary>
+    public class Texture : IDatFileType {
+        /// <summary>
+        /// The id of this texture
+        /// </summary>
+        public uint Id { get; set; }
+
         public int Unknown;
+
+        /// <summary>
+        /// The width of this texture
+        /// </summary>
         public int Width;
+        
+        /// <summary>
+        /// The height of this texture
+        /// </summary>
         public int Height;
+        /// <summary>
+        /// The <see cref="SurfacePixelFormat"/>
+        /// </summary>
         public SurfacePixelFormat Format;
+
+        /// <summary>
+        /// Data length of this texture
+        /// </summary>
         public int Length;
+
+        /// <summary>
+        /// Source bytes of this texture
+        /// </summary>
         public byte[] SourceData;
+
+        /// <summary>
+        /// The default palette id. Only valid when <see cref="SurfacePixelFormat"/> is
+        /// <see cref="SurfacePixelFormat.PFID_INDEX16"/> or <see cref="SurfacePixelFormat.PFID_P8"/>
+        /// </summary>
         public uint? DefaultPaletteId;
 
+        ///<inheritdoc/>
         public bool Unpack(DatFileReader reader) {
             Id = reader.ReadUInt32();
             Unknown = reader.ReadInt32();
@@ -38,6 +70,41 @@ namespace ACDatReader.FileTypes {
             }
 
             return true;
+        }
+
+        ///<inheritdoc/>
+        public bool Pack(DatFileWriter writer) {
+            writer.WriteUInt32(Id);
+            writer.WriteInt32(Unknown);
+            writer.WriteInt32(Width);
+            writer.WriteInt32(Height);
+            writer.WriteUInt32((uint)Format);
+            writer.WriteInt32(SourceData.Length);
+            writer.WriteBytes(SourceData, SourceData.Length);
+
+            switch (Format) {
+                case SurfacePixelFormat.PFID_INDEX16:
+                case SurfacePixelFormat.PFID_P8:
+                    writer.WriteUInt32(DefaultPaletteId.GetValueOrDefault());
+                    break;
+            }
+
+            return true;
+        }
+
+        ///<inheritdoc/>
+        public int GetSize() {
+            var size = sizeof(int) * 6;
+            size += SourceData.Length;
+
+            switch (Format) {
+                case SurfacePixelFormat.PFID_INDEX16:
+                case SurfacePixelFormat.PFID_P8:
+                    size += sizeof(int);
+                    break;
+            }
+
+            return size;
         }
 
         public override string ToString() {

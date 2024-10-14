@@ -161,6 +161,9 @@ namespace ACClientLib.DatReaderWriter.IO {
             writer.WriteBytes([0x00, 0x50, 0x4C, 0x00], 4);
         }
 
+        /// <inheritdoc/>
+        public int GetSize() => SIZE;
+
         /// <returns>True if successful (the magic was good)</returns>
         /// <inheritdoc/>
         public bool Unpack(DatFileReader reader) {

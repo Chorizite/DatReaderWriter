@@ -35,7 +35,7 @@ namespace ACClientLib.DatReaderWriter.IO.DatBTree {
         public uint Size { get; set; }
 
         /// <summary>
-        /// The dat this was last updated (maybe added?) in unix timestamp format
+        /// The date this was last updated (maybe added?) in unix timestamp format
         /// </summary>
         public int Date { get; set; }
 
@@ -48,6 +48,9 @@ namespace ACClientLib.DatReaderWriter.IO.DatBTree {
         /// The parent node of this file entry
         /// </summary>
         public DatBTreeNode? Parent { get; internal set; }
+
+        /// <inheritdoc/>
+        public int GetSize() => SIZE;
 
         /// <inheritdoc/>
         public bool Unpack(DatFileReader reader) {

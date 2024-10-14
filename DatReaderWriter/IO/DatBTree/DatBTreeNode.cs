@@ -48,6 +48,9 @@ namespace ACClientLib.DatReaderWriter.IO.DatBTree {
         }
 
         /// <inheritdoc/>
+        public int GetSize() => SIZE;
+
+        /// <inheritdoc/>
         unsafe public bool Unpack(DatFileReader reader) {
             Span<int> branchSpan = stackalloc int[1];
             Span<int> iSpan = [0];
