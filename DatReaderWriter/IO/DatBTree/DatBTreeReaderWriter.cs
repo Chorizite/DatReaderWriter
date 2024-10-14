@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Xml.Linq;
 using System.Diagnostics;
+using System.Collections;
 
 /*
  *  Heavily based on https://github.com/rsdcastro/btree-dotnet/ and https://github.com/msambol/dsa/blob/master/trees/b_tree.py
@@ -15,7 +16,7 @@ namespace ACClientLib.DatReaderWriter.IO.DatBTree {
     /// <summary>
     /// A dat BTree reader / writer.
     /// </summary>
-    public class DatBTreeReaderWriter : IDisposable {
+    public class DatBTreeReaderWriter : IEnumerable<DatBTreeFile>, IDisposable {
         /// <summary>
         /// Block allocator
         /// </summary>
@@ -199,6 +200,10 @@ namespace ACClientLib.DatReaderWriter.IO.DatBTree {
                     yield return fileEntry;
                 }
             }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() {
+            return GetEnumerator();
         }
 
         /// <summary>

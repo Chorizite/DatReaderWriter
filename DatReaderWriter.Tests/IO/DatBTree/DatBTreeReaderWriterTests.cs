@@ -200,6 +200,19 @@ namespace ACClientLib.DatReaderWriter.Tests.IO.DatBTree {
         [TestMethod]
         [TestCategory("EOR")]
         [CombinatorialData]
+        public void CanLinqOverEORDats([DataValues(EORDBType.Portal)] EORDBType dbType) {
+
+            using var tree = new DatBTreeReaderWriter(new MemoryMappedBlockAllocator(new Options.DatDatabaseOptions() {
+                FilePath = EORCommonData.GetDatPath(dbType)
+            }));
+
+            var textureCount = tree.Where(f => f.Id >> 24 == 0x05).Select(f => f.Id).Count();
+            Assert.AreEqual(7221, textureCount);
+        }
+
+        [TestMethod]
+        [TestCategory("EOR")]
+        [CombinatorialData]
         public void HasKnownEORPortalFiles(
             [DataValues(0x010022A8u, 0x06004A07u, 0x08001947u, 0x0A0005ACu, 0x33000421u)] uint fileId
             ) {
