@@ -4,7 +4,7 @@ using ACClientLib.DatReaderWriter.Options;
 using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.DBObjs;
 
-namespace DatReaderWriter.Tests.DBObjs {
+namespace ACClientLib.DatReaderWriter.Tests.DBObjs {
     [TestClass]
     public class SurfaceTextureTests {
         [TestMethod]

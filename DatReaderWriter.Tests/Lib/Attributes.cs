@@ -46,7 +46,7 @@ namespace ACClientLib.DatReaderWriter.Tests.Lib {
                 }
 
                 // Check if needs to be excluded
-#if NETSTANDARD
+#if (NETSTANDARD || NETFRAMEWORK)
                 if (!excluded.Any(e => e.Values.Zip(arg, (a, b) => a?.Equals(b) == true).All(a => a))) {
                     yield return arg!;
                 }

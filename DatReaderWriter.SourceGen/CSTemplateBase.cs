@@ -122,10 +122,10 @@ namespace DatReaderWriter.SourceGen {
             var getter = member.Value;
             if (!string.IsNullOrWhiteSpace(member.Shift))
                 getter = "(" + parent.Name + " >> " + member.Shift + ")";
-            if (!string.IsNullOrWhiteSpace(member.And))
-                getter = "(" + (string.IsNullOrWhiteSpace(getter) ? parent.Name : getter) + " & " + member.And + ")";
-            WriteSummary("Derived from " + parent.Name + ". " + member.Text);
-            WriteLine("public " + simplifiedType + " " + member.Name + " { get => (" + simplifiedType + ")(" + getter + "); }\n");
+            if (!string.IsNullOrWhiteSpace(member.Mask))
+                getter = "(" + (string.IsNullOrWhiteSpace(getter) ? parent.Name : getter) + " & " + member.Mask + ")";
+            WriteSummary(member.Text);
+            WriteLine("public " + simplifiedType + " " + member.Name + ";\n");
         }
 
         /// <summary>
@@ -185,10 +185,28 @@ namespace DatReaderWriter.SourceGen {
         /// </summary>
         /// <param name="member"></param>
         public override void WritePrimitiveReader(ACDataMember member) {
-            if (member.Parent is ACVector || member.IsLength || member.Name.StartsWith("_"))
+            if (member.Parent is ACVector || member.IsLength || member.Name.StartsWith("_")) {
                 WriteLine("var " + member.Name + " = " + GetBinaryReaderForType(member.MemberType) + ";");
-            else
+                if (member.SubMembers.Count > 0) {
+                    foreach (var sub in member.SubMembers) {
+                        if (!string.IsNullOrEmpty(sub.Mask) && !string.IsNullOrEmpty(sub.Shift)) {
+                            WriteLine($"{sub.Name} = ({SimplifyType(sub.Type)})(({member.Name} & {sub.Mask}) >> {sub.Shift});");
+                        }
+                        else if (!string.IsNullOrEmpty(sub.Mask)) {
+                            WriteLine($"{sub.Name} = ({SimplifyType(sub.Type)})({member.Name} & {sub.Mask});");
+                        }
+                        else if (!string.IsNullOrEmpty(sub.Shift)) {
+                            WriteLine($"{sub.Name} = ({SimplifyType(sub.Type)})({member.Name} >> {sub.Shift});");
+                        }
+                        else {
+                            WriteLine($"{sub.Name} = ({SimplifyType(sub.Type)})({member.Name});");
+                        }
+                    }
+                }
+            }
+            else {
                 WriteLine(member.Name + " = " + GetBinaryReaderForType(member.MemberType) + ";");
+            }
         }
 
         /// <summary>

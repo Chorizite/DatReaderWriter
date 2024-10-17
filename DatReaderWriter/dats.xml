@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema text="AC Protocol definitions / documentation. Heavily based off of zegeger's messages.xml work and ACE enums / code comments">
   <enums>
+    <enum name="DatFileType" parent="int">
+      <value name="Undefined" value="0" />
+      <value name="Portal" value="1" />
+      <value name="Cell" value="2" />
+      <value name="Local" value="3" />
+    </enum>
     <enum name="PixelFormat" parent="uint">
       <value name="PFID_UNKNOWN" value="0x00000000" />
       <value name="PFID_R8G8B8" value="0x00000014" />
@@ -86,6 +92,41 @@
       <value name="Physics" value="1" />
       <value name="Cell" value="2" />
     </enum>
+    <enum name="TerrainType" parent="Int32">
+      <value name="BarrenRock" value="0x00000000" />
+      <value name="Grassland" value="0x00000001" />
+      <value name="Ice" value="0x00000002" />
+      <value name="LushGrass" value="0x00000003" />
+      <value name="MarshSparseSwamp" value="0x00000004" />
+      <value name="MudRichDirt" value="0x00000005" />
+      <value name="ObsidianPlain" value="0x00000006" />
+      <value name="PackedDirt" value="0x00000007" />
+      <value name="PatchyDirt" value="0x00000008" />
+      <value name="PatchyGrassland" value="0x00000009" />
+      <value name="SandYellow" value="0x0000000A" />
+      <value name="SandGrey" value="0x0000000B" />
+      <value name="SandRockStrewn" value="0x0000000C" />
+      <value name="SedimentaryRock" value="0x0000000D" />
+      <value name="SemiBarrenRock" value="0x0000000E" />
+      <value name="Snow" value="0x0000000F" />
+      <value name="WaterRunning" value="0x00000010" />
+      <value name="WaterStandingFresh" value="0x00000011" />
+      <value name="WaterShallowSea" value="0x00000012" />
+      <value name="WaterShallowStillSea" value="0x00000013" />
+      <value name="WaterDeepSea" value="0x00000014" />
+      <value name="Reserved21" value="0x00000015" />
+      <value name="Reserved22" value="0x00000016" />
+      <value name="Reserved23" value="0x00000017" />
+      <value name="Reserved24" value="0x00000018" />
+      <value name="Reserved25" value="0x00000019" />
+      <value name="Reserved26" value="0x0000001A" />
+      <value name="Reserved27" value="0x0000001B" />
+      <value name="Reserved28" value="0x0000001C" />
+      <value name="Reserved29" value="0x0000001D" />
+      <value name="Reserved30" value="0x0000001E" />
+      <value name="Reserved31" value="0x0000001F" />
+      <value name="RoadType" value="0x00000020" />
+    </enum>
   </enums>
   <types>
     <type name="DBObj" abstract="true">
@@ -163,9 +204,16 @@
       </if>
       <align type="uint" />
     </type>
+    <type name="TerrainInfo">
+      <field name="_rawValue" type="ushort" hidden="true">
+        <subfield name="Road" type="byte" mask="0x3" text="Road type" />
+        <subfield name="Type" type="TerrainType" mask="0x7C" shift="2" text="Terrain type" />
+        <subfield name="Scenery" type="ushort" mask="0xF800" shift="11" text="Scenery type" />
+      </field>
+    </type>
   </types>
   <dats>
-    <dat name="portal" text="client_portal.dat">
+    <dat name="portal" text="client_portal.dat" type="DatFileType.Portal">
       <type name="GfxObj" description="GfxObj / DB_TYPE_GFXOBJ in the client." parent="DBObj" first="0x1000000" last="0x100FFFF" categorized="false">
         <field type="GfxObjFlags" name="Flags" />
         <field type="CompressedUInt" name="_numSurfaces" />
@@ -312,15 +360,19 @@
       <type name="ContractTable" description="DB_TYPE_CONTRACT_TABLE_0 in the client." parent="DBObj" first="0xE00001D" last="0xE00001D" categorized="false">
       </type>
     </dat>
-    <dat name="cell" text="client_cell_1.dat">
+    <dat name="cell" text="client_cell_1.dat" type="DatFileType.Cell">
       <type name="LandBlock" description="DB_TYPE_LAND_BLOCK in the client." parent="DBObj" first="0" last="0" categorized="false">
+        <field type="bool" name="HasObjects" />
+        <vector name="Terrain" length="81" type="TerrainInfo" />
+        <vector name="Height" length="81" type="byte" />
+        <align type="uint" />
       </type>
       <type name="LandBlockInfo" description="DB_TYPE_LBI in the client." parent="DBObj" first="0" last="0" categorized="false">
       </type>
       <type name="Cell" description="DB_TYPE_CELL in the client." parent="DBObj" first="0" last="0" categorized="false">
       </type>
     </dat>
-    <dat name="local" text="client_local_English.dat">
+    <dat name="local" text="client_local_English.dat" type="DatFileType.Local">
       <type name="StringTable" description="DB_TYPE_STRING_TABLE in the client." parent="DBObj" first="0x23000000" last="0x24FFFFFF" categorized="false">
       </type>
       <type name="FontLocal" description="DB_TYPE_FONT_LOCAL in the client." parent="DBObj" first="0x40001000" last="0x40FFFFFF" categorized="false">

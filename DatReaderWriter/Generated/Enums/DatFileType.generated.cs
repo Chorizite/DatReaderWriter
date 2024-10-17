@@ -10,12 +10,14 @@
 
 using System;
 namespace ACClientLib.DatReaderWriter.Enums {
-    public enum BSPType : int {
-        Drawing = 0,
+    public enum DatFileType : int {
+        Undefined = 0,
 
-        Physics = 1,
+        Portal = 1,
 
         Cell = 2,
+
+        Local = 3,
 
     };
 }

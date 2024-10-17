@@ -7,7 +7,7 @@ using Environment = ACClientLib.DatReaderWriter.DBObjs.Environment;
 using ACClientLib.DatReaderWriter.Types;
 using System.Numerics;
 
-namespace DatReaderWriter.Tests.DBObjs {
+namespace ACClientLib.DatReaderWriter.Tests.DBObjs {
     [TestClass]
     public class EnvironmentTests {
         [TestMethod]

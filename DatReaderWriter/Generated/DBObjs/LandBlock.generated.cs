@@ -19,36 +19,44 @@ using ACClientLib.DatReaderWriter.Types;
 using ACClientLib.DatReaderWriter.Attributes;
 
 namespace ACClientLib.DatReaderWriter.DBObjs {
-    [DBObjType(DatFileType.Portal, false, 0x0D000000, 0x0D00FFFF)]
-    public class Environment : DBObj {
+    [DBObjType(DatFileType.Cell, false, 0x00000000, 0x00000000)]
+    public class LandBlock : DBObj {
         /// <inheritdoc />
         public override bool HasDataCategory => false;
 
-        /// <summary>
-        /// The cells in this environment
-        /// </summary>
-        public Dictionary<uint, CellStruct> Cells = [];
+        public bool HasObjects;
+
+        public TerrainInfo[] Terrain = [];
+
+        public byte[] Height = [];
 
         /// <inheritdoc />
         public override bool Unpack(DatFileReader reader) {
             base.Unpack(reader);
-            var _cellCount = reader.ReadUInt32();
-            for (var i=0; i < _cellCount; i++) {
-                var _key = reader.ReadUInt32();
-                var _val = reader.ReadItem<CellStruct>();
-                Cells.Add(_key, _val);
+            HasObjects = reader.ReadBool();
+            Terrain = new TerrainInfo[81];
+            for (var i=0; i < 81; i++) {
+                Terrain[i] = reader.ReadItem<TerrainInfo>();
             }
+            Height = new byte[81];
+            for (var i=0; i < 81; i++) {
+                Height[i] = reader.ReadByte();
+            }
+            reader.Align(4);
             return true;
         }
 
         /// <inheritdoc />
         public override bool Pack(DatFileWriter writer) {
             base.Pack(writer);
-            writer.WriteUInt32((uint)Cells.Count());
-            foreach (var kv in Cells) {
-                writer.WriteUInt32(kv.Key);
-                writer.WriteItem<CellStruct>(kv.Value);
+            writer.WriteBool(HasObjects);
+            for (var i=0; i < Terrain.Count(); i++) {
+                writer.WriteItem<TerrainInfo>(Terrain[i]);
             }
+            for (var i=0; i < Height.Count(); i++) {
+                writer.WriteByte(Height[i]);
+            }
+            writer.Align(4);
             return true;
         }
 

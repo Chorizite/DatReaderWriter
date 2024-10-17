@@ -16,7 +16,10 @@ using System.Collections.Generic;
 using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 using ACClientLib.DatReaderWriter.Types;
+using ACClientLib.DatReaderWriter.Attributes;
+
 namespace ACClientLib.DatReaderWriter.DBObjs {
+    [DBObjType(DatFileType.Portal, false, 0x0E000018, 0x0E000018)]
     public class ExperienceTable : DBObj {
         /// <inheritdoc />
         public override bool HasDataCategory => false;

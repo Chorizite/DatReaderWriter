@@ -3,11 +3,8 @@ using ACClientLib.DatReaderWriter;
 using ACClientLib.DatReaderWriter.Options;
 using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.DBObjs;
-using Environment = ACClientLib.DatReaderWriter.DBObjs.Environment;
-using ACClientLib.DatReaderWriter.Types;
-using System.Numerics;
 
-namespace DatReaderWriter.Tests.DBObjs {
+namespace ACClientLib.DatReaderWriter.Tests.DBObjs {
     [TestClass]
     public class ExperienceTableTests {
         [TestMethod]

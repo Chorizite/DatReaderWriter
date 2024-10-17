@@ -16,15 +16,27 @@ using System.Collections.Generic;
 using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 using ACClientLib.DatReaderWriter.Types;
+using ACClientLib.DatReaderWriter.Attributes;
+
 namespace ACClientLib.DatReaderWriter.DBObjs {
+    [DBObjType(DatFileType.Portal, true, 0x05000000, 0x05FFFFFF)]
     public class SurfaceTexture : DBObj {
         /// <inheritdoc />
         public override bool HasDataCategory => true;
 
+        /// <summary>
+        /// The width of the SurfaceTexture
+        /// </summary>
         public int Width;
 
+        /// <summary>
+        /// The height of the SurfaceTexture
+        /// </summary>
         public int Height;
 
+        /// <summary>
+        /// The format of the SourceData
+        /// </summary>
         public PixelFormat Format;
 
         /// <summary>
@@ -32,6 +44,9 @@ namespace ACClientLib.DatReaderWriter.DBObjs {
         /// </summary>
         public byte[] SourceData = [];
 
+        /// <summary>
+        /// This is only set when Format is PixelFormat.PFID_INDEX16 | PixelFormat.PFID_P8.
+        /// </summary>
         public uint DefaultPaletteId;
 
         /// <inheritdoc />

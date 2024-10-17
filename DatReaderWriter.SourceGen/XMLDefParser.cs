@@ -38,7 +38,7 @@ namespace DatReaderWriter.SourceGen {
         private void ParseDBObjs() {
             var nodes = Xml.XPathSelectElements("/dats/dat/type");
             foreach (var node in nodes) {
-                var acDataType = ACDBObj.FromXElement(null, node);
+                var acDataType = ACDBObj.FromXElement(ACDat.FromXElement(node.Parent), node);
                 ACDBObjs.Add(acDataType.Name, acDataType);
             }
         }

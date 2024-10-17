@@ -567,6 +567,26 @@ namespace DatReaderWriter.SourceGen {
                 return;
             }
 
+            if (member.SubMembers.Count > 0) {
+                WriteLine($"{SimplifyType(member.MemberType)} {member.Name} = default;");
+                foreach (var sub in member.SubMembers) {
+                    if (!string.IsNullOrEmpty(sub.Mask) && !string.IsNullOrEmpty(sub.Shift)) {
+                        WriteLine($"{member.Name} |= ({member.MemberType})((({member.MemberType}){sub.Name} << {sub.Shift}) & {sub.Mask});");
+                    }
+                    else if (!string.IsNullOrEmpty(sub.Mask)) {
+                        WriteLine($"{member.Name} |= ({member.MemberType})(({member.MemberType}){sub.Name} & {sub.Mask});");
+                    }
+                    else if (!string.IsNullOrEmpty(sub.Shift)) {
+                        WriteLine($"{member.Name} |= ({member.MemberType})(({member.MemberType}){sub.Name} << {sub.Shift});");
+                    }
+                    else {
+                        WriteLine($"{member.Name} |= ({member.MemberType}){member.Value};");
+                    }
+                }
+                WriteLine($"writer.{GetBinaryWriterForType(member.MemberType)}({member.Name});");
+                return;
+            }
+
             if (!string.IsNullOrEmpty(member.Value)) {
                 WriteLine($"writer.{GetBinaryWriterForType(member.MemberType)}({member.Value});");
                 return;

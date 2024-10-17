@@ -12,7 +12,7 @@ namespace DatReaderWriter.SourceGen.Models {
         public string Type { get; set; }
         public string Value { get; set; }
         public string Shift { get; set; }
-        public string And { get; set; }
+        public string Mask { get; set; }
 
         public ACSubMember(ACBaseModel parent, XElement element) : base(parent, element) {
 
@@ -24,7 +24,7 @@ namespace DatReaderWriter.SourceGen.Models {
             var type = (string)element.Attribute("type");
             var value = (string)element.Attribute("value");
             var shift = (string)element.Attribute("shift");
-            var and = (string)element.Attribute("and");
+            var mask = (string)element.Attribute("mask");
 
             return new ACSubMember(parent, element) {
                 Name = (name),
@@ -32,7 +32,7 @@ namespace DatReaderWriter.SourceGen.Models {
                 Type = type,
                 Value = value,
                 Shift = shift,
-                And = and
+                Mask = mask
             };
         }
     }

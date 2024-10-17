@@ -21,12 +21,17 @@
         WriteLine("using ACClientLib.DatReaderWriter.Enums;");
         WriteLine("using ACClientLib.DatReaderWriter.IO;");
         WriteLine("using ACClientLib.DatReaderWriter.Types;");
+        WriteLine("using ACClientLib.DatReaderWriter.Attributes;");
+        WriteLine("");
         WriteLine("namespace ACClientLib.DatReaderWriter.DBObjs {");
         using (new IndentHelper(this)) {
             var dataType = kv.Value;
         
             // summary docs and class definition
             WriteSummary(dataType.Text);
+            var datType = (dataType.Parent as DatReaderWriter.SourceGen.Models.ACDat).Type;
+            var hasDataCategory = (dataType.HasDataCategory ? "true" : "false");
+            WriteLine($"[DBObjType({datType}, {hasDataCategory}, 0x{dataType.FirstId:X8}, 0x{dataType.LastId:X8})]");
             WriteLine("public class " + dataType.Name + " : DBObj {");
 
             using (new IndentHelper(this)) {
