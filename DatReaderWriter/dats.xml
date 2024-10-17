@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema text="AC Protocol definitions / documentation. Heavily based off of zegeger's messages.xml work and ACE enums / code comments">
+  <enums>
+    <enum name="PixelFormat" parent="uint">
+      <value name="PFID_UNKNOWN" value="0x00000000" />
+      <value name="PFID_R8G8B8" value="0x00000014" />
+      <value name="PFID_A8R8G8B8" value="0x00000015" />
+      <value name="PFID_X8R8G8B8" value="0x00000016" />
+      <value name="PFID_R5G6B5" value="0x00000017" />
+      <value name="PFID_X1R5G5B5" value="0x00000018" />
+      <value name="PFID_A1R5G5B5" value="0x00000019" />
+      <value name="PFID_A4R4G4B4" value="0x0000001A" />
+      <value name="PFID_R3G3B2" value="0x0000001B" />
+      <value name="PFID_A8" value="0x0000001C" />
+      <value name="PFID_A8R3G3B2" value="0x0000001D" />
+      <value name="PFID_X4R4G4B4" value="0x0000001E" />
+      <value name="PFID_A2B10G10R10" value="0x0000001F" />
+      <value name="PFID_A8B8G8R8" value="0x00000020" />
+      <value name="PFID_X8B8G8R8" value="0x00000021" />
+      <value name="PFID_A2R10G10B10" value="0x00000023" />
+      <value name="PFID_A8P8" value="0x00000028" />
+      <value name="PFID_P8" value="0x00000029" />
+      <value name="PFID_L8" value="0x00000032" />
+      <value name="PFID_A8L8" value="0x00000033" />
+      <value name="PFID_A4L4" value="0x00000034" />
+      <value name="PFID_V8U8" value="0x0000003C" />
+      <value name="PFID_L6V5U5" value="0x0000003D" />
+      <value name="PFID_X8L8V8U8" value="0x0000003E" />
+      <value name="PFID_Q8W8V8U8" value="0x0000003F" />
+      <value name="PFID_V16U16" value="0x00000040" />
+      <value name="PFID_A2W10V10U10" value="0x00000043" />
+      <value name="PFID_D16_LOCKABLE" value="0x00000046" />
+      <value name="PFID_D32" value="0x00000047" />
+      <value name="PFID_D15S1" value="0x00000049" />
+      <value name="PFID_D24S8" value="0x0000004B" />
+      <value name="PFID_D24X8" value="0x0000004D" />
+      <value name="PFID_D24X4S4" value="0x0000004F" />
+      <value name="PFID_D16" value="0x00000050" />
+      <value name="PFID_VERTEXDATA" value="0x00000064" />
+      <value name="PFID_INDEX16" value="0x00000065" />
+      <value name="PFID_INDEX32" value="0x00000066" />
+      <value name="PFID_CUSTOM_R8G8B8A8" value="0x000000F0" />
+      <value name="PFID_CUSTOM_A8B8G8R8" value="0x000000F1" />
+      <value name="PFID_CUSTOM_B8G8R8" value="0x000000F2" />
+      <value name="PFID_CUSTOM_LSCAPE_R8G8B8" value="0x000000F3" />
+      <value name="PFID_CUSTOM_LSCAPE_ALPHA" value="0x000000F4" />
+      <value name="PFID_CUSTOM_RAW_JPEG" value="0x000001F4" />
+      <value name="PFID_DXT1" value="0x31545844" />
+      <value name="PFID_DXT2" value="0x32545844" />
+      <value name="PFID_YUY2" value="0x32595559" />
+      <value name="PFID_DXT3" value="0x33545844" />
+      <value name="PFID_DXT4" value="0x34545844" />
+      <value name="PFID_DXT5" value="0x35545844" />
+      <value name="PFID_G8R8_G8B8" value="0x42475247" />
+      <value name="PFID_R8G8_B8G8" value="0x47424752" />
+      <value name="PFID_UYVY" value="0x59565955" />
+      <value name="PFID_INVALID" value="0x7FFFFFFF" />
+    </enum>
+    <enum name="GfxObjFlags" parent="uint" mask="true">
+      <value name="HasPhysics" value="0x00000001" />
+      <value name="HasDrawing" value="0x00000002" />
+      <value name="Unknown" value="0x00000004" />
+      <value name="HasDIDDegrade" value="0x00000008" />
+    </enum>
+    <enum name="VertexType" parent="int">
+      <value name="UnknownVertexType" value="0" />
+      <value name="CSWVertexType" value="1" />
+    </enum>
+    <enum name="StipplingType" parent="byte" mask="true">
+      <value name="None" value="0x00" />
+      <value name="Positive" value="0x01" />
+      <value name="Negative" value="0x02" />
+      <value name="Both" value="0x03" />
+      <value name="NoPos" value="0x04" />
+      <value name="NoNeg" value="0x08" />
+      <value name="NoUVS" value="0x14" />
+    </enum>
+    <enum name="CullMode" parent="int">
+      <value name="Landblock" value="0" />
+      <value name="None" value="1" />
+      <value name="Clockwise" value="2" />
+      <value name="CounterClockwise" value="3" />
+    </enum>
+    <enum name="BSPType" parent="int">
+      <value name="Drawing" value="0" />
+      <value name="Physics" value="1" />
+      <value name="Cell" value="2" />
+    </enum>
+  </enums>
+  <types>
+    <type name="DBObj" abstract="true">
+      <field type="uint" name="Id" />
+      <if condition="categorized">
+        <field type="uint" name="DataCategory" />
+      </if>
+    </type>
+    <type name="Vector3">
+      <field type="float" name="X" />
+      <field type="float" name="Y" />
+      <field type="float" name="Z" />
+    </type>
+    <type name="Quaternion">
+      <field type="float" name="W" />
+      <field type="float" name="X" />
+      <field type="float" name="Y" />
+      <field type="float" name="Z" />
+    </type>
+    <type name="VertexArray">
+      <field type="VertexType" name="VertexType" />
+      <field type="uint" name="_numVertices" />
+      <vector name="Vertices" length="_numVertices" type="Dictionary" genericKey="ushort" genericValue="SWVertex" />
+    </type>
+    <type name="SWVertex">
+      <field type="ushort" name="_numUVs" />
+      <field type="Vector3" name="Origin" />
+      <field type="Vector3" name="Normal" />
+      <vector name="UVs" length="_numUVs" type="List" genericValue="Vec2Duv" />
+    </type>
+    <type name="Vec2Duv">
+      <field type="float" name="U" />
+      <field type="float" name="V" />
+    </type>
+    <type name="Sphere">
+      <field type="Vector3" name="Origin" />
+      <field type="float" name="Radius" />
+    </type>
+    <type name="PortalPoly">
+      <field type="short" name="PortalIndex" />
+      <field type="short" name="PolygonId" />
+    </type>
+    <type name="Polygon">
+      <field type="byte" name="_numVertices" />
+      <field type="StipplingType" name="Stippling" />
+      <field type="CullMode" name="SidesType" />
+      <field type="short" name="PosSurface" />
+      <field type="short" name="NegSurface" />
+      <vector name="VertexIds" length="_numVertices" type="List" genericValue="short" />
+      <maskmap name="Stippling">
+        <mask value="!StipplingType.NoPos">
+          <vector name="PosUVIndices" length="_numVertices" type="List" genericValue="byte" />
+        </mask>
+        <mask value="!StipplingType.NoNeg">
+          <if condition="SidesType == CullMode.Clockwise">
+            <vector name="NegUVIndices" length="_numVertices" type="List" genericValue="byte" />
+          </if>
+        </mask>
+      </maskmap>
+    </type>
+    <type name="CellStruct">
+      <field type="uint" name="_numPolys" />
+      <field type="uint" name="_numPhysicsPolys" />
+      <field type="uint" name="_numPortals" />
+      <field type="VertexArray" name="VertexArray" />
+      <vector name="Polygons" length="_numPolys" type="Dictionary" genericKey="ushort" genericValue="Polygon" />
+      <vector name="Portals" length="_numPortals" type="List" genericValue="ushort" />
+      <align type="uint" />
+      <field type="CellBSPTree" name="CellBSP" BSPType="BSPType.Cell" />
+      <vector name="PhysicsPolygons" length="_numPhysicsPolys" type="Dictionary" genericKey="ushort" genericValue="Polygon" />
+      <field type="PhysicsBSPTree" name="PhysicsBSP" />
+      <field type="bool" name="_hasDrawingBSP" value="DrawingBSP != null" />
+      <if condition="_hasDrawingBSP" writeCondition="DrawingBSP != null">
+        <field type="DrawingBSPTree" name="DrawingBSP" />
+      </if>
+      <align type="uint" />
+    </type>
+  </types>
+  <dats>
+    <dat name="portal" text="client_portal.dat">
+      <type name="GfxObj" description="GfxObj / DB_TYPE_GFXOBJ in the client." parent="DBObj" first="0x1000000" last="0x100FFFF" categorized="false">
+        <field type="GfxObjFlags" name="Flags" />
+        <field type="CompressedUInt" name="_numSurfaces" />
+        <vector name="Surfaces" length="_numSurfaces" type="List" genericValue="uint" text="The list of surfaces" />
+        <field type="VertexArray" name="VertexArray" />
+        <maskmap name="Flags">
+          <mask value="GfxObjFlags.HasPhysics">
+            <field type="CompressedUInt" name="_numPhysicsPolys" />
+            <vector name="PhysicsPolygons" length="_numPhysicsPolys" type="Dictionary" genericKey="ushort" genericValue="Polygon" />
+            <field type="PhysicsBSPTree" name="PhysicsBSP" />
+          </mask>
+        </maskmap>
+        <field type="Vector3" name="SortCenter" />
+        <maskmap name="Flags">
+          <mask value="GfxObjFlags.HasDrawing">
+            <field type="CompressedUInt" name="_numPolys" />
+            <vector name="Polygons" length="_numPolys" type="Dictionary" genericKey="ushort" genericValue="Polygon" />
+            <field type="DrawingBSPTree" name="DrawingBSP" />
+          </mask>
+          <mask value="GfxObjFlags.HasDIDDegrade">
+            <field type="uint" name="DIDDegrade" />
+          </mask>
+        </maskmap>
+      </type>
+      <type name="Setup" description="DB_TYPE_SETUP in the client." parent="DBObj" first="0x2000000" last="0x200FFFF" categorized="false">
+      </type>
+      <type name="Animation" description="DB_TYPE_ANIM in the client." parent="DBObj" first="0x3000000" last="0x300FFFF" categorized="false">
+      </type>
+      <type name="Palette" description="DB_TYPE_PALETTE in the client." parent="DBObj" first="0x4000000" last="0x400FFFF" categorized="false">
+      </type>
+      <type name="SurfaceTexture" description="This holds raw texture data. DB_TYPE_SURFACETEXTURE in the client." parent="DBObj" first="0x5000000" last="0x5FFFFFF" categorized="true">
+        <field type="int" name="Width" text="The width of the SurfaceTexture" />
+        <field type="int" name="Height" text="The height of the SurfaceTexture" />
+        <field type="PixelFormat" name="Format" text="The format of the SourceData" />
+        <field type="int" name="_sourceDataLength" />
+        <vector name="SourceData" length="_sourceDataLength" type="byte" text="The source data of the texture" />
+        <switch name="Format">
+          <case value="PixelFormat.PFID_INDEX16 | PixelFormat.PFID_P8">
+            <field type="uint" name="DefaultPaletteId" text="This is only set when Format is PixelFormat.PFID_INDEX16 | PixelFormat.PFID_P8." />
+          </case>
+        </switch>
+      </type>
+      <type name="RenderSurface" description="DB_TYPE_RENDERSURFACE in the client." parent="DBObj" first="0x6000000" last="0x7FFFFFF" categorized="true">
+      </type>
+      <type name="Surface" description="DB_TYPE_SURFACE in the client." parent="DBObj" first="0x8000000" last="0x800FFFF" categorized="false">
+      </type>
+      <type name="MotionTable" description="DB_TYPE_MTABLE in the client." parent="DBObj" first="0x9000000" last="0x900FFFF" categorized="false">
+      </type>
+      <type name="Wave" description="DB_TYPE_WAVE in the client." parent="DBObj" first="0xA000000" last="0xA00FFFF" categorized="false">
+      </type>
+      <type name="Environment" description="DB_TYPE_ENVIRONMENT in the client." parent="DBObj" first="0xD000000" last="0xD00FFFF" categorized="false">
+        <field type="uint" name="_cellCount" />
+        <vector name="Cells" length="_cellCount" type="Dictionary" genericKey="uint" genericValue="CellStruct" text="The cells in this environment" />
+      </type>
+      <type name="ChatPoseTable" description="DB_TYPE_CHAT_POSE_TABLE in the client." parent="DBObj" first="0xE000007" last="0xE000007" categorized="false">
+      </type>
+      <type name="ObjectHierarchy" description="DB_TYPE_OBJECT_HIERARCHY in the client." parent="DBObj" first="0xE00000D" last="0xE00000D" categorized="false">
+      </type>
+      <type name="BadDataTable" description="DB_TYPE_BADDATA in the client." parent="DBObj" first="0xE00001A" last="0xE00001A" categorized="false">
+      </type>
+      <type name="TabooTable" description="DB_TYPE_TABOO_TABLE in the client." parent="DBObj" first="0xE00001E" last="0xE00001E" categorized="false">
+      </type>
+      <type name="FileToId" description="DB_TYPE_FILE2ID_TABLE in the client." parent="DBObj" first="0xE00001F" last="0xE00001F" categorized="false">
+      </type>
+      <type name="NameFilterTable" description="DB_TYPE_NAME_FILTER_TABLE in the client." parent="DBObj" first="0xE000020" last="0xE000020" categorized="false">
+      </type>
+      <type name="MonitoredProperties" description="DB_TYPE_MONITOREDPROPERTIES in the client." parent="DBObj" first="0xE020000" last="0xE02FFFF" categorized="false">
+      </type>
+      <type name="PaletteSet" description="DB_TYPE_PAL_SET in the client." parent="DBObj" first="0xF000000" last="0xF00FFFF" categorized="false">
+      </type>
+      <type name="Clothing" description="DB_TYPE_CLOTHING in the client." parent="DBObj" first="0x10000000" last="0x1000FFFF" categorized="false">
+      </type>
+      <type name="DegradeInfo" description="DB_TYPE_DEGRADEINFO in the client." parent="DBObj" first="0x11000000" last="0x1100FFFF" categorized="false">
+      </type>
+      <type name="Scene" description="DB_TYPE_SCENE in the client." parent="DBObj" first="0x12000000" last="0x1200FFFF" categorized="false">
+      </type>
+      <type name="Region" description="DB_TYPE_REGION in the client." parent="DBObj" first="0x13000000" last="0x1300FFFF" categorized="false">
+      </type>
+      <type name="Keymap" description="DB_TYPE_KEYMAP in the client." parent="DBObj" first="0x14000000" last="0x1400FFFF" categorized="false">
+      </type>
+      <type name="RenderTexture" description="DB_TYPE_RENDERTEXTURE in the client." parent="DBObj" first="0x15000000" last="0x15FFFFFF" categorized="true">
+      </type>
+      <type name="MaterialModifier" description="DB_TYPE_MATERIALMODIFIER in the client." parent="DBObj" first="0x17000000" last="0x17FFFFFF" categorized="false">
+      </type>
+      <type name="MaterialInstance" description="DB_TYPE_MATERIALINSTANCE in the client." parent="DBObj" first="0x18000000" last="0x18FFFFFF" categorized="false">
+      </type>
+      <type name="RenderMesh" description="DB_TYPE_RENDER_MESH in the client." parent="DBObj" first="0x19000000" last="0x19FFFFFF" categorized="false">
+      </type>
+      <type name="SoundTable" description="DB_TYPE_STABLE in the client." parent="DBObj" first="0x20000000" last="0x2000FFFF" categorized="false">
+      </type>
+      <type name="UILayout" description="DB_TYPE_UI_LAYOUT in the client." parent="DBObj" first="0x21000000" last="0x21FFFFFF" categorized="false">
+      </type>
+      <type name="EnumMapper" description="DB_TYPE_ENUM_MAPPER in the client." parent="DBObj" first="0x22000000" last="0x22FFFFFF" categorized="false">
+      </type>
+      <type name="DataIdMapper" description="DB_TYPE_DID_MAPPER in the client." parent="DBObj" first="0x25000000" last="0x25FFFFFF" categorized="false">
+      </type>
+      <type name="ActionMap" description="DB_TYPE_ACTIONMAP in the client." parent="DBObj" first="0x26000000" last="0x2600FFFF" categorized="false">
+      </type>
+      <type name="DualDataIdMapper" description="DB_TYPE_DUAL_DID_MAPPER in the client." parent="DBObj" first="0x27000000" last="0x27FFFFFF" categorized="false">
+      </type>
+      <type name="LanguageString" description="DB_TYPE_STRING in the client." parent="DBObj" first="0x31000000" last="0x3100FFFF" categorized="false">
+      </type>
+      <type name="ParticleEmitter" description="DB_TYPE_PARTICLE_EMITTER in the client." parent="DBObj" first="0x32000000" last="0x3200FFFF" categorized="false">
+      </type>
+      <type name="PhysicsScript" description="DB_TYPE_PHYSICS_SCRIPT in the client." parent="DBObj" first="0x33000000" last="0x3300FFFF" categorized="false">
+      </type>
+      <type name="PhysicsScriptTable" description="DB_TYPE_PHYSICS_SCRIPT_TABLE in the client." parent="DBObj" first="0x34000000" last="0x3400FFFF" categorized="false">
+      </type>
+      <type name="MasterProperty" description="DB_TYPE_MASTER_PROPERTY in the client." parent="DBObj" first="0x39000000" last="0x39FFFFFF" categorized="false">
+      </type>
+      <type name="Font" description="DB_TYPE_FONT in the client." parent="DBObj" first="0x40000000" last="0x40000FFF" categorized="false">
+      </type>
+      <type name="DBProperties" description="DB_TYPE_DBPROPERTIES in the client." parent="DBObj" first="0x78000000" last="0x7FFFFFFF" categorized="false">
+      </type>
+      <type name="CharGen" description="DB_TYPE_CHAR_GEN_0 in the client." parent="DBObj" first="0xE000002" last="0xE000002" categorized="false">
+      </type>
+      <type name="VitalTable" description="DB_TYPE_ATTRIBUTE_2ND_TABLE_0 in the client." parent="DBObj" first="0xE000003" last="0xE000003" categorized="false">
+      </type>
+      <type name="SkillTable" description="DB_TYPE_SKILL_TABLE_0 in the client." parent="DBObj" first="0xE000004" last="0xE000004" categorized="false">
+      </type>
+      <type name="SpellTable" description="DB_TYPE_SPELL_TABLE_0 in the client." parent="DBObj" first="0xE00000E" last="0xE00000E" categorized="false">
+      </type>
+      <type name="SpellComponentTable" description="DB_TYPE_SPELLCOMPONENT_TABLE_0 in the client." parent="DBObj" first="0xE00000F" last="0xE00000F" categorized="false">
+      </type>
+      <type name="ExperienceTable" description="Holds the experience required for different attributes/vitals/skill/levels, as well as the amount of skill credits obtained for each level. DB_TYPE_XP_TABLE_0 in the client." parent="DBObj" first="0xE000018" last="0xE000018" categorized="false">
+        <field type="int" name="_attributeCount" />
+        <field type="int" name="_vitalCount" />
+        <field type="int" name="_trainedSkillCount" />
+        <field type="int" name="_specializedSkillCount" />
+        <field type="uint" name="_levelCount" />
+        <vector name="Attributes" length="_attributeCount" lengthmod="1" type="uint" text="The amount of experience required to train attributes" />
+        <vector name="Vitals" length="_vitalCount" lengthmod="1" type="uint" text="The amount of experience required to train vitals" />
+        <vector name="TrainedSkills" length="_trainedSkillCount" lengthmod="1" type="uint" text="The amount of experience required to train trained skills" />
+        <vector name="SpecializedSkills" length="_specializedSkillCount" lengthmod="1" type="uint" text="The amount of experience required to train specialized skills" />
+        <vector name="Levels" length="_levelCount" lengthmod="1" type="ulong" text="The amount of experience required to level a character" />
+        <vector name="SkillCredits" length="_levelCount" lengthmod="1" type="uint" text="The amount of skill credits per level" />
+      </type>
+      <type name="QuestsTable" description="DB_TYPE_QUEST_DEF_DB_0 in the client." parent="DBObj" first="0xE00001B" last="0xE00001B" categorized="false">
+      </type>
+      <type name="QualityFilter" description="DB_TYPE_QUALITY_FILTER_0 in the client." parent="DBObj" first="0xE010000" last="0xE01FFFF" categorized="false">
+      </type>
+      <type name="CombatTable" description="DB_TYPE_COMBAT_TABLE_0 in the client." parent="DBObj" first="0x30000000" last="0x3000FFFF" categorized="false">
+      </type>
+      <type name="ContractTable" description="DB_TYPE_CONTRACT_TABLE_0 in the client." parent="DBObj" first="0xE00001D" last="0xE00001D" categorized="false">
+      </type>
+    </dat>
+    <dat name="cell" text="client_cell_1.dat">
+      <type name="LandBlock" description="DB_TYPE_LAND_BLOCK in the client." parent="DBObj" first="0" last="0" categorized="false">
+      </type>
+      <type name="LandBlockInfo" description="DB_TYPE_LBI in the client." parent="DBObj" first="0" last="0" categorized="false">
+      </type>
+      <type name="Cell" description="DB_TYPE_CELL in the client." parent="DBObj" first="0" last="0" categorized="false">
+      </type>
+    </dat>
+    <dat name="local" text="client_local_English.dat">
+      <type name="StringTable" description="DB_TYPE_STRING_TABLE in the client." parent="DBObj" first="0x23000000" last="0x24FFFFFF" categorized="false">
+      </type>
+      <type name="FontLocal" description="DB_TYPE_FONT_LOCAL in the client." parent="DBObj" first="0x40001000" last="0x40FFFFFF" categorized="false">
+      </type>
+      <type name="StringState" description="DB_TYPE_STRING_STATE in the client." parent="DBObj" first="0x41000000" last="0x41FFFFFF" categorized="false">
+      </type>
+    </dat>
+  </dats>
+</schema>

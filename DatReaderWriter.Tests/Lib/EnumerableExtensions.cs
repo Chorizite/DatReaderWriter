@@ -11,9 +11,9 @@ namespace ACClientLib.DatReaderWriter.Tests.Lib {
         }
 
         public static IList<T> Shuffle<T>(this IEnumerable<T> sequence, Random randomNumberGenerator) {
-            ArgumentNullException.ThrowIfNull(sequence);
+            //ArgumentNullException.ThrowIfNull(sequence);
 
-            ArgumentNullException.ThrowIfNull(randomNumberGenerator);
+            //ArgumentNullException.ThrowIfNull(randomNumberGenerator);
 
             T swapTemp;
             List<T> values = sequence.ToList();

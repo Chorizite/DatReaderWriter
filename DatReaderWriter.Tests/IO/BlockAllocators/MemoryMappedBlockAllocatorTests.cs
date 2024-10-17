@@ -2,15 +2,14 @@
 using ACClientLib.DatReaderWriter.IO.BlockAllocators;
 using ACClientLib.DatReaderWriter.Tests.Lib;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.PortableExecutable;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace ACClientLib.DatReaderWriter.Tests.IO.BlockAllocators {
     [TestClass]
     public class MemoryMappedBlockAllocatorTests {
+        private static Random _rnd = new Random();
+
         [TestMethod]
         [CombinatorialData]
         public void CanCreateNewEmptyDatAndLoadIt(
@@ -174,7 +173,7 @@ namespace ACClientLib.DatReaderWriter.Tests.IO.BlockAllocators {
             allocator.InitNew(DatDatabaseType.Portal, 0, blockSize, 10);
 
             var fileBytes = new byte[blockSize - 4];
-            Random.Shared.NextBytes(fileBytes.AsSpan());
+            _rnd.NextBytes(fileBytes);
 
             var blockOffset = allocator.WriteBlock(fileBytes, fileBytes.Length);
 
@@ -210,7 +209,7 @@ namespace ACClientLib.DatReaderWriter.Tests.IO.BlockAllocators {
             allocator.InitNew(DatDatabaseType.Portal, 0, blockSize, 10);
 
             var fileBytes = new byte[blockSize * 5];
-            Random.Shared.NextBytes(fileBytes.AsSpan());
+            _rnd.NextBytes(fileBytes);
 
             var blockOffset = allocator.WriteBlock(fileBytes, fileBytes.Length);
 
@@ -247,7 +246,7 @@ namespace ACClientLib.DatReaderWriter.Tests.IO.BlockAllocators {
             allocator.InitNew(DatDatabaseType.Portal, 0, blockSize, 10);
 
             var fileBytes = new byte[(blockSize - 4) * 4];
-            Random.Shared.NextBytes(fileBytes.AsSpan());
+            _rnd.NextBytes(fileBytes);
 
             var blockOffset = allocator.WriteBlock(fileBytes, fileBytes.Length);
             var freeBlocks = allocator.Header.FreeBlockCount;
@@ -276,7 +275,7 @@ namespace ACClientLib.DatReaderWriter.Tests.IO.BlockAllocators {
             allocator.InitNew(DatDatabaseType.Portal, 0, blockSize, 1);
 
             var fileBytes = new byte[blockSize * 5];
-            Random.Shared.NextBytes(fileBytes.AsSpan());
+            _rnd.NextBytes(fileBytes);
 
             var blockOffset = allocator.WriteBlock(fileBytes, fileBytes.Length);
 

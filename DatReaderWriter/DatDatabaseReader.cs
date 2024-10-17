@@ -70,7 +70,7 @@ namespace ACClientLib.DatReaderWriter {
 #if (NET8_0_OR_GREATER)
             public bool TryReadFile<T>(uint fileId, [MaybeNullWhen(false)] out T value) where T : IUnpackable {
 #else
-        public bool TryReadFile<T>(uint fileId, out T value) where T : IDatFileType {
+        public bool TryReadFile<T>(uint fileId, out T value) where T : IDBObj {
 #endif
             if (!TryGetFileBytes(fileId, out var bytes)) {
                 value = default!;
@@ -88,24 +88,24 @@ namespace ACClientLib.DatReaderWriter {
         }
 
         /// <summary>
-        /// Try and write a <see cref="IDatFileType"/> to the dat.
+        /// Try and write a <see cref="IDBObj"/> to the dat.
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="fileId">The file id to write to</param>
         /// <param name="value">The value to write</param>
         /// <returns>True if successful, false otherwise</returns>
-        public bool TryWriteFile<T>(T value) where T : IDatFileType {
+        public bool TryWriteFile<T>(T value) where T : IDBObj {
             int startingBlockId = 0;
             if (Tree.TryGetFile(value.Id, out var existingFile)) {
                 startingBlockId = existingFile.Offset;
             }
 
-            var buffer = BaseBlockAllocator.SharedBytes.Rent(value.GetSize());
+            // TODO: fix this static 5mb buffer...
+            var buffer = BaseBlockAllocator.SharedBytes.Rent(1024 * 1024 * 5);
             var writer = new DatFileWriter(buffer);
 
             value.Pack(writer);
 
-            startingBlockId = Tree.BlockAllocator.WriteBlock(buffer, buffer.Length);
+            startingBlockId = Tree.BlockAllocator.WriteBlock(buffer, writer.Offset);
             Tree.Insert(new DatBTreeFile() {
                 Flags = 0,
                 Id = value.Id,

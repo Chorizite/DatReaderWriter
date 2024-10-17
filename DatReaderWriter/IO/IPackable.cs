@@ -6,12 +6,6 @@ namespace ACClientLib.DatReaderWriter.IO {
     /// </summary>
     public interface IPackable {
         /// <summary>
-        /// Get the total size in bytes this will use when written.
-        /// </summary>
-        /// <returns></returns>
-        int GetSize();
-
-        /// <summary>
         /// Pack this instance into a writer
         /// </summary>
         /// <param name="writer">The writer to write to</param>
