@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema text="AC Protocol definitions / documentation. Heavily based off of zegeger's messages.xml work and ACE enums / code comments">
+<schema text="AC dat object definitions / documentation. Heavily based off of ACE.DatReader FileTypes">
   <enums>
     <enum name="DatFileType" parent="int">
       <value name="Undefined" value="0" />
