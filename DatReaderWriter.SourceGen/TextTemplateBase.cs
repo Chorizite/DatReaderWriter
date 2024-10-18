@@ -215,7 +215,7 @@ namespace DatReaderWriter.SourceGen {
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        public abstract string GetBinaryReaderForType(string type);
+        public abstract string GetBinaryReaderForType(string type, string? size);
 
         /// <summary>
         /// Write out binary writer for specified type
@@ -588,7 +588,7 @@ namespace DatReaderWriter.SourceGen {
             }
 
             if (!string.IsNullOrEmpty(member.Value)) {
-                WriteLine($"writer.{GetBinaryWriterForType(member.MemberType)}({member.Value});");
+                WriteLine($"writer.{GetBinaryWriterForType(member.MemberType)}({member.Value}{(string.IsNullOrEmpty(member.Size) ? "" : $", {member.Size}")});");
                 return;
             }
 

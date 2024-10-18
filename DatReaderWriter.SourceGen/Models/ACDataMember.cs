@@ -13,6 +13,7 @@ namespace DatReaderWriter.SourceGen.Models {
         public string GenericValue { get; set; } = "";
         public string GenericType { get; set; } = "";
         public string Value { get; set; } = "";
+        public string Size { get; set; } = "";
 
         public List<ACSubMember> SubMembers { get; set; } = new List<ACSubMember>();
 
@@ -31,6 +32,7 @@ namespace DatReaderWriter.SourceGen.Models {
             var genericValue = (string)element.Attribute("genericValue");
             var genericType = (string)element.Attribute("genericType");
             var value = (string)element.Attribute("value");
+            var size = (string)element.Attribute("size");
 
             var dataMember = new ACDataMember(parent, element) {
                 Name = name,
@@ -39,7 +41,8 @@ namespace DatReaderWriter.SourceGen.Models {
                 GenericKey = genericKey,
                 GenericType = genericType,
                 GenericValue = genericValue,
-                Value = value
+                Value = value,
+                Size = size
             };
 
             var subMemberNodes = element.XPathSelectElements("./subfield");

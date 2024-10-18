@@ -127,6 +127,15 @@
       <value name="Reserved31" value="0x0000001F" />
       <value name="RoadType" value="0x00000020" />
     </enum>
+    <enum name="PortalFlags" parent="ushort" mask="true">
+      <value name="ExactMatch" value="0x0001" />
+      <value name="PortalSide" value="0x0002" />
+    </enum>
+    <enum name="EnvCellFlags" parent="int">
+    <value name="SeenOutside" value="0x00000001" />
+    <value name="HasStaticObjs" value="0x00000002" />
+    <value name="HasRestrictionObj" value="0x00000008" />
+  </enum>
   </enums>
   <types>
     <type name="DBObj" abstract="true">
@@ -210,6 +219,35 @@
         <subfield name="Type" type="TerrainType" mask="0x7C" shift="2" text="Terrain type" />
         <subfield name="Scenery" type="ushort" mask="0xF800" shift="11" text="Scenery type" />
       </field>
+    </type>
+    <type name="Stab" text="Information about a static object spawn.">
+      <field name="Id" type="uint" text="The id of this static object" />
+      <field name="Frame" type="Frame" text="The position information" />
+    </type>
+    <type name="Frame" text="Positioning information.">
+      <field name="Origin" type="Vector3" text="The origin, offset from the parent" />
+      <field name="Orientation" type="Quaternion" text="The orientation" />
+    </type>
+    <type name="BuildingInfo" text="Building information.">
+      <field name="ModelId" type="uint" text="Either a SetupModel or GfxObj id." />
+      <field name="Frame" type="Frame" text="The position information" />
+      <field name="NumLeaves" type="uint" />
+      <field name="_numPortals" type="uint" />
+      <vector name="Portals" length="_numPortals" type="List" genericValue="BuildingPortal" />
+    </type>
+    <type name="BuildingPortal">
+      <field name="Flags" type="PortalFlags" />
+      <field name="OtherCellId" type="ushort" />
+      <field name="OtherPortalId" type="ushort" />
+      <field name="_numStabs" type="ushort" />
+      <vector name="StabList" length="_numStabs" type="List" genericValue="ushort" />
+      <align type="uint" />
+    </type>
+    <type name="CellPortal">
+      <field name="Flags" type="PortalFlags" />
+      <field name="PolygonId" type="ushort" />
+      <field name="OtherCellId" type="ushort" />
+      <field name="OtherPortalId" type="ushort" />
     </type>
   </types>
   <dats>
@@ -367,9 +405,40 @@
         <vector name="Height" length="81" type="byte" />
         <align type="uint" />
       </type>
-      <type name="LandBlockInfo" description="DB_TYPE_LBI in the client." parent="DBObj" first="0" last="0" categorized="false">
+      <type name="LandBlockInfo" description="Stores static spawns, buildings. DB_TYPE_LBI in the client." parent="DBObj" first="0" last="0" categorized="false">
+        <field type="uint" name="NumCells" text="The number of inside cells. These can be looked up at 0xAAAABBBB where AAAA is the landblock id and BBBB is the cell id + 0x100" />
+        <field type="uint" name="_numObjects" />
+        <vector name="Objects" length="_numObjects" type="List" genericValue="Stab" text="Static objects" />
+        <field type="ushort" name="_numBuildings" />
+        <field type="bool" name="_hasRestrictionsTable" size="2" value="RestrictionTable != null" />
+        <vector name="Buildings" length="_numBuildings" type="List" genericValue="BuildingInfo" />
+        <if condition="_hasRestrictionsTable" writeCondition="RestrictionTable != null &amp;&amp; RestrictionTable.Count() > 0">
+          <field type="ushort" name="_numRestrictionTableEntries" />
+          <field type="ushort" name="_numBuckets" value="0" />
+          <vector name="RestrictionTable" length="_numRestrictionTableEntries" type="Dictionary" genericKey="uint" genericValue="uint" />
+        </if>
       </type>
-      <type name="Cell" description="DB_TYPE_CELL in the client." parent="DBObj" first="0" last="0" categorized="false">
+      <type name="EnvCell" description="DB_TYPE_CELL in the client." parent="DBObj" first="0" last="0" categorized="false">
+        <field type="EnvCellFlags" name="Flags" />
+        <field type="uint" name="_cellId" value="Id" />
+        <field type="byte" name="_numSurfaces" />
+        <field type="byte" name="_numPortals" />
+        <field type="ushort" name="_numVisibleCells" />
+        <vector name="Surfaces" length="_numSurfaces" type="List" genericValue="ushort" text="A list of surface ids. These are not fully qualified so you need to or with 0x08000000 to get the file id." />
+        <field type="ushort" name="EnvironmentId" text="The environment id. This is not fully qualified so you need to or with 0x0D000000 to get the file id." />
+        <field type="ushort" name="CellStructure" />
+        <field type="Frame" name="Position" />
+        <vector name="CellPortals" length="_numPortals" type="List" genericValue="CellPortal" text="A list of cell portals" />
+        <vector name="VisibleCells" length="_numVisibleCells" type="List" genericValue="ushort" text="A list of visible cell ids" />
+        <maskmap name="Flags">
+          <mask value="EnvCellFlags.HasStaticObjs">
+            <field type="ushort" name="_numStabs" />
+            <vector name="StaticObjects" length="_numStabs" type="List" genericValue="Stab" text="A list of static objects" />
+          </mask>
+          <mask value="EnvCellFlags.HasRestrictionObj">
+            <field type="uint" name="RestrictionObj" />
+          </mask>
+        </maskmap>
       </type>
     </dat>
     <dat name="local" text="client_local_English.dat" type="DatFileType.Local">

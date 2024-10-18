@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Buffers.Binary;
+using System.Drawing;
 using System.Numerics;
 
 namespace ACClientLib.DatReaderWriter.IO {
@@ -75,8 +76,23 @@ namespace ACClientLib.DatReaderWriter.IO {
         /// Write an bool and advance the buffer position accordingly
         /// </summary>
         /// <returns></returns>
-        public void WriteBool(bool value) {
-            BinaryPrimitives.WriteUInt32LittleEndian(GetSpanAndAdvanceOffset(4), value ? 1u : 0u);
+        public void WriteBool(bool value, int size=4) {
+            switch (size) {
+                case 8:
+                    WriteUInt64(value ? 1u : 0u);
+                    break;
+                case 4:
+                    WriteUInt32(value ? 1u : 0u);
+                    break;
+                case 2:
+                    WriteUInt16((ushort)(value ? 1u : 0u));
+                    break;
+                case 1:
+                    WriteByte((byte)(value ? 1 : 0));
+                    break;
+                default:
+                    throw new NotSupportedException($"Unsupported bool size: {size}");
+            }
         }
 
         /// <summary>

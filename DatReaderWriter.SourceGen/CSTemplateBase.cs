@@ -186,7 +186,7 @@ namespace DatReaderWriter.SourceGen {
         /// <param name="member"></param>
         public override void WritePrimitiveReader(ACDataMember member) {
             if (member.Parent is ACVector || member.IsLength || member.Name.StartsWith("_")) {
-                WriteLine("var " + member.Name + " = " + GetBinaryReaderForType(member.MemberType) + ";");
+                WriteLine("var " + member.Name + " = " + GetBinaryReaderForType(member.MemberType, member.Size) + ";");
                 if (member.SubMembers.Count > 0) {
                     foreach (var sub in member.SubMembers) {
                         if (!string.IsNullOrEmpty(sub.Mask) && !string.IsNullOrEmpty(sub.Shift)) {
@@ -486,7 +486,7 @@ namespace DatReaderWriter.SourceGen {
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        public override string GetBinaryReaderForType(string type) {
+        public override string GetBinaryReaderForType(string type, string? size = null) {
             switch (type) {
                 case "WORD":
                 case "SpellId":
@@ -510,7 +510,7 @@ namespace DatReaderWriter.SourceGen {
                 case "double":
                     return "reader.ReadDouble()";
                 case "bool":
-                    return "reader.ReadBool()";
+                    return $"reader.ReadBool({size})";
                 case "byte":
                     return "reader.ReadByte()";
                 case "string":

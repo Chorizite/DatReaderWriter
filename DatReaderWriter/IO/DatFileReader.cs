@@ -81,8 +81,19 @@ namespace ACClientLib.DatReaderWriter.IO {
         /// Read an bool and advance the buffer position accordingly
         /// </summary>
         /// <returns></returns>
-        public bool ReadBool() {
-            return BinaryPrimitives.ReadUInt32LittleEndian(ReadBytesInternal(4)) != 0;
+        public bool ReadBool(int size = 4) {
+            switch (size) {
+                case 8:
+                    return ReadUInt64() != 0;
+                case 4:
+                    return ReadUInt32() != 0;
+                case 2:
+                    return ReadUInt16() != 0;
+                case 1:
+                    return ReadByte() != 0;
+                default:
+                    throw new NotSupportedException($"Unsupported bool size: {size}");
+            }
         }
 
         /// <summary>
