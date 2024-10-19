@@ -440,6 +440,13 @@
     <enum name="AnimationFlags" parent="uint" mask="true">
       <value name="PosFrames" value="0x1" />
     </enum>
+    <enum name="TextureType" parent="byte">
+      <value name="Undefined" value="0x1" />
+      <value name="Texture2D" value="0x2" />
+      <value name="Texture3D" value="0x3" />
+      <value name="Cube" value="0x4" />
+      <value name="Movie2D" value="0x5" />
+    </enum>
   </enums>
   <types>
     <type name="DBObj" abstract="true">
@@ -770,7 +777,12 @@
       </type>
       <type name="Palette" text="DB_TYPE_PALETTE in the client." parent="DBObj" first="0x4000000" last="0x400FFFF" categorized="false">
       </type>
-      <type name="SurfaceTexture" text="This holds raw texture data. DB_TYPE_SURFACETEXTURE in the client." parent="DBObj" first="0x5000000" last="0x5FFFFFF" categorized="true">
+      <type name="SurfaceTexture" text="DB_TYPE_SURFACETEXTURE in the client." parent="DBObj" first="0x5000000" last="0x5FFFFFF" categorized="true">
+        <field type="TextureType" name="Type" text="This seems to always be TextureType.Texture2D in the dats." />
+        <field type="int" name="_numtextures" />
+        <vector name="Textures" length="_numtextures" type="List" genericValue="uint" />
+      </type>
+      <type name="RenderSurface" text="This holds raw texture data. DB_TYPE_RENDERSURFACE in the client." parent="DBObj" first="0x6000000" last="0x7FFFFFF" categorized="true">
         <field type="int" name="Width" text="The width of the SurfaceTexture" />
         <field type="int" name="Height" text="The height of the SurfaceTexture" />
         <field type="PixelFormat" name="Format" text="The format of the SourceData" />
@@ -781,8 +793,6 @@
             <field type="uint" name="DefaultPaletteId" text="This is only set when Format is PixelFormat.PFID_INDEX16 | PixelFormat.PFID_P8." />
           </case>
         </switch>
-      </type>
-      <type name="RenderSurface" text="DB_TYPE_RENDERSURFACE in the client." parent="DBObj" first="0x6000000" last="0x7FFFFFF" categorized="true">
       </type>
       <type name="Surface" text="DB_TYPE_SURFACE in the client." parent="DBObj" first="0x8000000" last="0x800FFFF" categorized="false">
       </type>

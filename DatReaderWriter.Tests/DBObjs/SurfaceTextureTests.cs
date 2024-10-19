@@ -18,49 +18,23 @@ namespace DatReaderWriter.Tests.DBObjs {
             dat.BlockAllocator.InitNew(DatDatabaseType.Portal, 0);
 
             var texture1 = new SurfaceTexture() {
-                Id = 0x06000001,
-                Width = 100,
-                Height = 100,
-                Format = PixelFormat.PFID_UNKNOWN,
-                SourceData = new byte[1000],
-                DefaultPaletteId = 1111, // this shouldn't get serialized for PFID_UNKNOWN
-            };
-            var texture2 = new SurfaceTexture() {
-                Id = 0x06000002,
-                Width = 100,
-                Height = 100,
-                Format = PixelFormat.PFID_INDEX16,
-                SourceData = new byte[1000],
-                DefaultPaletteId = 1111
+                Id = 0x05000001,
+                Type = TextureType.Texture2D,
+                Textures = [ 0x06000002, 0x06000003 ],
             };
 
             var res = dat.TryWriteFile(texture1);
             Assert.IsTrue(res);
 
-            res = dat.TryWriteFile(texture2);
-            Assert.IsTrue(res);
-
-            res = dat.TryReadFile<SurfaceTexture>(0x06000001, out var readTexture1);
+            res = dat.TryReadFile<SurfaceTexture>(0x05000001, out var readTexture1);
             Assert.IsTrue(res);
             Assert.IsNotNull(readTexture1);
 
-            Assert.AreEqual(0x06000001u, readTexture1.Id);
-            Assert.AreEqual(100, readTexture1.Width);
-            Assert.AreEqual(100, readTexture1.Height);
-            Assert.AreEqual(PixelFormat.PFID_UNKNOWN, readTexture1.Format);
-            Assert.AreEqual(1000, readTexture1.SourceData.Length);
-            Assert.AreEqual(0u, readTexture1.DefaultPaletteId); // should be empty even though it's set above
-
-            res = dat.TryReadFile<SurfaceTexture>(0x06000002, out var readTexture2);
-            Assert.IsTrue(res);
-            Assert.IsNotNull(readTexture2);
-
-            Assert.AreEqual(0x06000002u, readTexture2.Id);
-            Assert.AreEqual(100, readTexture2.Width);
-            Assert.AreEqual(100, readTexture2.Height);
-            Assert.AreEqual(PixelFormat.PFID_INDEX16, readTexture2.Format);
-            Assert.AreEqual(1000, readTexture2.SourceData.Length);
-            Assert.AreEqual(1111u, readTexture2.DefaultPaletteId);
+            Assert.AreEqual(0x05000001u, readTexture1.Id);
+            Assert.AreEqual(TextureType.Texture2D, readTexture1.Type);
+            Assert.AreEqual(2, readTexture1.Textures.Count);
+            Assert.AreEqual(0x06000002u, readTexture1.Textures[0]);
+            Assert.AreEqual(0x06000003u, readTexture1.Textures[1]);
 
             dat.Dispose();
             File.Delete(datFilePath);
@@ -75,27 +49,21 @@ namespace DatReaderWriter.Tests.DBObjs {
             });
 
 
-            var res = dat.TryReadFile<SurfaceTexture>(0x06000164, out var texture1);
+            var res = dat.TryReadFile<SurfaceTexture>(0x0500330D, out var texture1);
             Assert.IsTrue(res);
             Assert.IsNotNull(texture1);
 
-            Assert.AreEqual(6u, texture1.DataCategory);
-            Assert.AreEqual(20, texture1.Width);
-            Assert.AreEqual(20, texture1.Height);
-            Assert.AreEqual(PixelFormat.PFID_R8G8B8, texture1.Format);
-            Assert.AreEqual(1200, texture1.SourceData.Length);
-            Assert.AreEqual(0u, texture1.DefaultPaletteId);
+            Assert.AreEqual(0u, texture1.DataCategory);
+            Assert.AreEqual(TextureType.Texture2D, texture1.Type);
+            CollectionAssert.AreEqual(new uint[] { 0x060074CD }, texture1.Textures);
 
-            res = dat.TryReadFile<SurfaceTexture>(0x06007364, out var texture2);
+            res = dat.TryReadFile<SurfaceTexture>(0x050023BF, out var texture2);
             Assert.IsTrue(res);
             Assert.IsNotNull(texture2);
 
-            Assert.AreEqual(4u, texture2.DataCategory);
-            Assert.AreEqual(512, texture2.Width);
-            Assert.AreEqual(512, texture2.Height);
-            Assert.AreEqual(PixelFormat.PFID_INDEX16, texture2.Format);
-            Assert.AreEqual(524288, texture2.SourceData.Length);
-            Assert.AreEqual(0x0400007Eu, texture2.DefaultPaletteId);
+            Assert.AreEqual(0u, texture2.DataCategory);
+            Assert.AreEqual(TextureType.Texture2D, texture2.Type);
+            CollectionAssert.AreEqual(new uint[] { 0x06005731, 0x06005731 }, texture2.Textures);
 
             dat.Dispose();
         }
