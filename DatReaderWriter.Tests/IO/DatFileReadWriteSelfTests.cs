@@ -99,6 +99,30 @@ namespace ACClientLib.DatReaderWriter.Tests.IO {
 
         [TestMethod]
         [CombinatorialData]
+        public void CanWritereadSingle([DataValues(0f, 1f, -1f, 0.123f, 12f, float.MaxValue, float.MinValue)] float number) {
+            var bytes = new byte[sizeof(float)];
+            var writer = new DatFileWriter(bytes);
+            writer.WriteSingle(number);
+
+            var reader = new DatFileReader(bytes);
+            Assert.AreEqual(number, reader.ReadSingle());
+            Assert.AreEqual(sizeof(float), reader.Offset);
+        }
+
+        [TestMethod]
+        [CombinatorialData]
+        public void CanWritereadSingle([DataValues(0.0, 1.0, -1.0, 0.123, (double)12, double.MaxValue, double.MinValue)] double number) {
+            var bytes = new byte[sizeof(double)];
+            var writer = new DatFileWriter(bytes);
+            writer.WriteDouble(number);
+
+            var reader = new DatFileReader(bytes);
+            Assert.AreEqual(number, reader.ReadDouble());
+            Assert.AreEqual(sizeof(double), reader.Offset);
+        }
+
+        [TestMethod]
+        [CombinatorialData]
         public void CanWriteCompressedUInt([DataValues(1234u, 5678u, 0u, 1u)] uint number) {
             var bytes = new byte[sizeof(uint)];
             var writer = new DatFileWriter(bytes);
