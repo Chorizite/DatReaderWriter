@@ -22,10 +22,10 @@ namespace ACClientLib.DatReaderWriter.DBObjs {
     /// <summary>
     /// DB_TYPE_SETUP in the client.
     /// </summary>
-    [DBObjType(DatFileType.Portal, false, 0x02000000, 0x0200FFFF)]
+    [DBObjType(DatFileType.Portal, DBObjHeaderFlags.HasId, 0x02000000, 0x0200FFFF)]
     public class Setup : DBObj {
         /// <inheritdoc />
-        public override bool HasDataCategory => false;
+        public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;
 
         public SetupFlags Flags;
 

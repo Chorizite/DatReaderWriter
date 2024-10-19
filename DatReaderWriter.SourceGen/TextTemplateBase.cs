@@ -366,6 +366,15 @@ namespace DatReaderWriter.SourceGen {
                         GenerateWriterContents(maskChild, depth);
                     }
                     WriteMaskMapCheckEnding(maskMap, mask);
+                    if (mask.ElseChildren.Count > 0) {
+                        WriteLine("else {");
+                        Indent();
+                        foreach (var elseChild in mask.ElseChildren) {
+                            GenerateWriterContents(elseChild, depth);
+                        }
+                        Outdent();
+                        WriteLine("}");
+                    }
                 }
             }
             else if (model is ACAlign) {
@@ -477,6 +486,15 @@ namespace DatReaderWriter.SourceGen {
                         GenerateReaderContents(maskChild, depth);
                     }
                     WriteMaskMapCheckEnding(maskMap, mask);
+                    if (mask.ElseChildren.Count > 0) {
+                        WriteLine("else {");
+                        Indent();
+                        foreach (var elseChild in mask.ElseChildren) {
+                            GenerateReaderContents(elseChild, depth);
+                        }
+                        Outdent();
+                        WriteLine("}");
+                    }
                 }
             }
             else if (model is ACAlign) {

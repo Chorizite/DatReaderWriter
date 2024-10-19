@@ -30,15 +30,14 @@
             // summary docs and class definition
             WriteSummary(dataType.Text);
             var datType = (dataType.Parent as DatReaderWriter.SourceGen.Models.ACDat).Type;
-            var hasDataCategory = (dataType.HasDataCategory ? "true" : "false");
-            WriteLine($"[DBObjType({datType}, {hasDataCategory}, 0x{dataType.FirstId:X8}, 0x{dataType.LastId:X8})]");
+            WriteLine($"[DBObjType({datType}, {dataType.DBObjHeaderFlags}, 0x{dataType.FirstId:X8}, 0x{dataType.LastId:X8})]");
             WriteLine("public class " + dataType.Name + " : DBObj {");
 
             using (new IndentHelper(this)) {
                 var usedPropertyNames = new List<string>();
                 
                 WriteLine("/// <inheritdoc />");
-                WriteLine($"public override bool HasDataCategory => {dataType.HasDataCategory.ToString().ToLower()};\n");
+                WriteLine($"public override DBObjHeaderFlags HeaderFlags => {dataType.DBObjHeaderFlags};\n");
 
                 // generate struct fields from messages.xml
                 foreach (var baseModel in dataType.AllChildren) {

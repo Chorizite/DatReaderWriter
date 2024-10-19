@@ -7,6 +7,11 @@
       <value name="Cell" value="2" />
       <value name="Local" value="3" />
     </enum>
+    <enum name="DBObjHeaderFlags" parent="uint" mask="true">
+      <value name="None" value="0x00" />
+      <value name="HasId" value="0x01" />
+      <value name="HasDataCategory" value="0x02" />
+    </enum>
     <enum name="PixelFormat" parent="uint">
       <value name="PFID_UNKNOWN" value="0x00000000" />
       <value name="PFID_R8G8B8" value="0x00000014" />
@@ -447,6 +452,21 @@
       <value name="Cube" value="0x4" />
       <value name="Movie2D" value="0x5" />
     </enum>
+    <enum name="SurfaceType" parent="uint" mask="true">
+      <value name="Base1Solid" value="0x00000001" />
+      <value name="Base1Image" value="0x00000002" />
+      <value name="Base1ClipMap" value="0x00000004" />
+      <value name="Translucent" value="0x00000010" />
+      <value name="Diffuse" value="0x00000020" />
+      <value name="Luminous" value="0x00000040" />
+      <value name="Alpha" value="0x00000100" />
+      <value name="InvAlpha" value="0x00000200" />
+      <value name="Additive" value="0x00010000" />
+      <value name="Detail" value="0x00020000" />
+      <value name="Gouraud" value="0x10000000" />
+      <value name="Stippled" value="0x40000000" />
+      <value name="Perspective" value="0x80000000" />
+    </enum>
   </enums>
   <types>
     <type name="DBObj" abstract="true">
@@ -704,7 +724,7 @@
   </types>
   <dats>
     <dat name="portal" text="client_portal.dat" type="DatFileType.Portal">
-      <type name="GfxObj" text="GfxObj / DB_TYPE_GFXOBJ in the client." parent="DBObj" first="0x1000000" last="0x100FFFF" categorized="false">
+      <type name="GfxObj" text="GfxObj / DB_TYPE_GFXOBJ in the client." parent="DBObj" first="0x1000000" last="0x100FFFF" flags="DBObjHeaderFlags.HasId">
         <field type="GfxObjFlags" name="Flags" />
         <field type="CompressedUInt" name="_numSurfaces" />
         <vector name="Surfaces" length="_numSurfaces" type="List" genericValue="uint" text="The list of surfaces" />
@@ -728,7 +748,7 @@
           </mask>
         </maskmap>
       </type>
-      <type name="Setup" text="DB_TYPE_SETUP in the client." parent="DBObj" first="0x2000000" last="0x200FFFF" categorized="false">
+      <type name="Setup" text="DB_TYPE_SETUP in the client." parent="DBObj" first="0x2000000" last="0x200FFFF" flags="DBObjHeaderFlags.HasId">
         <field type="SetupFlags" name="Flags" />
         <field type="uint" name="NumParts" hidden="true" />
         <vector name="Parts" length="NumParts" type="List" genericValue="uint" />
@@ -764,7 +784,7 @@
         <field type="uint" name="DefaultSoundTable" />
         <field type="uint" name="DefaultScriptTable" />
       </type>
-      <type name="Animation" text="DB_TYPE_ANIM in the client." parent="DBObj" first="0x3000000" last="0x300FFFF" categorized="false">
+      <type name="Animation" text="DB_TYPE_ANIM in the client." parent="DBObj" first="0x3000000" last="0x300FFFF" flags="DBObjHeaderFlags.HasId">
         <field type="AnimationFlags" name="Flags" />
         <field type="uint" name="NumParts" />
         <field type="uint" name="_numFrames" lengthof="PartFrames" />
@@ -775,14 +795,14 @@
         </maskmap>
         <vector name="PartFrames" length="_numFrames" type="List" genericValue="AnimationFrame" />
       </type>
-      <type name="Palette" text="DB_TYPE_PALETTE in the client." parent="DBObj" first="0x4000000" last="0x400FFFF" categorized="false">
+      <type name="Palette" text="DB_TYPE_PALETTE in the client." parent="DBObj" first="0x4000000" last="0x400FFFF" flags="DBObjHeaderFlags.HasId">
       </type>
-      <type name="SurfaceTexture" text="DB_TYPE_SURFACETEXTURE in the client." parent="DBObj" first="0x5000000" last="0x5FFFFFF" categorized="true">
+      <type name="SurfaceTexture" text="DB_TYPE_SURFACETEXTURE in the client." parent="DBObj" first="0x5000000" last="0x5FFFFFF" flags="DBObjHeaderFlags.HasId | DBObjHeaderFlags.HasDataCategory">
         <field type="TextureType" name="Type" text="This seems to always be TextureType.Texture2D in the dats." />
         <field type="int" name="_numtextures" />
         <vector name="Textures" length="_numtextures" type="List" genericValue="uint" />
       </type>
-      <type name="RenderSurface" text="This holds raw texture data. DB_TYPE_RENDERSURFACE in the client." parent="DBObj" first="0x6000000" last="0x7FFFFFF" categorized="true">
+      <type name="RenderSurface" text="This holds raw texture data. DB_TYPE_RENDERSURFACE in the client." parent="DBObj" first="0x6000000" last="0x7FFFFFF" flags="DBObjHeaderFlags.HasId | DBObjHeaderFlags.HasDataCategory">
         <field type="int" name="Width" text="The width of the SurfaceTexture" />
         <field type="int" name="Height" text="The height of the SurfaceTexture" />
         <field type="PixelFormat" name="Format" text="The format of the SourceData" />
@@ -794,87 +814,100 @@
           </case>
         </switch>
       </type>
-      <type name="Surface" text="DB_TYPE_SURFACE in the client." parent="DBObj" first="0x8000000" last="0x800FFFF" categorized="false">
+      <type name="Surface" text="DB_TYPE_SURFACE in the client." parent="DBObj" first="0x8000000" last="0x800FFFF" flags="DBObjHeaderFlags.None">
+        <field type="SurfaceType" name="Type" />
+        <maskmap name="Type">
+          <mask value="SurfaceType.Base1Image | SurfaceType.Base1ClipMap">
+            <field type="uint" name="OrigTextureId" />
+            <field type="uint" name="OrigPaletteId" />
+            <else>
+              <field type="ColorARGB" name="ColorValue" />
+            </else>
+          </mask>
+        </maskmap>
+        <field type="float" name="Translucency" />
+        <field type="float" name="Luminosity" />
+        <field type="float" name="Diffuse" />
       </type>
-      <type name="MotionTable" text="DB_TYPE_MTABLE in the client." parent="DBObj" first="0x9000000" last="0x900FFFF" categorized="false">
+      <type name="MotionTable" text="DB_TYPE_MTABLE in the client." parent="DBObj" first="0x9000000" last="0x900FFFF" flags="DBObjHeaderFlags.HasId">
       </type>
-      <type name="Wave" text="DB_TYPE_WAVE in the client." parent="DBObj" first="0xA000000" last="0xA00FFFF" categorized="false">
+      <type name="Wave" text="DB_TYPE_WAVE in the client." parent="DBObj" first="0xA000000" last="0xA00FFFF" flags="DBObjHeaderFlags.HasId">
       </type>
-      <type name="Environment" text="DB_TYPE_ENVIRONMENT in the client." parent="DBObj" first="0xD000000" last="0xD00FFFF" categorized="false">
+      <type name="Environment" text="DB_TYPE_ENVIRONMENT in the client." parent="DBObj" first="0xD000000" last="0xD00FFFF" flags="DBObjHeaderFlags.HasId">
         <field type="uint" name="_cellCount" />
         <vector name="Cells" length="_cellCount" type="Dictionary" genericKey="uint" genericValue="CellStruct" text="The cells in this environment" />
       </type>
-      <type name="ChatPoseTable" text="DB_TYPE_CHAT_POSE_TABLE in the client." parent="DBObj" first="0xE000007" last="0xE000007" categorized="false">
+      <type name="ChatPoseTable" text="DB_TYPE_CHAT_POSE_TABLE in the client." parent="DBObj" first="0xE000007" last="0xE000007" flags="DBObjHeaderFlags.HasId">
       </type>
-      <type name="ObjectHierarchy" text="DB_TYPE_OBJECT_HIERARCHY in the client." parent="DBObj" first="0xE00000D" last="0xE00000D" categorized="false">
+      <type name="ObjectHierarchy" text="DB_TYPE_OBJECT_HIERARCHY in the client." parent="DBObj" first="0xE00000D" last="0xE00000D" flags="DBObjHeaderFlags.HasId">
       </type>
-      <type name="BadDataTable" text="DB_TYPE_BADDATA in the client." parent="DBObj" first="0xE00001A" last="0xE00001A" categorized="false">
+      <type name="BadDataTable" text="DB_TYPE_BADDATA in the client." parent="DBObj" first="0xE00001A" last="0xE00001A" flags="DBObjHeaderFlags.HasId">
       </type>
-      <type name="TabooTable" text="DB_TYPE_TABOO_TABLE in the client." parent="DBObj" first="0xE00001E" last="0xE00001E" categorized="false">
+      <type name="TabooTable" text="DB_TYPE_TABOO_TABLE in the client." parent="DBObj" first="0xE00001E" last="0xE00001E" flags="DBObjHeaderFlags.HasId">
       </type>
-      <type name="FileToId" text="DB_TYPE_FILE2ID_TABLE in the client." parent="DBObj" first="0xE00001F" last="0xE00001F" categorized="false">
+      <type name="FileToId" text="DB_TYPE_FILE2ID_TABLE in the client." parent="DBObj" first="0xE00001F" last="0xE00001F" flags="DBObjHeaderFlags.HasId">
       </type>
-      <type name="NameFilterTable" text="DB_TYPE_NAME_FILTER_TABLE in the client." parent="DBObj" first="0xE000020" last="0xE000020" categorized="false">
+      <type name="NameFilterTable" text="DB_TYPE_NAME_FILTER_TABLE in the client." parent="DBObj" first="0xE000020" last="0xE000020" flags="DBObjHeaderFlags.HasId">
       </type>
-      <type name="MonitoredProperties" text="DB_TYPE_MONITOREDPROPERTIES in the client." parent="DBObj" first="0xE020000" last="0xE02FFFF" categorized="false">
+      <type name="MonitoredProperties" text="DB_TYPE_MONITOREDPROPERTIES in the client." parent="DBObj" first="0xE020000" last="0xE02FFFF" flags="DBObjHeaderFlags.HasId">
       </type>
-      <type name="PaletteSet" text="DB_TYPE_PAL_SET in the client." parent="DBObj" first="0xF000000" last="0xF00FFFF" categorized="false">
+      <type name="PaletteSet" text="DB_TYPE_PAL_SET in the client." parent="DBObj" first="0xF000000" last="0xF00FFFF" flags="DBObjHeaderFlags.HasId">
       </type>
-      <type name="Clothing" text="DB_TYPE_CLOTHING in the client." parent="DBObj" first="0x10000000" last="0x1000FFFF" categorized="false">
+      <type name="Clothing" text="DB_TYPE_CLOTHING in the client." parent="DBObj" first="0x10000000" last="0x1000FFFF" flags="DBObjHeaderFlags.HasId">
       </type>
-      <type name="DegradeInfo" text="DB_TYPE_DEGRADEINFO in the client." parent="DBObj" first="0x11000000" last="0x1100FFFF" categorized="false">
+      <type name="DegradeInfo" text="DB_TYPE_DEGRADEINFO in the client." parent="DBObj" first="0x11000000" last="0x1100FFFF" flags="DBObjHeaderFlags.HasId">
       </type>
-      <type name="Scene" text="DB_TYPE_SCENE in the client." parent="DBObj" first="0x12000000" last="0x1200FFFF" categorized="false">
+      <type name="Scene" text="DB_TYPE_SCENE in the client." parent="DBObj" first="0x12000000" last="0x1200FFFF" flags="DBObjHeaderFlags.HasId">
       </type>
-      <type name="Region" text="DB_TYPE_REGION in the client." parent="DBObj" first="0x13000000" last="0x1300FFFF" categorized="false">
+      <type name="Region" text="DB_TYPE_REGION in the client." parent="DBObj" first="0x13000000" last="0x1300FFFF" flags="DBObjHeaderFlags.HasId">
       </type>
-      <type name="Keymap" text="DB_TYPE_KEYMAP in the client." parent="DBObj" first="0x14000000" last="0x1400FFFF" categorized="false">
+      <type name="Keymap" text="DB_TYPE_KEYMAP in the client." parent="DBObj" first="0x14000000" last="0x1400FFFF" flags="DBObjHeaderFlags.HasId">
       </type>
-      <type name="RenderTexture" text="DB_TYPE_RENDERTEXTURE in the client." parent="DBObj" first="0x15000000" last="0x15FFFFFF" categorized="true">
+      <type name="RenderTexture" text="DB_TYPE_RENDERTEXTURE in the client." parent="DBObj" first="0x15000000" last="0x15FFFFFF" flags="DBObjHeaderFlags.HasId | DBObjHeaderFlags.HasDataCategory">
       </type>
-      <type name="MaterialModifier" text="DB_TYPE_MATERIALMODIFIER in the client." parent="DBObj" first="0x17000000" last="0x17FFFFFF" categorized="false">
+      <type name="MaterialModifier" text="DB_TYPE_MATERIALMODIFIER in the client." parent="DBObj" first="0x17000000" last="0x17FFFFFF" flags="DBObjHeaderFlags.HasId">
       </type>
-      <type name="MaterialInstance" text="DB_TYPE_MATERIALINSTANCE in the client." parent="DBObj" first="0x18000000" last="0x18FFFFFF" categorized="false">
+      <type name="MaterialInstance" text="DB_TYPE_MATERIALINSTANCE in the client." parent="DBObj" first="0x18000000" last="0x18FFFFFF" flags="DBObjHeaderFlags.HasId">
       </type>
-      <type name="RenderMesh" text="DB_TYPE_RENDER_MESH in the client." parent="DBObj" first="0x19000000" last="0x19FFFFFF" categorized="false">
+      <type name="RenderMesh" text="DB_TYPE_RENDER_MESH in the client." parent="DBObj" first="0x19000000" last="0x19FFFFFF" flags="DBObjHeaderFlags.HasId">
       </type>
-      <type name="SoundTable" text="DB_TYPE_STABLE in the client." parent="DBObj" first="0x20000000" last="0x2000FFFF" categorized="false">
+      <type name="SoundTable" text="DB_TYPE_STABLE in the client." parent="DBObj" first="0x20000000" last="0x2000FFFF" flags="DBObjHeaderFlags.HasId">
       </type>
-      <type name="UILayout" text="DB_TYPE_UI_LAYOUT in the client." parent="DBObj" first="0x21000000" last="0x21FFFFFF" categorized="false">
+      <type name="UILayout" text="DB_TYPE_UI_LAYOUT in the client." parent="DBObj" first="0x21000000" last="0x21FFFFFF" flags="DBObjHeaderFlags.HasId">
       </type>
-      <type name="EnumMapper" text="DB_TYPE_ENUM_MAPPER in the client." parent="DBObj" first="0x22000000" last="0x22FFFFFF" categorized="false">
+      <type name="EnumMapper" text="DB_TYPE_ENUM_MAPPER in the client." parent="DBObj" first="0x22000000" last="0x22FFFFFF" flags="DBObjHeaderFlags.HasId">
       </type>
-      <type name="DataIdMapper" text="DB_TYPE_DID_MAPPER in the client." parent="DBObj" first="0x25000000" last="0x25FFFFFF" categorized="false">
+      <type name="DataIdMapper" text="DB_TYPE_DID_MAPPER in the client." parent="DBObj" first="0x25000000" last="0x25FFFFFF" flags="DBObjHeaderFlags.HasId">
       </type>
-      <type name="ActionMap" text="DB_TYPE_ACTIONMAP in the client." parent="DBObj" first="0x26000000" last="0x2600FFFF" categorized="false">
+      <type name="ActionMap" text="DB_TYPE_ACTIONMAP in the client." parent="DBObj" first="0x26000000" last="0x2600FFFF" flags="DBObjHeaderFlags.HasId">
       </type>
-      <type name="DualDataIdMapper" text="DB_TYPE_DUAL_DID_MAPPER in the client." parent="DBObj" first="0x27000000" last="0x27FFFFFF" categorized="false">
+      <type name="DualDataIdMapper" text="DB_TYPE_DUAL_DID_MAPPER in the client." parent="DBObj" first="0x27000000" last="0x27FFFFFF" flags="DBObjHeaderFlags.HasId">
       </type>
-      <type name="LanguageString" text="DB_TYPE_STRING in the client." parent="DBObj" first="0x31000000" last="0x3100FFFF" categorized="false">
+      <type name="LanguageString" text="DB_TYPE_STRING in the client." parent="DBObj" first="0x31000000" last="0x3100FFFF" flags="DBObjHeaderFlags.HasId">
       </type>
-      <type name="ParticleEmitter" text="DB_TYPE_PARTICLE_EMITTER in the client." parent="DBObj" first="0x32000000" last="0x3200FFFF" categorized="false">
+      <type name="ParticleEmitter" text="DB_TYPE_PARTICLE_EMITTER in the client." parent="DBObj" first="0x32000000" last="0x3200FFFF" flags="DBObjHeaderFlags.HasId">
       </type>
-      <type name="PhysicsScript" text="DB_TYPE_PHYSICS_SCRIPT in the client." parent="DBObj" first="0x33000000" last="0x3300FFFF" categorized="false">
+      <type name="PhysicsScript" text="DB_TYPE_PHYSICS_SCRIPT in the client." parent="DBObj" first="0x33000000" last="0x3300FFFF" flags="DBObjHeaderFlags.HasId">
       </type>
-      <type name="PhysicsScriptTable" text="DB_TYPE_PHYSICS_SCRIPT_TABLE in the client." parent="DBObj" first="0x34000000" last="0x3400FFFF" categorized="false">
+      <type name="PhysicsScriptTable" text="DB_TYPE_PHYSICS_SCRIPT_TABLE in the client." parent="DBObj" first="0x34000000" last="0x3400FFFF" flags="DBObjHeaderFlags.HasId">
       </type>
-      <type name="MasterProperty" text="DB_TYPE_MASTER_PROPERTY in the client." parent="DBObj" first="0x39000000" last="0x39FFFFFF" categorized="false">
+      <type name="MasterProperty" text="DB_TYPE_MASTER_PROPERTY in the client." parent="DBObj" first="0x39000000" last="0x39FFFFFF" flags="DBObjHeaderFlags.HasId">
       </type>
-      <type name="Font" text="DB_TYPE_FONT in the client." parent="DBObj" first="0x40000000" last="0x40000FFF" categorized="false">
+      <type name="Font" text="DB_TYPE_FONT in the client." parent="DBObj" first="0x40000000" last="0x40000FFF" flags="DBObjHeaderFlags.HasId">
       </type>
-      <type name="DBProperties" text="DB_TYPE_DBPROPERTIES in the client." parent="DBObj" first="0x78000000" last="0x7FFFFFFF" categorized="false">
+      <type name="DBProperties" text="DB_TYPE_DBPROPERTIES in the client." parent="DBObj" first="0x78000000" last="0x7FFFFFFF" flags="DBObjHeaderFlags.HasId">
       </type>
-      <type name="CharGen" text="DB_TYPE_CHAR_GEN_0 in the client." parent="DBObj" first="0xE000002" last="0xE000002" categorized="false">
+      <type name="CharGen" text="DB_TYPE_CHAR_GEN_0 in the client." parent="DBObj" first="0xE000002" last="0xE000002" flags="DBObjHeaderFlags.HasId">
       </type>
-      <type name="VitalTable" text="DB_TYPE_ATTRIBUTE_2ND_TABLE_0 in the client." parent="DBObj" first="0xE000003" last="0xE000003" categorized="false">
+      <type name="VitalTable" text="DB_TYPE_ATTRIBUTE_2ND_TABLE_0 in the client." parent="DBObj" first="0xE000003" last="0xE000003" flags="DBObjHeaderFlags.HasId">
       </type>
-      <type name="SkillTable" text="DB_TYPE_SKILL_TABLE_0 in the client." parent="DBObj" first="0xE000004" last="0xE000004" categorized="false">
+      <type name="SkillTable" text="DB_TYPE_SKILL_TABLE_0 in the client." parent="DBObj" first="0xE000004" last="0xE000004" flags="DBObjHeaderFlags.HasId">
       </type>
-      <type name="SpellTable" text="DB_TYPE_SPELL_TABLE_0 in the client." parent="DBObj" first="0xE00000E" last="0xE00000E" categorized="false">
+      <type name="SpellTable" text="DB_TYPE_SPELL_TABLE_0 in the client." parent="DBObj" first="0xE00000E" last="0xE00000E" flags="DBObjHeaderFlags.HasId">
       </type>
-      <type name="SpellComponentTable" text="DB_TYPE_SPELLCOMPONENT_TABLE_0 in the client." parent="DBObj" first="0xE00000F" last="0xE00000F" categorized="false">
+      <type name="SpellComponentTable" text="DB_TYPE_SPELLCOMPONENT_TABLE_0 in the client." parent="DBObj" first="0xE00000F" last="0xE00000F" flags="DBObjHeaderFlags.HasId">
       </type>
-      <type name="ExperienceTable" text="Holds the experience required for different attributes/vitals/skill/levels, as well as the amount of skill credits obtained for each level. DB_TYPE_XP_TABLE_0 in the client." parent="DBObj" first="0xE000018" last="0xE000018" categorized="false">
+      <type name="ExperienceTable" text="Holds the experience required for different attributes/vitals/skill/levels, as well as the amount of skill credits obtained for each level. DB_TYPE_XP_TABLE_0 in the client." parent="DBObj" first="0xE000018" last="0xE000018" flags="DBObjHeaderFlags.HasId">
         <field type="int" name="_attributeCount" />
         <field type="int" name="_vitalCount" />
         <field type="int" name="_trainedSkillCount" />
@@ -887,23 +920,23 @@
         <vector name="Levels" length="_levelCount" lengthmod="1" type="ulong" text="The amount of experience required to level a character" />
         <vector name="SkillCredits" length="_levelCount" lengthmod="1" type="uint" text="The amount of skill credits per level" />
       </type>
-      <type name="QuestsTable" text="DB_TYPE_QUEST_DEF_DB_0 in the client." parent="DBObj" first="0xE00001B" last="0xE00001B" categorized="false">
+      <type name="QuestsTable" text="DB_TYPE_QUEST_DEF_DB_0 in the client." parent="DBObj" first="0xE00001B" last="0xE00001B" flags="DBObjHeaderFlags.HasId">
       </type>
-      <type name="QualityFilter" text="DB_TYPE_QUALITY_FILTER_0 in the client." parent="DBObj" first="0xE010000" last="0xE01FFFF" categorized="false">
+      <type name="QualityFilter" text="DB_TYPE_QUALITY_FILTER_0 in the client." parent="DBObj" first="0xE010000" last="0xE01FFFF" flags="DBObjHeaderFlags.HasId">
       </type>
-      <type name="CombatTable" text="DB_TYPE_COMBAT_TABLE_0 in the client." parent="DBObj" first="0x30000000" last="0x3000FFFF" categorized="false">
+      <type name="CombatTable" text="DB_TYPE_COMBAT_TABLE_0 in the client." parent="DBObj" first="0x30000000" last="0x3000FFFF" flags="DBObjHeaderFlags.HasId">
       </type>
-      <type name="ContractTable" text="DB_TYPE_CONTRACT_TABLE_0 in the client." parent="DBObj" first="0xE00001D" last="0xE00001D" categorized="false">
+      <type name="ContractTable" text="DB_TYPE_CONTRACT_TABLE_0 in the client." parent="DBObj" first="0xE00001D" last="0xE00001D" flags="DBObjHeaderFlags.HasId">
       </type>
     </dat>
     <dat name="cell" text="client_cell_1.dat" type="DatFileType.Cell">
-      <type name="LandBlock" text="DB_TYPE_LAND_BLOCK in the client." parent="DBObj" first="0" last="0" categorized="false">
+      <type name="LandBlock" text="DB_TYPE_LAND_BLOCK in the client." parent="DBObj" first="0" last="0" flags="DBObjHeaderFlags.HasId">
         <field type="bool" name="HasObjects" />
         <vector name="Terrain" length="81" type="TerrainInfo" />
         <vector name="Height" length="81" type="byte" />
         <align type="uint" />
       </type>
-      <type name="LandBlockInfo" text="Stores static spawns, buildings. DB_TYPE_LBI in the client." parent="DBObj" first="0" last="0" categorized="false">
+      <type name="LandBlockInfo" text="Stores static spawns, buildings. DB_TYPE_LBI in the client." parent="DBObj" first="0" last="0" flags="DBObjHeaderFlags.HasId">
         <field type="uint" name="NumCells" text="The number of inside cells. These can be looked up at 0xAAAABBBB where AAAA is the landblock id and BBBB is the cell id + 0x100" />
         <field type="uint" name="_numObjects" />
         <vector name="Objects" length="_numObjects" type="List" genericValue="Stab" text="Static objects" />
@@ -916,7 +949,7 @@
           <vector name="RestrictionTable" length="_numRestrictionTableEntries" type="Dictionary" genericKey="uint" genericValue="uint" />
         </if>
       </type>
-      <type name="EnvCell" text="DB_TYPE_CELL in the client." parent="DBObj" first="0" last="0" categorized="false">
+      <type name="EnvCell" text="DB_TYPE_CELL in the client." parent="DBObj" first="0" last="0" flags="DBObjHeaderFlags.HasId">
         <field type="EnvCellFlags" name="Flags" />
         <field type="uint" name="_cellId" value="Id" />
         <field type="byte" name="_numSurfaces" />
@@ -940,11 +973,11 @@
       </type>
     </dat>
     <dat name="local" text="client_local_English.dat" type="DatFileType.Local">
-      <type name="StringTable" text="DB_TYPE_STRING_TABLE in the client." parent="DBObj" first="0x23000000" last="0x24FFFFFF" categorized="false">
+      <type name="StringTable" text="DB_TYPE_STRING_TABLE in the client." parent="DBObj" first="0x23000000" last="0x24FFFFFF" flags="DBObjHeaderFlags.HasId">
       </type>
-      <type name="FontLocal" text="DB_TYPE_FONT_LOCAL in the client." parent="DBObj" first="0x40001000" last="0x40FFFFFF" categorized="false">
+      <type name="FontLocal" text="DB_TYPE_FONT_LOCAL in the client." parent="DBObj" first="0x40001000" last="0x40FFFFFF" flags="DBObjHeaderFlags.HasId">
       </type>
-      <type name="StringState" text="DB_TYPE_STRING_STATE in the client." parent="DBObj" first="0x41000000" last="0x41FFFFFF" categorized="false">
+      <type name="StringState" text="DB_TYPE_STRING_STATE in the client." parent="DBObj" first="0x41000000" last="0x41FFFFFF" flags="DBObjHeaderFlags.HasId">
       </type>
     </dat>
   </dats>

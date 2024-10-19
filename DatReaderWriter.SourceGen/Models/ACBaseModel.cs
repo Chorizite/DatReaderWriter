@@ -51,6 +51,10 @@ namespace DatReaderWriter.SourceGen.Models {
                 children.AddRange((model as ACMaskMap).Masks);
             }
 
+            if (model is ACMask) {
+                children.AddRange((model as ACMask).ElseChildren);
+            }
+
             if (model is ACSwitch) {
                 children.AddRange((model as ACSwitch).Cases);
             }

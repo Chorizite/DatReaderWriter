@@ -22,10 +22,10 @@ namespace ACClientLib.DatReaderWriter.DBObjs {
     /// <summary>
     /// Holds the experience required for different attributes/vitals/skill/levels, as well as the amount of skill credits obtained for each level. DB_TYPE_XP_TABLE_0 in the client.
     /// </summary>
-    [DBObjType(DatFileType.Portal, false, 0x0E000018, 0x0E000018)]
+    [DBObjType(DatFileType.Portal, DBObjHeaderFlags.HasId, 0x0E000018, 0x0E000018)]
     public class ExperienceTable : DBObj {
         /// <inheritdoc />
-        public override bool HasDataCategory => false;
+        public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;
 
         /// <summary>
         /// The amount of experience required to train attributes

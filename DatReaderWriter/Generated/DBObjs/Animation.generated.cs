@@ -22,10 +22,10 @@ namespace ACClientLib.DatReaderWriter.DBObjs {
     /// <summary>
     /// DB_TYPE_ANIM in the client.
     /// </summary>
-    [DBObjType(DatFileType.Portal, false, 0x03000000, 0x0300FFFF)]
+    [DBObjType(DatFileType.Portal, DBObjHeaderFlags.HasId, 0x03000000, 0x0300FFFF)]
     public class Animation : DBObj {
         /// <inheritdoc />
-        public override bool HasDataCategory => false;
+        public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;
 
         public AnimationFlags Flags;
 

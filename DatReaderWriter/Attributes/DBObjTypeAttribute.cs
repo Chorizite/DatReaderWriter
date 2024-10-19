@@ -13,9 +13,9 @@ namespace ACClientLib.DatReaderWriter.Attributes {
         public DatFileType DatFileType { get; }
 
         /// <summary>
-        /// Wether this DBObj has a data category
+        /// DBObj header flags. Determines what fields will be packed/unpacked.
         /// </summary>
-        public bool HasDataCategory { get; }
+        public DBObjHeaderFlags HeaderFlags { get; }
 
         /// <summary>
         /// The lower limit of ids used for this DBObjType
@@ -31,12 +31,12 @@ namespace ACClientLib.DatReaderWriter.Attributes {
         /// 
         /// </summary>
         /// <param name="datFileType">The dat file type this DBObj exists in</param>
-        /// <param name="hasDataCategory">Wether this DBObj has a data category</param>
+        /// <param name="headerFlags">DBObj header flags. Determines what fields will be packed/unpacked.</param>
         /// <param name="firstId">The lower limit of ids used for this DBObjType</param>
         /// <param name="lastId">The upper limit of ids used for this DBObjType</param>
-        public DBObjTypeAttribute(DatFileType datFileType, bool hasDataCategory, uint firstId, uint lastId) {
+        public DBObjTypeAttribute(DatFileType datFileType, DBObjHeaderFlags headerFlags, uint firstId, uint lastId) {
             DatFileType = datFileType;
-            HasDataCategory = hasDataCategory;
+            HeaderFlags = headerFlags;
             FirstId = firstId;
             LastId = lastId;
         }

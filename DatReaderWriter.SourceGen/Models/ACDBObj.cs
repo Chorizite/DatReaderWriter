@@ -11,7 +11,7 @@ namespace DatReaderWriter.SourceGen.Models {
         public string BaseType { get; set; } = "";
         public uint FirstId { get; set; }
         public uint LastId { get; set; }
-        public bool HasDataCategory { get; set; } = false;
+        public string DBObjHeaderFlags { get; set; } = "";
 
         public ACDBObj(ACBaseModel parent, XElement element) : base(parent, element) {
 
@@ -22,7 +22,7 @@ namespace DatReaderWriter.SourceGen.Models {
             var type = (string)element.Attribute("type");
             var text = (string)element.Attribute("text");
             var baseType = (string)element.Attribute("parent");
-            var hasDataCategory = ((string)element.Attribute("categorized") ?? "").ToLower() == "true";
+            var flags = (string)element.Attribute("flags");
             var firstId = Convert.ToUInt32(element.Attribute("first").Value, 16);
             var lastId = Convert.ToUInt32(element.Attribute("last").Value, 16);
             var message = new ACDBObj(parent, element) {
@@ -32,7 +32,7 @@ namespace DatReaderWriter.SourceGen.Models {
                 BaseType = baseType,
                 FirstId = firstId,
                 LastId = lastId,
-                HasDataCategory = hasDataCategory
+                DBObjHeaderFlags = flags
             };
 
             return message;

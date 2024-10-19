@@ -265,12 +265,17 @@ namespace DatReaderWriter.SourceGen {
                 WriteIfStatementStart($"((uint){maskMap.Name} & (uint){mask.Value}) != 0");
             }
             else {
-                if (mask.Value.StartsWith("!")) {
-                    WriteIfStatementStart($"!{maskMap.Name}.HasFlag({mask.Value.Substring(1)})");
-                }
-                else {
-                    WriteIfStatementStart($"{maskMap.Name}.HasFlag({mask.Value})");
-                }
+                var parts = mask.Value
+                    .Split('|').Select(v => v.Trim())
+                    .Select(a => {
+                        if (a.StartsWith("!")) {
+                            return $"!{maskMap.Name}.HasFlag({a.Substring(1)})";
+                        }
+                        else {
+                            return $"{maskMap.Name}.HasFlag({a})";
+                        }
+                    });
+                WriteIfStatementStart(string.Join(" || ", parts));
             }
         }
 

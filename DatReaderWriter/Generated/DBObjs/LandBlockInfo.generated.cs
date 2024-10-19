@@ -22,10 +22,10 @@ namespace ACClientLib.DatReaderWriter.DBObjs {
     /// <summary>
     /// Stores static spawns, buildings. DB_TYPE_LBI in the client.
     /// </summary>
-    [DBObjType(DatFileType.Cell, false, 0x00000000, 0x00000000)]
+    [DBObjType(DatFileType.Cell, DBObjHeaderFlags.HasId, 0x00000000, 0x00000000)]
     public class LandBlockInfo : DBObj {
         /// <inheritdoc />
-        public override bool HasDataCategory => false;
+        public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;
 
         /// <summary>
         /// The number of inside cells. These can be looked up at 0xAAAABBBB where AAAA is the landblock id and BBBB is the cell id + 0x100

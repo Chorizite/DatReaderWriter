@@ -22,10 +22,10 @@ namespace ACClientLib.DatReaderWriter.DBObjs {
     /// <summary>
     /// GfxObj / DB_TYPE_GFXOBJ in the client.
     /// </summary>
-    [DBObjType(DatFileType.Portal, false, 0x01000000, 0x0100FFFF)]
+    [DBObjType(DatFileType.Portal, DBObjHeaderFlags.HasId, 0x01000000, 0x0100FFFF)]
     public class GfxObj : DBObj {
         /// <inheritdoc />
-        public override bool HasDataCategory => false;
+        public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;
 
         public GfxObjFlags Flags;
 
