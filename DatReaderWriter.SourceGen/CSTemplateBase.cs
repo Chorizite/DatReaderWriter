@@ -401,7 +401,15 @@ namespace DatReaderWriter.SourceGen {
                     WriteLine($"{vector.Name}.Add({vector.GenericValue}.Unpack(reader, _peekedValue));");
                 }
                 else {
-                    WriteLine($"{vector.Name}.Add({GetBinaryReaderForType(vector.GenericValue)});");
+                    XMLDefParser.ACDataTypes.TryGetValue(vector.GenericValue, out var vType);
+                    if (vType is not null && vType.AllChildren.Any(c => c is ACVector m && m.Length.Contains("parent."))) {
+                        var child = vType.AllChildren.First(c => c is ACVector m && m.Length.Contains("parent.")) as ACVector;
+                        WriteLine($"var _val = {GetBinaryReaderForType(vector.GenericValue).TrimEnd(')')}{child.Length.Substring(7)});");
+                        WriteLine($"{vector.Name}.Add(_val);");
+                    }
+                    else {
+                        WriteLine($"{vector.Name}.Add({GetBinaryReaderForType(vector.GenericValue)});");
+                    }
                 }
             }
             else {

@@ -29,8 +29,6 @@ namespace DatReaderWriter.SourceGen.Models {
                 WriteCondition = writeCondition
             };
 
-            acif.Members = acif.ParseChildren(element.XPathSelectElement("./true"));
-
             acif.Children.AddRange(acif.Members);
 
             return acif;

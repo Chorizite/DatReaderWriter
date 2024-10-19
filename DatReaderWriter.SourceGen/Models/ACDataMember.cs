@@ -9,6 +9,7 @@ namespace DatReaderWriter.SourceGen.Models {
         public string Name { get; set; } = "";
         public string MemberType { get; set; } = "";
         public string Text { get; set; } = "";
+        public string LengthOf{ get; set; } = "";
         public string GenericKey { get; set; } = "";
         public string GenericValue { get; set; } = "";
         public string GenericType { get; set; } = "";
@@ -18,8 +19,18 @@ namespace DatReaderWriter.SourceGen.Models {
 
         public List<ACSubMember> SubMembers { get; set; } = new List<ACSubMember>();
 
-        public bool IsLength => Parent.AllChildren.Any(c => c is ACVector v && v.Length.Split(' ').First() == Name);
-        public ACVector? LengthFor => Parent.AllChildren.FirstOrDefault(c => c is ACVector v && v.Length.Split(' ').First() == Name) as ACVector;
+        public bool IsLength => Parent.AllChildren.Any(c => c is ACVector v && (v.Length.Split(' ').First() == Name || v.Length.Split(' ').First() == LengthOf));
+        public ACVector? LengthFor {
+            get {
+                if (!string.IsNullOrEmpty(LengthOf)) {
+                    var res = Parent.AllChildren.FirstOrDefault(c => c is ACVector v && v.Length.Split(' ').First() == LengthOf) as ACVector;
+                    if (res is not null) {
+                        return res;
+                    }
+                }
+                return Parent.AllChildren.FirstOrDefault(c => c is ACVector v && v.Length.Split(' ').First() == Name) as ACVector;
+            }
+        }
 
         public ACDataMember(ACBaseModel parent, XElement element) : base(parent, element) {
 
@@ -35,6 +46,7 @@ namespace DatReaderWriter.SourceGen.Models {
             var genericType = (string)element.Attribute("genericType");
             var value = (string)element.Attribute("value");
             var size = (string)element.Attribute("size");
+            var lengthof = (string)element.Attribute("lengthof");
 
             var dataMember = new ACDataMember(parent, element) {
                 Name = name,
@@ -45,7 +57,8 @@ namespace DatReaderWriter.SourceGen.Models {
                 GenericValue = genericValue,
                 Value = value,
                 Size = size,
-                KnownType = knownType
+                KnownType = knownType,
+                LengthOf = lengthof
             };
 
             var subMemberNodes = element.XPathSelectElements("./subfield");

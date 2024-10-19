@@ -10,7 +10,7 @@
 
 using System;
 namespace ACClientLib.DatReaderWriter.Enums {
-    public enum TerrainType : Int32 {
+    public enum TerrainType : int {
         BarrenRock = 0x00000000,
 
         Grassland = 0x00000001,

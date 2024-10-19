@@ -1,8 +1,9 @@
+using ACClientLib.DatReaderWriter;
 using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.Options;
-using ACClientLib.DatReaderWriter.Tests.Lib;
+using DatReaderWriter.Tests.Lib;
 using System.Text;
-namespace ACClientLib.DatReaderWriter.Tests {
+namespace DatReaderWriter.Tests {
     [TestClass]
     public class EORDatDatabaseTests {
         [TestMethod]

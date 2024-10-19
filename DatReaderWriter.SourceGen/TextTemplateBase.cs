@@ -634,11 +634,11 @@ namespace DatReaderWriter.SourceGen {
             }
 
             if (member.IsLength) {
-                if (!string.IsNullOrEmpty(member.LengthFor.LengthMod)) {
+                if (!string.IsNullOrEmpty(member.LengthFor?.LengthMod)) {
                     WriteLine($"writer.{GetBinaryWriterForType(member.MemberType)}(({SimplifyType(member.MemberType)}){member.LengthFor.Name}.Count() - {member.LengthFor.LengthMod});");
                 }
                 else {
-                    WriteLine($"writer.{GetBinaryWriterForType(member.MemberType)}(({SimplifyType(member.MemberType)}){member.LengthFor.Name}.Count());");
+                    WriteLine($"writer.{GetBinaryWriterForType(member.MemberType)}(({SimplifyType(member.MemberType)}){(string.IsNullOrEmpty(member.LengthOf) ? member.LengthFor.Name : member.LengthOf)}.Count());");
                 }
                 return;
             }

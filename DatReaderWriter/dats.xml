@@ -92,7 +92,7 @@
       <value name="Physics" value="1" />
       <value name="Cell" value="2" />
     </enum>
-    <enum name="TerrainType" parent="Int32">
+    <enum name="TerrainType" parent="int">
       <value name="BarrenRock" value="0x00000000" />
       <value name="Grassland" value="0x00000001" />
       <value name="Ice" value="0x00000002" />
@@ -230,6 +230,216 @@
       <value name="XXXUnknownF0" value="0x000000F0" />
       <value name="XXXUnknown3F2" value="0x000003F2" />
     </enum>
+    <enum name="Sound" parent="uint">
+      <value name="Invalid" value="0x00000000" />
+      <value name="Speak1" value="0x00000001" />
+      <value name="Random" value="0x00000002" />
+      <value name="Attack1" value="0x00000003" />
+      <value name="Attack2" value="0x00000004" />
+      <value name="Attack3" value="0x00000005" />
+      <value name="SpecialAttack1" value="0x00000006" />
+      <value name="SpecialAttack2" value="0x00000007" />
+      <value name="SpecialAttack3" value="0x00000008" />
+      <value name="Damage1" value="0x00000009" />
+      <value name="Damage2" value="0x0000000A" />
+      <value name="Damage3" value="0x0000000B" />
+      <value name="Wound1" value="0x0000000C" />
+      <value name="Wound2" value="0x0000000D" />
+      <value name="Wound3" value="0x0000000E" />
+      <value name="Death1" value="0x0000000F" />
+      <value name="Death2" value="0x00000010" />
+      <value name="Death3" value="0x00000011" />
+      <value name="Grunt1" value="0x00000012" />
+      <value name="Grunt2" value="0x00000013" />
+      <value name="Grunt3" value="0x00000014" />
+      <value name="Oh1" value="0x00000015" />
+      <value name="Oh2" value="0x00000016" />
+      <value name="Oh3" value="0x00000017" />
+      <value name="Heave1" value="0x00000018" />
+      <value name="Heave2" value="0x00000019" />
+      <value name="Heave3" value="0x0000001A" />
+      <value name="Knockdown1" value="0x0000001B" />
+      <value name="Knockdown2" value="0x0000001C" />
+      <value name="Knockdown3" value="0x0000001D" />
+      <value name="Swoosh1" value="0x0000001E" />
+      <value name="Swoosh2" value="0x0000001F" />
+      <value name="Swoosh3" value="0x00000020" />
+      <value name="Thump1" value="0x00000021" />
+      <value name="Smash1" value="0x00000022" />
+      <value name="Scratch1" value="0x00000023" />
+      <value name="Spear" value="0x00000024" />
+      <value name="Sling" value="0x00000025" />
+      <value name="Dagger" value="0x00000026" />
+      <value name="ArrowWhiz1" value="0x00000027" />
+      <value name="ArrowWhiz2" value="0x00000028" />
+      <value name="CrossbowPull" value="0x00000029" />
+      <value name="CrossbowRelease" value="0x0000002A" />
+      <value name="BowPull" value="0x0000002B" />
+      <value name="BowRelease" value="0x0000002C" />
+      <value name="ThrownWeaponRelease1" value="0x0000002D" />
+      <value name="ArrowLand" value="0x0000002E" />
+      <value name="Collision" value="0x0000002F" />
+      <value name="HitFlesh1" value="0x00000030" />
+      <value name="HitLeather1" value="0x00000031" />
+      <value name="HitChain1" value="0x00000032" />
+      <value name="HitPlate1" value="0x00000033" />
+      <value name="HitMissile1" value="0x00000034" />
+      <value name="HitMissile2" value="0x00000035" />
+      <value name="HitMissile3" value="0x00000036" />
+      <value name="Footstep1" value="0x00000037" />
+      <value name="Footstep2" value="0x00000038" />
+      <value name="Walk1" value="0x00000039" />
+      <value name="Dance1" value="0x0000003A" />
+      <value name="Dance2" value="0x0000003B" />
+      <value name="Dance3" value="0x0000003C" />
+      <value name="Hidden1" value="0x0000003D" />
+      <value name="Hidden2" value="0x0000003E" />
+      <value name="Hidden3" value="0x0000003F" />
+      <value name="Eat1" value="0x00000040" />
+      <value name="Drink1" value="0x00000041" />
+      <value name="Open" value="0x00000042" />
+      <value name="Close" value="0x00000043" />
+      <value name="OpenSlam" value="0x00000044" />
+      <value name="CloseSlam" value="0x00000045" />
+      <value name="Ambient1" value="0x00000046" />
+      <value name="Ambient2" value="0x00000047" />
+      <value name="Ambient3" value="0x00000048" />
+      <value name="Ambient4" value="0x00000049" />
+      <value name="Ambient5" value="0x0000004A" />
+      <value name="Ambient6" value="0x0000004B" />
+      <value name="Ambient7" value="0x0000004C" />
+      <value name="Ambient8" value="0x0000004D" />
+      <value name="Waterfall" value="0x0000004E" />
+      <value name="LogOut" value="0x0000004F" />
+      <value name="LogIn" value="0x00000050" />
+      <value name="LifestoneOn" value="0x00000051" />
+      <value name="AttribUp" value="0x00000052" />
+      <value name="AttribDown" value="0x00000053" />
+      <value name="SkillUp" value="0x00000054" />
+      <value name="SkillDown" value="0x00000055" />
+      <value name="HealthUp" value="0x00000056" />
+      <value name="HealthDown" value="0x00000057" />
+      <value name="ShieldUp" value="0x00000058" />
+      <value name="ShieldDown" value="0x00000059" />
+      <value name="EnchantUp" value="0x0000005A" />
+      <value name="EnchantDown" value="0x0000005B" />
+      <value name="VisionUp" value="0x0000005C" />
+      <value name="VisionDown" value="0x0000005D" />
+      <value name="Fizzle" value="0x0000005E" />
+      <value name="Launch" value="0x0000005F" />
+      <value name="Explode" value="0x00000060" />
+      <value name="TransUp" value="0x00000061" />
+      <value name="TransDown" value="0x00000062" />
+      <value name="BreatheFlaem" value="0x00000063" />
+      <value name="BreatheAcid" value="0x00000064" />
+      <value name="BreatheFrost" value="0x00000065" />
+      <value name="BreatheLightning" value="0x00000066" />
+      <value name="Create" value="0x00000067" />
+      <value name="Destroy" value="0x00000068" />
+      <value name="Lockpicking" value="0x00000069" />
+      <value name="UI_EnterPortal" value="0x0000006A" />
+      <value name="UI_ExitPortal" value="0x0000006B" />
+      <value name="UI_GeneralQuery" value="0x0000006C" />
+      <value name="UI_GeneralError" value="0x0000006D" />
+      <value name="UI_TransientMessage" value="0x0000006E" />
+      <value name="UI_IconPickUp" value="0x0000006F" />
+      <value name="UI_IconSuccessfulDrop" value="0x00000070" />
+      <value name="UI_IconInvalid_Drop" value="0x00000071" />
+      <value name="UI_ButtonPress" value="0x00000072" />
+      <value name="UI_GrabSlider" value="0x00000073" />
+      <value name="UI_ReleaseSlider" value="0x00000074" />
+      <value name="UI_NewTargetSelected" value="0x00000075" />
+      <value name="UI_Roar" value="0x00000076" />
+      <value name="UI_Bell" value="0x00000077" />
+      <value name="UI_Chant1" value="0x00000078" />
+      <value name="UI_Chant2" value="0x00000079" />
+      <value name="UI_DarkWhispers1" value="0x0000007A" />
+      <value name="UI_DarkWhispers2" value="0x0000007B" />
+      <value name="UI_DarkLaugh" value="0x0000007C" />
+      <value name="UI_DarkWind" value="0x0000007D" />
+      <value name="UI_DarkSpeech" value="0x0000007E" />
+      <value name="UI_Drums" value="0x0000007F" />
+      <value name="UI_GhostSpeak" value="0x00000080" />
+      <value name="UI_Breathing" value="0x00000081" />
+      <value name="UI_Howl" value="0x00000082" />
+      <value name="UI_LostSouls" value="0x00000083" />
+      <value name="UI_Squeal" value="0x00000084" />
+      <value name="UI_Thunder1" value="0x00000085" />
+      <value name="UI_Thunder2" value="0x00000086" />
+      <value name="UI_Thunder3" value="0x00000087" />
+      <value name="UI_Thunder4" value="0x00000088" />
+      <value name="UI_Thunder5" value="0x00000089" />
+      <value name="UI_Thunder6" value="0x0000008A" />
+      <value name="RaiseTrait" value="0x0000008B" />
+      <value name="WieldObject" value="0x0000008C" />
+      <value name="UnwieldObject" value="0x0000008D" />
+      <value name="ReceiveItem" value="0x0000008E" />
+      <value name="PickUpItem" value="0x0000008F" />
+      <value name="DropItem" value="0x00000090" />
+      <value name="ResistSpell" value="0x00000091" />
+      <value name="PicklockFail" value="0x00000092" />
+      <value name="LockSuccess" value="0x00000093" />
+      <value name="OpenFailDueToLock" value="0x00000094" />
+      <value name="TriggerActivated" value="0x00000095" />
+      <value name="SpellExpire" value="0x00000096" />
+      <value name="ItemManaDepleted" value="0x00000097" />
+      <value name="TriggerActivated1" value="0x00000098" />
+      <value name="TriggerActivated2" value="0x00000099" />
+      <value name="TriggerActivated3" value="0x0000009A" />
+      <value name="TriggerActivated4" value="0x0000009B" />
+      <value name="TriggerActivated5" value="0x0000009C" />
+      <value name="TriggerActivated6" value="0x0000009D" />
+      <value name="TriggerActivated7" value="0x0000009E" />
+      <value name="TriggerActivated8" value="0x0000009F" />
+      <value name="TriggerActivated9" value="0x000000A0" />
+      <value name="TriggerActivated10" value="0x000000A1" />
+      <value name="TriggerActivated11" value="0x000000A2" />
+      <value name="TriggerActivated12" value="0x000000A3" />
+      <value name="TriggerActivated13" value="0x000000A4" />
+      <value name="TriggerActivated14" value="0x000000A5" />
+      <value name="TriggerActivated15" value="0x000000A6" />
+      <value name="TriggerActivated16" value="0x000000A7" />
+      <value name="TriggerActivated17" value="0x000000A8" />
+      <value name="TriggerActivated18" value="0x000000A9" />
+      <value name="TriggerActivated19" value="0x000000AA" />
+      <value name="TriggerActivated20" value="0x000000AB" />
+      <value name="TriggerActivated21" value="0x000000AC" />
+      <value name="TriggerActivated22" value="0x000000AD" />
+      <value name="TriggerActivated23" value="0x000000AE" />
+      <value name="TriggerActivated24" value="0x000000AF" />
+      <value name="TriggerActivated25" value="0x000000B0" />
+      <value name="TriggerActivated26" value="0x000000B1" />
+      <value name="TriggerActivated27" value="0x000000B2" />
+      <value name="TriggerActivated28" value="0x000000B3" />
+      <value name="TriggerActivated29" value="0x000000B4" />
+      <value name="TriggerActivated30" value="0x000000B5" />
+      <value name="TriggerActivated31" value="0x000000B6" />
+      <value name="TriggerActivated32" value="0x000000B7" />
+      <value name="TriggerActivated33" value="0x000000B8" />
+      <value name="TriggerActivated34" value="0x000000B9" />
+      <value name="TriggerActivated35" value="0x000000BA" />
+      <value name="TriggerActivated36" value="0x000000BB" />
+      <value name="TriggerActivated37" value="0x000000BC" />
+      <value name="TriggerActivated38" value="0x000000BD" />
+      <value name="TriggerActivated39" value="0x000000BE" />
+      <value name="TriggerActivated40" value="0x000000BF" />
+      <value name="TriggerActivated41" value="0x000000C0" />
+      <value name="TriggerActivated42" value="0x000000C1" />
+      <value name="TriggerActivated43" value="0x000000C2" />
+      <value name="TriggerActivated44" value="0x000000C3" />
+      <value name="TriggerActivated45" value="0x000000C4" />
+      <value name="TriggerActivated46" value="0x000000C5" />
+      <value name="TriggerActivated47" value="0x000000C6" />
+      <value name="TriggerActivated48" value="0x000000C7" />
+      <value name="TriggerActivated49" value="0x000000C8" />
+      <value name="TriggerActivated50" value="0x000000C9" />
+      <value name="HealthDownVoid" value="0x000000CA" />
+      <value name="RegenDownVoid" value="0x000000CB" />
+      <value name="SkillDownVoid" value="0x000000CC" />
+    </enum>
+    <enum name="AnimationFlags" parent="uint" mask="true">
+      <value name="PosFrames" value="0x1" />
+    </enum>
   </enums>
   <types>
     <type name="DBObj" abstract="true">
@@ -348,7 +558,7 @@
       <field name="Frame" type="Frame" />
     </type>
     <type name="AnimationFrame">
-      <vector name="Frames" length="parent._numParts" type="List" genericValue="Frame" />
+      <vector name="Frames" length="parent.NumParts" type="List" genericValue="Frame" />
       <field name="_numHooks" type="uint" />
       <vector name="Hooks" length="_numHooks" type="List" genericValue="AnimationHook" />
     </type>
@@ -360,7 +570,7 @@
           <field name="Id" type="uint" />
         </type>
         <type name="SoundTableHook" value="AnimationHookType.SoundTable">
-          <field name="SoundType" type="uint" />
+          <field name="SoundType" type="Sound" />
         </type>
         <type name="AttackHook" value="AnimationHookType.Attack">
           <field name="AttackCone" type="AttackCone" />
@@ -513,14 +723,14 @@
       </type>
       <type name="Setup" text="DB_TYPE_SETUP in the client." parent="DBObj" first="0x2000000" last="0x200FFFF" categorized="false">
         <field type="SetupFlags" name="Flags" />
-        <field type="uint" name="_numParts" />
-        <vector name="Parts" length="_numParts" type="List" genericValue="uint" />
+        <field type="uint" name="NumParts" hidden="true" />
+        <vector name="Parts" length="NumParts" type="List" genericValue="uint" />
         <maskmap name="Flags">
           <mask value="SetupFlags.HasParent">
-            <vector name="ParentIndex" length="_numParts" type="List" genericValue="uint" />
+            <vector name="ParentIndex" length="NumParts" type="List" genericValue="uint" />
           </mask>
           <mask value="SetupFlags.HasDefaultScale">
-            <vector name="DefaultScale" length="_numParts" type="List" genericValue="Vector3" />
+            <vector name="DefaultScale" length="NumParts" type="List" genericValue="Vector3" />
           </mask>
         </maskmap>
         <field type="int" name="_numHoldingLocations" />
@@ -548,6 +758,15 @@
         <field type="uint" name="DefaultScriptTable" />
       </type>
       <type name="Animation" text="DB_TYPE_ANIM in the client." parent="DBObj" first="0x3000000" last="0x300FFFF" categorized="false">
+        <field type="AnimationFlags" name="Flags" />
+        <field type="uint" name="NumParts" />
+        <field type="uint" name="_numFrames" lengthof="PartFrames" />
+        <maskmap name="Flags">
+          <mask value="AnimationFlags.PosFrames">
+            <vector name="PosFrames" length="_numFrames" type="List" genericValue="Frame" />
+          </mask>
+        </maskmap>
+        <vector name="PartFrames" length="_numFrames" type="List" genericValue="AnimationFrame" />
       </type>
       <type name="Palette" text="DB_TYPE_PALETTE in the client." parent="DBObj" first="0x4000000" last="0x400FFFF" categorized="false">
       </type>

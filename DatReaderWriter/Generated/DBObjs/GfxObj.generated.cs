@@ -19,6 +19,9 @@ using ACClientLib.DatReaderWriter.Types;
 using ACClientLib.DatReaderWriter.Attributes;
 
 namespace ACClientLib.DatReaderWriter.DBObjs {
+    /// <summary>
+    /// GfxObj / DB_TYPE_GFXOBJ in the client.
+    /// </summary>
     [DBObjType(DatFileType.Portal, false, 0x01000000, 0x0100FFFF)]
     public class GfxObj : DBObj {
         /// <inheritdoc />

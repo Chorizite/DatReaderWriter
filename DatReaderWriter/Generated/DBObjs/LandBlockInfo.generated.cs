@@ -19,6 +19,9 @@ using ACClientLib.DatReaderWriter.Types;
 using ACClientLib.DatReaderWriter.Attributes;
 
 namespace ACClientLib.DatReaderWriter.DBObjs {
+    /// <summary>
+    /// Stores static spawns, buildings. DB_TYPE_LBI in the client.
+    /// </summary>
     [DBObjType(DatFileType.Cell, false, 0x00000000, 0x00000000)]
     public class LandBlockInfo : DBObj {
         /// <inheritdoc />

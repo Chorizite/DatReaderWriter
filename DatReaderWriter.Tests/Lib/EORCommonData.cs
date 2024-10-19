@@ -1,4 +1,5 @@
-﻿using ACClientLib.DatReaderWriter.IO;
+﻿using ACClientLib.DatReaderWriter;
+using ACClientLib.DatReaderWriter.IO;
 using ACClientLib.DatReaderWriter.IO.DatBTree;
 using System;
 using System.Collections;
@@ -7,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ACClientLib.DatReaderWriter.Tests.Lib {
+namespace DatReaderWriter.Tests.Lib {
     public enum EORDBType {
         Unknown = 0,
         Portal,

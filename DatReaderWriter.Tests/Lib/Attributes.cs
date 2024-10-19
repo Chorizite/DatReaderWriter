@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ACClientLib.DatReaderWriter.Tests.Lib {
+namespace DatReaderWriter.Tests.Lib {
     [AttributeUsage(AttributeTargets.Parameter, AllowMultiple = false)]
     public class DataValuesAttribute : Attribute {
         public object?[] Values { get; }

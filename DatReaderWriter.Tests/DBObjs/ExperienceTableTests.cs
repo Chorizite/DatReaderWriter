@@ -1,10 +1,10 @@
-﻿using ACClientLib.DatReaderWriter.Tests.Lib;
+﻿using DatReaderWriter.Tests.Lib;
 using ACClientLib.DatReaderWriter;
 using ACClientLib.DatReaderWriter.Options;
 using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.DBObjs;
 
-namespace ACClientLib.DatReaderWriter.Tests.DBObjs {
+namespace DatReaderWriter.Tests.DBObjs {
     [TestClass]
     public class ExperienceTableTests {
         [TestMethod]

@@ -22,7 +22,7 @@ namespace DatReaderWriter.Tests.Types {
         public void CanSerializeAndDeserialize() {
             var writeObj = new SoundTableHook() {
                 Direction = AnimationHookDir.Both,
-                SoundType = 1234,
+                SoundType = Sound.Dance2,
             };
 
             var buffer = new byte[5_000_000];
@@ -41,7 +41,7 @@ namespace DatReaderWriter.Tests.Types {
         public void CanBeCreatedByAbstractUnpack() {
             var writeHook = new SoundTableHook() {
                 Direction = AnimationHookDir.Forward,
-                SoundType = 1234,
+                SoundType = Sound.Fizzle,
             };
 
             var buffer = new byte[5_000_000];

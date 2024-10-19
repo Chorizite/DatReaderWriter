@@ -55,6 +55,10 @@ namespace DatReaderWriter.SourceGen.Models {
                 children.AddRange((model as ACSwitch).Cases);
             }
 
+            if (model is ACIf) {
+                children.AddRange((model as ACIf).Children);
+            }
+
             if (model is ACDataMember) {
                 children.AddRange((model as ACDataMember).SubMembers);
             }

@@ -19,6 +19,9 @@ using ACClientLib.DatReaderWriter.Types;
 using ACClientLib.DatReaderWriter.Attributes;
 
 namespace ACClientLib.DatReaderWriter.DBObjs {
+    /// <summary>
+    /// DB_TYPE_LAND_BLOCK in the client.
+    /// </summary>
     [DBObjType(DatFileType.Cell, false, 0x00000000, 0x00000000)]
     public class LandBlock : DBObj {
         /// <inheritdoc />

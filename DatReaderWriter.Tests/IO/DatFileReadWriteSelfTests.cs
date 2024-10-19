@@ -1,5 +1,5 @@
 ﻿using ACClientLib.DatReaderWriter.IO;
-using ACClientLib.DatReaderWriter.Tests.Lib;
+using DatReaderWriter.Tests.Lib;
 using System;
 using System.Buffers.Binary;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ACClientLib.DatReaderWriter.Tests.IO {
+namespace DatReaderWriter.Tests.IO {
     [TestClass]
     public class DatFileReadWriteSelfTests {
         private static Random _rnd = new Random();

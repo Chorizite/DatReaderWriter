@@ -19,6 +19,9 @@ using ACClientLib.DatReaderWriter.Types;
 using ACClientLib.DatReaderWriter.Attributes;
 
 namespace ACClientLib.DatReaderWriter.DBObjs {
+    /// <summary>
+    /// This holds raw texture data. DB_TYPE_SURFACETEXTURE in the client.
+    /// </summary>
     [DBObjType(DatFileType.Portal, true, 0x05000000, 0x05FFFFFF)]
     public class SurfaceTexture : DBObj {
         /// <inheritdoc />

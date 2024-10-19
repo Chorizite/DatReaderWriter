@@ -19,12 +19,17 @@ using ACClientLib.DatReaderWriter.Types;
 using ACClientLib.DatReaderWriter.Attributes;
 
 namespace ACClientLib.DatReaderWriter.DBObjs {
+    /// <summary>
+    /// DB_TYPE_SETUP in the client.
+    /// </summary>
     [DBObjType(DatFileType.Portal, false, 0x02000000, 0x0200FFFF)]
     public class Setup : DBObj {
         /// <inheritdoc />
         public override bool HasDataCategory => false;
 
         public SetupFlags Flags;
+
+        public uint NumParts;
 
         public List<uint> Parts = [];
 
@@ -70,17 +75,17 @@ namespace ACClientLib.DatReaderWriter.DBObjs {
         public override bool Unpack(DatFileReader reader) {
             base.Unpack(reader);
             Flags = (SetupFlags)reader.ReadUInt32();
-            var _numParts = reader.ReadUInt32();
-            for (var i=0; i < _numParts; i++) {
+            var NumParts = reader.ReadUInt32();
+            for (var i=0; i < NumParts; i++) {
                 Parts.Add(reader.ReadUInt32());
             }
             if (Flags.HasFlag(SetupFlags.HasParent)) {
-                for (var i=0; i < _numParts; i++) {
+                for (var i=0; i < NumParts; i++) {
                     ParentIndex.Add(reader.ReadUInt32());
                 }
             }
             if (Flags.HasFlag(SetupFlags.HasDefaultScale)) {
-                for (var i=0; i < _numParts; i++) {
+                for (var i=0; i < NumParts; i++) {
                     DefaultScale.Add(reader.ReadVector3());
                 }
             }
@@ -99,7 +104,7 @@ namespace ACClientLib.DatReaderWriter.DBObjs {
             var _numPlacements = reader.ReadInt32();
             for (var i=0; i < _numPlacements; i++) {
                 var _key = (Placement)reader.ReadUInt32();
-                var _val = reader.ReadItem<AnimationFrame>(_numParts);
+                var _val = reader.ReadItem<AnimationFrame>(NumParts);
                 PlacementFrames.Add(_key, _val);
             }
             var _numCylSpheres = reader.ReadUInt32();

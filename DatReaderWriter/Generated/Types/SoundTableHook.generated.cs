@@ -21,19 +21,19 @@ namespace ACClientLib.DatReaderWriter.Types {
         /// <inheritdoc />
         public override AnimationHookType HookType => AnimationHookType.SoundTable;
 
-        public uint SoundType;
+        public Sound SoundType;
 
         /// <inheritdoc />
         public override bool Unpack(DatFileReader reader) {
             base.Unpack(reader);
-            SoundType = reader.ReadUInt32();
+            SoundType = (Sound)reader.ReadUInt32();
             return true;
         }
 
         /// <inheritdoc />
         public override bool Pack(DatFileWriter writer) {
             base.Pack(writer);
-            writer.WriteUInt32(SoundType);
+            writer.WriteUInt32((uint)SoundType);
             return true;
         }
 
