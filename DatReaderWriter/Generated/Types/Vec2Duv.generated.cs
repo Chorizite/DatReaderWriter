@@ -15,6 +15,7 @@ using System.Linq;
 using System.Collections.Generic;
 using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
+
 namespace ACClientLib.DatReaderWriter.Types {
     public class Vec2Duv : IDatObjType {
         public float U;

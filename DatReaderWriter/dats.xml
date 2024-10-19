@@ -132,10 +132,104 @@
       <value name="PortalSide" value="0x0002" />
     </enum>
     <enum name="EnvCellFlags" parent="int">
-    <value name="SeenOutside" value="0x00000001" />
-    <value name="HasStaticObjs" value="0x00000002" />
-    <value name="HasRestrictionObj" value="0x00000008" />
-  </enum>
+      <value name="SeenOutside" value="0x00000001" />
+      <value name="HasStaticObjs" value="0x00000002" />
+      <value name="HasRestrictionObj" value="0x00000008" />
+    </enum>
+    <enum name="SetupFlags" parent="uint">
+      <value name="HasParent" value="0x00000001" />
+      <value name="HasDefaultScale" value="0x00000002" />
+      <value name="AllowFreeHeading" value="0x00000004" />
+      <value name="HasPhysicsBSP" value="0x00000008" />
+    </enum>
+    <enum name="AnimationHookType" parent="uint">
+      <value name="NoOp" value="0x00000000" />
+      <value name="Sound" value="0x00000001" />
+      <value name="SoundTable" value="0x00000002" />
+      <value name="Attack" value="0x00000003" />
+      <value name="AnimationDone" value="0x00000004" />
+      <value name="ReplaceObject" value="0x00000005" />
+      <value name="Ethereal" value="0x00000006" />
+      <value name="TransparentPart" value="0x00000007" />
+      <value name="Luminous" value="0x00000008" />
+      <value name="LuminousPart" value="0x00000009" />
+      <value name="Diffuse" value="0x0000000A" />
+      <value name="DiffusePart" value="0x0000000B" />
+      <value name="Scale" value="0x0000000C" />
+      <value name="CreateParticle" value="0x0000000D" />
+      <value name="DestroyParticle" value="0x0000000E" />
+      <value name="StopParticle" value="0x0000000F" />
+      <value name="NoDraw" value="0x00000010" />
+      <value name="DefaultScript" value="0x00000011" />
+      <value name="DefaultScriptPart" value="0x00000012" />
+      <value name="CallPES" value="0x00000013" />
+      <value name="Transparent" value="0x00000014" />
+      <value name="SoundTweaked" value="0x00000015" />
+      <value name="SetOmega" value="0x00000016" />
+      <value name="TextureVelocity" value="0x00000017" />
+      <value name="TextureVelocityPart" value="0x00000018" />
+      <value name="SetLight" value="0x00000019" />
+      <value name="CreateBlockingParticle" value="0x0000001A" />
+      <value name="Unknown" value="0xFFFFFFFF" />
+    </enum>
+    <enum name="AnimationHookDir" parent="uint">
+      <value name="Both" value="0x00000000" />
+      <value name="Forward" value="0x00000001" />
+      <value name="Unknown" value="0xFFFFFFFE" />
+      <value name="Backward" value="0xFFFFFFFF" />
+    </enum>
+    <enum name="ParentLocation" parent="int">
+      <value name="None" value="0x00000000" />
+      <value name="RightHand" value="0x00000001" />
+      <value name="LeftHand" value="0x00000002" />
+      <value name="Shield" value="0x00000003" />
+      <value name="Belt" value="0x00000004" />
+      <value name="Quiver" value="0x00000005" />
+      <value name="Hearldry" value="0x00000006" />
+      <value name="Mouth" value="0x00000007" />
+      <value name="LeftWeapon" value="0x00000008" />
+      <value name="LeftUnarmed" value="0x00000009" />
+    </enum>
+    <enum name="Placement" parent="uint">
+      <value name="Default" value="0x00000000" />
+      <value name="RightHandCombat" value="0x00000001" />
+      <value name="RightHandNonCombat" value="0x00000002" />
+      <value name="LeftHand" value="0x00000003" />
+      <value name="Belt" value="0x00000004" />
+      <value name="Quiver" value="0x00000005" />
+      <value name="Shield" value="0x00000006" />
+      <value name="LeftWeapon" value="0x00000007" />
+      <value name="LeftUnarmed" value="0x00000008" />
+      <value name="XXXUnknownA" value="0x0000000A" />
+      <value name="XXXUnknownF" value="0x0000000F" />
+      <value name="XXXUnknown14" value="0x00000014" />
+      <value name="XXXUnknown1E" value="0x0000001E" />
+      <value name="XXXUnknown20" value="0x00000020" />
+      <value name="SpecialCrowssbowBolt" value="0x00000033" />
+      <value name="MissileFlight" value="0x00000034" />
+      <value name="XXXUnknown3C" value="0x0000003C" />
+      <value name="XXXUnknown63" value="0x00000063" />
+      <value name="Resting" value="0x00000065" />
+      <value name="Other" value="0x00000066" />
+      <value name="Hook" value="0x00000067" />
+      <value name="XXXUnknown68" value="0x00000068" />
+      <value name="XXXUnknown69" value="0x00000069" />
+      <value name="XXXUnknown6A" value="0x0000006A" />
+      <value name="XXXUnknown78" value="0x00000078" />
+      <value name="Random1" value="0x00000079" />
+      <value name="Random2" value="0x0000007A" />
+      <value name="Random3" value="0x0000007B" />
+      <value name="Random4" value="0x0000007C" />
+      <value name="Random5" value="0x0000007D" />
+      <value name="Random6" value="0x0000007E" />
+      <value name="Random7" value="0x0000007F" />
+      <value name="Random8" value="0x00000080" />
+      <value name="Random9" value="0x00000081" />
+      <value name="Random10" value="0x00000082" />
+      <value name="XXXUnknown84" value="0x00000084" />
+      <value name="XXXUnknownF0" value="0x000000F0" />
+      <value name="XXXUnknown3F2" value="0x000003F2" />
+    </enum>
   </enums>
   <types>
     <type name="DBObj" abstract="true">
@@ -249,10 +343,151 @@
       <field name="OtherCellId" type="ushort" />
       <field name="OtherPortalId" type="ushort" />
     </type>
+    <type name="LocationType">
+      <field name="PartId" type="int" />
+      <field name="Frame" type="Frame" />
+    </type>
+    <type name="AnimationFrame">
+      <vector name="Frames" length="parent._numParts" type="List" genericValue="Frame" />
+      <field name="_numHooks" type="uint" />
+      <vector name="Hooks" length="_numHooks" type="List" genericValue="AnimationHook" />
+    </type>
+    <type name="AnimationHook" abstract="true">
+      <field name="_hookType" type="AnimationHookType" />
+      <field name="Direction" type="AnimationHookDir" />
+      <typeswitch name="_hookType">
+        <type name="SoundHook" value="AnimationHookType.Sound">
+          <field name="Id" type="uint" />
+        </type>
+        <type name="SoundTableHook" value="AnimationHookType.SoundTable">
+          <field name="SoundType" type="uint" />
+        </type>
+        <type name="AttackHook" value="AnimationHookType.Attack">
+          <field name="AttackCone" type="AttackCone" />
+        </type>
+        <type name="ReplaceObjectHook" value="AnimationHookType.ReplaceObject">
+          <field name="PartIndex" type="ushort" />
+          <field name="PartId" type="DataIdOfKnownType" knownType="0x01000000" />
+        </type>
+        <type name="EtherealHook" value="AnimationHookType.Ethereal">
+          <field name="Ethereal" type="bool" />
+        </type>
+        <type name="TransparentPartHook" value="AnimationHookType.TransparentPart">
+          <field name="PartIndex" type="uint" />
+          <field name="Start" type="float" />
+          <field name="End" type="float" />
+          <field name="Time" type="float" />
+        </type>
+        <type name="LuminousHook" value="AnimationHookType.Luminous">
+          <field name="Start" type="float" />
+          <field name="End" type="float" />
+          <field name="Time" type="float" />
+        </type>
+        <type name="LuminousPartHook" value="AnimationHookType.LuminousPart">
+          <field name="PartIndex" type="uint" />
+          <field name="Start" type="float" />
+          <field name="End" type="float" />
+          <field name="Time" type="float" />
+        </type>
+        <type name="DiffuseHook" value="AnimationHookType.Diffuse">
+          <field name="Start" type="float" />
+          <field name="End" type="float" />
+          <field name="Time" type="float" />
+        </type>
+        <type name="DiffusePartHook" value="AnimationHookType.DiffusePart">
+          <field name="PartIndex" type="uint" />
+          <field name="Start" type="float" />
+          <field name="End" type="float" />
+          <field name="Time" type="float" />
+        </type>
+        <type name="ScaleHook" value="AnimationHookType.Scale">
+          <field name="End" type="float" />
+          <field name="Time" type="float" />
+        </type>
+        <type name="CreateParticleHook" value="AnimationHookType.CreateParticle">
+          <field name="EmitterInfoId" type="uint" />
+          <field name="PartIndex" type="uint" />
+          <field name="Offset" type="Frame" />
+          <field name="EmitterId" type="uint" />
+        </type>
+        <type name="DestroyParticleHook" value="AnimationHookType.DestroyParticle">
+          <field name="EmitterId" type="uint" />
+        </type>
+        <type name="StopParticleHook" value="AnimationHookType.StopParticle">
+          <field name="EmitterId" type="uint" />
+        </type>
+        <type name="NoDrawHook" value="AnimationHookType.NoDraw">
+          <field name="NoDraw" type="bool" />
+        </type>
+        <type name="DefaultScriptPartHook" value="AnimationHookType.DefaultScriptPart">
+          <field name="PartIndex" type="uint" />
+        </type>
+        <type name="CallPESHook" value="AnimationHookType.CallPES">
+          <field name="PES" type="uint" />
+          <field name="Pause" type="float" />
+        </type>
+        <type name="TransparentHook" value="AnimationHookType.Transparent">
+          <field name="Start" type="float" />
+          <field name="End" type="float" />
+          <field name="Time" type="float" />
+        </type>
+        <type name="SoundTweakedHook" value="AnimationHookType.SoundTweaked">
+          <field name="SoundID" type="uint" />
+          <field name="Priority" type="float" />
+          <field name="Probability" type="float" />
+          <field name="Volume" type="float" />
+        </type>
+        <type name="SetOmegaHook" value="AnimationHookType.SetOmega">
+          <field name="Axis" type="Vector3" />
+        </type>
+        <type name="TextureVelocityHook" value="AnimationHookType.TextureVelocity">
+          <field name="USpeed" type="float" />
+          <field name="VSpeed" type="float" />
+        </type>
+        <type name="TextureVelocityPartHook" value="AnimationHookType.TextureVelocityPart">
+          <field name="PartIndex" type="uint" />
+          <field name="USpeed" type="float" />
+          <field name="VSpeed" type="float" />
+        </type>
+        <type name="SetLightHook" value="AnimationHookType.SetLight">
+          <field name="LightsOn" type="bool" />
+        </type>
+        <type name="CreateBlockingParticleHook" value="AnimationHookType.CreateBlockingParticle" />
+        <type name="AnimationDoneHook" value="AnimationHookType.AnimationDone" />
+        <type name="DefaultScriptHook" value="AnimationHookType.DefaultScript" />
+      </typeswitch>
+    </type>
+    <type name="AttackCone">
+      <field name="PartIndex" type="uint" />
+      <field name="LeftX" type="float" />
+      <field name="LeftY" type="float" />
+      <field name="RightX" type="float" />
+      <field name="RightY" type="float" />
+      <field name="Radius" type="float" />
+      <field name="Height" type="float" />
+    </type>
+    <type name="ColorARGB" text="A 32 bit color with alpha/red/green/blue">
+      <field name="Blue" type="byte" text="The blue amount from 0-255" />
+      <field name="Green" type="byte" text="The green amount from 0-255" />
+      <field name="Red" type="byte" text="The red amount from 0-255" />
+      <field name="Alpha" type="byte" text="The alpha amount from 0-255" />
+    </type>
+    <type name="LightInfo">
+      <field name="ViewSpaceLocation" type="Frame" />
+      <field name="Color" type="ColorARGB" />
+      <field name="Intensity" type="float" />
+      <field name="Falloff" type="float" />
+      <field name="ConeAngle" type="float" />
+    </type>
+    <type name="CylSphere">
+      <field name="Origin" type="Vector3" />
+      <field name="Radius" type="float" />
+      <field name="Height" type="float" />
+    </type>
   </types>
   <dats>
     <dat name="portal" text="client_portal.dat" type="DatFileType.Portal">
-      <type name="GfxObj" description="GfxObj / DB_TYPE_GFXOBJ in the client." parent="DBObj" first="0x1000000" last="0x100FFFF" categorized="false">
+      <type name="GfxObj" text="GfxObj / DB_TYPE_GFXOBJ in the client." parent="DBObj" first="0x1000000" last="0x100FFFF" categorized="false">
         <field type="GfxObjFlags" name="Flags" />
         <field type="CompressedUInt" name="_numSurfaces" />
         <vector name="Surfaces" length="_numSurfaces" type="List" genericValue="uint" text="The list of surfaces" />
@@ -276,13 +511,47 @@
           </mask>
         </maskmap>
       </type>
-      <type name="Setup" description="DB_TYPE_SETUP in the client." parent="DBObj" first="0x2000000" last="0x200FFFF" categorized="false">
+      <type name="Setup" text="DB_TYPE_SETUP in the client." parent="DBObj" first="0x2000000" last="0x200FFFF" categorized="false">
+        <field type="SetupFlags" name="Flags" />
+        <field type="uint" name="_numParts" />
+        <vector name="Parts" length="_numParts" type="List" genericValue="uint" />
+        <maskmap name="Flags">
+          <mask value="SetupFlags.HasParent">
+            <vector name="ParentIndex" length="_numParts" type="List" genericValue="uint" />
+          </mask>
+          <mask value="SetupFlags.HasDefaultScale">
+            <vector name="DefaultScale" length="_numParts" type="List" genericValue="Vector3" />
+          </mask>
+        </maskmap>
+        <field type="int" name="_numHoldingLocations" />
+        <vector name="HoldingLocations" length="_numHoldingLocations" type="Dictionary" genericKey="ParentLocation" genericValue="LocationType" />
+        <field type="int" name="_numConnectionPoints" />
+        <vector name="ConnectionPoints" length="_numConnectionPoints" type="Dictionary" genericKey="ParentLocation" genericValue="LocationType" />
+        <field type="int" name="_numPlacements" />
+        <vector name="PlacementFrames" length="_numPlacements" type="Dictionary" genericKey="Placement" genericValue="AnimationFrame" />
+        <field type="uint" name="_numCylSpheres" />
+        <vector name="CylSpheres" length="_numCylSpheres" type="List" genericValue="CylSphere" />
+        <field type="uint" name="_numSpheres" />
+        <vector name="Spheres" length="_numSpheres" type="List" genericValue="Sphere" />
+        <field type="float" name="Height" />
+        <field type="float" name="Radius" />
+        <field type="float" name="StepUpHeight" />
+        <field type="float" name="StepDownHeight" />
+        <field type="Sphere" name="SortingSphere" />
+        <field type="Sphere" name="SelectionSphere" />
+        <field type="int" name="_numLights" />
+        <vector name="Lights" length="_numLights" type="Dictionary" genericKey="int" genericValue="LightInfo" />
+        <field type="uint" name="DefaultAnimation" />
+        <field type="uint" name="DefaultScript" />
+        <field type="uint" name="DefaultMotionTable" />
+        <field type="uint" name="DefaultSoundTable" />
+        <field type="uint" name="DefaultScriptTable" />
       </type>
-      <type name="Animation" description="DB_TYPE_ANIM in the client." parent="DBObj" first="0x3000000" last="0x300FFFF" categorized="false">
+      <type name="Animation" text="DB_TYPE_ANIM in the client." parent="DBObj" first="0x3000000" last="0x300FFFF" categorized="false">
       </type>
-      <type name="Palette" description="DB_TYPE_PALETTE in the client." parent="DBObj" first="0x4000000" last="0x400FFFF" categorized="false">
+      <type name="Palette" text="DB_TYPE_PALETTE in the client." parent="DBObj" first="0x4000000" last="0x400FFFF" categorized="false">
       </type>
-      <type name="SurfaceTexture" description="This holds raw texture data. DB_TYPE_SURFACETEXTURE in the client." parent="DBObj" first="0x5000000" last="0x5FFFFFF" categorized="true">
+      <type name="SurfaceTexture" text="This holds raw texture data. DB_TYPE_SURFACETEXTURE in the client." parent="DBObj" first="0x5000000" last="0x5FFFFFF" categorized="true">
         <field type="int" name="Width" text="The width of the SurfaceTexture" />
         <field type="int" name="Height" text="The height of the SurfaceTexture" />
         <field type="PixelFormat" name="Format" text="The format of the SourceData" />
@@ -294,89 +563,89 @@
           </case>
         </switch>
       </type>
-      <type name="RenderSurface" description="DB_TYPE_RENDERSURFACE in the client." parent="DBObj" first="0x6000000" last="0x7FFFFFF" categorized="true">
+      <type name="RenderSurface" text="DB_TYPE_RENDERSURFACE in the client." parent="DBObj" first="0x6000000" last="0x7FFFFFF" categorized="true">
       </type>
-      <type name="Surface" description="DB_TYPE_SURFACE in the client." parent="DBObj" first="0x8000000" last="0x800FFFF" categorized="false">
+      <type name="Surface" text="DB_TYPE_SURFACE in the client." parent="DBObj" first="0x8000000" last="0x800FFFF" categorized="false">
       </type>
-      <type name="MotionTable" description="DB_TYPE_MTABLE in the client." parent="DBObj" first="0x9000000" last="0x900FFFF" categorized="false">
+      <type name="MotionTable" text="DB_TYPE_MTABLE in the client." parent="DBObj" first="0x9000000" last="0x900FFFF" categorized="false">
       </type>
-      <type name="Wave" description="DB_TYPE_WAVE in the client." parent="DBObj" first="0xA000000" last="0xA00FFFF" categorized="false">
+      <type name="Wave" text="DB_TYPE_WAVE in the client." parent="DBObj" first="0xA000000" last="0xA00FFFF" categorized="false">
       </type>
-      <type name="Environment" description="DB_TYPE_ENVIRONMENT in the client." parent="DBObj" first="0xD000000" last="0xD00FFFF" categorized="false">
+      <type name="Environment" text="DB_TYPE_ENVIRONMENT in the client." parent="DBObj" first="0xD000000" last="0xD00FFFF" categorized="false">
         <field type="uint" name="_cellCount" />
         <vector name="Cells" length="_cellCount" type="Dictionary" genericKey="uint" genericValue="CellStruct" text="The cells in this environment" />
       </type>
-      <type name="ChatPoseTable" description="DB_TYPE_CHAT_POSE_TABLE in the client." parent="DBObj" first="0xE000007" last="0xE000007" categorized="false">
+      <type name="ChatPoseTable" text="DB_TYPE_CHAT_POSE_TABLE in the client." parent="DBObj" first="0xE000007" last="0xE000007" categorized="false">
       </type>
-      <type name="ObjectHierarchy" description="DB_TYPE_OBJECT_HIERARCHY in the client." parent="DBObj" first="0xE00000D" last="0xE00000D" categorized="false">
+      <type name="ObjectHierarchy" text="DB_TYPE_OBJECT_HIERARCHY in the client." parent="DBObj" first="0xE00000D" last="0xE00000D" categorized="false">
       </type>
-      <type name="BadDataTable" description="DB_TYPE_BADDATA in the client." parent="DBObj" first="0xE00001A" last="0xE00001A" categorized="false">
+      <type name="BadDataTable" text="DB_TYPE_BADDATA in the client." parent="DBObj" first="0xE00001A" last="0xE00001A" categorized="false">
       </type>
-      <type name="TabooTable" description="DB_TYPE_TABOO_TABLE in the client." parent="DBObj" first="0xE00001E" last="0xE00001E" categorized="false">
+      <type name="TabooTable" text="DB_TYPE_TABOO_TABLE in the client." parent="DBObj" first="0xE00001E" last="0xE00001E" categorized="false">
       </type>
-      <type name="FileToId" description="DB_TYPE_FILE2ID_TABLE in the client." parent="DBObj" first="0xE00001F" last="0xE00001F" categorized="false">
+      <type name="FileToId" text="DB_TYPE_FILE2ID_TABLE in the client." parent="DBObj" first="0xE00001F" last="0xE00001F" categorized="false">
       </type>
-      <type name="NameFilterTable" description="DB_TYPE_NAME_FILTER_TABLE in the client." parent="DBObj" first="0xE000020" last="0xE000020" categorized="false">
+      <type name="NameFilterTable" text="DB_TYPE_NAME_FILTER_TABLE in the client." parent="DBObj" first="0xE000020" last="0xE000020" categorized="false">
       </type>
-      <type name="MonitoredProperties" description="DB_TYPE_MONITOREDPROPERTIES in the client." parent="DBObj" first="0xE020000" last="0xE02FFFF" categorized="false">
+      <type name="MonitoredProperties" text="DB_TYPE_MONITOREDPROPERTIES in the client." parent="DBObj" first="0xE020000" last="0xE02FFFF" categorized="false">
       </type>
-      <type name="PaletteSet" description="DB_TYPE_PAL_SET in the client." parent="DBObj" first="0xF000000" last="0xF00FFFF" categorized="false">
+      <type name="PaletteSet" text="DB_TYPE_PAL_SET in the client." parent="DBObj" first="0xF000000" last="0xF00FFFF" categorized="false">
       </type>
-      <type name="Clothing" description="DB_TYPE_CLOTHING in the client." parent="DBObj" first="0x10000000" last="0x1000FFFF" categorized="false">
+      <type name="Clothing" text="DB_TYPE_CLOTHING in the client." parent="DBObj" first="0x10000000" last="0x1000FFFF" categorized="false">
       </type>
-      <type name="DegradeInfo" description="DB_TYPE_DEGRADEINFO in the client." parent="DBObj" first="0x11000000" last="0x1100FFFF" categorized="false">
+      <type name="DegradeInfo" text="DB_TYPE_DEGRADEINFO in the client." parent="DBObj" first="0x11000000" last="0x1100FFFF" categorized="false">
       </type>
-      <type name="Scene" description="DB_TYPE_SCENE in the client." parent="DBObj" first="0x12000000" last="0x1200FFFF" categorized="false">
+      <type name="Scene" text="DB_TYPE_SCENE in the client." parent="DBObj" first="0x12000000" last="0x1200FFFF" categorized="false">
       </type>
-      <type name="Region" description="DB_TYPE_REGION in the client." parent="DBObj" first="0x13000000" last="0x1300FFFF" categorized="false">
+      <type name="Region" text="DB_TYPE_REGION in the client." parent="DBObj" first="0x13000000" last="0x1300FFFF" categorized="false">
       </type>
-      <type name="Keymap" description="DB_TYPE_KEYMAP in the client." parent="DBObj" first="0x14000000" last="0x1400FFFF" categorized="false">
+      <type name="Keymap" text="DB_TYPE_KEYMAP in the client." parent="DBObj" first="0x14000000" last="0x1400FFFF" categorized="false">
       </type>
-      <type name="RenderTexture" description="DB_TYPE_RENDERTEXTURE in the client." parent="DBObj" first="0x15000000" last="0x15FFFFFF" categorized="true">
+      <type name="RenderTexture" text="DB_TYPE_RENDERTEXTURE in the client." parent="DBObj" first="0x15000000" last="0x15FFFFFF" categorized="true">
       </type>
-      <type name="MaterialModifier" description="DB_TYPE_MATERIALMODIFIER in the client." parent="DBObj" first="0x17000000" last="0x17FFFFFF" categorized="false">
+      <type name="MaterialModifier" text="DB_TYPE_MATERIALMODIFIER in the client." parent="DBObj" first="0x17000000" last="0x17FFFFFF" categorized="false">
       </type>
-      <type name="MaterialInstance" description="DB_TYPE_MATERIALINSTANCE in the client." parent="DBObj" first="0x18000000" last="0x18FFFFFF" categorized="false">
+      <type name="MaterialInstance" text="DB_TYPE_MATERIALINSTANCE in the client." parent="DBObj" first="0x18000000" last="0x18FFFFFF" categorized="false">
       </type>
-      <type name="RenderMesh" description="DB_TYPE_RENDER_MESH in the client." parent="DBObj" first="0x19000000" last="0x19FFFFFF" categorized="false">
+      <type name="RenderMesh" text="DB_TYPE_RENDER_MESH in the client." parent="DBObj" first="0x19000000" last="0x19FFFFFF" categorized="false">
       </type>
-      <type name="SoundTable" description="DB_TYPE_STABLE in the client." parent="DBObj" first="0x20000000" last="0x2000FFFF" categorized="false">
+      <type name="SoundTable" text="DB_TYPE_STABLE in the client." parent="DBObj" first="0x20000000" last="0x2000FFFF" categorized="false">
       </type>
-      <type name="UILayout" description="DB_TYPE_UI_LAYOUT in the client." parent="DBObj" first="0x21000000" last="0x21FFFFFF" categorized="false">
+      <type name="UILayout" text="DB_TYPE_UI_LAYOUT in the client." parent="DBObj" first="0x21000000" last="0x21FFFFFF" categorized="false">
       </type>
-      <type name="EnumMapper" description="DB_TYPE_ENUM_MAPPER in the client." parent="DBObj" first="0x22000000" last="0x22FFFFFF" categorized="false">
+      <type name="EnumMapper" text="DB_TYPE_ENUM_MAPPER in the client." parent="DBObj" first="0x22000000" last="0x22FFFFFF" categorized="false">
       </type>
-      <type name="DataIdMapper" description="DB_TYPE_DID_MAPPER in the client." parent="DBObj" first="0x25000000" last="0x25FFFFFF" categorized="false">
+      <type name="DataIdMapper" text="DB_TYPE_DID_MAPPER in the client." parent="DBObj" first="0x25000000" last="0x25FFFFFF" categorized="false">
       </type>
-      <type name="ActionMap" description="DB_TYPE_ACTIONMAP in the client." parent="DBObj" first="0x26000000" last="0x2600FFFF" categorized="false">
+      <type name="ActionMap" text="DB_TYPE_ACTIONMAP in the client." parent="DBObj" first="0x26000000" last="0x2600FFFF" categorized="false">
       </type>
-      <type name="DualDataIdMapper" description="DB_TYPE_DUAL_DID_MAPPER in the client." parent="DBObj" first="0x27000000" last="0x27FFFFFF" categorized="false">
+      <type name="DualDataIdMapper" text="DB_TYPE_DUAL_DID_MAPPER in the client." parent="DBObj" first="0x27000000" last="0x27FFFFFF" categorized="false">
       </type>
-      <type name="LanguageString" description="DB_TYPE_STRING in the client." parent="DBObj" first="0x31000000" last="0x3100FFFF" categorized="false">
+      <type name="LanguageString" text="DB_TYPE_STRING in the client." parent="DBObj" first="0x31000000" last="0x3100FFFF" categorized="false">
       </type>
-      <type name="ParticleEmitter" description="DB_TYPE_PARTICLE_EMITTER in the client." parent="DBObj" first="0x32000000" last="0x3200FFFF" categorized="false">
+      <type name="ParticleEmitter" text="DB_TYPE_PARTICLE_EMITTER in the client." parent="DBObj" first="0x32000000" last="0x3200FFFF" categorized="false">
       </type>
-      <type name="PhysicsScript" description="DB_TYPE_PHYSICS_SCRIPT in the client." parent="DBObj" first="0x33000000" last="0x3300FFFF" categorized="false">
+      <type name="PhysicsScript" text="DB_TYPE_PHYSICS_SCRIPT in the client." parent="DBObj" first="0x33000000" last="0x3300FFFF" categorized="false">
       </type>
-      <type name="PhysicsScriptTable" description="DB_TYPE_PHYSICS_SCRIPT_TABLE in the client." parent="DBObj" first="0x34000000" last="0x3400FFFF" categorized="false">
+      <type name="PhysicsScriptTable" text="DB_TYPE_PHYSICS_SCRIPT_TABLE in the client." parent="DBObj" first="0x34000000" last="0x3400FFFF" categorized="false">
       </type>
-      <type name="MasterProperty" description="DB_TYPE_MASTER_PROPERTY in the client." parent="DBObj" first="0x39000000" last="0x39FFFFFF" categorized="false">
+      <type name="MasterProperty" text="DB_TYPE_MASTER_PROPERTY in the client." parent="DBObj" first="0x39000000" last="0x39FFFFFF" categorized="false">
       </type>
-      <type name="Font" description="DB_TYPE_FONT in the client." parent="DBObj" first="0x40000000" last="0x40000FFF" categorized="false">
+      <type name="Font" text="DB_TYPE_FONT in the client." parent="DBObj" first="0x40000000" last="0x40000FFF" categorized="false">
       </type>
-      <type name="DBProperties" description="DB_TYPE_DBPROPERTIES in the client." parent="DBObj" first="0x78000000" last="0x7FFFFFFF" categorized="false">
+      <type name="DBProperties" text="DB_TYPE_DBPROPERTIES in the client." parent="DBObj" first="0x78000000" last="0x7FFFFFFF" categorized="false">
       </type>
-      <type name="CharGen" description="DB_TYPE_CHAR_GEN_0 in the client." parent="DBObj" first="0xE000002" last="0xE000002" categorized="false">
+      <type name="CharGen" text="DB_TYPE_CHAR_GEN_0 in the client." parent="DBObj" first="0xE000002" last="0xE000002" categorized="false">
       </type>
-      <type name="VitalTable" description="DB_TYPE_ATTRIBUTE_2ND_TABLE_0 in the client." parent="DBObj" first="0xE000003" last="0xE000003" categorized="false">
+      <type name="VitalTable" text="DB_TYPE_ATTRIBUTE_2ND_TABLE_0 in the client." parent="DBObj" first="0xE000003" last="0xE000003" categorized="false">
       </type>
-      <type name="SkillTable" description="DB_TYPE_SKILL_TABLE_0 in the client." parent="DBObj" first="0xE000004" last="0xE000004" categorized="false">
+      <type name="SkillTable" text="DB_TYPE_SKILL_TABLE_0 in the client." parent="DBObj" first="0xE000004" last="0xE000004" categorized="false">
       </type>
-      <type name="SpellTable" description="DB_TYPE_SPELL_TABLE_0 in the client." parent="DBObj" first="0xE00000E" last="0xE00000E" categorized="false">
+      <type name="SpellTable" text="DB_TYPE_SPELL_TABLE_0 in the client." parent="DBObj" first="0xE00000E" last="0xE00000E" categorized="false">
       </type>
-      <type name="SpellComponentTable" description="DB_TYPE_SPELLCOMPONENT_TABLE_0 in the client." parent="DBObj" first="0xE00000F" last="0xE00000F" categorized="false">
+      <type name="SpellComponentTable" text="DB_TYPE_SPELLCOMPONENT_TABLE_0 in the client." parent="DBObj" first="0xE00000F" last="0xE00000F" categorized="false">
       </type>
-      <type name="ExperienceTable" description="Holds the experience required for different attributes/vitals/skill/levels, as well as the amount of skill credits obtained for each level. DB_TYPE_XP_TABLE_0 in the client." parent="DBObj" first="0xE000018" last="0xE000018" categorized="false">
+      <type name="ExperienceTable" text="Holds the experience required for different attributes/vitals/skill/levels, as well as the amount of skill credits obtained for each level. DB_TYPE_XP_TABLE_0 in the client." parent="DBObj" first="0xE000018" last="0xE000018" categorized="false">
         <field type="int" name="_attributeCount" />
         <field type="int" name="_vitalCount" />
         <field type="int" name="_trainedSkillCount" />
@@ -389,23 +658,23 @@
         <vector name="Levels" length="_levelCount" lengthmod="1" type="ulong" text="The amount of experience required to level a character" />
         <vector name="SkillCredits" length="_levelCount" lengthmod="1" type="uint" text="The amount of skill credits per level" />
       </type>
-      <type name="QuestsTable" description="DB_TYPE_QUEST_DEF_DB_0 in the client." parent="DBObj" first="0xE00001B" last="0xE00001B" categorized="false">
+      <type name="QuestsTable" text="DB_TYPE_QUEST_DEF_DB_0 in the client." parent="DBObj" first="0xE00001B" last="0xE00001B" categorized="false">
       </type>
-      <type name="QualityFilter" description="DB_TYPE_QUALITY_FILTER_0 in the client." parent="DBObj" first="0xE010000" last="0xE01FFFF" categorized="false">
+      <type name="QualityFilter" text="DB_TYPE_QUALITY_FILTER_0 in the client." parent="DBObj" first="0xE010000" last="0xE01FFFF" categorized="false">
       </type>
-      <type name="CombatTable" description="DB_TYPE_COMBAT_TABLE_0 in the client." parent="DBObj" first="0x30000000" last="0x3000FFFF" categorized="false">
+      <type name="CombatTable" text="DB_TYPE_COMBAT_TABLE_0 in the client." parent="DBObj" first="0x30000000" last="0x3000FFFF" categorized="false">
       </type>
-      <type name="ContractTable" description="DB_TYPE_CONTRACT_TABLE_0 in the client." parent="DBObj" first="0xE00001D" last="0xE00001D" categorized="false">
+      <type name="ContractTable" text="DB_TYPE_CONTRACT_TABLE_0 in the client." parent="DBObj" first="0xE00001D" last="0xE00001D" categorized="false">
       </type>
     </dat>
     <dat name="cell" text="client_cell_1.dat" type="DatFileType.Cell">
-      <type name="LandBlock" description="DB_TYPE_LAND_BLOCK in the client." parent="DBObj" first="0" last="0" categorized="false">
+      <type name="LandBlock" text="DB_TYPE_LAND_BLOCK in the client." parent="DBObj" first="0" last="0" categorized="false">
         <field type="bool" name="HasObjects" />
         <vector name="Terrain" length="81" type="TerrainInfo" />
         <vector name="Height" length="81" type="byte" />
         <align type="uint" />
       </type>
-      <type name="LandBlockInfo" description="Stores static spawns, buildings. DB_TYPE_LBI in the client." parent="DBObj" first="0" last="0" categorized="false">
+      <type name="LandBlockInfo" text="Stores static spawns, buildings. DB_TYPE_LBI in the client." parent="DBObj" first="0" last="0" categorized="false">
         <field type="uint" name="NumCells" text="The number of inside cells. These can be looked up at 0xAAAABBBB where AAAA is the landblock id and BBBB is the cell id + 0x100" />
         <field type="uint" name="_numObjects" />
         <vector name="Objects" length="_numObjects" type="List" genericValue="Stab" text="Static objects" />
@@ -418,7 +687,7 @@
           <vector name="RestrictionTable" length="_numRestrictionTableEntries" type="Dictionary" genericKey="uint" genericValue="uint" />
         </if>
       </type>
-      <type name="EnvCell" description="DB_TYPE_CELL in the client." parent="DBObj" first="0" last="0" categorized="false">
+      <type name="EnvCell" text="DB_TYPE_CELL in the client." parent="DBObj" first="0" last="0" categorized="false">
         <field type="EnvCellFlags" name="Flags" />
         <field type="uint" name="_cellId" value="Id" />
         <field type="byte" name="_numSurfaces" />
@@ -442,11 +711,11 @@
       </type>
     </dat>
     <dat name="local" text="client_local_English.dat" type="DatFileType.Local">
-      <type name="StringTable" description="DB_TYPE_STRING_TABLE in the client." parent="DBObj" first="0x23000000" last="0x24FFFFFF" categorized="false">
+      <type name="StringTable" text="DB_TYPE_STRING_TABLE in the client." parent="DBObj" first="0x23000000" last="0x24FFFFFF" categorized="false">
       </type>
-      <type name="FontLocal" description="DB_TYPE_FONT_LOCAL in the client." parent="DBObj" first="0x40001000" last="0x40FFFFFF" categorized="false">
+      <type name="FontLocal" text="DB_TYPE_FONT_LOCAL in the client." parent="DBObj" first="0x40001000" last="0x40FFFFFF" categorized="false">
       </type>
-      <type name="StringState" description="DB_TYPE_STRING_STATE in the client." parent="DBObj" first="0x41000000" last="0x41FFFFFF" categorized="false">
+      <type name="StringState" text="DB_TYPE_STRING_STATE in the client." parent="DBObj" first="0x41000000" last="0x41FFFFFF" categorized="false">
       </type>
     </dat>
   </dats>

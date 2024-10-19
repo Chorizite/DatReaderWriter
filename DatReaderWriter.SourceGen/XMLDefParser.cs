@@ -48,6 +48,9 @@ namespace DatReaderWriter.SourceGen {
             foreach (var node in nodes) {
                 var acDataType = ACDataType.FromXElement(null, node);
                 ACDataTypes.Add(acDataType.Name, acDataType);
+                foreach (var child in acDataType.SubTypes) {
+                    ACDataTypes.Add(child.Name, child);
+                }
             }
         }
 

@@ -100,6 +100,11 @@ namespace DatReaderWriter.SourceGen {
         /// </summary>
         /// <param name="member"></param>
         public override void WriteClassProperty(ACDataMember member) {
+            if (member.Name.StartsWith("_") && member.Parent is ACDataType dType && dType.TypeSwitch == member.Name) {
+                WriteSummary(member.Text);
+                WriteLine("public abstract " + GetTypeDeclaration(member) + " " + member.Name.Substring(1, 1).ToUpper() + member.Name.Substring(2) + " { get; }\n");
+                return;
+            }
             if (member.Name.StartsWith("_")) return;
             WriteSummary(member.Text);
             if (XMLDefParser.ACTemplatedTypes.ContainsKey(member.MemberType)) {
@@ -146,7 +151,7 @@ namespace DatReaderWriter.SourceGen {
         /// <param name="member"></param>
         public override void WriteEnumReader(ACDataMember member) {
             var reader = GetBinaryReaderForType(XMLDefParser.ACEnums[member.MemberType].ParentType);
-            if (member.HasParentOfType(typeof(ACVector))) {
+            if (member.HasParentOfType(typeof(ACVector)) || member.Name.StartsWith("_")) {
                 WriteLine("var " + member.Name + " = (" + member.MemberType + ")" + reader + ";");
             }
             else {
@@ -205,7 +210,12 @@ namespace DatReaderWriter.SourceGen {
                 }
             }
             else {
-                WriteLine(member.Name + " = " + GetBinaryReaderForType(member.MemberType) + ";");
+                if (!string.IsNullOrEmpty(member.KnownType)) {
+                    WriteLine(member.Name + " = " + GetBinaryReaderForType(member.MemberType, member.KnownType) + ";");
+                }
+                else {
+                    WriteLine(member.Name + " = " + GetBinaryReaderForType(member.MemberType) + ";");
+                }
             }
         }
 
@@ -337,7 +347,7 @@ namespace DatReaderWriter.SourceGen {
                 WriteLine($"for (var {indexVar}=0; {indexVar} < {vector.Length} + {vector.LengthMod}; {indexVar}++) {{");
             }
             else {
-                WriteLine($"for (var {indexVar}=0; {indexVar} < {vector.Length}; {indexVar}++) {{");
+                WriteLine($"for (var {indexVar}=0; {indexVar} < {vector.Length.Replace("parent.", "")}; {indexVar}++) {{");
             }
             Indent();
             return indexVar;
@@ -373,11 +383,43 @@ namespace DatReaderWriter.SourceGen {
                 WriteLine($"{vector.Name}[{loopChar}] = {GetBinaryReaderForType(vector.Type)};");
             }
             else if (string.IsNullOrEmpty(vector.GenericKey)) {
-                WriteLine($"{vector.Name}.Add({GetBinaryReaderForType(vector.GenericValue)});");
+                var type = XMLDefParser.ACDataTypes.Values
+                    .FirstOrDefault(t => t.Name == vector.GenericValue);
+                if (type != null && type.IsAbstract) {
+                    var field = type.Children
+                        .FirstOrDefault(c => c is ACDataMember m && m.Name == type.TypeSwitch)
+                        as ACDataMember;
+
+                    if (XMLDefParser.ACEnums.TryGetValue(field.MemberType, out var en)) {
+                        var reader = GetBinaryReaderForType(XMLDefParser.ACEnums[field.MemberType].ParentType);
+                        WriteLine($"var _peekedValue = (" + field.MemberType + ")" + reader + ";");
+                    }
+                    else {
+                        WriteLine($"var _peekedValue = {GetBinaryReaderForType(field.MemberType)};");
+                    }
+                    WriteLine($"reader.Skip(-sizeof({field.MemberType}));");
+                    WriteLine($"{vector.Name}.Add({vector.GenericValue}.Unpack(reader, _peekedValue));");
+                }
+                else {
+                    WriteLine($"{vector.Name}.Add({GetBinaryReaderForType(vector.GenericValue)});");
+                }
             }
             else {
-                WriteLine($"var _key = {GetBinaryReaderForType(vector.GenericKey)};");
-                WriteLine($"var _val = {GetBinaryReaderForType(vector.GenericValue)};");
+                if (XMLDefParser.ACEnums.ContainsKey(vector.GenericKey)) {
+                    var reader = GetBinaryReaderForType(XMLDefParser.ACEnums[vector.GenericKey].ParentType);
+                    WriteLine("var _key = (" + vector.GenericKey + ")" + reader + ";");
+                }
+                else {
+                    WriteLine($"var _key = {GetBinaryReaderForType(vector.GenericKey)};");
+                }
+                XMLDefParser.ACDataTypes.TryGetValue(vector.GenericValue, out var vType);
+                if (vType is not null && vType.AllChildren.Any(c => c is ACVector m && m.Length.Contains("parent."))) {
+                    var child = vType.AllChildren.First(c => c is ACVector m && m.Length.Contains("parent.")) as ACVector;
+                    WriteLine($"var _val = {GetBinaryReaderForType(vector.GenericValue).TrimEnd(')')}{child.Length.Substring(7)});");
+                }
+                else {
+                    WriteLine($"var _val = {GetBinaryReaderForType(vector.GenericValue)};");
+                }
                 WriteLine($"{vector.Name}.Add(_key, _val);");
             }
         }
@@ -474,8 +516,14 @@ namespace DatReaderWriter.SourceGen {
                     return "WriteString16L";
                 case "WString":
                     return "WriteString32L";
+                case "Vector3":
+                    return "WriteVector3";
+                case "Quaternion":
+                    return "WriteQuaternion";
                 case "CompressedUInt":
                     return "WriteCompressedUInt";
+                case "DataIdOfKnownType":
+                    return $"WriteDataIdOfKnownType";
                 default:
                     return $"WriteItem<{type}>";
             }
@@ -519,12 +567,18 @@ namespace DatReaderWriter.SourceGen {
                     return "reader.ReadString32L()";
                 case "PackedWORD":
                     return "reader.ReadPackedWORD()";
+                case "Vector3":
+                    return "reader.ReadVector3()";
+                case "Quaternion":
+                    return "reader.ReadQuaternion()";
                 case "DataID":
                 case "DataId":
                 case "PackedDWORD":
                     return "reader.ReadPackedDWORD()";
                 case "CompressedUInt":
                     return "reader.ReadCompressedUInt()";
+                case "DataIdOfKnownType":
+                    return $"reader.ReadDataIdOfKnownType({size})";
                 default:
                     return $"reader.ReadItem<{type}>()";
             }

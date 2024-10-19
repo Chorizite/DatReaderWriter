@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Buffers.Binary;
 using System.Drawing;
+using System.IO;
 using System.Numerics;
 
 namespace ACClientLib.DatReaderWriter.IO {
@@ -76,7 +77,7 @@ namespace ACClientLib.DatReaderWriter.IO {
         /// Write an bool and advance the buffer position accordingly
         /// </summary>
         /// <returns></returns>
-        public void WriteBool(bool value, int size=4) {
+        public void WriteBool(bool value, int size = 4) {
             switch (size) {
                 case 8:
                     WriteUInt64(value ? 1u : 0u);
@@ -148,7 +149,7 @@ namespace ACClientLib.DatReaderWriter.IO {
         /// </summary>
         /// <returns></returns>
         public void WriteSingle(float value) {
-#if NETSTANDARD2_0
+#if (NETFRAMEWORK || NETSTANDARD2_0)
             BitConverter.GetBytes(value).CopyTo(GetSpanAndAdvanceOffset(4));
 #else
             BinaryPrimitives.WriteSingleLittleEndian(GetSpanAndAdvanceOffset(4), value);
@@ -160,7 +161,7 @@ namespace ACClientLib.DatReaderWriter.IO {
         /// </summary>
         /// <returns></returns>
         public void WriteDouble(double value) {
-#if NETSTANDARD2_0
+#if (NETFRAMEWORK || NETSTANDARD2_0)
             BitConverter.GetBytes(value).CopyTo(GetSpanAndAdvanceOffset(8));
 #else
             BinaryPrimitives.WriteDoubleLittleEndian(GetSpanAndAdvanceOffset(8), value);
@@ -223,6 +224,30 @@ namespace ACClientLib.DatReaderWriter.IO {
         public void WritePlane(Plane value) {
             WriteVector3(value.Normal);
             WriteSingle(value.D);
+        }
+
+        /// <summary>
+        /// Writes the data ID based on knownType, reversing the logic of ReadDataIdOfKnownType.
+        /// If the dataID minus knownType is larger than 0x7FFF, it writes it in two UInt16 values.
+        /// If it is smaller or equal to 0x7FFF, it writes it as a single UInt16 value.
+        /// </summary>
+        public void WriteDataIdOfKnownType(uint dataID, uint knownType) {
+            // Subtract the known type to get the raw value
+            var rawValue = dataID - knownType;
+
+            if (rawValue > 0x7FFF) { // If the value is larger than 15 bits (0x7FFF)
+                                     // Write the higher 16 bits with MSB set, masked with 0x3FFF
+                var higher = (ushort)(0x8000 | ((rawValue >> 16) & 0x3FFF)); // Set MSB and mask to 14 bits
+                WriteUInt16(higher);
+
+                // Write the lower 16 bits
+                var lower = (ushort)(rawValue & 0xFFFF);
+                WriteUInt16(lower);
+            }
+            else {
+                // Write the raw value directly as a 16-bit value
+                WriteUInt16((ushort)rawValue);
+            }
         }
     }
 }

@@ -22,6 +22,7 @@
         WriteLine("using System.Collections.Generic;"); 
         WriteLine("using ACClientLib.DatReaderWriter.Enums;");
         WriteLine("using ACClientLib.DatReaderWriter.IO;");
+        WriteLine("");
         WriteLine("namespace ACClientLib.DatReaderWriter.Types {");
         using (new IndentHelper(this)) {
             var dataType = kv.Value;
@@ -31,38 +32,96 @@
 
             // summary docs and class definition
             WriteSummary(dataType.Text);
-            WriteLine("public" + (dataType.IsAbstract ? " abstract" : "") + " class " + dataType.Name + " : IDatObjType {");
+            if (dataType.IsAbstractImplementation) {
+                WriteLine("public" + (dataType.IsAbstract ? " abstract" : "") + " class " + dataType.Name + " : " + dataType.ParentType + " {");
+            }
+            else {
+                WriteLine("public" + (dataType.IsAbstract ? " abstract" : "") + " class " + dataType.Name + " : IDatObjType {");
+            }
 
             using (new IndentHelper(this)) {
                 var usedPropertyNames = new List<string>();
+
+                
+                if (dataType.IsAbstractImplementation) {
+                    WriteAbstractTypeGetter(dataType);
+                }
                 
                 // generate struct fields from messages.xml
                 foreach (var baseModel in dataType.AllChildren) {
                     GenerateClassProperties(baseModel, ref usedPropertyNames);
                 }
 
+                WriteParentContructor(dataType);
+                
                 // define method that can parse from binary
                 WriteLine("/// <inheritdoc />");
-                WriteLine("public bool Unpack(DatFileReader reader) {"); 
+                    
+                if (dataType.IsAbstractImplementation) {
+                    WriteLine("public override bool Unpack(DatFileReader reader) {");
+                }
+                else if (dataType.IsAbstract) {
+                    WriteLine("public virtual bool Unpack(DatFileReader reader) {");
+                }
+                else {
+                    WriteLine("public bool Unpack(DatFileReader reader) {"); 
+                }
                 using (new IndentHelper(this)) {
+                    if (dataType.IsAbstractImplementation) {
+                        WriteLine("base.Unpack(reader);");
+                    }
                     foreach (var child in dataType.Children) {
                         GenerateReaderContents(child, 0);
                     }
                     WriteLine("return true;");
                 }
                 WriteLine("}\n");
-
+                
                 // define method that can parse to binary
                 WriteLine("/// <inheritdoc />");
-                WriteLine("public bool Pack(DatFileWriter writer) {");
+                if (dataType.IsAbstractImplementation) {
+                    WriteLine("public override bool Pack(DatFileWriter writer) {");
+                }
+                else if (dataType.IsAbstract) {
+                    WriteLine("public virtual bool Pack(DatFileWriter writer) {");
+                }
+                else {
+                    WriteLine("public bool Pack(DatFileWriter writer) {");
+                }
                 using (new IndentHelper(this)) {
+                    if (dataType.IsAbstractImplementation) {
+                        WriteLine("base.Pack(writer);");
+                    }
                     foreach (var child in dataType.Children) {
                         GenerateWriterContents(child, 0);
                     }
                     WriteLine("return true;");
                 }
                 WriteLine("}\n");
+
+                if (!string.IsNullOrEmpty(dataType.TypeSwitch)) {
+                    WriteSummary("Create a typed instance of this abstract class");
+                    WriteLine($"public static {dataType.Name}? Unpack(DatFileReader reader, {dataType.GetParameterType()} type) {{");
+                    using (new IndentHelper(this)) {
+                        WriteLine($"{dataType.Name}? instance = null;");
+                        WriteLine("switch(type) {");
+                        using (new IndentHelper(this)) {
+                            foreach (var subType in dataType.SubTypes) {
+                                WriteLine($"case {subType.Value}:");
+                                using (new IndentHelper(this)) {
+                                    WriteLine($"instance = new {subType.Name}();");
+                                    WriteLine("break;");
+                                }
+                            }
+                        }
+                        WriteLine("}");
+                        WriteLine("instance?.Unpack(reader);");
+                        WriteLine("return instance;");
+                    }
+                    WriteLine("}");
+                }
             }
+
             WriteLine("}\n"); // close class definition
         }
         WriteLine("}");

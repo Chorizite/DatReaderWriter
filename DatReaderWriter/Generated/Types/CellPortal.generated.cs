@@ -15,6 +15,7 @@ using System.Linq;
 using System.Collections.Generic;
 using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
+
 namespace ACClientLib.DatReaderWriter.Types {
     public class CellPortal : IDatObjType {
         public PortalFlags Flags;

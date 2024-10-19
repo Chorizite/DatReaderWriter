@@ -253,6 +253,9 @@ namespace DatReaderWriter.SourceGen {
             if (type == "CompressedUInt") {
                 return "uint";
             }
+            if (type == "DataIdOfKnownType") {
+                return "uint";
+            }
             return type;
         }
 
@@ -293,6 +296,42 @@ namespace DatReaderWriter.SourceGen {
             else {
                 WriteVectorPusher(vector, vector.Children, loopChar);
             }
+        }
+
+        public void WriteParentContructor(ACDataType type) {
+            var child = type.AllVectors.FirstOrDefault(c => c.Length.StartsWith("parent."));
+            if (child is null) {
+                return;
+            }
+
+            string parentTypeType = "";
+            string parentTypeName = "";
+            var parentType = XMLDefParser.ACDataTypes.Values
+                .FirstOrDefault(t => t.AllVectors.Count(v => v.GenericValue == type.Name) > 0);
+
+            if (parentType is not null) {
+                parentTypeType = SimplifyType(parentType?.Name);
+                parentTypeName = SimplifyType(parentType?.Name);
+                WriteLine($"private {SimplifyType(parentType?.Name)};");
+            }
+            else {
+                var parentType2 = XMLDefParser.ACDBObjs.Values
+                    .FirstOrDefault(t => t.Children.Any(c => c is ACVector v && v.GenericValue == type.Name))
+                    .Children
+                    .FirstOrDefault(c => c is ACDataMember m && m.Name == child.Length.Substring(7))
+                    as ACDataMember;
+                parentTypeType = SimplifyType(parentType2?.MemberType);
+                parentTypeName = SimplifyType(parentType2?.Name);
+                WriteLine($"private {parentType2.MemberType} {parentType2.Name};");
+            }
+            WriteLine("");
+
+            WriteLine($"public {type.Name}({parentTypeType} {parentTypeName}) {{");
+            Indent();
+            WriteLine($"this.{parentTypeName} = {parentTypeName};");
+            Outdent();
+            WriteLine("}");
+            WriteLine("");
         }
 
         /// <summary>
@@ -386,7 +425,12 @@ namespace DatReaderWriter.SourceGen {
                 else {
                     WriteLine($"foreach (var kv in {vector.Name}) {{");
                     Indent();
-                    WriteLine($"writer.{GetBinaryWriterForType(vector.GenericKey)}(kv.Key);");
+                    if (XMLDefParser.ACEnums.ContainsKey(vector.GenericKey)) {
+                        WriteLine($"writer.{GetBinaryWriterForType(XMLDefParser.ACEnums[vector.GenericKey].ParentType)}(({XMLDefParser.ACEnums[vector.GenericKey].ParentType})kv.Key);");
+                    }
+                    else {
+                        WriteLine($"writer.{GetBinaryWriterForType(vector.GenericKey)}(kv.Key);");
+                    }
                     WriteLine($"writer.{GetBinaryWriterForType(vector.GenericValue)}(kv.Value);");
                     Outdent();
                     WriteLine("}");
@@ -531,11 +575,43 @@ namespace DatReaderWriter.SourceGen {
             WriteLine($"writer.Write{member.MemberType}({member.Name});");
         }
 
+        public void WriteAbstractTypeGetter(ACDataType type) {
+            var dType = (type.Parent as DatReaderWriter.SourceGen.Models.ACDataType);
+            if (dType is null || string.IsNullOrEmpty(dType.TypeSwitch)) return;
+            var name = dType.TypeSwitch.Substring(1, 1).ToUpper() + dType.TypeSwitch.Substring(2);
+            var switched = dType.AllChildren.FirstOrDefault(s => s is ACDataMember m && m.Name == dType.TypeSwitch) as ACDataMember;
+            WriteLine("/// <inheritdoc />");
+            WriteLine($"public override {switched?.MemberType} {name} => {type?.Value};\n");
+        }
+
         /// <summary>
         /// Writes out csharp to read an ACEnum
         /// </summary>
         /// <param name="member"></param>
         public void WriteEnumWriter(ACDataMember member, string pre = "") {
+
+            if (member.Name.StartsWith("_") && member.Parent is ACDataType dType && dType.TypeSwitch == member.Name) {
+                WriteLine($"writer.{GetBinaryWriterForType(XMLDefParser.ACEnums[member.MemberType].ParentType)}(({XMLDefParser.ACEnums[member.MemberType].ParentType}){member.Name.Substring(1,1).ToUpper() + member.Name.Substring(2)});");
+                return;
+            }
+            /*
+            if (member.Parent is ACDataType dType && dType.TypeSwitch == member.Name) {
+                for (var i = 0; i < dType.SubTypes.Count; i++) {
+                    var ifStr = i == 0 ? "if" : "else if";
+                    WriteLine($"{ifStr} (this is {dType.SubTypes[i].Name}) {{");
+                    Indent();
+                    WriteLine($"writer.{GetBinaryWriterForType(XMLDefParser.ACEnums[member.MemberType].ParentType)}(({XMLDefParser.ACEnums[member.MemberType].ParentType}){dType.SubTypes[i].Value});");
+                    Outdent();
+                    WriteLine("}");
+                }
+                WriteLine("else {");
+                Indent();
+                WriteLine("""throw new Exception($"Unsupported Hook type: {GetType()}");""");
+                Outdent();
+                WriteLine("}");
+                return;
+            }
+            */
             WriteLine($"writer.{GetBinaryWriterForType(XMLDefParser.ACEnums[member.MemberType].ParentType)}(({XMLDefParser.ACEnums[member.MemberType].ParentType}){member.Name});");
         }
 
@@ -589,6 +665,11 @@ namespace DatReaderWriter.SourceGen {
 
             if (!string.IsNullOrEmpty(member.Value)) {
                 WriteLine($"writer.{GetBinaryWriterForType(member.MemberType)}({member.Value}{(string.IsNullOrEmpty(member.Size) ? "" : $", {member.Size}")});");
+                return;
+            }
+
+            if (!string.IsNullOrEmpty(member.KnownType)) {
+                WriteLine($"writer.{GetBinaryWriterForType(member.MemberType)}({member.Name}, {member.KnownType});");
                 return;
             }
 

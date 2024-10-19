@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Buffers.Binary;
+using System.IO;
 using System.Linq;
 using System.Numerics;
 
@@ -55,8 +56,8 @@ namespace ACClientLib.DatReaderWriter.IO {
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public T ReadItem<T>() where T : IUnpackable {
-            var item = Activator.CreateInstance<T>();
+        public T ReadItem<T>(params object[] p) where T : IUnpackable {
+            var item = (T)Activator.CreateInstance(typeof(T), p ?? []);
             item.Unpack(this);
             return item;
         }
@@ -223,6 +224,23 @@ namespace ACClientLib.DatReaderWriter.IO {
             var normal = ReadVector3();
             var distance = ReadSingle();
             return new Plane(normal, distance);
+        }
+
+        /// <summary>
+        /// From ACE: First reads a UInt16. If the MSB is set, it will be masked with 0x3FFF, shifted left 2 bytes, and then OR'd with the next UInt16. The sum is then added to knownType.
+        /// </summary>
+        /// <returns></returns>
+        public uint ReadDataIdOfKnownType(uint knownType) {
+            var value = ReadUInt16();
+
+            if ((value & 0x8000) != 0) {
+                var lower = ReadUInt16();
+                var higher = (value & 0x3FFF) << 16;
+
+                return (uint)(knownType + (higher | lower));
+            }
+
+            return (knownType + value);
         }
     }
 }
