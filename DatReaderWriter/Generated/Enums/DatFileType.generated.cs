@@ -11,7 +11,7 @@
 using System;
 namespace ACClientLib.DatReaderWriter.Enums {
     public enum DatFileType : int {
-        All = 0,
+        Undefined = 0,
 
         Portal = 1,
 

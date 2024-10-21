@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace ACClientLib.DatReaderWriter.DBObjs {
-    [DBObjType(DatFileType.All, DBObjHeaderFlags.None, 0xFFFF0001, 0xFFFF0001)]
+    [DBObjType(DatFileType.Undefined, DBObjHeaderFlags.None, 0xFFFF0001, 0xFFFF0001)]
     public class Iteration : DBObj {
         /// <inheritdoc/>
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.None;

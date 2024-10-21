@@ -163,6 +163,7 @@ namespace ACClientLib.DatReaderWriter {
         protected virtual void Dispose(bool disposing) {
             if (disposing) {
                 Tree?.Dispose();
+                BlockAllocator?.Dispose();
             }
         }
 
