@@ -1,5 +1,5 @@
 ﻿using ACClientLib.DatReaderWriter.IO;
-using ACClientLib.DatReaderWriter.Tests.Lib;
+using DatReaderWriter.Tests.Lib;
 using System;
 using System.Buffers.Binary;
 using System.Collections.Generic;
@@ -7,9 +7,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ACClientLib.DatReaderWriter.Tests.IO {
+namespace DatReaderWriter.Tests.IO {
     [TestClass]
     public class DatFileWriterTests {
+        private static Random _rnd = new Random();
+
         [TestMethod]
         public void CanWriteMultipleValues() {
             var bytes = new byte[12];
@@ -17,7 +19,7 @@ namespace ACClientLib.DatReaderWriter.Tests.IO {
             var writer = new DatFileWriter(bytes);
 
             var randomBytes = new byte[4];
-            Random.Shared.NextBytes(randomBytes);
+            _rnd.NextBytes(randomBytes);
 
             Assert.AreEqual(0, writer.Offset);
 
@@ -89,7 +91,7 @@ namespace ACClientLib.DatReaderWriter.Tests.IO {
         public void CanWriteBytes() {
             var bytes = new byte[100];
             var randomBytes = new byte[100];
-            Random.Shared.NextBytes(randomBytes);
+            _rnd.NextBytes(randomBytes);
 
             var writer = new DatFileWriter(randomBytes);
 

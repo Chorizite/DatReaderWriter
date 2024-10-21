@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ACClientLib.DatReaderWriter.Tests.Lib {
+namespace DatReaderWriter.Tests.Lib {
     [AttributeUsage(AttributeTargets.Parameter, AllowMultiple = false)]
     public class DataValuesAttribute : Attribute {
         public object?[] Values { get; }
@@ -39,14 +39,22 @@ namespace ACClientLib.DatReaderWriter.Tests.Lib {
             while (true) {
                 // Create new arguments
                 var arg = new object?[indices.Length];
+                var arg2 = new object?[indices.Length];
                 for (int i = 0; i < indices.Length; i++) {
                     arg[i] = values[i][indices[i]];
+                    arg2[i] = null;
                 }
 
                 // Check if needs to be excluded
+#if (NETSTANDARD || NETFRAMEWORK)
+                if (!excluded.Any(e => e.Values.Zip(arg, (a, b) => a?.Equals(b) == true).All(a => a))) {
+                    yield return arg!;
+                }
+#else
                 if (!excluded.Any(e => e.Values.Zip(arg).All(v => v.First?.Equals(v.Second) == true))) {
                     yield return arg!;
                 }
+#endif
 
                 // Increment indices
                 for (int i = indices.Length - 1; i >= 0; i--) {

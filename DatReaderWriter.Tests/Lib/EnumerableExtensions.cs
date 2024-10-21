@@ -4,16 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ACClientLib.DatReaderWriter.Tests.Lib {
+namespace DatReaderWriter.Tests.Lib {
     public static class EnumerableExtensions {
         public static IList<T> Shuffle<T>(this IEnumerable<T> sequence) {
             return sequence.Shuffle(new Random());
         }
 
         public static IList<T> Shuffle<T>(this IEnumerable<T> sequence, Random randomNumberGenerator) {
-            ArgumentNullException.ThrowIfNull(sequence);
+            //ArgumentNullException.ThrowIfNull(sequence);
 
-            ArgumentNullException.ThrowIfNull(randomNumberGenerator);
+            //ArgumentNullException.ThrowIfNull(randomNumberGenerator);
 
             T swapTemp;
             List<T> values = sequence.ToList();

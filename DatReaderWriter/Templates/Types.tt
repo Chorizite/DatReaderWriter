@@ -1,0 +1,133 @@
+﻿<#@ assembly name="netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51" #>
+<#@ assembly name="$(SolutionDir)\ext\DatReaderWriter\DatReaderWriter.SourceGen\bin\Debug\netstandard2.0\System.CodeDom.dll" #>
+<#@ assembly name="$(SolutionDir)\ext\DatReaderWriter\DatReaderWriter.SourceGen\bin\Debug\netstandard2.0\DatReaderWriter.SourceGen.dll" #>
+<#@ template language="c#" hostspecific="true" inherits="DatReaderWriter.SourceGen.CSTemplateBase" #>
+<#@ output extension=".cs" #>
+<#@include file="MultipleOutputHelper.ttinclude"#>
+<#
+    var manager = Manager.Create(Host, GenerationEnvironment);
+    
+    SetupMessageParser(this.Host.ResolvePath("../dats.xml"));
+    foreach (var kv in this.XMLDefParser.ACDataTypes) {
+        if (kv.Key == "Vector3" || kv.Key == "Quaternion" || kv.Key == "Plane" || kv.Key == "DBObj") {
+            continue;
+        }
+
+        manager.StartNewFile($"../Generated/Types/{kv.Key}.generated.cs");
+        PrintLocalModificationWarning();
+        WriteLine("using System;");
+        WriteLine("using System.Numerics;");
+        WriteLine("using System.IO;");
+        WriteLine("using System.Linq;");
+        WriteLine("using System.Collections.Generic;"); 
+        WriteLine("using ACClientLib.DatReaderWriter.Enums;");
+        WriteLine("using ACClientLib.DatReaderWriter.IO;");
+        WriteLine("");
+        WriteLine("namespace ACClientLib.DatReaderWriter.Types {");
+        using (new IndentHelper(this)) {
+            var dataType = kv.Value;
+        
+            if (dataType.IsTemplated)
+                continue;
+
+            // summary docs and class definition
+            WriteSummary(dataType.Text);
+            if (dataType.IsAbstractImplementation) {
+                WriteLine("public" + (dataType.IsAbstract ? " abstract" : "") + " class " + dataType.Name + " : " + dataType.ParentType + " {");
+            }
+            else {
+                WriteLine("public" + (dataType.IsAbstract ? " abstract" : "") + " class " + dataType.Name + " : IDatObjType {");
+            }
+
+            using (new IndentHelper(this)) {
+                var usedPropertyNames = new List<string>();
+
+                
+                if (dataType.IsAbstractImplementation) {
+                    WriteAbstractTypeGetter(dataType);
+                }
+                
+                // generate struct fields from messages.xml
+                foreach (var baseModel in dataType.AllChildren) {
+                    GenerateClassProperties(baseModel, ref usedPropertyNames);
+                }
+
+                WriteParentContructor(dataType);
+                
+                // define method that can parse from binary
+                WriteLine("/// <inheritdoc />");
+                    
+                if (dataType.IsAbstractImplementation) {
+                    WriteLine("public override bool Unpack(DatFileReader reader) {");
+                }
+                else if (dataType.IsAbstract) {
+                    WriteLine("public virtual bool Unpack(DatFileReader reader) {");
+                }
+                else {
+                    WriteLine("public bool Unpack(DatFileReader reader) {"); 
+                }
+                using (new IndentHelper(this)) {
+                    if (dataType.IsAbstractImplementation) {
+                        WriteLine("base.Unpack(reader);");
+                    }
+                    foreach (var child in dataType.Children) {
+                        GenerateReaderContents(child, 0);
+                    }
+                    WriteLine("return true;");
+                }
+                WriteLine("}\n");
+                
+                // define method that can parse to binary
+                WriteLine("/// <inheritdoc />");
+                if (dataType.IsAbstractImplementation) {
+                    WriteLine("public override bool Pack(DatFileWriter writer) {");
+                }
+                else if (dataType.IsAbstract) {
+                    WriteLine("public virtual bool Pack(DatFileWriter writer) {");
+                }
+                else {
+                    WriteLine("public bool Pack(DatFileWriter writer) {");
+                }
+                using (new IndentHelper(this)) {
+                    if (dataType.IsAbstractImplementation) {
+                        WriteLine("base.Pack(writer);");
+                    }
+                    foreach (var child in dataType.Children) {
+                        GenerateWriterContents(child, 0);
+                    }
+                    WriteLine("return true;");
+                }
+                WriteLine("}\n");
+
+                if (!string.IsNullOrEmpty(dataType.TypeSwitch)) {
+                    WriteSummary("Create a typed instance of this abstract class");
+                    WriteLine($"public static {dataType.Name}? Unpack(DatFileReader reader, {dataType.GetParameterType()} type) {{");
+                    using (new IndentHelper(this)) {
+                        WriteLine($"{dataType.Name}? instance = null;");
+                        WriteLine("switch(type) {");
+                        using (new IndentHelper(this)) {
+                            foreach (var subType in dataType.SubTypes) {
+                                WriteLine($"case {subType.Value}:");
+                                using (new IndentHelper(this)) {
+                                    WriteLine($"instance = new {subType.Name}();");
+                                    WriteLine("break;");
+                                }
+                            }
+                        }
+                        WriteLine("}");
+                        WriteLine("instance?.Unpack(reader);");
+                        WriteLine("return instance;");
+                    }
+                    WriteLine("}");
+                }
+            }
+
+            WriteLine("}\n"); // close class definition
+        }
+        WriteLine("}");
+        manager.EndBlock();
+    }
+
+
+    manager.Process(true);
+#>

@@ -1,16 +1,17 @@
-﻿using ACClientLib.DatReaderWriter.IO;
+﻿using ACClientLib.DatReaderWriter.Options;
+using ACClientLib.DatReaderWriter.IO;
 using ACClientLib.DatReaderWriter.IO.BlockAllocators;
-using ACClientLib.DatReaderWriter.Tests.Lib;
+using DatReaderWriter.Tests.Lib;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.PortableExecutable;
 using System.Text;
 using System.Threading.Tasks;
+using ACClientLib.DatReaderWriter;
 
-namespace ACClientLib.DatReaderWriter.Tests.IO.BlockAllocators {
+namespace DatReaderWriter.Tests.IO.BlockAllocators {
     [TestClass]
     public class MemoryMappedBlockAllocatorTests {
+        private static Random _rnd = new Random();
+
         [TestMethod]
         [CombinatorialData]
         public void CanCreateNewEmptyDatAndLoadIt(
@@ -18,9 +19,9 @@ namespace ACClientLib.DatReaderWriter.Tests.IO.BlockAllocators {
             [DataValues(1, 2, 1_000, 10_000)] int numBlocksToAllocate
             ) {
             var file = Path.GetTempFileName();
-            var allocator = new MemoryMappedBlockAllocator(new Options.DatDatabaseOptions() {
+            var allocator = new MemoryMappedBlockAllocator(new DatDatabaseOptions() {
                 FilePath = file,
-                AccessType = Options.DatAccessType.ReadWrite
+                AccessType = DatAccessType.ReadWrite
             });
 
             Assert.IsFalse(allocator.HasHeaderData);
@@ -38,9 +39,9 @@ namespace ACClientLib.DatReaderWriter.Tests.IO.BlockAllocators {
 
             var actualFileSize = new FileInfo(file).Length;
 
-            allocator = new MemoryMappedBlockAllocator(new Options.DatDatabaseOptions() {
+            allocator = new MemoryMappedBlockAllocator(new DatDatabaseOptions() {
                 FilePath = file,
-                AccessType = Options.DatAccessType.Read
+                AccessType = DatAccessType.Read
             });
             Assert.IsTrue(allocator.HasHeaderData);
             Assert.AreEqual(actualFileSize, allocator.Header.FileSize);
@@ -57,9 +58,9 @@ namespace ACClientLib.DatReaderWriter.Tests.IO.BlockAllocators {
         [CombinatorialData]
         public void CanCreateNewDatAndSetVersion([DataValues(256, 1024)] int blockSize) {
             var file = Path.GetTempFileName();
-            var allocator = new MemoryMappedBlockAllocator(new Options.DatDatabaseOptions() {
+            var allocator = new MemoryMappedBlockAllocator(new DatDatabaseOptions() {
                 FilePath = file,
-                AccessType = Options.DatAccessType.ReadWrite
+                AccessType = DatAccessType.ReadWrite
             });
 
             Assert.IsFalse(allocator.HasHeaderData);
@@ -76,9 +77,9 @@ namespace ACClientLib.DatReaderWriter.Tests.IO.BlockAllocators {
 
             allocator.Dispose();
             
-            allocator = new MemoryMappedBlockAllocator(new Options.DatDatabaseOptions() {
+            allocator = new MemoryMappedBlockAllocator(new DatDatabaseOptions() {
                 FilePath = file,
-                AccessType = Options.DatAccessType.Read
+                AccessType = DatAccessType.Read
             });
 
             Assert.AreEqual("Testing", allocator.Header.Version);
@@ -96,9 +97,9 @@ namespace ACClientLib.DatReaderWriter.Tests.IO.BlockAllocators {
         [CombinatorialData]
         public void CanReadWriteRawBytesToDat([DataValues(256, 1024)] int blockSize) {
             var file = Path.GetTempFileName();
-            var allocator = new MemoryMappedBlockAllocator(new Options.DatDatabaseOptions() {
+            var allocator = new MemoryMappedBlockAllocator(new DatDatabaseOptions() {
                 FilePath = file,
-                AccessType = Options.DatAccessType.ReadWrite
+                AccessType = DatAccessType.ReadWrite
             });
 
             Assert.IsFalse(allocator.HasHeaderData);
@@ -113,9 +114,9 @@ namespace ACClientLib.DatReaderWriter.Tests.IO.BlockAllocators {
 
             allocator.Dispose();
 
-            allocator = new MemoryMappedBlockAllocator(new Options.DatDatabaseOptions() {
+            allocator = new MemoryMappedBlockAllocator(new DatDatabaseOptions() {
                 FilePath = file,
-                AccessType = Options.DatAccessType.Read
+                AccessType = DatAccessType.Read
             });
 
             allocator.ReadBytes(readBuffer, 0, 0, readBuffer.Length);
@@ -133,9 +134,9 @@ namespace ACClientLib.DatReaderWriter.Tests.IO.BlockAllocators {
             [DataValues(1, 2, 1_000, 10_000)] int numBlocksToAllocate
             ) {
             var file = Path.GetTempFileName();
-            var allocator = new MemoryMappedBlockAllocator(new Options.DatDatabaseOptions() {
+            var allocator = new MemoryMappedBlockAllocator(new DatDatabaseOptions() {
                 FilePath = file,
-                AccessType = Options.DatAccessType.ReadWrite
+                AccessType = DatAccessType.ReadWrite
             });
 
             Assert.IsFalse(allocator.HasHeaderData);
@@ -149,9 +150,9 @@ namespace ACClientLib.DatReaderWriter.Tests.IO.BlockAllocators {
 
             allocator.Dispose();
 
-            allocator = new MemoryMappedBlockAllocator(new Options.DatDatabaseOptions() {
+            allocator = new MemoryMappedBlockAllocator(new DatDatabaseOptions() {
                 FilePath = file,
-                AccessType = Options.DatAccessType.Read
+                AccessType = DatAccessType.Read
             });
 
             Assert.AreEqual(numBlocksToAllocate, allocator.Header.FreeBlockCount);
@@ -165,16 +166,16 @@ namespace ACClientLib.DatReaderWriter.Tests.IO.BlockAllocators {
         [CombinatorialData]
         public void CanWriteToSingleUnusedDatBlock([DataValues(256, 1024)] int blockSize) {
             var file = Path.GetTempFileName();
-            var allocator = new MemoryMappedBlockAllocator(new Options.DatDatabaseOptions() {
+            var allocator = new MemoryMappedBlockAllocator(new DatDatabaseOptions() {
                 FilePath = file,
-                AccessType = Options.DatAccessType.ReadWrite
+                AccessType = DatAccessType.ReadWrite
             });
 
             Assert.IsFalse(allocator.HasHeaderData);
             allocator.InitNew(DatDatabaseType.Portal, 0, blockSize, 10);
 
             var fileBytes = new byte[blockSize - 4];
-            Random.Shared.NextBytes(fileBytes.AsSpan());
+            _rnd.NextBytes(fileBytes);
 
             var blockOffset = allocator.WriteBlock(fileBytes, fileBytes.Length);
 
@@ -184,9 +185,9 @@ namespace ACClientLib.DatReaderWriter.Tests.IO.BlockAllocators {
 
             allocator.Dispose();
 
-            allocator = new MemoryMappedBlockAllocator(new Options.DatDatabaseOptions() {
+            allocator = new MemoryMappedBlockAllocator(new DatDatabaseOptions() {
                 FilePath = file,
-                AccessType = Options.DatAccessType.Read
+                AccessType = DatAccessType.Read
             });
 
             allocator.ReadBlock(readBuffer, blockOffset);
@@ -201,16 +202,16 @@ namespace ACClientLib.DatReaderWriter.Tests.IO.BlockAllocators {
         [CombinatorialData]
         public void CanWriteToMultipleUnusedDatBlocks([DataValues(256, 1024)] int blockSize) {
             var file = Path.GetTempFileName();
-            var allocator = new MemoryMappedBlockAllocator(new Options.DatDatabaseOptions() {
+            var allocator = new MemoryMappedBlockAllocator(new DatDatabaseOptions() {
                 FilePath = file,
-                AccessType = Options.DatAccessType.ReadWrite
+                AccessType = DatAccessType.ReadWrite
             });
 
             Assert.IsFalse(allocator.HasHeaderData);
             allocator.InitNew(DatDatabaseType.Portal, 0, blockSize, 10);
 
             var fileBytes = new byte[blockSize * 5];
-            Random.Shared.NextBytes(fileBytes.AsSpan());
+            _rnd.NextBytes(fileBytes);
 
             var blockOffset = allocator.WriteBlock(fileBytes, fileBytes.Length);
 
@@ -221,9 +222,9 @@ namespace ACClientLib.DatReaderWriter.Tests.IO.BlockAllocators {
 
             allocator.Dispose();
 
-            allocator = new MemoryMappedBlockAllocator(new Options.DatDatabaseOptions() {
+            allocator = new MemoryMappedBlockAllocator(new DatDatabaseOptions() {
                 FilePath = file,
-                AccessType = Options.DatAccessType.Read
+                AccessType = DatAccessType.Read
             });
 
             allocator.ReadBlock(readBuffer, blockOffset);
@@ -238,16 +239,16 @@ namespace ACClientLib.DatReaderWriter.Tests.IO.BlockAllocators {
         [CombinatorialData]
         public void UpdatingBlockContentsReusesAllocatedBlocks([DataValues(256, 1024)] int blockSize) {
             var file = Path.GetTempFileName();
-            var allocator = new MemoryMappedBlockAllocator(new Options.DatDatabaseOptions() {
+            var allocator = new MemoryMappedBlockAllocator(new DatDatabaseOptions() {
                 FilePath = file,
-                AccessType = Options.DatAccessType.ReadWrite
+                AccessType = DatAccessType.ReadWrite
             });
 
             Assert.IsFalse(allocator.HasHeaderData);
             allocator.InitNew(DatDatabaseType.Portal, 0, blockSize, 10);
 
             var fileBytes = new byte[(blockSize - 4) * 4];
-            Random.Shared.NextBytes(fileBytes.AsSpan());
+            _rnd.NextBytes(fileBytes);
 
             var blockOffset = allocator.WriteBlock(fileBytes, fileBytes.Length);
             var freeBlocks = allocator.Header.FreeBlockCount;
@@ -267,16 +268,16 @@ namespace ACClientLib.DatReaderWriter.Tests.IO.BlockAllocators {
         [CombinatorialData]
         public void CanExpandDatToWriteBlocks([DataValues(256, 1024)] int blockSize) {
             var file = Path.GetTempFileName();
-            var allocator = new MemoryMappedBlockAllocator(new Options.DatDatabaseOptions() {
+            var allocator = new MemoryMappedBlockAllocator(new DatDatabaseOptions() {
                 FilePath = file,
-                AccessType = Options.DatAccessType.ReadWrite
+                AccessType = DatAccessType.ReadWrite
             });
 
             Assert.IsFalse(allocator.HasHeaderData);
             allocator.InitNew(DatDatabaseType.Portal, 0, blockSize, 1);
 
             var fileBytes = new byte[blockSize * 5];
-            Random.Shared.NextBytes(fileBytes.AsSpan());
+            _rnd.NextBytes(fileBytes);
 
             var blockOffset = allocator.WriteBlock(fileBytes, fileBytes.Length);
 
@@ -287,9 +288,9 @@ namespace ACClientLib.DatReaderWriter.Tests.IO.BlockAllocators {
 
             allocator.Dispose();
 
-            allocator = new MemoryMappedBlockAllocator(new Options.DatDatabaseOptions() {
+            allocator = new MemoryMappedBlockAllocator(new DatDatabaseOptions() {
                 FilePath = file,
-                AccessType = Options.DatAccessType.Read
+                AccessType = DatAccessType.Read
             });
 
             allocator.ReadBlock(readBuffer, blockOffset);
@@ -307,9 +308,9 @@ namespace ACClientLib.DatReaderWriter.Tests.IO.BlockAllocators {
             [DataValues(252, 1020, 200, 800, 1000, 10_000, 10_000_000)] int fileSize
             ) {
             var file = Path.GetTempFileName();
-            var allocator = new MemoryMappedBlockAllocator(new Options.DatDatabaseOptions() {
+            var allocator = new MemoryMappedBlockAllocator(new DatDatabaseOptions() {
                 FilePath = file,
-                AccessType = Options.DatAccessType.ReadWrite
+                AccessType = DatAccessType.ReadWrite
             });
 
             var allocatedBlockCount = (fileSize + (blockSize * 100)) / (blockSize - 4);
@@ -341,9 +342,9 @@ namespace ACClientLib.DatReaderWriter.Tests.IO.BlockAllocators {
             [DataValues(1, 10, 100, 1000)] int blocksToReserve
             ) {
             var file = Path.GetTempFileName();
-            var allocator = new MemoryMappedBlockAllocator(new Options.DatDatabaseOptions() {
+            var allocator = new MemoryMappedBlockAllocator(new DatDatabaseOptions() {
                 FilePath = file,
-                AccessType = Options.DatAccessType.ReadWrite
+                AccessType = DatAccessType.ReadWrite
             });
 
             var allocatedBlockCount = 50;
