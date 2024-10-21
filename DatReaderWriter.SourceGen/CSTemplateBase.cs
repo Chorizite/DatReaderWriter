@@ -431,7 +431,13 @@ namespace DatReaderWriter.SourceGen {
                     WriteLine($"var _val = {GetBinaryReaderForType(vector.GenericValue).TrimEnd(')')}{child.Length.Substring(7)});");
                 }
                 else {
-                    WriteLine($"var _val = {GetBinaryReaderForType(vector.GenericValue)};");
+                    if (XMLDefParser.ACEnums.ContainsKey(vector.GenericValue)) {
+                        var reader = GetBinaryReaderForType(XMLDefParser.ACEnums[vector.GenericValue].ParentType);
+                        WriteLine("var _val = (" + vector.GenericValue + ")" + reader + ";");
+                    }
+                    else {
+                        WriteLine($"var _val = {GetBinaryReaderForType(vector.GenericValue)};");
+                    }
                 }
                 WriteLine($"{vector.Name}.Add(_key, _val);");
             }

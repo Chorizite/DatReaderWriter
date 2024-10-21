@@ -30,8 +30,8 @@ namespace DatReaderWriter.Tests.DBObjs {
             var res = dat.TryWriteFile(xpTable);
             Assert.IsTrue(res);
 
-            res = dat.TryReadFile<ExperienceTable>(0xE000018, out var readXPTable);
-            Assert.IsTrue(res);
+            var res2 = dat.TryReadFile<ExperienceTable>(0xE000018, out var readXPTable);
+            Assert.IsTrue(res2);
             Assert.IsNotNull(readXPTable);
             Assert.AreEqual(0xE000018u, readXPTable.Id);
 

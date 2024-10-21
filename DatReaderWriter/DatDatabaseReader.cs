@@ -1,4 +1,5 @@
-﻿using ACClientLib.DatReaderWriter.IO;
+﻿using ACClientLib.DatReaderWriter.DBObjs;
+using ACClientLib.DatReaderWriter.IO;
 using ACClientLib.DatReaderWriter.IO.BlockAllocators;
 using ACClientLib.DatReaderWriter.IO.DatBTree;
 using ACClientLib.DatReaderWriter.Options;
@@ -27,6 +28,11 @@ namespace ACClientLib.DatReaderWriter {
         public DatHeader Header => BlockAllocator.Header;
 
         /// <summary>
+        /// Iteration data
+        /// </summary>
+        public Iteration Iteration { get; }
+
+        /// <summary>
         /// Create a new DatDatabase
         /// </summary>
         /// <param name="options">Options configuration action</param>
@@ -37,6 +43,19 @@ namespace ACClientLib.DatReaderWriter {
 
             BlockAllocator = blockAllocator ?? new MemoryMappedBlockAllocator(Options);
             Tree = new DatBTreeReaderWriter(BlockAllocator);
+
+            if (TryReadFile<Iteration>(0xFFFF0001, out var iteration)) {
+                Iteration = iteration;
+
+                if (BlockAllocator.CanWrite && Iteration.Iterations.Count > 1) {
+                    throw new NotSupportedException("Can't write to a database with multiple iterations");
+                }
+            }
+            else {
+                Iteration = new Iteration();
+                Iteration.CurrentIteration = 1;
+                Iteration.Iterations.Add(1, -1);
+            }
         }
 
         /// <summary>
@@ -90,10 +109,13 @@ namespace ACClientLib.DatReaderWriter {
         /// <summary>
         /// Try and write a <see cref="IDBObj"/> to the dat.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
         /// <param name="value">The value to write</param>
-        /// <returns>True if successful, false otherwise</returns>
-        public bool TryWriteFile<T>(T value) where T : IDBObj {
+        /// <param name="iteration">The iteration to use. If none is passed, it will use the current files iteration if available, otherwise it will use the current dat iteration.</param>
+        public Result<T, string> TryWriteFile<T>(T value, int? iteration = null) where T : IDBObj {
+            if (!BlockAllocator.CanWrite) {
+                return "Block allocator was opened as read only.";
+            }
+
             int startingBlockId = 0;
             if (Tree.TryGetFile(value.Id, out var existingFile)) {
                 startingBlockId = existingFile.Offset;
@@ -104,18 +126,31 @@ namespace ACClientLib.DatReaderWriter {
             var writer = new DatFileWriter(buffer);
 
             value.Pack(writer);
+            Console.WriteLine($"Wrote {writer.Offset} bytes to {value.Id:X8} @ ({startingBlockId:X8})");
+            startingBlockId = Tree.BlockAllocator.WriteBlock(buffer, writer.Offset, startingBlockId);
 
-            startingBlockId = Tree.BlockAllocator.WriteBlock(buffer, writer.Offset);
-            Tree.Insert(new DatBTreeFile() {
-                Flags = 0,
+            var newIteration = iteration.HasValue ? iteration.Value : (existingFile?.Iteration ?? 0);
+            var oldEntry = Tree.Insert(new DatBTreeFile() {
+                Flags = existingFile?.Flags ?? 0u,
                 Id = value.Id,
-                Size = (uint)buffer.Length,
-                Offset = startingBlockId
+                Size = (uint)writer.Offset,
+                Offset = startingBlockId,
+                Date = DateTime.UtcNow,
+                Iteration = newIteration
             });
+
+            // update dat iteration if needed
+            if (newIteration > Iteration.CurrentIteration) {
+                Iteration.CurrentIteration = newIteration;
+                var iterationUpdateRes = TryWriteFile(Iteration);
+                if (!iterationUpdateRes) {
+                    return iterationUpdateRes.Error ?? "Failed to update dat iteration.";
+                }
+            }
 
             BaseBlockAllocator.SharedBytes.Return(buffer);
 
-            return true;
+            return value;
         }
 
         /// <inheritdoc/>
@@ -129,6 +164,10 @@ namespace ACClientLib.DatReaderWriter {
             if (disposing) {
                 Tree?.Dispose();
             }
+        }
+
+        public void TryWriteDXT1(RenderSurface renderSurface) {
+            throw new NotImplementedException();
         }
     }
 }

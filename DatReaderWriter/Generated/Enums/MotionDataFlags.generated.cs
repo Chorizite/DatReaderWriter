@@ -10,14 +10,12 @@
 
 using System;
 namespace ACClientLib.DatReaderWriter.Enums {
-    public enum DatFileType : int {
-        All = 0,
+    public enum MotionDataFlags : byte {
+        None = 0x00,
 
-        Portal = 1,
+        HasVelocity = 0x01,
 
-        Cell = 2,
-
-        Local = 3,
+        HasOmega = 0x02,
 
     };
 }

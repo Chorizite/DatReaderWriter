@@ -53,8 +53,8 @@ namespace DatReaderWriter.Tests.DBObjs {
             var res = dat.TryWriteFile(envCell1);
             Assert.IsTrue(res);
 
-            res = dat.TryReadFile<EnvCell>(0x00010100, out var readEnvCell1);
-            Assert.IsTrue(res);
+            var res2 = dat.TryReadFile<EnvCell>(0x00010100, out var readEnvCell1);
+            Assert.IsTrue(res2);
             Assert.IsNotNull(readEnvCell1);
 
             Assert.AreEqual(0x00010100u, readEnvCell1.Id);

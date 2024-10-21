@@ -467,6 +467,422 @@
       <value name="Stippled" value="0x40000000" />
       <value name="Perspective" value="0x80000000" />
     </enum>
+    <enum name="MotionDataFlags" parent="byte">
+      <value name="None" value="0x00" />
+      <value name="HasVelocity" value="0x01" />
+      <value name="HasOmega" value="0x02" />
+    </enum>
+    <enum name="MotionCommand" parent="uint">
+      <value name="Invalid" value="0x00000000" />
+      <value name="Cancel" value="0x080000A2" />
+      <value name="CreateShortcutToSelected" value="0x080000A9" />
+      <value name="EnterChat" value="0x080000B5" />
+      <value name="ToggleChat" value="0x080000B6" />
+      <value name="SavePosition" value="0x080000B7" />
+      <value name="UseSelected" value="0x090000A3" />
+      <value name="AutosortSelected" value="0x090000A4" />
+      <value name="DropSelected" value="0x090000A5" />
+      <value name="GiveSelected" value="0x090000A6" />
+      <value name="SplitSelected" value="0x090000A7" />
+      <value name="ExamineSelected" value="0x090000A8" />
+      <value name="PreviousCompassItem" value="0x090000AA" />
+      <value name="NextCompassItem" value="0x090000AB" />
+      <value name="ClosestCompassItem" value="0x090000AC" />
+      <value name="PreviousSelection" value="0x090000AD" />
+      <value name="LastAttacker" value="0x090000AE" />
+      <value name="PreviousFellow" value="0x090000AF" />
+      <value name="NextFellow" value="0x090000B0" />
+      <value name="ToggleCombat" value="0x090000B1" />
+      <value name="OptionsPanel" value="0x090000B8" />
+      <value name="ResetView" value="0x090000B9" />
+      <value name="FloorView" value="0x090000C0" />
+      <value name="PreviousItem" value="0x090000C2" />
+      <value name="NextItem" value="0x090000C3" />
+      <value name="ClosestItem" value="0x090000C4" />
+      <value name="MapView" value="0x090000C6" />
+      <value name="AutoRun" value="0x090000C7" />
+      <value name="DecreasePowerSetting" value="0x090000C8" />
+      <value name="IncreasePowerSetting" value="0x090000C9" />
+      <value name="FirstPersonView" value="0x090000D5" />
+      <value name="AllegiancePanel" value="0x090000D6" />
+      <value name="FellowshipPanel" value="0x090000D7" />
+      <value name="SpellbookPanel" value="0x090000D8" />
+      <value name="SpellComponentsPanel" value="0x090000D9" />
+      <value name="HousePanel" value="0x090000DA" />
+      <value name="AttributesPanel" value="0x090000DB" />
+      <value name="SkillsPanel" value="0x090000DC" />
+      <value name="MapPanel" value="0x090000DD" />
+      <value name="InventoryPanel" value="0x090000DE" />
+      <value name="CaptureScreenshotToFile" value="0x090000E7" />
+      <value name="AutoCreateShortcuts" value="0x090000FE" />
+      <value name="AutoRepeatAttacks" value="0x090000FF" />
+      <value name="AutoTarget" value="0x09000100" />
+      <value name="AdvancedCombatInterface" value="0x09000101" />
+      <value name="IgnoreAllegianceRequests" value="0x09000102" />
+      <value name="IgnoreFellowshipRequests" value="0x09000103" />
+      <value name="InvertMouseLook" value="0x09000104" />
+      <value name="LetPlayersGiveYouItems" value="0x09000105" />
+      <value name="AutoTrackCombatTargets" value="0x09000106" />
+      <value name="DisplayTooltips" value="0x09000107" />
+      <value name="AttemptToDeceivePlayers" value="0x09000108" />
+      <value name="RunAsDefaultMovement" value="0x09000109" />
+      <value name="StayInChatModeAfterSend" value="0x0900010A" />
+      <value name="RightClickToMouseLook" value="0x0900010B" />
+      <value name="VividTargetIndicator" value="0x0900010C" />
+      <value name="SelectSelf" value="0x0900010D" />
+      <value name="PreviousMonster" value="0x09000110" />
+      <value name="ClosestMonster" value="0x09000111" />
+      <value name="NextPlayer" value="0x09000112" />
+      <value name="PreviousPlayer" value="0x09000113" />
+      <value name="ClosestPlayer" value="0x09000114" />
+      <value name="TradePanel" value="0x0900011D" />
+      <value name="CharacterOptionsPanel" value="0x09000154" />
+      <value name="SoundAndGraphicsPanel" value="0x09000155" />
+      <value name="HelpfulSpellsPanel" value="0x09000156" />
+      <value name="HarmfulSpellsPanel" value="0x09000157" />
+      <value name="CharacterInformationPanel" value="0x09000158" />
+      <value name="LinkStatusPanel" value="0x09000159" />
+      <value name="VitaePanel" value="0x0900015A" />
+      <value name="ShareFellowshipXP" value="0x0900015B" />
+      <value name="ShareFellowshipLoot" value="0x0900015C" />
+      <value name="AcceptCorpseLooting" value="0x0900015D" />
+      <value name="IgnoreTradeRequests" value="0x0900015E" />
+      <value name="DisableWeather" value="0x0900015F" />
+      <value name="DisableHouseEffect" value="0x09000160" />
+      <value name="SideBySideVitals" value="0x09000161" />
+      <value name="ShowRadarCoordinates" value="0x09000162" />
+      <value name="ShowSpellDurations" value="0x09000163" />
+      <value name="MuteOnLosingFocus" value="0x09000164" />
+      <value name="AllegianceChat" value="0x09000168" />
+      <value name="AutomaticallyAcceptFellowshipRequests" value="0x09000169" />
+      <value name="Reply" value="0x0900016A" />
+      <value name="MonarchReply" value="0x0900016B" />
+      <value name="PatronReply" value="0x0900016C" />
+      <value name="ToggleCraftingChanceOfSuccessDialog" value="0x0900016D" />
+      <value name="UseClosestUnopenedCorpse" value="0x0900016E" />
+      <value name="UseNextUnopenedCorpse" value="0x0900016F" />
+      <value name="IssueSlashCommand" value="0x09000170" />
+      <value name="MouseLook" value="0x0C0000C1" />
+      <value name="HighAttack" value="0x0D0000B2" />
+      <value name="MediumAttack" value="0x0D0000B3" />
+      <value name="LowAttack" value="0x0D0000B4" />
+      <value name="CameraLeftRotate" value="0x0D0000BA" />
+      <value name="CameraRightRotate" value="0x0D0000BB" />
+      <value name="CameraRaise" value="0x0D0000BC" />
+      <value name="CameraLower" value="0x0D0000BD" />
+      <value name="CameraCloser" value="0x0D0000BE" />
+      <value name="CameraFarther" value="0x0D0000BF" />
+      <value name="ShiftView" value="0x0D0000C5" />
+      <value name="Hop" value="0x1000004A" />
+      <value name="Jumpup" value="0x1000004B" />
+      <value name="ChestBeat" value="0x1000004D" />
+      <value name="TippedLeft" value="0x1000004E" />
+      <value name="TippedRight" value="0x1000004F" />
+      <value name="FallDown" value="0x10000050" />
+      <value name="Twitch1" value="0x10000051" />
+      <value name="Twitch2" value="0x10000052" />
+      <value name="Twitch3" value="0x10000053" />
+      <value name="Twitch4" value="0x10000054" />
+      <value name="StaggerBackward" value="0x10000055" />
+      <value name="StaggerForward" value="0x10000056" />
+      <value name="Sanctuary" value="0x10000057" />
+      <value name="ThrustMed" value="0x10000058" />
+      <value name="ThrustLow" value="0x10000059" />
+      <value name="ThrustHigh" value="0x1000005A" />
+      <value name="SlashHigh" value="0x1000005B" />
+      <value name="SlashMed" value="0x1000005C" />
+      <value name="SlashLow" value="0x1000005D" />
+      <value name="BackhandHigh" value="0x1000005E" />
+      <value name="BackhandMed" value="0x1000005F" />
+      <value name="BackhandLow" value="0x10000060" />
+      <value name="Shoot" value="0x10000061" />
+      <value name="AttackHigh1" value="0x10000062" />
+      <value name="AttackMed1" value="0x10000063" />
+      <value name="AttackLow1" value="0x10000064" />
+      <value name="AttackHigh2" value="0x10000065" />
+      <value name="AttackMed2" value="0x10000066" />
+      <value name="AttackLow2" value="0x10000067" />
+      <value name="AttackHigh3" value="0x10000068" />
+      <value name="AttackMed3" value="0x10000069" />
+      <value name="AttackLow3" value="0x1000006A" />
+      <value name="HeadThrow" value="0x1000006B" />
+      <value name="FistSlam" value="0x1000006C" />
+      <value name="BreatheFlame" value="0x1000006D" />
+      <value name="SpinAttack" value="0x1000006E" />
+      <value name="MagicPowerUp01" value="0x1000006F" />
+      <value name="MagicPowerUp02" value="0x10000070" />
+      <value name="MagicPowerUp03" value="0x10000071" />
+      <value name="MagicPowerUp04" value="0x10000072" />
+      <value name="MagicPowerUp05" value="0x10000073" />
+      <value name="MagicPowerUp06" value="0x10000074" />
+      <value name="MagicPowerUp07" value="0x10000075" />
+      <value name="MagicPowerUp08" value="0x10000076" />
+      <value name="MagicPowerUp09" value="0x10000077" />
+      <value name="MagicPowerUp10" value="0x10000078" />
+      <value name="EnterGame" value="0x1000009C" />
+      <value name="ExitGame" value="0x1000009D" />
+      <value name="OnCreation" value="0x1000009E" />
+      <value name="OnDestruction" value="0x1000009F" />
+      <value name="EnterPortal" value="0x100000A0" />
+      <value name="ExitPortal" value="0x100000A1" />
+      <value name="SpecialAttack1" value="0x100000CD" />
+      <value name="SpecialAttack2" value="0x100000CE" />
+      <value name="SpecialAttack3" value="0x100000CF" />
+      <value name="MissileAttack1" value="0x100000D0" />
+      <value name="MissileAttack2" value="0x100000D1" />
+      <value name="MissileAttack3" value="0x100000D2" />
+      <value name="Blink" value="0x100000E2" />
+      <value name="Bite" value="0x100000E3" />
+      <value name="SkillHealSelf" value="0x1000010E" />
+      <value name="SkillHealOther" value="0x1000010F" />
+      <value name="LogOut" value="0x1000011E" />
+      <value name="DoubleSlashLow" value="0x1000011F" />
+      <value name="DoubleSlashMed" value="0x10000120" />
+      <value name="DoubleSlashHigh" value="0x10000121" />
+      <value name="TripleSlashLow" value="0x10000122" />
+      <value name="TripleSlashMed" value="0x10000123" />
+      <value name="TripleSlashHigh" value="0x10000124" />
+      <value name="DoubleThrustLow" value="0x10000125" />
+      <value name="DoubleThrustMed" value="0x10000126" />
+      <value name="DoubleThrustHigh" value="0x10000127" />
+      <value name="TripleThrustLow" value="0x10000128" />
+      <value name="TripleThrustMed" value="0x10000129" />
+      <value name="TripleThrustHigh" value="0x1000012A" />
+      <value name="MagicPowerUp01Purple" value="0x1000012B" />
+      <value name="MagicPowerUp02Purple" value="0x1000012C" />
+      <value name="MagicPowerUp03Purple" value="0x1000012D" />
+      <value name="MagicPowerUp04Purple" value="0x1000012E" />
+      <value name="MagicPowerUp05Purple" value="0x1000012F" />
+      <value name="MagicPowerUp06Purple" value="0x10000130" />
+      <value name="MagicPowerUp07Purple" value="0x10000131" />
+      <value name="MagicPowerUp08Purple" value="0x10000132" />
+      <value name="MagicPowerUp09Purple" value="0x10000133" />
+      <value name="MagicPowerUp10Purple" value="0x10000134" />
+      <value name="HouseRecall" value="0x1000013A" />
+      <value name="LifestoneRecall" value="0x10000153" />
+      <value name="Fishing" value="0x10000165" />
+      <value name="MarketplaceRecall" value="0x10000166" />
+      <value name="EnterPKLite" value="0x10000167" />
+      <value name="AllegianceHometownRecall" value="0x10000171" />
+      <value name="PKArenaRecall" value="0x10000172" />
+      <value name="OffhandSlashHigh" value="0x10000173" />
+      <value name="OffhandSlashMed" value="0x10000174" />
+      <value name="OffhandSlashLow" value="0x10000175" />
+      <value name="OffhandThrustHigh" value="0x10000176" />
+      <value name="OffhandThrustMed" value="0x10000177" />
+      <value name="OffhandThrustLow" value="0x10000178" />
+      <value name="OffhandDoubleSlashLow" value="0x10000179" />
+      <value name="OffhandDoubleSlashMed" value="0x1000017A" />
+      <value name="OffhandDoubleSlashHigh" value="0x1000017B" />
+      <value name="OffhandTripleSlashLow" value="0x1000017C" />
+      <value name="OffhandTripleSlashMed" value="0x1000017D" />
+      <value name="OffhandTripleSlashHigh" value="0x1000017E" />
+      <value name="OffhandDoubleThrustLow" value="0x1000017F" />
+      <value name="OffhandDoubleThrustMed" value="0x10000180" />
+      <value name="OffhandDoubleThrustHigh" value="0x10000181" />
+      <value name="OffhandTripleThrustLow" value="0x10000182" />
+      <value name="OffhandTripleThrustMed" value="0x10000183" />
+      <value name="OffhandTripleThrustHigh" value="0x10000184" />
+      <value name="OffhandKick" value="0x10000185" />
+      <value name="AttackHigh4" value="0x10000186" />
+      <value name="AttackMed4" value="0x10000187" />
+      <value name="AttackLow4" value="0x10000188" />
+      <value name="AttackHigh5" value="0x10000189" />
+      <value name="AttackMed5" value="0x1000018A" />
+      <value name="AttackLow5" value="0x1000018B" />
+      <value name="AttackHigh6" value="0x1000018C" />
+      <value name="AttackMed6" value="0x1000018D" />
+      <value name="AttackLow6" value="0x1000018E" />
+      <value name="PunchFastHigh" value="0x1000018F" />
+      <value name="PunchFastMed" value="0x10000190" />
+      <value name="PunchFastLow" value="0x10000191" />
+      <value name="PunchSlowHigh" value="0x10000192" />
+      <value name="PunchSlowMed" value="0x10000193" />
+      <value name="PunchSlowLow" value="0x10000194" />
+      <value name="OffhandPunchFastHigh" value="0x10000195" />
+      <value name="OffhandPunchFastMed" value="0x10000196" />
+      <value name="OffhandPunchFastLow" value="0x10000197" />
+      <value name="OffhandPunchSlowHigh" value="0x10000198" />
+      <value name="OffhandPunchSlowMed" value="0x10000199" />
+      <value name="OffhandPunchSlowLow" value="0x1000019A" />
+      <value name="WoahDuplicate2" value="0x1000019B" />
+      <value name="YMCA" value="0x1200009B" />
+      <value name="Flatulence" value="0x120000D4" />
+      <value name="Demonet" value="0x120000DF" />
+      <value name="Cheer" value="0x1300004C" />
+      <value name="ShakeFist" value="0x13000079" />
+      <value name="Beckon" value="0x1300007A" />
+      <value name="BeSeeingYou" value="0x1300007B" />
+      <value name="BlowKiss" value="0x1300007C" />
+      <value name="BowDeep" value="0x1300007D" />
+      <value name="ClapHands" value="0x1300007E" />
+      <value name="Cry" value="0x1300007F" />
+      <value name="Laugh" value="0x13000080" />
+      <value name="MimeEat" value="0x13000081" />
+      <value name="MimeDrink" value="0x13000082" />
+      <value name="Nod" value="0x13000083" />
+      <value name="Point" value="0x13000084" />
+      <value name="ShakeHead" value="0x13000085" />
+      <value name="Shrug" value="0x13000086" />
+      <value name="Wave" value="0x13000087" />
+      <value name="Akimbo" value="0x13000088" />
+      <value name="HeartyLaugh" value="0x13000089" />
+      <value name="Salute" value="0x1300008A" />
+      <value name="ScratchHead" value="0x1300008B" />
+      <value name="SmackHead" value="0x1300008C" />
+      <value name="TapFoot" value="0x1300008D" />
+      <value name="WaveHigh" value="0x1300008E" />
+      <value name="WaveLow" value="0x1300008F" />
+      <value name="YawnStretch" value="0x13000090" />
+      <value name="Cringe" value="0x13000091" />
+      <value name="Kneel" value="0x13000092" />
+      <value name="Plead" value="0x13000093" />
+      <value name="Shiver" value="0x13000094" />
+      <value name="Shoo" value="0x13000095" />
+      <value name="Slouch" value="0x13000096" />
+      <value name="Spit" value="0x13000097" />
+      <value name="Surrender" value="0x13000098" />
+      <value name="Woah" value="0x13000099" />
+      <value name="Winded" value="0x1300009A" />
+      <value name="Pray" value="0x130000CA" />
+      <value name="Mock" value="0x130000CB" />
+      <value name="Teapot" value="0x130000CC" />
+      <value name="WarmHands" value="0x13000119" />
+      <value name="Helper" value="0x13000135" />
+      <value name="NudgeLeft" value="0x1300014A" />
+      <value name="NudgeRight" value="0x1300014B" />
+      <value name="PointLeft" value="0x1300014C" />
+      <value name="PointRight" value="0x1300014D" />
+      <value name="PointDown" value="0x1300014E" />
+      <value name="Knock" value="0x1300014F" />
+      <value name="ScanHorizon" value="0x13000150" />
+      <value name="DrudgeDance" value="0x13000151" />
+      <value name="HaveASeat" value="0x13000152" />
+      <value name="StopTurning" value="0x2000003A" />
+      <value name="Jump" value="0x2500003B" />
+      <value name="Stop" value="0x40000004" />
+      <value name="Fallen" value="0x40000008" />
+      <value name="Interpolating" value="0x40000009" />
+      <value name="Hover" value="0x4000000A" />
+      <value name="On" value="0x4000000B" />
+      <value name="Off" value="0x4000000C" />
+      <value name="Dead" value="0x40000011" />
+      <value name="Falling" value="0x40000015" />
+      <value name="Reload" value="0x40000016" />
+      <value name="Unload" value="0x40000017" />
+      <value name="Pickup" value="0x40000018" />
+      <value name="StoreInBackpack" value="0x40000019" />
+      <value name="Eat" value="0x4000001A" />
+      <value name="Drink" value="0x4000001B" />
+      <value name="Reading" value="0x4000001C" />
+      <value name="JumpCharging" value="0x4000001D" />
+      <value name="AimLevel" value="0x4000001E" />
+      <value name="AimHigh15" value="0x4000001F" />
+      <value name="AimHigh30" value="0x40000020" />
+      <value name="AimHigh45" value="0x40000021" />
+      <value name="AimHigh60" value="0x40000022" />
+      <value name="AimHigh75" value="0x40000023" />
+      <value name="AimHigh90" value="0x40000024" />
+      <value name="AimLow15" value="0x40000025" />
+      <value name="AimLow30" value="0x40000026" />
+      <value name="AimLow45" value="0x40000027" />
+      <value name="AimLow60" value="0x40000028" />
+      <value name="AimLow75" value="0x40000029" />
+      <value name="AimLow90" value="0x4000002A" />
+      <value name="MagicBlast" value="0x4000002B" />
+      <value name="MagicSelfHead" value="0x4000002C" />
+      <value name="MagicSelfHeart" value="0x4000002D" />
+      <value name="MagicBonus" value="0x4000002E" />
+      <value name="MagicClap" value="0x4000002F" />
+      <value name="MagicHarm" value="0x40000030" />
+      <value name="MagicHeal" value="0x40000031" />
+      <value name="MagicThrowMissile" value="0x40000032" />
+      <value name="MagicRecoilMissile" value="0x40000033" />
+      <value name="MagicPenalty" value="0x40000034" />
+      <value name="MagicTransfer" value="0x40000035" />
+      <value name="MagicVision" value="0x40000036" />
+      <value name="MagicEnchantItem" value="0x40000037" />
+      <value name="MagicPortal" value="0x40000038" />
+      <value name="MagicPray" value="0x40000039" />
+      <value name="CastSpell" value="0x400000D3" />
+      <value name="UseMagicStaff" value="0x400000E0" />
+      <value name="UseMagicWand" value="0x400000E1" />
+      <value name="TwitchSubstate1" value="0x400000E4" />
+      <value name="TwitchSubstate2" value="0x400000E5" />
+      <value name="TwitchSubstate3" value="0x400000E6" />
+      <value name="Pickup5" value="0x40000136" />
+      <value name="Pickup10" value="0x40000137" />
+      <value name="Pickup15" value="0x40000138" />
+      <value name="Pickup20" value="0x40000139" />
+      <value name="Ready" value="0x41000003" />
+      <value name="Crouch" value="0x41000012" />
+      <value name="Sitting" value="0x41000013" />
+      <value name="Sleeping" value="0x41000014" />
+      <value name="ATOYOT" value="0x420000F9" />
+      <value name="ShakeFistState" value="0x430000EA" />
+      <value name="PrayState" value="0x430000EB" />
+      <value name="BowDeepState" value="0x430000EC" />
+      <value name="ClapHandsState" value="0x430000ED" />
+      <value name="CrossArmsState" value="0x430000EE" />
+      <value name="ShiverState" value="0x430000EF" />
+      <value name="PointState" value="0x430000F0" />
+      <value name="WaveState" value="0x430000F1" />
+      <value name="AkimboState" value="0x430000F2" />
+      <value name="SaluteState" value="0x430000F3" />
+      <value name="ScratchHeadState" value="0x430000F4" />
+      <value name="TapFootState" value="0x430000F5" />
+      <value name="LeanState" value="0x430000F6" />
+      <value name="KneelState" value="0x430000F7" />
+      <value name="PleadState" value="0x430000F8" />
+      <value name="SlouchState" value="0x430000FA" />
+      <value name="SurrenderState" value="0x430000FB" />
+      <value name="WoahState" value="0x430000FC" />
+      <value name="WindedState" value="0x430000FD" />
+      <value name="SnowAngelState" value="0x43000118" />
+      <value name="CurtseyState" value="0x4300011A" />
+      <value name="AFKState" value="0x4300011B" />
+      <value name="MeditateState" value="0x4300011C" />
+      <value name="SitState" value="0x4300013D" />
+      <value name="SitCrossleggedState" value="0x4300013E" />
+      <value name="SitBackState" value="0x4300013F" />
+      <value name="PointLeftState" value="0x43000140" />
+      <value name="PointRightState" value="0x43000141" />
+      <value name="TalktotheHandState" value="0x43000142" />
+      <value name="PointDownState" value="0x43000143" />
+      <value name="DrudgeDanceState" value="0x43000144" />
+      <value name="PossumState" value="0x43000145" />
+      <value name="ReadState" value="0x43000146" />
+      <value name="ThinkerState" value="0x43000147" />
+      <value name="HaveASeatState" value="0x43000148" />
+      <value name="AtEaseState" value="0x43000149" />
+      <value name="RunForward" value="0x44000007" />
+      <value name="WalkForward" value="0x45000005" />
+      <value name="WalkBackwards" value="0x45000006" />
+      <value name="TurnRight" value="0x6500000D" />
+      <value name="TurnLeft" value="0x6500000E" />
+      <value name="SideStepRight" value="0x6500000F" />
+      <value name="SideStepLeft" value="0x65000010" />
+      <value name="HandCombat" value="0x8000003C" />
+      <value name="NonCombat" value="0x8000003D" />
+      <value name="SwordCombat" value="0x8000003E" />
+      <value name="BowCombat" value="0x8000003F" />
+      <value name="SwordShieldCombat" value="0x80000040" />
+      <value name="CrossbowCombat" value="0x80000041" />
+      <value name="UnusedCombat" value="0x80000042" />
+      <value name="SlingCombat" value="0x80000043" />
+      <value name="TwoHandedSwordCombat" value="0x80000044" />
+      <value name="TwoHandedStaffCombat" value="0x80000045" />
+      <value name="DualWieldCombat" value="0x80000046" />
+      <value name="ThrownWeaponCombat" value="0x80000047" />
+      <value name="Graze" value="0x80000048" />
+      <value name="Magic" value="0x80000049" />
+      <value name="BowNoAmmo" value="0x800000E8" />
+      <value name="CrossBowNoAmmo" value="0x800000E9" />
+      <value name="AtlatlCombat" value="0x8000013B" />
+      <value name="ThrownShieldCombat" value="0x8000013C" />
+      <value name="HoldRun" value="0x85000001" />
+      <value name="HoldSidestep" value="0x85000002" />
+    </enum>
   </enums>
   <types>
     <type name="DBObj" abstract="true">
@@ -721,6 +1137,31 @@
       <field name="Radius" type="float" />
       <field name="Height" type="float" />
     </type>
+    <type name="AnimData">
+      <field name="AnimId" type="uint" />
+      <field name="LowFrame" type="int" />
+      <field name="HighFrame" type="int" />
+      <field name="Framerate" type="float" />
+    </type>
+    <type name="MotionData">
+      <field name="_numAnims" type="byte" />
+      <field name="Bitfield" type="byte" />
+      <field name="Flags" type="MotionDataFlags" />
+      <align type="uint" />
+      <vector name="Anims" length="_numAnims" type="List" genericValue="AnimData" />
+      <maskmap name="Flags">
+        <mask value="MotionDataFlags.HasVelocity">
+          <field name="Velocity" type="Vector3" />
+        </mask>
+        <mask value="MotionDataFlags.HasOmega">
+          <field name="Omega" type="Vector3" />
+        </mask>
+      </maskmap>
+    </type>
+    <type name="MotionCommandData">
+      <field name="_numCommands" type="uint" />
+      <vector name="MotionData" length="_numCommands" type="Dictionary" genericKey="int" genericValue="MotionData" />
+    </type>
   </types>
   <dats>
     <dat name="portal" text="client_portal.dat" type="DatFileType.Portal">
@@ -830,6 +1271,15 @@
         <field type="float" name="Diffuse" />
       </type>
       <type name="MotionTable" text="DB_TYPE_MTABLE in the client." parent="DBObj" first="0x9000000" last="0x900FFFF" flags="DBObjHeaderFlags.HasId">
+        <field name="DefaultStyle" type="MotionCommand" />
+        <field name="_numStyleDefaults" type="uint" />
+        <vector name="StyleDefaults" length="_numStyleDefaults" type="Dictionary" genericKey="MotionCommand" genericValue="MotionCommand" />
+        <field name="_numCycles" type="uint" />
+        <vector name="Cycles" length="_numCycles" type="Dictionary" genericKey="int" genericValue="MotionData" />
+        <field name="_numModifiers" type="uint" />
+        <vector name="Modifiers" length="_numModifiers" type="Dictionary" genericKey="int" genericValue="MotionData" />
+        <field name="_numLinks" type="uint" />
+        <vector name="Links" length="_numLinks" type="Dictionary" genericKey="int" genericValue="MotionCommandData" />
       </type>
       <type name="Wave" text="DB_TYPE_WAVE in the client." parent="DBObj" first="0xA000000" last="0xA00FFFF" flags="DBObjHeaderFlags.HasId">
       </type>
@@ -941,7 +1391,7 @@
         <field type="uint" name="_numObjects" />
         <vector name="Objects" length="_numObjects" type="List" genericValue="Stab" text="Static objects" />
         <field type="ushort" name="_numBuildings" />
-        <field type="bool" name="_hasRestrictionsTable" size="2" value="RestrictionTable != null" />
+        <field type="bool" name="_hasRestrictionsTable" size="2" value="RestrictionTable != null &amp;&amp; RestrictionTable.Count() > 0" />
         <vector name="Buildings" length="_numBuildings" type="List" genericValue="BuildingInfo" />
         <if condition="_hasRestrictionsTable" writeCondition="RestrictionTable != null &amp;&amp; RestrictionTable.Count() > 0">
           <field type="ushort" name="_numRestrictionTableEntries" />

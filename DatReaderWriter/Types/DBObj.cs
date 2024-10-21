@@ -15,12 +15,12 @@ namespace ACClientLib.DatReaderWriter.Types {
         /// <remarks>
         /// Only valid if <see cref="HeaderFlags"/> has <see cref="DBObjHeaderFlags.HasId"/>.
         /// </remarks>
-        public uint Id { get; set; }
+        public virtual uint Id { get; set; }
 
         /// <remarks>
         /// Only valid if <see cref="HeaderFlags"/> has <see cref="DBObjHeaderFlags.HasDataCategory"/>.
         /// </remarks>
-        public uint DataCategory { get; set; }
+        public virtual uint DataCategory { get; set; }
 
         /// <inheritdoc />
         public virtual bool Unpack(DatFileReader reader) {

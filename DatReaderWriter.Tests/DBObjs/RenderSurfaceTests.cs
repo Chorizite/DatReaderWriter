@@ -40,8 +40,8 @@ namespace DatReaderWriter.Tests.DBObjs {
             res = dat.TryWriteFile(texture2);
             Assert.IsTrue(res);
 
-            res = dat.TryReadFile<RenderSurface>(0x06000001, out var readTexture1);
-            Assert.IsTrue(res);
+            var res2 = dat.TryReadFile<RenderSurface>(0x06000001, out var readTexture1);
+            Assert.IsTrue(res2);
             Assert.IsNotNull(readTexture1);
 
             Assert.AreEqual(0x06000001u, readTexture1.Id);
@@ -51,8 +51,8 @@ namespace DatReaderWriter.Tests.DBObjs {
             Assert.AreEqual(1000, readTexture1.SourceData.Length);
             Assert.AreEqual(0u, readTexture1.DefaultPaletteId); // should be empty even though it's set above
 
-            res = dat.TryReadFile<RenderSurface>(0x06000002, out var readTexture2);
-            Assert.IsTrue(res);
+            res2 = dat.TryReadFile<RenderSurface>(0x06000002, out var readTexture2);
+            Assert.IsTrue(res2);
             Assert.IsNotNull(readTexture2);
 
             Assert.AreEqual(0x06000002u, readTexture2.Id);

@@ -40,8 +40,8 @@ namespace DatReaderWriter.Tests.DBObjs {
             var res = dat.TryWriteFile(writeAnim);
             Assert.IsTrue(res);
 
-            res = dat.TryReadFile<Animation>(0x03000001, out var readAnim);
-            Assert.IsTrue(res);
+            var res2 = dat.TryReadFile<Animation>(0x03000001, out var readAnim);
+            Assert.IsTrue(res2);
             Assert.IsNotNull(readAnim);
 
             Assert.AreEqual(0x03000001u, readAnim.Id);

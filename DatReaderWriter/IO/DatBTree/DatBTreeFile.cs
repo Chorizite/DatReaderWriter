@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DatReaderWriter.Extensions;
+using System;
 using System.Text;
 
 namespace ACClientLib.DatReaderWriter.IO.DatBTree {
@@ -35,9 +36,9 @@ namespace ACClientLib.DatReaderWriter.IO.DatBTree {
         public uint Size { get; set; }
 
         /// <summary>
-        /// The date this was last updated (maybe added?) in unix timestamp format
+        /// The date this was last updated (maybe added?)
         /// </summary>
-        public int Date { get; set; }
+        public DateTime Date { get; set; }
 
         /// <summary>
         /// The iteration of this file entry
@@ -58,7 +59,7 @@ namespace ACClientLib.DatReaderWriter.IO.DatBTree {
             Id = reader.ReadUInt32();
             Offset = reader.ReadInt32();
             Size = reader.ReadUInt32();
-            Date = reader.ReadInt32();
+            Date = DateTimeOffset.FromUnixTimeSeconds(reader.ReadUInt32()).UtcDateTime;
             Iteration = reader.ReadInt32();
 
             return true;
@@ -70,7 +71,7 @@ namespace ACClientLib.DatReaderWriter.IO.DatBTree {
             writer.WriteUInt32(Id);
             writer.WriteInt32(Offset);
             writer.WriteUInt32(Size);
-            writer.WriteInt32(Date);
+            writer.WriteUInt32(Date.ToUnixTimestamp());
             writer.WriteInt32(Iteration);
 
             return true;
@@ -79,16 +80,12 @@ namespace ACClientLib.DatReaderWriter.IO.DatBTree {
         /// <inheritdoc/>
         public override string ToString() {
             var str = new StringBuilder();
-            
-            DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-            dateTime = dateTime.AddSeconds(Date).ToLocalTime();
-
             str.AppendLine($"DatFileEntry:");
             str.AppendLine($"\t Id: {Id:X8}");
             str.AppendLine($"\t Flags: {Flags:X8}");
             str.AppendLine($"\t Offset: {Offset:X8}");
             str.AppendLine($"\t Size: {Size:N0}");
-            str.AppendLine($"\t Date: {dateTime}");
+            str.AppendLine($"\t Date: {Date}");
             str.AppendLine($"\t Iteration: {Iteration}");
 
             return str.ToString();

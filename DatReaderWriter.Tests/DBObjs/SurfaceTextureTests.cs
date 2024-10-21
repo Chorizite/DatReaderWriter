@@ -26,8 +26,8 @@ namespace DatReaderWriter.Tests.DBObjs {
             var res = dat.TryWriteFile(texture1);
             Assert.IsTrue(res);
 
-            res = dat.TryReadFile<SurfaceTexture>(0x05000001, out var readTexture1);
-            Assert.IsTrue(res);
+            var res2 = dat.TryReadFile<SurfaceTexture>(0x05000001, out var readTexture1);
+            Assert.IsTrue(res2);
             Assert.IsNotNull(readTexture1);
 
             Assert.AreEqual(0x05000001u, readTexture1.Id);

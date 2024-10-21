@@ -125,6 +125,7 @@ namespace ACClientLib.DatReaderWriter.IO {
         /// Initialize a new empty dat header.
         /// </summary>
         internal DatHeader() {
+            Magic = RETAIL_MAGIC;
             Transactions = new byte[64];
             WriteEmptyTransaction();
         }

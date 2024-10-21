@@ -48,8 +48,8 @@ namespace DatReaderWriter.Tests.DBObjs {
             res = dat.TryWriteFile(surface2);
             Assert.IsTrue(res);
 
-            res = dat.TryReadFile<Surface>(0x05000001, out var readSurface1);
-            Assert.IsTrue(res);
+            var res2 = dat.TryReadFile<Surface>(0x05000001, out var readSurface1);
+            Assert.IsTrue(res2);
             Assert.IsNotNull(readSurface1);
 
             Assert.AreEqual(0u, readSurface1.Id); // Ids of surfaces dont get written!
@@ -61,8 +61,8 @@ namespace DatReaderWriter.Tests.DBObjs {
             Assert.AreEqual(0.4f, readSurface1.Translucency);
             Assert.IsNull(readSurface1.ColorValue);
 
-            res = dat.TryReadFile<Surface>(0x05000002, out var readSurface2);
-            Assert.IsTrue(res);
+            res2 = dat.TryReadFile<Surface>(0x05000002, out var readSurface2);
+            Assert.IsTrue(res2);
             Assert.IsNotNull(readSurface2);
 
             Assert.AreEqual(0u, readSurface2.Id); // Ids of surfaces dont get written!

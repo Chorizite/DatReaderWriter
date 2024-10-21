@@ -440,7 +440,12 @@ namespace DatReaderWriter.SourceGen {
                     else {
                         WriteLine($"writer.{GetBinaryWriterForType(vector.GenericKey)}(kv.Key);");
                     }
-                    WriteLine($"writer.{GetBinaryWriterForType(vector.GenericValue)}(kv.Value);");
+                    if (XMLDefParser.ACEnums.ContainsKey(vector.GenericValue)) {
+                        WriteLine($"writer.{GetBinaryWriterForType(XMLDefParser.ACEnums[vector.GenericValue].ParentType)}(({XMLDefParser.ACEnums[vector.GenericValue].ParentType})kv.Value);");
+                    }
+                    else {
+                        WriteLine($"writer.{GetBinaryWriterForType(vector.GenericValue)}(kv.Value);");
+                    }
                     Outdent();
                     WriteLine("}");
                 }

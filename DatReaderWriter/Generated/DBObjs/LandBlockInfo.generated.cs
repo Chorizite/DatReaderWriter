@@ -75,7 +75,7 @@ namespace ACClientLib.DatReaderWriter.DBObjs {
                 writer.WriteItem<Stab>(item);
             }
             writer.WriteUInt16((ushort)Buildings.Count());
-            writer.WriteBool(RestrictionTable != null, 2);
+            writer.WriteBool(RestrictionTable != null && RestrictionTable.Count() > 0, 2);
             foreach (var item in Buildings) {
                 writer.WriteItem<BuildingInfo>(item);
             }
