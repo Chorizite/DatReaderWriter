@@ -17,7 +17,7 @@ namespace DatReaderWriter.Tests.DBObjs {
                 options.AccessType = DatAccessType.ReadWrite;
             });
 
-            dat.BlockAllocator.InitNew(DatDatabaseType.Cell, 0);
+            dat.BlockAllocator.InitNew(DatFileType.Cell, 0);
 
             var landblock1 = new LandBlockInfo() {
                 Id = 0x0001FFFE,

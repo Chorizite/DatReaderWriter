@@ -1,6 +1,8 @@
-﻿using System;
+﻿using ACClientLib.DatReaderWriter.Enums;
+using System;
 using System.Linq;
 using System.Text;
+using System.Transactions;
 
 namespace ACClientLib.DatReaderWriter.IO {
 
@@ -48,10 +50,10 @@ namespace ACClientLib.DatReaderWriter.IO {
         /// and you will need to check its <see cref="SubSet"/>. for portal the <see cref="SubSet"/>
         /// is 0
         /// </summary>
-        public DatDatabaseType Type;
+        public DatFileType Type;
 
         /// <summary>
-        /// Specific subset of the database <see cref="Type"/>. For <see cref="DatDatabaseType.Cell"/>
+        /// Specific subset of the database <see cref="Type"/>. For <see cref="DatFileType.Cell"/>
         /// databases this is the region id
         /// </summary>
         public uint SubSet;
@@ -141,7 +143,7 @@ namespace ACClientLib.DatReaderWriter.IO {
         /// <param name="gameVersion">game version</param>
         /// <param name="majorVersion">major version</param>
         /// <param name="minorVersion">minor version</param>
-        public DatHeader(DatDatabaseType type, uint subset, int blockSize = 1024, string? version = null, int engineVersion = 1, int gameVersion = 1, Guid majorVersion = new(), uint minorVersion = 1) {
+        public DatHeader(DatFileType type, uint subset, int blockSize = 1024, string? version = null, int engineVersion = 1, int gameVersion = 1, Guid majorVersion = new(), uint minorVersion = 1) {
             if (version?.Length > 255) {
                 throw new InvalidOperationException($"Version string can be at max 255 characters. It was ${version.Length}");
             }
@@ -158,6 +160,7 @@ namespace ACClientLib.DatReaderWriter.IO {
         }
 
         internal void WriteEmptyTransaction() {
+            Transactions = new byte[64];
             var writer = new DatFileWriter(Transactions);
             writer.WriteBytes([0x00, 0x50, 0x4C, 0x00], 4);
         }
@@ -173,7 +176,7 @@ namespace ACClientLib.DatReaderWriter.IO {
             Magic = reader.ReadInt32();
             BlockSize = reader.ReadInt32();
             FileSize = reader.ReadInt32();
-            Type = (DatDatabaseType)reader.ReadUInt32();
+            Type = (DatFileType)reader.ReadUInt32();
             SubSet = reader.ReadUInt32();
             FirstFreeBlock = reader.ReadInt32();
             LastFreeBlock = reader.ReadInt32();

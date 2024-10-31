@@ -22,10 +22,13 @@ namespace ACClientLib.DatReaderWriter.DBObjs {
     /// <summary>
     /// DB_TYPE_MTABLE in the client.
     /// </summary>
-    [DBObjType(DatFileType.Portal, DBObjHeaderFlags.HasId, 0x09000000, 0x0900FFFF)]
+    [DBObjType(typeof(MotionTable), DatFileType.Portal, DBObjType.MotionTable, DBObjHeaderFlags.HasId, 0x09000000, 0x0900FFFF, 0x00000000)]
     public class MotionTable : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;
+
+        /// <inheritdoc />
+        public override DBObjType DBObjType => DBObjType.MotionTable;
 
         public MotionCommand DefaultStyle;
 

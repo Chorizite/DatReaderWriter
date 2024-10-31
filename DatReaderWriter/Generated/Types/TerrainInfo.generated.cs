@@ -26,7 +26,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         /// <summary>
         /// Terrain type
         /// </summary>
-        public TerrainType Type;
+        public TerrainTextureType Type;
 
         /// <summary>
         /// Scenery type
@@ -37,7 +37,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         public bool Unpack(DatFileReader reader) {
             var _rawValue = reader.ReadUInt16();
             Road = (byte)(_rawValue & 0x3);
-            Type = (TerrainType)((_rawValue & 0x7C) >> 2);
+            Type = (TerrainTextureType)((_rawValue & 0x7C) >> 2);
             Scenery = (ushort)((_rawValue & 0xF800) >> 11);
             return true;
         }

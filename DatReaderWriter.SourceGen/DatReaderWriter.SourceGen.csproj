@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <LangVersion>12</LangVersion>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <OutputPath>bin\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="System.CodeDom" Version="8.0.0" />

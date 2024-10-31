@@ -11,7 +11,12 @@ namespace ACClientLib.DatReaderWriter.IO {
         DBObjHeaderFlags HeaderFlags { get; }
 
         /// <summary>
-        /// The id of this texture
+        /// The type of this DBObj
+        /// </summary>
+        DBObjType DBObjType { get; }
+
+        /// <summary>
+        /// The id of this DBObj
         /// </summary>
         public uint Id { get; set; }
 

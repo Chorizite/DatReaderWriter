@@ -42,7 +42,7 @@ namespace ACClientLib.DatReaderWriter.IO.DatBTree {
 
         /// <summary>
         /// The maximum amount of file entries that can be stored on a node.
-        /// This is <code>(<see cref="Degree"/> * 2) + 1</code>
+        /// This is <code>(<see cref="Degree"/> * 2) - 1</code>
         /// </summary>
         public int MaxItems => (Degree * 2) - 1;
 
@@ -81,7 +81,7 @@ namespace ACClientLib.DatReaderWriter.IO.DatBTree {
             var buffer = BaseBlockAllocator.SharedBytes.Rent(DatBTreeNode.SIZE);
             var writer = new DatFileWriter(buffer);
             node.Pack(writer);
-            BlockAllocator.WriteBlock(buffer, DatBTreeNode.SIZE, node.Offset);
+            node.Offset = BlockAllocator.WriteBlock(buffer, DatBTreeNode.SIZE, node.Offset);
             BaseBlockAllocator.SharedBytes.Return(buffer);
         }
 
@@ -147,16 +147,22 @@ namespace ACClientLib.DatReaderWriter.IO.DatBTree {
             var newNode = new DatBTreeNode(BlockAllocator.ReserveBlock());
             var childIdx = parent.Branches.FindIndex(f => f == child.Offset);
 
+            // Insert the middle entry from the full child into the parent
             parent.Files.Insert(childIdx, child.Files[Degree - 1]);
             parent.Branches.Insert(childIdx + 1, newNode.Offset);
 
-            newNode.Files.AddRange(child.Files.GetRange(Degree, Degree - 1));
+            // Transfer second half of files from child to new node
+            // Correcting ranges to ensure split aligns with degree and doesn't leave empty branches.
+            newNode.Files.AddRange(child.Files.Skip(Degree).Take(Degree - 1));
             child.Files.RemoveRange(Degree - 1, Degree);
 
+            // If not a leaf, also split the branches
             if (!child.IsLeaf) {
-                newNode.Branches.AddRange(child.Branches.GetRange(Degree, Degree));
-                child.Branches.RemoveRange(Degree, Degree);
+                newNode.Branches.AddRange(child.Branches.GetRange(Degree, child.Branches.Count - Degree));
+                child.Branches.RemoveRange(Degree, child.Branches.Count - Degree);
             }
+
+            // Write nodes back to ensure the changes are persisted in the tree structure
             WriteNode(newNode);
             WriteNode(child);
             WriteNode(parent);
@@ -279,26 +285,34 @@ namespace ACClientLib.DatReaderWriter.IO.DatBTree {
             int positionToInsert = node.Files.TakeWhile(entry => file.Id.CompareTo(entry.Id) >= 0).Count();
 
             if (node.IsLeaf) {
+                // Directly insert into the leaf node at the calculated position.
                 node.Files.Insert(positionToInsert, file);
                 WriteNode(node);
                 return;
             }
 
+            // Ensure the child at positionToInsert is loaded
             if (!TryGetNode(node.Branches[positionToInsert], out var child)) {
                 throw new Exception("Could not look up child node during insertion!");
             }
 
+            // Check if the child node is full
             if (child.Files.Count == MaxItems) {
+                // Split the child node
                 SplitChild(node, child);
+
+                // After splitting, if the file's ID is greater than the middle key
+                // (which was moved up to the parent), adjust positionToInsert to the right child.
                 if (file.Id.CompareTo(node.Files[positionToInsert].Id) > 0) {
                     positionToInsert++;
-
+                    // Reload child if it points to the newly created right child
                     if (!TryGetNode(node.Branches[positionToInsert], out child)) {
-                        throw new Exception("Could not look up child node during insertion!");
+                        throw new Exception("Could not look up child node after split!");
                     }
                 }
             }
 
+            // Recursively insert into the appropriate child
             InsertNonFull(child, file);
         }
 
@@ -309,7 +323,7 @@ namespace ACClientLib.DatReaderWriter.IO.DatBTree {
         /// <param name="fileEntry">The file entry that was deleted</param>
         /// <returns>True if file was deleted, false otherwise (not found)</returns>
 #if (NET8_0_OR_GREATER)
-            public bool TryDelete(uint fileId, [MaybeNullWhen(false)] out DatBTreeFile fileEntry) {
+        public bool TryDelete(uint fileId, [MaybeNullWhen(false)] out DatBTreeFile fileEntry) {
 #else
         public bool TryDelete(uint fileId, out DatBTreeFile fileEntry) {
 #endif

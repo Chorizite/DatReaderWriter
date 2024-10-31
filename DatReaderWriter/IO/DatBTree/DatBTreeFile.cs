@@ -16,7 +16,7 @@ namespace ACClientLib.DatReaderWriter.IO.DatBTree {
         /// <summary>
         /// Some kind of flags?
         /// </summary>
-        public uint Flags { get; set; }
+        public uint Flags { get; set; } = 0x20000;
 
         /// <summary>
         /// The id of the file this entry points to. These are dat file ids like
@@ -67,7 +67,7 @@ namespace ACClientLib.DatReaderWriter.IO.DatBTree {
 
         /// <inheritdoc/>
         public bool Pack(DatFileWriter writer) {
-            writer.WriteUInt32(Flags);
+            writer.WriteUInt32(0x20000);
             writer.WriteUInt32(Id);
             writer.WriteInt32(Offset);
             writer.WriteUInt32(Size);

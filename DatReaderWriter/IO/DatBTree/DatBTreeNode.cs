@@ -23,8 +23,10 @@ namespace ACClientLib.DatReaderWriter.IO.DatBTree {
 
         /// <summary>
         /// A list of branches / child node ids directly contained in this node.
-        /// Except on leaf nodes, Branches.Count must always be equal to Files.Count - 1.
         /// </summary>
+        /// <remarks>
+        /// Except on leaf nodes, Branches.Count must always be equal to Files.Count + 1.
+        /// </remarks>
         public List<int> Branches { get; set; } = [];
 
         /// <summary>
@@ -52,19 +54,19 @@ namespace ACClientLib.DatReaderWriter.IO.DatBTree {
 
         /// <inheritdoc/>
         unsafe public bool Unpack(DatFileReader reader) {
-            Span<int> branchSpan = stackalloc int[1];
             Span<int> iSpan = [0];
 
             bool didFindEnd = false;
+            var lastBranch = 0;
             for (iSpan[0] = 0; iSpan[0] < 62; iSpan[0]++) {
-                branchSpan[0] = reader.ReadInt32();
-
-                if (branchSpan[0] == 0 || branchSpan[0] == unchecked((int)0xCDCDCDCD)) {
+                var branch = reader.ReadInt32();
+                if (branch == 0 || branch == lastBranch || branch == unchecked((int)0xCDCDCDCD)) {
                     didFindEnd = true;
                 }
 
                 if (!didFindEnd) {
-                    Branches.Add(branchSpan[0]);
+                    lastBranch = branch;
+                    Branches.Add(branch);
                 }
             }
 
@@ -76,6 +78,10 @@ namespace ACClientLib.DatReaderWriter.IO.DatBTree {
                 };
                 file.Unpack(reader);
                 Files.Add(file);
+            }
+
+            if (Branches.Count > 0) {
+                Branches = Branches.GetRange(0, Files.Count + 1);
             }
 
             return true;
@@ -98,6 +104,10 @@ namespace ACClientLib.DatReaderWriter.IO.DatBTree {
             writer.WriteInt32(Files.Count);
             foreach (var file in Files) {
                 file.Pack(writer);
+            }
+
+            if (!IsLeaf && Branches.Count != Files.Count + 1) {
+                throw new Exception($"PACK Branches.Count != Files.Count -+ 1 ({Branches.Count} != {Files.Count} + 1)");
             }
 
             return true;

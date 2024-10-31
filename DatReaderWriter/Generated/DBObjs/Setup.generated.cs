@@ -22,10 +22,13 @@ namespace ACClientLib.DatReaderWriter.DBObjs {
     /// <summary>
     /// DB_TYPE_SETUP in the client.
     /// </summary>
-    [DBObjType(DatFileType.Portal, DBObjHeaderFlags.HasId, 0x02000000, 0x0200FFFF)]
+    [DBObjType(typeof(Setup), DatFileType.Portal, DBObjType.Setup, DBObjHeaderFlags.HasId, 0x02000000, 0x0200FFFF, 0x00000000)]
     public class Setup : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;
+
+        /// <inheritdoc />
+        public override DBObjType DBObjType => DBObjType.Setup;
 
         public SetupFlags Flags;
 

@@ -249,5 +249,24 @@ namespace ACClientLib.DatReaderWriter.IO {
                 WriteUInt16((ushort)rawValue);
             }
         }
+
+        public void WriteString16L(string value, int sizeOfLength = 2, bool align = true) {
+            var bytes = System.Text.Encoding.Default.GetBytes(value);
+            switch (sizeOfLength) {
+                case 1:
+                    WriteByte((byte)bytes.Length);
+                    break;
+                case 2:
+                default:
+                    WriteUInt16((ushort)bytes.Length);
+                    break;
+            }
+            WriteBytes(bytes, bytes.Length);
+            if (align) Align(4);
+        }
+
+        public void WriteString16LByte(string value) {
+            WriteString16L(value, 1, false);
+        }
     }
 }

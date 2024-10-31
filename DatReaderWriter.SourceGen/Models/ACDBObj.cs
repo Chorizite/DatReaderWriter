@@ -11,6 +11,7 @@ namespace DatReaderWriter.SourceGen.Models {
         public string BaseType { get; set; } = "";
         public uint FirstId { get; set; }
         public uint LastId { get; set; }
+        public uint MaskId { get; set; }
         public string DBObjHeaderFlags { get; set; } = "";
 
         public ACDBObj(ACBaseModel parent, XElement element) : base(parent, element) {
@@ -23,8 +24,9 @@ namespace DatReaderWriter.SourceGen.Models {
             var text = (string)element.Attribute("text");
             var baseType = (string)element.Attribute("parent");
             var flags = (string)element.Attribute("flags");
-            var firstId = Convert.ToUInt32(element.Attribute("first").Value, 16);
-            var lastId = Convert.ToUInt32(element.Attribute("last").Value, 16);
+            var firstId = Convert.ToUInt32(element.Attribute("first")?.Value ?? "0x0", 16);
+            var lastId = Convert.ToUInt32(element.Attribute("last")?.Value ?? "0x0", 16);
+            var maskId = Convert.ToUInt32(element.Attribute("mask")?.Value ?? "0x0", 16);
             var message = new ACDBObj(parent, element) {
                 Name = name,
                 Type = type,
@@ -32,6 +34,7 @@ namespace DatReaderWriter.SourceGen.Models {
                 BaseType = baseType,
                 FirstId = firstId,
                 LastId = lastId,
+                MaskId = maskId,
                 DBObjHeaderFlags = flags
             };
 

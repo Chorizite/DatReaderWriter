@@ -16,7 +16,7 @@ namespace DatReaderWriter.Tests.Types {
             var writeObj = new TerrainInfo() {
                 Road = 2,
                 Scenery = 3,
-                Type = TerrainType.MarshSparseSwamp
+                Type = TerrainTextureType.MarshSparseSwamp
             };
 
             var buffer = new byte[5_000_000];

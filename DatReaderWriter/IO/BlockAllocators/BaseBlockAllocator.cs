@@ -1,4 +1,5 @@
-﻿using ACClientLib.DatReaderWriter.Options;
+﻿using ACClientLib.DatReaderWriter.Enums;
+using ACClientLib.DatReaderWriter.Options;
 using System;
 using System.Buffers;
 using System.Buffers.Binary;
@@ -35,23 +36,27 @@ namespace ACClientLib.DatReaderWriter.IO.BlockAllocators {
         }
 
         /// <inheritdoc/>
-        public void InitNew(DatDatabaseType type, uint subset, int blockSize = 1024, int numBlocksToAllocate = 1024) {
+        public void InitNew(DatFileType type, uint subset, int blockSize = 1024, int numBlocksToAllocate = 1024) {
             if (!CanWrite) {
                 throw new Exception($"Attempted to write a new database, but MemoryMappedBlockAllocator.CanWrite is false");
             }
+
+            var headerBlockCount = (int)Math.Ceiling((double)DatHeader.SIZE / blockSize);
 
             Header.Type = type;
             Header.SubSet = subset;
             Header.BlockSize = blockSize;
             Header.RootBlock = 0;
-            Header.FileSize = Header.GetSize();
+            Header.FileSize = headerBlockCount * blockSize;
             Header.Magic = DatHeader.RETAIL_MAGIC;
 
             if (numBlocksToAllocate > 0) {
                 AllocateEmptyBlocks(numBlocksToAllocate);
             }
+            else {
+                Expand(headerBlockCount * blockSize);
+            }
 
-            Header.WriteEmptyTransaction();
             WriteHeader();
 
             HasHeaderData = true;
@@ -87,6 +92,8 @@ namespace ACClientLib.DatReaderWriter.IO.BlockAllocators {
 
         /// <inheritdoc/>
         public void AllocateEmptyBlocks(int numBlocksToAllocate) {
+            if (numBlocksToAllocate <= 0) return;
+
             if (Header.FirstFreeBlock == 0 && Header.LastFreeBlock == 0) {
                 // new dat. start creating blocks directly after the dat header
                 // but aligned to Header.BlockSize
@@ -134,6 +141,7 @@ namespace ACClientLib.DatReaderWriter.IO.BlockAllocators {
         /// </summary>
         protected void WriteHeader() {
             var headerBuffer = SharedBytes.Rent(DatHeader.SIZE);
+            Header.WriteEmptyTransaction();
             Header.Pack(new DatFileWriter(headerBuffer));
             WriteBytes(headerBuffer, 0, DatHeader.SIZE);
             SharedBytes.Return(headerBuffer);

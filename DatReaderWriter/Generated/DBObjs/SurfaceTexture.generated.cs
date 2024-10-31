@@ -22,10 +22,13 @@ namespace ACClientLib.DatReaderWriter.DBObjs {
     /// <summary>
     /// DB_TYPE_SURFACETEXTURE in the client.
     /// </summary>
-    [DBObjType(DatFileType.Portal, DBObjHeaderFlags.HasId | DBObjHeaderFlags.HasDataCategory, 0x05000000, 0x05FFFFFF)]
+    [DBObjType(typeof(SurfaceTexture), DatFileType.Portal, DBObjType.SurfaceTexture, DBObjHeaderFlags.HasId | DBObjHeaderFlags.HasDataCategory, 0x05000000, 0x05FFFFFF, 0x00000000)]
     public class SurfaceTexture : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId | DBObjHeaderFlags.HasDataCategory;
+
+        /// <inheritdoc />
+        public override DBObjType DBObjType => DBObjType.SurfaceTexture;
 
         /// <summary>
         /// This seems to always be TextureType.Texture2D in the dats.

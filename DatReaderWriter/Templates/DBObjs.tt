@@ -1,6 +1,6 @@
 ﻿<#@ assembly name="netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51" #>
-<#@ assembly name="$(SolutionDir)\ext\DatReaderWriter\DatReaderWriter.SourceGen\bin\Debug\netstandard2.0\System.CodeDom.dll" #>
-<#@ assembly name="$(SolutionDir)\ext\DatReaderWriter\DatReaderWriter.SourceGen\bin\Debug\netstandard2.0\DatReaderWriter.SourceGen.dll" #>
+<#@ assembly name="$(ProjectDir)\..\DatReaderWriter.SourceGen\bin\netstandard2.0\System.CodeDom.dll" #>
+<#@ assembly name="$(ProjectDir)\..\DatReaderWriter.SourceGen\bin\netstandard2.0\DatReaderWriter.SourceGen.dll" #>
 <#@ template language="c#" hostspecific="true" inherits="DatReaderWriter.SourceGen.CSTemplateBase" #>
 <#@ output extension=".cs" #>
 <#@include file="MultipleOutputHelper.ttinclude"#>
@@ -30,7 +30,7 @@
             // summary docs and class definition
             WriteSummary(dataType.Text);
             var datType = (dataType.Parent as DatReaderWriter.SourceGen.Models.ACDat).Type;
-            WriteLine($"[DBObjType({datType}, {dataType.DBObjHeaderFlags}, 0x{dataType.FirstId:X8}, 0x{dataType.LastId:X8})]");
+            WriteLine($"[DBObjType(typeof({dataType.Name}), {datType}, DBObjType.{dataType.Name}, {dataType.DBObjHeaderFlags}, 0x{dataType.FirstId:X8}, 0x{dataType.LastId:X8}, 0x{dataType.MaskId:X8})]");
             WriteLine("public class " + dataType.Name + " : DBObj {");
 
             using (new IndentHelper(this)) {
@@ -38,6 +38,9 @@
                 
                 WriteLine("/// <inheritdoc />");
                 WriteLine($"public override DBObjHeaderFlags HeaderFlags => {dataType.DBObjHeaderFlags};\n");
+                
+                WriteLine("/// <inheritdoc />");
+                WriteLine($"public override DBObjType DBObjType => DBObjType.{dataType.Name};\n");
 
                 // generate struct fields from messages.xml
                 foreach (var baseModel in dataType.AllChildren) {

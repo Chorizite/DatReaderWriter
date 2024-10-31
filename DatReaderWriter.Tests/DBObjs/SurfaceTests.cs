@@ -16,7 +16,7 @@ namespace DatReaderWriter.Tests.DBObjs {
                 options.AccessType = DatAccessType.ReadWrite;
             });
 
-            dat.BlockAllocator.InitNew(DatDatabaseType.Portal, 0);
+            dat.BlockAllocator.InitNew(DatFileType.Portal, 0);
 
             var surface1 = new Surface() {
                 Id = 0x05000001, // Ids of surfaces dont get written!
