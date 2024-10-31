@@ -214,7 +214,7 @@ namespace DatReaderWriter.SourceGen {
                     WriteLine(member.Name + " = " + GetBinaryReaderForType(member.MemberType, member.KnownType) + ";");
                 }
                 else {
-                    WriteLine(member.Name + " = " + GetBinaryReaderForType(member.MemberType) + ";");
+                    WriteLine(member.Name + " = " + GetBinaryReaderForType(member.MemberType, member.Size) + ";");
                 }
             }
         }

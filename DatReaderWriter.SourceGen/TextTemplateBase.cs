@@ -726,7 +726,7 @@ namespace DatReaderWriter.SourceGen {
                     }
                 }
                 else if (string.IsNullOrEmpty(pre)) {
-                    WriteLine($"writer.{GetBinaryWriterForType(member.MemberType)}({member.Name});");
+                    WriteLine($"writer.{GetBinaryWriterForType(member.MemberType)}({member.Name}{(string.IsNullOrEmpty(member.Size) ? "" : $", {member.Size}")});");
                 }
                 else if (member.Parent?.GetType() == typeof(ACVector) && member.Parent?.Children?.Count > 1) {
                     WriteLine($"writer.Write({pre}{member.Name});");

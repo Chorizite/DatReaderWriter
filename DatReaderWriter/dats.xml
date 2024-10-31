@@ -897,6 +897,13 @@
       <value name="HoldRun" value="0x85000001" />
       <value name="HoldSidestep" value="0x85000002" />
     </enum>
+    <enum name="RMDataType" parent="ushort">
+      <value name="WaveForm" value="0x3E8" />
+      <value name="Color" value="0x7D0" />
+      <value name="Texture" value="0xBB8" />
+      <value name="Bool" value="0xFA0" />
+      <value name="TexturePtr" value="0x2710" />
+    </enum>
   </enums>
   <types>
     <type name="DBObj" abstract="true">
@@ -1345,6 +1352,15 @@
       <field name="ClearCellId" type="uint" />
       <field name="ClearMonsterId" type="uint" />
     </type>
+    <type name="MaterialProperty">
+      <field name="NameId" type="uint" />
+      <field name="DataType" type="RMDataType" />
+      <align size="4" />
+      <field name="DataLength" type="uint" />
+      <field name="DataLength2" type="uint" />
+      <field name="DataLength3" type="ushort" />
+      <field name="DataLength4" type="byte" />
+    </type>
   </types>
   <dats>
     <dat name="portal" text="client_portal.dat" type="DatFileType.Portal">
@@ -1523,8 +1539,16 @@
       <type name="RenderTexture" text="DB_TYPE_RENDERTEXTURE in the client." parent="DBObj" first="0x15000000" last="0x15FFFFFF" flags="DBObjHeaderFlags.HasId | DBObjHeaderFlags.HasDataCategory">
       </type>
       <type name="MaterialModifier" text="DB_TYPE_MATERIALMODIFIER in the client." parent="DBObj" first="0x17000000" last="0x17FFFFFF" flags="DBObjHeaderFlags.HasId">
+        <field name="_numMaterialProperties" type="uint" />
+        <vector name="MaterialProperties" length="_numMaterialProperties" type="List" genericValue="MaterialProperty" />
       </type>
       <type name="MaterialInstance" text="DB_TYPE_MATERIALINSTANCE in the client." parent="DBObj" first="0x18000000" last="0x18FFFFFF" flags="DBObjHeaderFlags.HasId">
+        <field name="MaterialId" type="uint" />
+        <field name="MaterialType" type="uint" />
+        <field name="_numModifierRefs" type="uint" />
+        <vector name="ModifierRefs" length="_numModifierRefs" type="List" genericValue="uint" />
+        <field name="AllowStencilShadows" type="bool" size="1" />
+        <field name="WantDiscardGeometry" type="bool" size="1" />
       </type>
       <type name="RenderMesh" text="DB_TYPE_RENDER_MESH in the client." parent="DBObj" first="0x19000000" last="0x19FFFFFF" flags="DBObjHeaderFlags.HasId">
       </type>
