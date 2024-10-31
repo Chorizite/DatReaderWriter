@@ -17,28 +17,40 @@ using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 
 namespace ACClientLib.DatReaderWriter.Types {
-    public class TimeOfDay : IDatObjType {
-        public float Start;
+    public class MaterialProperty : IDatObjType {
+        public uint NameId;
 
-        public bool IsNight;
+        public RMDataType DataType;
 
-        public string Name;
+        public uint DataLength;
+
+        public uint DataLength2;
+
+        public ushort DataLength3;
+
+        public byte DataLength4;
 
         /// <inheritdoc />
         public bool Unpack(DatFileReader reader) {
-            Start = reader.ReadSingle();
-            IsNight = reader.ReadBool(4);
-            Name = reader.ReadString16L();
+            NameId = reader.ReadUInt32();
+            DataType = (RMDataType)reader.ReadUInt16();
             reader.Align(4);
+            DataLength = reader.ReadUInt32();
+            DataLength2 = reader.ReadUInt32();
+            DataLength3 = reader.ReadUInt16();
+            DataLength4 = reader.ReadByte();
             return true;
         }
 
         /// <inheritdoc />
         public bool Pack(DatFileWriter writer) {
-            writer.WriteSingle(Start);
-            writer.WriteBool(IsNight, 4);
-            writer.WriteString16L(Name);
+            writer.WriteUInt32(NameId);
+            writer.WriteUInt16((ushort)DataType);
             writer.Align(4);
+            writer.WriteUInt32(DataLength);
+            writer.WriteUInt32(DataLength2);
+            writer.WriteUInt16(DataLength3);
+            writer.WriteByte(DataLength4);
             return true;
         }
 

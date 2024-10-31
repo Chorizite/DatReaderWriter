@@ -67,7 +67,12 @@ namespace ACClientLib.DatReaderWriter.IO.DatBTree {
 
         /// <inheritdoc/>
         public bool Pack(DatFileWriter writer) {
-            writer.WriteUInt32(0x20000);
+            if (Flags != 0) {
+                writer.WriteUInt32(Flags);
+            }
+            else {
+                writer.WriteUInt32(0x20000);
+            }
             writer.WriteUInt32(Id);
             writer.WriteInt32(Offset);
             writer.WriteUInt32(Size);
