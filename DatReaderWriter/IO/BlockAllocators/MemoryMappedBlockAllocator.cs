@@ -80,6 +80,8 @@ namespace ACClientLib.DatReaderWriter.IO.BlockAllocators {
                 }
             }
 
+            WriteHeader();
+
             return startingBlock;
         }
 

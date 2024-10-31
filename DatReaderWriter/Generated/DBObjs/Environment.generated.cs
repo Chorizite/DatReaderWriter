@@ -22,10 +22,13 @@ namespace ACClientLib.DatReaderWriter.DBObjs {
     /// <summary>
     /// DB_TYPE_ENVIRONMENT in the client.
     /// </summary>
-    [DBObjType(DatFileType.Portal, DBObjHeaderFlags.HasId, 0x0D000000, 0x0D00FFFF)]
+    [DBObjType(typeof(Environment), DatFileType.Portal, DBObjType.Environment, DBObjHeaderFlags.HasId, 0x0D000000, 0x0D00FFFF, 0x00000000)]
     public class Environment : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;
+
+        /// <inheritdoc />
+        public override DBObjType DBObjType => DBObjType.Environment;
 
         /// <summary>
         /// The cells in this environment

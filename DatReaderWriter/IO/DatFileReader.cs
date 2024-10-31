@@ -242,5 +242,26 @@ namespace ACClientLib.DatReaderWriter.IO {
 
             return (knownType + value);
         }
+
+        public string ReadString16L(int sizeOfLength = 2, bool align = true) {
+            int stringlength;
+            switch (sizeOfLength) {
+                case 1:
+                    stringlength = ReadByte();
+                    break;
+                case 2:
+                default:
+                    stringlength = ReadUInt16();
+                    break;
+            }
+
+            byte[] thestring = ReadBytes(stringlength);
+            if (align) Align(4);
+            return System.Text.Encoding.Default.GetString(thestring);
+        }
+
+        public string ReadString16LByte() {
+            return ReadString16L(1, false);
+        }
     }
 }

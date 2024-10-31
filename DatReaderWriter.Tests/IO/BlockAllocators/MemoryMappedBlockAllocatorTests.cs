@@ -6,6 +6,7 @@ using System;
 using System.Text;
 using System.Threading.Tasks;
 using ACClientLib.DatReaderWriter;
+using ACClientLib.DatReaderWriter.Enums;
 
 namespace DatReaderWriter.Tests.IO.BlockAllocators {
     [TestClass]
@@ -25,7 +26,7 @@ namespace DatReaderWriter.Tests.IO.BlockAllocators {
             });
 
             Assert.IsFalse(allocator.HasHeaderData);
-            allocator.InitNew(DatDatabaseType.Portal, 0, blockSize, numBlocksToAllocate);
+            allocator.InitNew(DatFileType.Portal, 0, blockSize, numBlocksToAllocate);
 
             var expectedFirstBlockOffset = (int)Math.Ceiling((double)DatHeader.SIZE / blockSize) * blockSize;
             var expectedLastBlockOffset = expectedFirstBlockOffset + ((numBlocksToAllocate - 1) * blockSize);
@@ -64,7 +65,7 @@ namespace DatReaderWriter.Tests.IO.BlockAllocators {
             });
 
             Assert.IsFalse(allocator.HasHeaderData);
-            allocator.InitNew(DatDatabaseType.Portal, 0, blockSize, 1);
+            allocator.InitNew(DatFileType.Portal, 0, blockSize, 1);
 
             var versionGuid = Guid.NewGuid();
             allocator.SetVersion("Testing", 123, 456, versionGuid, 789u);
@@ -95,6 +96,122 @@ namespace DatReaderWriter.Tests.IO.BlockAllocators {
 
         [TestMethod]
         [CombinatorialData]
+        public void HeaderHasProperFileSizeAfterInit(
+            [DataValues(256, 1024)] int blockSize,
+            [DataValues(0, 1, 100, 1000, 1234)] int numBlocks
+            ) {
+            var file = Path.GetTempFileName();
+            var allocator = new MemoryMappedBlockAllocator(new DatDatabaseOptions() {
+                FilePath = file,
+                AccessType = DatAccessType.ReadWrite
+            });
+
+            Assert.IsFalse(allocator.HasHeaderData);
+            allocator.InitNew(DatFileType.Portal, 0, blockSize, numBlocks);
+
+            Assert.AreEqual((int)Math.Ceiling(((double)DatHeader.SIZE / blockSize) + numBlocks) * blockSize, allocator.Header.FileSize);
+
+            allocator.Dispose();
+
+            File.Delete(file);
+        }
+
+        [TestMethod]
+        [CombinatorialData]
+        public void HeaderHasProperBlockIndicesAfterInit(
+            [DataValues(256, 1024)] int blockSize,
+            [DataValues(0, 1, 100, 1000, 1234)] int numBlocks
+            ) {
+            var file = Path.GetTempFileName();
+            var allocator = new MemoryMappedBlockAllocator(new DatDatabaseOptions() {
+                FilePath = file,
+                AccessType = DatAccessType.ReadWrite
+            });
+
+            Assert.IsFalse(allocator.HasHeaderData);
+            allocator.InitNew(DatFileType.Portal, 0, blockSize, numBlocks);
+            var headerBlockCount = (int)Math.Ceiling(((double)DatHeader.SIZE / blockSize));
+
+            Assert.AreEqual((headerBlockCount + numBlocks) * blockSize, allocator.Header.FileSize);
+            if (numBlocks > 0) {
+                Assert.AreEqual(headerBlockCount * blockSize, allocator.Header.FirstFreeBlock);
+                Assert.AreEqual((headerBlockCount + numBlocks - 1) * blockSize, allocator.Header.LastFreeBlock);
+            }
+            else {
+                Assert.AreEqual(0, allocator.Header.FirstFreeBlock);
+                Assert.AreEqual(0, allocator.Header.LastFreeBlock);
+            }
+            Assert.AreEqual(numBlocks, allocator.Header.FreeBlockCount);
+
+            allocator.Dispose();
+
+            File.Delete(file);
+        }
+
+        [TestMethod]
+        [CombinatorialData]
+        public void HeaderHasProperFileSizeAfterAllocations(
+            [DataValues(256, 1024)] int blockSize,
+            [DataValues(0, 1, 100, 1000, 1234)] int numBlocks
+            ) {
+            var file = Path.GetTempFileName();
+            var allocator = new MemoryMappedBlockAllocator(new DatDatabaseOptions() {
+                FilePath = file,
+                AccessType = DatAccessType.ReadWrite
+            });
+
+            Assert.IsFalse(allocator.HasHeaderData);
+
+            allocator.InitNew(DatFileType.Portal, 0, blockSize, numBlocks);
+
+            Assert.AreEqual((int)Math.Ceiling(((double)DatHeader.SIZE / blockSize) + numBlocks) * blockSize, allocator.Header.FileSize);
+
+            allocator.AllocateEmptyBlocks(100);
+            numBlocks += 100;
+
+            Assert.AreEqual((int)Math.Ceiling(((double)DatHeader.SIZE / blockSize) + numBlocks) * blockSize, allocator.Header.FileSize);
+
+            allocator.Dispose();
+
+            File.Delete(file);
+        }
+
+        [TestMethod]
+        [CombinatorialData]
+        public void HeaderHasProperBlockIndicesAfterAllocations(
+            [DataValues(256, 1024)] int blockSize,
+            [DataValues(0, 1, 100, 1000, 1234)] int numBlocks
+            ) {
+            var file = Path.GetTempFileName();
+            var allocator = new MemoryMappedBlockAllocator(new DatDatabaseOptions() {
+                FilePath = file,
+                AccessType = DatAccessType.ReadWrite
+            });
+
+            Assert.IsFalse(allocator.HasHeaderData);
+            allocator.InitNew(DatFileType.Portal, 0, blockSize, 0);
+            var headerBlockCount = (int)Math.Ceiling(((double)DatHeader.SIZE / blockSize));
+
+            allocator.AllocateEmptyBlocks(numBlocks);
+
+            Assert.AreEqual((headerBlockCount + numBlocks) * blockSize, allocator.Header.FileSize);
+            if (numBlocks > 0) {
+                Assert.AreEqual(headerBlockCount * blockSize, allocator.Header.FirstFreeBlock);
+                Assert.AreEqual((headerBlockCount + numBlocks - 1) * blockSize, allocator.Header.LastFreeBlock);
+            }
+            else {
+                Assert.AreEqual(0, allocator.Header.FirstFreeBlock);
+                Assert.AreEqual(0, allocator.Header.LastFreeBlock);
+            }
+            Assert.AreEqual(numBlocks, allocator.Header.FreeBlockCount);
+
+            allocator.Dispose();
+
+            File.Delete(file);
+        }
+
+        [TestMethod]
+        [CombinatorialData]
         public void CanReadWriteRawBytesToDat([DataValues(256, 1024)] int blockSize) {
             var file = Path.GetTempFileName();
             var allocator = new MemoryMappedBlockAllocator(new DatDatabaseOptions() {
@@ -103,7 +220,7 @@ namespace DatReaderWriter.Tests.IO.BlockAllocators {
             });
 
             Assert.IsFalse(allocator.HasHeaderData);
-            allocator.InitNew(DatDatabaseType.Portal, 0, blockSize, 1);
+            allocator.InitNew(DatFileType.Portal, 0, blockSize, 1);
 
             var bytes = Encoding.ASCII.GetBytes("Hello World");
             allocator.WriteBytes(bytes, 0, bytes.Length);
@@ -140,7 +257,7 @@ namespace DatReaderWriter.Tests.IO.BlockAllocators {
             });
 
             Assert.IsFalse(allocator.HasHeaderData);
-            allocator.InitNew(DatDatabaseType.Portal, 0, blockSize, 0);
+            allocator.InitNew(DatFileType.Portal, 0, blockSize, 0);
 
             Assert.AreEqual(0, allocator.Header.FreeBlockCount);
 
@@ -172,7 +289,7 @@ namespace DatReaderWriter.Tests.IO.BlockAllocators {
             });
 
             Assert.IsFalse(allocator.HasHeaderData);
-            allocator.InitNew(DatDatabaseType.Portal, 0, blockSize, 10);
+            allocator.InitNew(DatFileType.Portal, 0, blockSize, 10);
 
             var fileBytes = new byte[blockSize - 4];
             _rnd.NextBytes(fileBytes);
@@ -208,7 +325,7 @@ namespace DatReaderWriter.Tests.IO.BlockAllocators {
             });
 
             Assert.IsFalse(allocator.HasHeaderData);
-            allocator.InitNew(DatDatabaseType.Portal, 0, blockSize, 10);
+            allocator.InitNew(DatFileType.Portal, 0, blockSize, 10);
 
             var fileBytes = new byte[blockSize * 5];
             _rnd.NextBytes(fileBytes);
@@ -245,7 +362,7 @@ namespace DatReaderWriter.Tests.IO.BlockAllocators {
             });
 
             Assert.IsFalse(allocator.HasHeaderData);
-            allocator.InitNew(DatDatabaseType.Portal, 0, blockSize, 10);
+            allocator.InitNew(DatFileType.Portal, 0, blockSize, 10);
 
             var fileBytes = new byte[(blockSize - 4) * 4];
             _rnd.NextBytes(fileBytes);
@@ -266,6 +383,45 @@ namespace DatReaderWriter.Tests.IO.BlockAllocators {
 
         [TestMethod]
         [CombinatorialData]
+        public void HeaderIsUpdatedAfterWritingBlocks(
+            [DataValues(256, 1024)] int blockSize,
+            [DataValues(1, 2, 1_000, 10_000)] int numBlocks
+            ) {
+            var file = Path.GetTempFileName();
+            var allocator = new MemoryMappedBlockAllocator(new DatDatabaseOptions() {
+                FilePath = file,
+                AccessType = DatAccessType.ReadWrite
+            });
+
+            Assert.IsFalse(allocator.HasHeaderData);
+            allocator.InitNew(DatFileType.Portal, 0, blockSize, 20_000);
+
+            var fileBytes = new byte[(blockSize - 4) * numBlocks];
+
+            var blockOffset = allocator.WriteBlock(fileBytes, fileBytes.Length);
+
+            Assert.AreEqual(20_000 - numBlocks, allocator.Header.FreeBlockCount);
+
+            allocator.Dispose();
+
+            allocator = new MemoryMappedBlockAllocator(new DatDatabaseOptions() {
+                FilePath = file,
+                AccessType = DatAccessType.Read
+            });
+
+            var headerBlockCount = (int)Math.Ceiling(((double)DatHeader.SIZE / blockSize));
+
+            Assert.AreEqual((headerBlockCount + 20_000) * blockSize, allocator.Header.FileSize);
+            Assert.AreEqual((headerBlockCount + numBlocks) * blockSize, allocator.Header.FirstFreeBlock);
+            Assert.AreEqual((headerBlockCount + 20_000 - 1) * blockSize, allocator.Header.LastFreeBlock);
+
+            allocator.Dispose();
+
+            File.Delete(file);
+        }
+
+        [TestMethod]
+        [CombinatorialData]
         public void CanExpandDatToWriteBlocks([DataValues(256, 1024)] int blockSize) {
             var file = Path.GetTempFileName();
             var allocator = new MemoryMappedBlockAllocator(new DatDatabaseOptions() {
@@ -274,7 +430,7 @@ namespace DatReaderWriter.Tests.IO.BlockAllocators {
             });
 
             Assert.IsFalse(allocator.HasHeaderData);
-            allocator.InitNew(DatDatabaseType.Portal, 0, blockSize, 1);
+            allocator.InitNew(DatFileType.Portal, 0, blockSize, 1);
 
             var fileBytes = new byte[blockSize * 5];
             _rnd.NextBytes(fileBytes);
@@ -316,7 +472,7 @@ namespace DatReaderWriter.Tests.IO.BlockAllocators {
             var allocatedBlockCount = (fileSize + (blockSize * 100)) / (blockSize - 4);
 
             Assert.IsFalse(allocator.HasHeaderData);
-            allocator.InitNew(DatDatabaseType.Portal, 0, blockSize, allocatedBlockCount);
+            allocator.InitNew(DatFileType.Portal, 0, blockSize, allocatedBlockCount);
 
             Assert.AreEqual(allocatedBlockCount, allocator.Header.FreeBlockCount);
 
@@ -350,7 +506,7 @@ namespace DatReaderWriter.Tests.IO.BlockAllocators {
             var allocatedBlockCount = 50;
 
             Assert.IsFalse(allocator.HasHeaderData);
-            allocator.InitNew(DatDatabaseType.Portal, 0, blockSize, allocatedBlockCount);
+            allocator.InitNew(DatFileType.Portal, 0, blockSize, allocatedBlockCount);
 
             Assert.AreEqual(allocatedBlockCount, allocator.Header.FreeBlockCount);
 

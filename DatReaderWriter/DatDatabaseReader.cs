@@ -1,19 +1,22 @@
 ﻿using ACClientLib.DatReaderWriter.DBObjs;
+using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 using ACClientLib.DatReaderWriter.IO.BlockAllocators;
 using ACClientLib.DatReaderWriter.IO.DatBTree;
+using ACClientLib.DatReaderWriter.Lib;
 using ACClientLib.DatReaderWriter.Options;
 using System;
-using System.Buffers;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.InteropServices;
+using System.Linq;
+using System.Linq.Expressions;
 
 namespace ACClientLib.DatReaderWriter {
     /// <summary>
     /// Provides read access to a dat database
     /// </summary>
-    public class DatDatabaseReader : IDisposable {
+    public partial class DatDatabaseReader : IDisposable {
         public readonly IDatBlockAllocator BlockAllocator;
         public readonly DatBTreeReaderWriter Tree;
 
@@ -59,13 +62,22 @@ namespace ACClientLib.DatReaderWriter {
         }
 
         /// <summary>
+        /// Get the type of a DBObj based on its id.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public DBObjType TypeFromId(uint id) {
+            return DBObjAttributeCache.DBObjTypeFromId(Header.Type, id);
+        }
+
+        /// <summary>
         /// Get the raw bytes of a file entry
         /// </summary>
         /// <param name="fileId">The id of the file to get</param>
         /// <param name="bytes">The raw bytes</param>
         /// <returns>True if the file was found, false otherwise</returns>
 #if (NET8_0_OR_GREATER)
-            public bool TryGetFileBytes(uint fileId, [MaybeNullWhen(false)] out byte[] bytes) {
+        public bool TryGetFileBytes(uint fileId, [MaybeNullWhen(false)] out byte[] bytes) {
 #else
         public bool TryGetFileBytes(uint fileId, out byte[] bytes) {
 #endif
@@ -126,18 +138,18 @@ namespace ACClientLib.DatReaderWriter {
             var writer = new DatFileWriter(buffer);
 
             value.Pack(writer);
-            Console.WriteLine($"Wrote {writer.Offset} bytes to {value.Id:X8} @ ({startingBlockId:X8})");
             startingBlockId = Tree.BlockAllocator.WriteBlock(buffer, writer.Offset, startingBlockId);
 
             var newIteration = iteration.HasValue ? iteration.Value : (existingFile?.Iteration ?? 0);
-            var oldEntry = Tree.Insert(new DatBTreeFile() {
+            var newEntry = new DatBTreeFile() {
                 Flags = existingFile?.Flags ?? 0u,
                 Id = value.Id,
                 Size = (uint)writer.Offset,
                 Offset = startingBlockId,
                 Date = DateTime.UtcNow,
                 Iteration = newIteration
-            });
+            };
+            var oldEntry = Tree.Insert(newEntry);
 
             // update dat iteration if needed
             if (newIteration > Iteration.CurrentIteration) {
@@ -165,10 +177,6 @@ namespace ACClientLib.DatReaderWriter {
                 Tree?.Dispose();
                 BlockAllocator?.Dispose();
             }
-        }
-
-        public void TryWriteDXT1(RenderSurface renderSurface) {
-            throw new NotImplementedException();
         }
     }
 }

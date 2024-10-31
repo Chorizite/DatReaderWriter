@@ -77,6 +77,12 @@
       <value name="UnknownVertexType" value="0" />
       <value name="CSWVertexType" value="1" />
     </enum>
+    <enum name="PartsMask" parent="uint">
+      <value name="HasSoundInfo" value="0x01" />
+      <value name="HasSceneInfo" value="0x02" />
+      <value name="HasSkyInfo" value="0x10" />
+      <value name="HasRegionMisc" value="0x200" />
+    </enum>
     <enum name="StipplingType" parent="byte" mask="true">
       <value name="None" value="0x00" />
       <value name="Positive" value="0x01" />
@@ -97,7 +103,7 @@
       <value name="Physics" value="1" />
       <value name="Cell" value="2" />
     </enum>
-    <enum name="TerrainType" parent="int">
+    <enum name="TerrainTextureType" parent="int">
       <value name="BarrenRock" value="0x00000000" />
       <value name="Grassland" value="0x00000001" />
       <value name="Ice" value="0x00000002" />
@@ -471,6 +477,14 @@
       <value name="None" value="0x00" />
       <value name="HasVelocity" value="0x01" />
       <value name="HasOmega" value="0x02" />
+    </enum>
+    <enum name="NumberingType" parent="byte">
+      <value name="Undefined" value="0x00" />
+      <value name="Normal" value="0x01" />
+      <value name="Sequential" value="0x01" />
+      <value name="Bitfield" value="0x02" />
+      <value name="Bitfield32" value="0x3" />
+      <value name="Bitfield64" value="0x4" />
     </enum>
     <enum name="MotionCommand" parent="uint">
       <value name="Invalid" value="0x00000000" />
@@ -963,7 +977,7 @@
     <type name="TerrainInfo">
       <field name="_rawValue" type="ushort" hidden="true">
         <subfield name="Road" type="byte" mask="0x3" text="Road type" />
-        <subfield name="Type" type="TerrainType" mask="0x7C" shift="2" text="Terrain type" />
+        <subfield name="Type" type="TerrainTextureType" mask="0x7C" shift="2" text="Terrain type" />
         <subfield name="Scenery" type="ushort" mask="0xF800" shift="11" text="Scenery type" />
       </field>
     </type>
@@ -1162,6 +1176,175 @@
       <field name="_numCommands" type="uint" />
       <vector name="MotionData" length="_numCommands" type="Dictionary" genericKey="int" genericValue="MotionData" />
     </type>
+    <type name="LandDefs">
+      <field name="NumBlockLength" type="int" />
+      <field name="NumBlockWidth" type="int" />
+      <field name="SquareLength" type="float" />
+      <field name="LBlockLength" type="int" />
+      <field name="VertexPerCell" type="int" />
+      <field name="MaxObjHeight" type="float" />
+      <field name="SkyHeight" type="float" />
+      <field name="RoadWidth" type="float" />
+      <vector name="LandHeightTable" length="256" type="float" />
+    </type>
+    <type name="GameTime">
+      <field name="ZeroTimeOfYear" type="double" />
+      <field name="ZeroYear" type="uint" />
+      <field name="DayLength" type="float" />
+      <field name="DaysPerYear" type="uint" />
+      <field name="YearSpec" type="string" />
+      <align type="uint" />
+      <field name="_numTimesOfDay" type="uint" />
+      <vector name="TimesOfDay" length="_numTimesOfDay" type="List" genericValue="TimeOfDay" />
+      <field name="_numDaysOfWeek" type="uint" />
+      <vector name="DaysOfWeek" length="_numDaysOfWeek" type="List" genericValue="string" align="uint" />
+      <field name="_numSeasons" type="uint" />
+      <vector name="Seasons" length="_numSeasons" type="List" genericValue="Season" />
+    </type>
+    <type name="TimeOfDay">
+      <field name="Start" type="float" />
+      <field name="IsNight" type="bool" size="4" />
+      <field name="Name" type="string" />
+      <align type="uint" />
+    </type>
+    <type name="Season">
+      <field name="Start" type="uint" />
+      <field name="Name" type="string" />
+      <align type="uint" />
+    </type>
+    <type name="SkyDesc">
+      <field name="TickSize" type="double" />
+      <field name="LightTickSize" type="double" />
+      <field name="_numDayGroups" type="uint" />
+      <vector name="DayGroups" length="_numDayGroups" type="List" genericValue="DayGroup" />
+    </type>
+    <type name="DayGroup">
+      <field name="ChanceOfOccur" type="float" />
+      <field name="DayName" type="string" />
+      <align type="uint" />
+      <field name="_numSkyObjects" type="uint" />
+      <vector name="SkyObjects" length="_numSkyObjects" type="List" genericValue="SkyObject" />
+      <field name="_numSkyTimeOfDays" type="uint" />
+      <vector name="SkyTime" length="_numSkyTimeOfDays" type="List" genericValue="SkyTimeOfDay" />
+    </type>
+    <type name="SkyObject">
+      <field name="BeginTime" type="float" />
+      <field name="EndTime" type="float" />
+      <field name="BeginAngle" type="float" />
+      <field name="EndAngle" type="float" />
+      <field name="TexVelocityX" type="float" />
+      <field name="TexVelocityY" type="float" />
+      <field name="DefaultGFXObjectId" type="uint" />
+      <field name="DefaultPESObjectId" type="uint" />
+      <field name="Properties" type="uint" />
+    </type>
+    <type name="SkyTimeOfDay">
+      <field name="Begin" type="float" />
+      <field name="DirBright" type="float" />
+      <field name="DirHeading" type="float" />
+      <field name="DirPitch" type="float" />
+      <field name="DirColor" type="ColorARGB" />
+      <field name="AmbBright" type="float" />
+      <field name="AmbColor" type="ColorARGB" />
+      <field name="MinWorldFog" type="float" />
+      <field name="MaxWorldFog" type="float" />
+      <field name="WorldFogColor" type="ColorARGB" />
+      <field name="WorldFog" type="uint" />
+      <field name="_numSkyObjReplaces" type="uint" />
+      <vector name="SkyObjReplace" length="_numSkyObjReplaces" type="List" genericValue="SkyObjectReplace" />
+    </type>
+    <type name="SkyObjectReplace">
+      <field name="ObjectIndex" type="uint" />
+      <field name="GFXObjId" type="uint" />
+      <field name="Rotate" type="float" />
+      <field name="Transparent" type="float" />
+      <field name="Luminosity" type="float" />
+      <field name="MaxBright" type="float" />
+    </type>
+    <type name="SoundDesc">
+      <field name="_numSTBDescs" type="uint" />
+      <vector name="STBDesc" length="_numSTBDescs" type="List" genericValue="AmbientSTBDesc" />
+    </type>
+    <type name="AmbientSTBDesc">
+      <field name="STBId" type="uint" />
+      <field name="_numAmbientSounds" type="uint" />
+      <vector name="AmbientSounds" length="_numAmbientSounds" type="List" genericValue="AmbientSoundDesc" />
+    </type>
+    <type name="AmbientSoundDesc">
+      <field name="SType" type="uint" />
+      <field name="Volume" type="float" />
+      <field name="BaseChance" type="float" />
+      <field name="MinRate" type="float" />
+      <field name="MaxRate" type="float" />
+    </type>
+    <type name="SceneDesc">
+      <field name="_numSceneTypes" type="uint" />
+      <vector name="SceneTypes" length="_numSceneTypes" type="List" genericValue="SceneType" />
+    </type>
+    <type name="SceneType">
+      <field name="StbIndex" type="uint" />
+      <field name="_numScenes" type="uint" />
+      <vector name="Scenes" length="_numScenes" type="List" genericValue="uint" />
+    </type>
+    <type name="TerrainDesc">
+      <field name="_numTerrainTypes" type="uint" />
+      <vector name="TerrainTypes" length="_numTerrainTypes" type="List" genericValue="TerrainType" />
+      <field name="LandSurfaces" type="LandSurf" />
+    </type>
+    <type name="TerrainType">
+      <field name="TerrainName" type="string" />
+      <align type="uint" />
+      <field name="TerrainColor" type="ColorARGB" />
+      <field name="_numSceneTypes" type="uint" />
+      <vector name="SceneTypes" length="_numSceneTypes" type="List" genericValue="uint" />
+    </type>
+    <type name="LandSurf">
+      <field name="Type" type="uint" />
+      <field name="TexMerge" type="TexMerge" />
+    </type>
+    <type name="TexMerge">
+      <field name="BaseTexSize" type="uint" />
+      <field name="_numCornerTerrainMaps" type="uint" />
+      <vector name="CornerTerrainMaps" length="_numCornerTerrainMaps" type="List" genericValue="TerrainAlphaMap" />
+      <field name="_numSideTerrainMaps" type="uint" />
+      <vector name="SideTerrainMaps" length="_numSideTerrainMaps" type="List" genericValue="TerrainAlphaMap" />
+      <field name="_numRoadMaps" type="uint" />
+      <vector name="RoadMaps" length="_numRoadMaps" type="List" genericValue="RoadAlphaMap" />
+      <field name="_numTerrainDescs" type="uint" />
+      <vector name="TerrainDesc" length="_numTerrainDescs" type="List" genericValue="TMTerrainDesc" />
+    </type>
+    <type name="TerrainAlphaMap">
+      <field name="TCode" type="uint" />
+      <field name="TexGID" type="uint" />
+    </type>
+    <type name="RoadAlphaMap">
+      <field name="RCode" type="uint" />
+      <field name="TexGID" type="uint" />
+    </type>
+    <type name="TMTerrainDesc">
+      <field name="TerrainType" type="TerrainTextureType" />
+      <field name="TerrainTex" type="TerrainTex" />
+    </type>
+    <type name="TerrainTex">
+      <field name="TexGID" type="uint" />
+      <field name="TexTiling" type="uint" />
+      <field name="MaxVertBright" type="uint" />
+      <field name="MinVertBright" type="uint" />
+      <field name="MaxVertSaturate" type="uint" />
+      <field name="MinVertSaturate" type="uint" />
+      <field name="MaxVertHue" type="uint" />
+      <field name="MinVertHue" type="uint" />
+      <field name="DetailTexTiling" type="uint" />
+      <field name="DetailTexGID" type="uint" />
+    </type>
+    <type name="RegionMisc">
+      <field name="Version" type="uint" />
+      <field name="GameMapID" type="uint" />
+      <field name="AutotestMapId" type="uint" />
+      <field name="AutotestMapSize" type="uint" />
+      <field name="ClearCellId" type="uint" />
+      <field name="ClearMonsterId" type="uint" />
+    </type>
   </types>
   <dats>
     <dat name="portal" text="client_portal.dat" type="DatFileType.Portal">
@@ -1310,6 +1493,30 @@
       <type name="Scene" text="DB_TYPE_SCENE in the client." parent="DBObj" first="0x12000000" last="0x1200FFFF" flags="DBObjHeaderFlags.HasId">
       </type>
       <type name="Region" text="DB_TYPE_REGION in the client." parent="DBObj" first="0x13000000" last="0x1300FFFF" flags="DBObjHeaderFlags.HasId">
+        <field name="RegionNumber" type="uint" />
+        <field name="Version" type="uint" />
+        <field name="RegionName" type="string" />
+        <align type="uint" />
+        <field name="LandDefs" type="LandDefs" />
+        <field name="GameTime" type="GameTime" />
+        <field name="PartsMask" type="PartsMask" />
+        <maskmap name="PartsMask">
+          <mask value="PartsMask.HasSkyInfo">
+            <field name="SkyInfo" type="SkyDesc" />
+          </mask>
+          <mask value="PartsMask.HasSoundInfo">
+            <field name="SoundInfo" type="SoundDesc" />
+          </mask>
+          <mask value="PartsMask.HasSceneInfo">
+            <field name="SceneInfo" type="SceneDesc" />
+          </mask>
+        </maskmap>
+        <field name="TerrainInfo" type="TerrainDesc" />
+        <maskmap name="PartsMask">
+          <mask value="PartsMask.HasRegionMisc">
+            <field name="RegionMisc" type="RegionMisc" />
+          </mask>
+        </maskmap>
       </type>
       <type name="Keymap" text="DB_TYPE_KEYMAP in the client." parent="DBObj" first="0x14000000" last="0x1400FFFF" flags="DBObjHeaderFlags.HasId">
       </type>
@@ -1328,6 +1535,18 @@
       <type name="EnumMapper" text="DB_TYPE_ENUM_MAPPER in the client." parent="DBObj" first="0x22000000" last="0x22FFFFFF" flags="DBObjHeaderFlags.HasId">
       </type>
       <type name="DataIdMapper" text="DB_TYPE_DID_MAPPER in the client." parent="DBObj" first="0x25000000" last="0x25FFFFFF" flags="DBObjHeaderFlags.HasId">
+        <field name="ClientIDNumberingType" type="NumberingType" />
+        <field name="_numClientEnumToIDs" type="CompressedUInt" />
+        <vector name="ClientEnumToID" length="_numClientEnumToIDs" type="Dictionary" genericKey="uint" genericValue="uint" />
+        <field name="ClientNameNumberingType" type="NumberingType" />
+        <field name="_numClientEnumToNames" type="CompressedUInt" />
+        <vector name="ClientEnumToName" length="_numClientEnumToNames" type="Dictionary" genericKey="uint" genericValue="bytestring" />
+        <field name="ServerIDNumberingType" type="NumberingType" />
+        <field name="_numServerEnumToIDs" type="CompressedUInt" />
+        <vector name="ServerEnumToID" length="_numServerEnumToIDs" type="Dictionary" genericKey="uint" genericValue="uint" />
+        <field name="ServerNameNumberingType" type="NumberingType" />
+        <field name="_numServerEnumToNames" type="CompressedUInt" />
+        <vector name="ServerEnumToName" length="_numServerEnumToNames" type="Dictionary" genericKey="uint" genericValue="bytestring" />
       </type>
       <type name="ActionMap" text="DB_TYPE_ACTIONMAP in the client." parent="DBObj" first="0x26000000" last="0x2600FFFF" flags="DBObjHeaderFlags.HasId">
       </type>
@@ -1380,13 +1599,13 @@
       </type>
     </dat>
     <dat name="cell" text="client_cell_1.dat" type="DatFileType.Cell">
-      <type name="LandBlock" text="DB_TYPE_LAND_BLOCK in the client." parent="DBObj" first="0" last="0" flags="DBObjHeaderFlags.HasId">
+      <type name="LandBlock" text="DB_TYPE_LAND_BLOCK in the client." parent="DBObj" mask="0x0000FFFF" flags="DBObjHeaderFlags.HasId">
         <field type="bool" name="HasObjects" />
         <vector name="Terrain" length="81" type="TerrainInfo" />
         <vector name="Height" length="81" type="byte" />
         <align type="uint" />
       </type>
-      <type name="LandBlockInfo" text="Stores static spawns, buildings. DB_TYPE_LBI in the client." parent="DBObj" first="0" last="0" flags="DBObjHeaderFlags.HasId">
+      <type name="LandBlockInfo" text="Stores static spawns, buildings. DB_TYPE_LBI in the client." parent="DBObj" mask="0x0000FFFE" flags="DBObjHeaderFlags.HasId">
         <field type="uint" name="NumCells" text="The number of inside cells. These can be looked up at 0xAAAABBBB where AAAA is the landblock id and BBBB is the cell id + 0x100" />
         <field type="uint" name="_numObjects" />
         <vector name="Objects" length="_numObjects" type="List" genericValue="Stab" text="Static objects" />
@@ -1399,7 +1618,7 @@
           <vector name="RestrictionTable" length="_numRestrictionTableEntries" type="Dictionary" genericKey="uint" genericValue="uint" />
         </if>
       </type>
-      <type name="EnvCell" text="DB_TYPE_CELL in the client." parent="DBObj" first="0" last="0" flags="DBObjHeaderFlags.HasId">
+      <type name="EnvCell" text="DB_TYPE_CELL in the client." parent="DBObj" flags="DBObjHeaderFlags.HasId">
         <field type="EnvCellFlags" name="Flags" />
         <field type="uint" name="_cellId" value="Id" />
         <field type="byte" name="_numSurfaces" />

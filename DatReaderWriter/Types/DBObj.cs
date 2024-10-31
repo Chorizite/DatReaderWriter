@@ -7,9 +7,11 @@ namespace ACClientLib.DatReaderWriter.Types {
     /// Base class for all DBObjs
     /// </summary>
     public abstract class DBObj : IDBObj {
-
         /// <inheritdoc />
         public abstract DBObjHeaderFlags HeaderFlags { get; }
+
+        /// <inheritdoc />
+        public abstract DBObjType DBObjType { get; }
 
         /// <inheritdoc />
         /// <remarks>

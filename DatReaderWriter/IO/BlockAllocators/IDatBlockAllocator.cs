@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ACClientLib.DatReaderWriter.Enums;
+using System;
 using System.Collections.Generic;
 
 namespace ACClientLib.DatReaderWriter.IO.BlockAllocators {
@@ -15,7 +16,7 @@ namespace ACClientLib.DatReaderWriter.IO.BlockAllocators {
 
         /// <summary>
         /// Has header data, either from reading from an existing data or from using
-        /// <see cref="InitNew(DatDatabaseType, uint, int, int)"/>
+        /// <see cref="InitNew(DatFileType, uint, int, int)"/>
         /// </summary>
         bool HasHeaderData { get; }
 
@@ -31,7 +32,7 @@ namespace ACClientLib.DatReaderWriter.IO.BlockAllocators {
         /// <param name="subset">The database sub type</param>
         /// <param name="blockSize">block size to use</param>
         /// <param name="numBlocksToAllocate">number of empty blocks to allocate</param>
-        void InitNew(DatDatabaseType type, uint subset, int blockSize = 1024, int numBlocksToAllocate = 1024);
+        void InitNew(DatFileType type, uint subset, int blockSize = 1024, int numBlocksToAllocate = 1024);
 
         /// <summary>
         /// Set the version headers

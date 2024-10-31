@@ -17,7 +17,7 @@ namespace DatReaderWriter.Tests.DBObjs {
                 options.AccessType = DatAccessType.ReadWrite;
             });
 
-            dat.BlockAllocator.InitNew(DatDatabaseType.Cell, 0);
+            dat.BlockAllocator.InitNew(DatFileType.Cell, 0);
 
             var envCell1 = new EnvCell() {
                 Id = 0x00010100,

@@ -9,10 +9,16 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace ACClientLib.DatReaderWriter.DBObjs {
-    [DBObjType(DatFileType.Undefined, DBObjHeaderFlags.None, 0xFFFF0001, 0xFFFF0001)]
+    /// <summary>
+    /// Database iteration (versioning) data
+    /// </summary>
+    [DBObjType(typeof(Iteration), DatFileType.Undefined, DBObjType.Iteration, DBObjHeaderFlags.None, 0xFFFF0001, 0xFFFF0001, 0x00000000)]
     public class Iteration : DBObj {
         /// <inheritdoc/>
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.None;
+
+        /// <inheritdoc/>
+        public override DBObjType DBObjType => DBObjType.Iteration;
 
         /// <inheritdoc/>
         public override uint Id { get; set; } = 0xFFFF0001;
@@ -21,6 +27,7 @@ namespace ACClientLib.DatReaderWriter.DBObjs {
         /// The current iteration
         /// </summary>
         public int CurrentIteration { get; set; }
+
 
         /// <summary>
         /// Iteration data

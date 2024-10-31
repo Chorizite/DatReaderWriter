@@ -15,7 +15,7 @@ namespace DatReaderWriter.Tests.DBObjs {
                 options.AccessType = DatAccessType.ReadWrite;
             });
 
-            dat.BlockAllocator.InitNew(DatDatabaseType.Portal, 0);
+            dat.BlockAllocator.InitNew(DatFileType.Portal, 0);
 
             var texture1 = new SurfaceTexture() {
                 Id = 0x05000001,

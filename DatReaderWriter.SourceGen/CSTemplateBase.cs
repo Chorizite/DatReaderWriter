@@ -533,6 +533,8 @@ namespace DatReaderWriter.SourceGen {
                     return "WriteByte";
                 case "string":
                     return "WriteString16L";
+                case "bytestring":
+                    return "WriteString16LByte";
                 case "WString":
                     return "WriteString32L";
                 case "Vector3":
@@ -582,6 +584,8 @@ namespace DatReaderWriter.SourceGen {
                     return "reader.ReadByte()";
                 case "string":
                     return "reader.ReadString16L()";
+                case "bytestring":
+                    return "reader.ReadString16LByte()";
                 case "WString":
                     return "reader.ReadString32L()";
                 case "PackedWORD":
