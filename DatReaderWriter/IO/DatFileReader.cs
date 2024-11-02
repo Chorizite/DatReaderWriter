@@ -152,7 +152,7 @@ namespace ACClientLib.DatReaderWriter.IO {
         /// </summary>
         /// <returns></returns>
         public float ReadSingle() {
-#if NETSTANDARD2_0
+#if NETSTANDARD2_0 || NETFRAMEWORK
             return BitConverter.ToSingle(ReadBytesInternal(4).ToArray(), 0);
 #else
             return BinaryPrimitives.ReadSingleLittleEndian(ReadBytesInternal(4));
@@ -164,7 +164,7 @@ namespace ACClientLib.DatReaderWriter.IO {
         /// </summary>
         /// <returns></returns>
         public double ReadDouble() {
-#if NETSTANDARD2_0
+#if NETSTANDARD2_0 || NETFRAMEWORK
             return BitConverter.ToDouble(ReadBytesInternal(8).ToArray(), 0);
 #else
             return BinaryPrimitives.ReadDoubleLittleEndian(ReadBytesInternal(8));
