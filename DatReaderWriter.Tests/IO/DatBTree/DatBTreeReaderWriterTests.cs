@@ -6,6 +6,7 @@ using ACClientLib.DatReaderWriter.IO.DatBTree;
 using ACClientLib.DatReaderWriter.Options;
 using DatReaderWriter.Tests.Lib;
 using Moq;
+using System.Data;
 
 namespace DatReaderWriter.Tests.IO.DatBTree {
     [TestClass]
@@ -210,6 +211,52 @@ namespace DatReaderWriter.Tests.IO.DatBTree {
 
         [TestMethod]
         [CombinatorialData]
+        public void CanIterateRangedFileEntries([DataValues(1, 10, 60, 61, 62, 100, 1000)] int entryCount) {
+            var datFilePath = Path.GetTempFileName();
+            var allocator = new MemoryMappedBlockAllocator(new DatDatabaseOptions() {
+                FilePath = datFilePath,
+                AccessType = DatAccessType.ReadWrite
+            });
+
+            allocator.InitNew(DatFileType.Portal, 0);
+
+            var tree = new DatBTreeReaderWriter(allocator);
+
+            Assert.AreEqual(0, allocator.Header.RootBlock);
+            var now = DateTime.UtcNow;
+
+            var files = new List<DatBTreeFile>();
+            for (var i = 0; i < entryCount; i++) {
+                files.Add(new DatBTreeFile() {
+                    Id = (uint)(i + 1)
+                });
+            }
+
+            // insert ids that will be higher than our range request to
+            // ensure they are not included in the request
+            for (var i = 0; i < entryCount; i++) {
+                files.Add(new DatBTreeFile() {
+                    Id = (uint)(10 * entryCount) + (uint)(i + 1)
+                });
+            }
+
+            foreach (var file in files) {
+                tree.Insert(file);
+            }
+
+            Assert.AreEqual(entryCount * 2, tree.Count());
+            Assert.AreEqual(entryCount, tree.GetFilesInRange(1, (uint)entryCount).Count());
+
+            var min = Math.Max((uint)entryCount / 2, entryCount);
+            Assert.AreEqual(min, tree.GetFilesInRange(1, (uint)min).Count());
+
+            tree.Dispose();
+
+            File.Delete(datFilePath);
+        }
+
+        [TestMethod]
+        [CombinatorialData]
         public void CanDeleteFileEntries([DataValues(1, 10, 100, 1000)] int entryCount) {
             var datFilePath = Path.GetTempFileName();
             var allocator = new MemoryMappedBlockAllocator(new DatDatabaseOptions() {
@@ -340,16 +387,16 @@ namespace DatReaderWriter.Tests.IO.DatBTree {
 
         [TestMethod]
         [TestCategory("EOR")]
-        [CombinatorialData]
-        public void CanLinqOverEORDats([DataValues(EORDBType.Portal)] EORDBType dbType) {
-
-            return;
+        public void CanReadEORSurfaceTextureRanges() {
             using var tree = new DatBTreeReaderWriter(new MemoryMappedBlockAllocator(new DatDatabaseOptions() {
-                FilePath = EORCommonData.GetDatPath(dbType)
+                FilePath = EORCommonData.GetDatPath(EORDBType.Portal)
             }));
+            var sw = System.Diagnostics.Stopwatch.StartNew();
+            var files = tree.GetFilesInRange(0x5000000, 0x5FFFFFF);
+            Assert.AreEqual(7221, files.Count());
+            sw.Stop();
 
-            var textureCount = tree.Where(f => f.Id >> 24 == 0x05).Select(f => f.Id).Count();
-            Assert.AreEqual(7221, textureCount);
+            Console.WriteLine(sw.ElapsedMilliseconds);
         }
 
         [TestMethod]

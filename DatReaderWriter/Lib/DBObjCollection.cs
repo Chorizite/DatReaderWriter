@@ -38,9 +38,18 @@ namespace ACClientLib.DatReaderWriter.Lib {
         /// </summary>
         /// <returns>An enumerator</returns>
         public IEnumerator<T> GetEnumerator() {
-            foreach (var entry in _dat.Tree) {
-                if (_dat.TypeFromId(entry.Id) == _typeAttr.DBObjType && _dat.TryReadFile<T>(entry.Id, out var dbObj)) {
-                    yield return dbObj;
+            if (_typeAttr.HasRangeData || _typeAttr.IsSingular) {
+                foreach (var entry in _dat.Tree.GetFilesInRange(_typeAttr.FirstId, _typeAttr.LastId)) {
+                    if (_dat.TryReadFile<T>(entry.Id, out var dbObj)) {
+                        yield return dbObj;
+                    }
+                }
+            }
+            else {
+                foreach (var entry in _dat.Tree) {
+                    if (_dat.TypeFromId(entry.Id) == _typeAttr.DBObjType && _dat.TryReadFile<T>(entry.Id, out var dbObj)) {
+                        yield return dbObj;
+                    }
                 }
             }
         }

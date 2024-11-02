@@ -86,7 +86,7 @@ namespace ACClientLib.DatReaderWriter.IO.DatBTree {
         }
 
 #if (NET8_0_OR_GREATER)
-            private bool TryGetFileInternal(uint fileId, int startingBlock, [MaybeNullWhen(false)] out DatBTreeFile file) {
+        private bool TryGetFileInternal(uint fileId, int startingBlock, [MaybeNullWhen(false)] out DatBTreeFile file) {
 #else
         private bool TryGetFileInternal(uint fileId, int startingBlock, out DatBTreeFile file) {
 #endif
@@ -213,13 +213,62 @@ namespace ACClientLib.DatReaderWriter.IO.DatBTree {
         }
 
         /// <summary>
+        /// Gets all file entries within the specified ID range (inclusive).
+        /// </summary>
+        /// <param name="minId">The minimum file ID (inclusive)</param>
+        /// <param name="maxId">The maximum file ID (inclusive)</param>
+        /// <returns>An enumerable of files within the range</returns>
+        public IEnumerable<DatBTreeFile> GetFilesInRange(uint minId, uint maxId) {
+            if (Root is null) {
+                yield break;
+            }
+
+            foreach (var file in GetFilesInRangeRecursive(Root, minId, maxId)) {
+                yield return file;
+            }
+        }
+
+        private IEnumerable<DatBTreeFile> GetFilesInRangeRecursive(DatBTreeNode node, uint minId, uint maxId) {
+            int i = 0;
+
+            // Skip entries less than minId
+            while (i < node.Files.Count && node.Files[i].Id < minId) {
+                i++;
+            }
+
+            if (!node.IsLeaf) {
+                // Check the leftmost qualifying subtree
+                if (i < node.Branches.Count && TryGetNode(node.Branches[i], out var child)) {
+                    foreach (var file in GetFilesInRangeRecursive(child, minId, maxId)) {
+                        yield return file;
+                    }
+                }
+            }
+
+            // Return entries from this node that are in range
+            while (i < node.Files.Count && node.Files[i].Id <= maxId) {
+                yield return node.Files[i];
+
+                if (!node.IsLeaf) {
+                    // Check the right subtree for this entry
+                    if (i + 1 < node.Branches.Count && TryGetNode(node.Branches[i + 1], out var child)) {
+                        foreach (var file in GetFilesInRangeRecursive(child, minId, maxId)) {
+                            yield return file;
+                        }
+                    }
+                }
+                i++;
+            }
+        }
+
+        /// <summary>
         /// Try and get a file in the tree with the specified id
         /// </summary>
         /// <param name="fileId">The file id to search for</param>
         /// <param name="file">The file, or null if not found</param>
         /// <returns>true if the file was found, false otherwise</returns>
 #if (NET8_0_OR_GREATER)
-            public bool TryGetFile(uint fileId, [MaybeNullWhen(false)] out DatBTreeFile file) {
+        public bool TryGetFile(uint fileId, [MaybeNullWhen(false)] out DatBTreeFile file) {
 #else
         public bool TryGetFile(uint fileId, out DatBTreeFile file) {
 #endif
@@ -505,7 +554,7 @@ namespace ACClientLib.DatReaderWriter.IO.DatBTree {
                     Debug.Assert(false, "Unable to lookup successorChild node!");
                     return;
                 }
-                
+
                 if (successorChild.Files.Count >= Degree) {
                     var successor = this.DeleteSuccessor(predecessorChild);
                     node.Files[keyIndexInNode] = successor;

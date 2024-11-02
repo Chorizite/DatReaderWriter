@@ -32,10 +32,20 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+    <None Include="Templates\CellDatabase.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>CellDatabase.tt</DependentUpon>
+    </None>
     <None Include="Templates\DBObjs.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>DBObjs.tt</DependentUpon>
+    </None>
+    <None Include="Templates\PortalDatabase.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>PortalDatabase.tt</DependentUpon>
     </None>
   </ItemGroup>
 
@@ -45,6 +55,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Templates\CellDatabase.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>CellDatabase.cs</LastGenOutput>
+    </None>
     <None Update="Templates\DBObjs.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>DBObjs.cs</LastGenOutput>
@@ -52,6 +66,10 @@
     <None Update="Templates\Enums.tt">
       <LastGenOutput>Enums.cs</LastGenOutput>
       <Generator>TextTemplatingFileGenerator</Generator>
+    </None>
+    <None Update="Templates\PortalDatabase.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>PortalDatabase.cs</LastGenOutput>
     </None>
     <None Update="Templates\Types.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
@@ -64,6 +82,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Templates\CellDatabase.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>CellDatabase.tt</DependentUpon>
+    </Compile>
     <Compile Update="Templates\DBObjs.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -73,6 +96,11 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>Enums.tt</DependentUpon>
+    </Compile>
+    <Compile Update="Templates\PortalDatabase.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>PortalDatabase.tt</DependentUpon>
     </Compile>
     <Compile Update="Templates\Types.cs">
       <DesignTime>True</DesignTime>
