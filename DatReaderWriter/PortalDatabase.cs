@@ -10,17 +10,19 @@ using System.Threading.Tasks;
 
 namespace ACClientLib.DatReaderWriter {
     /// <summary>
-    /// Used to read / write from the cell database. This is just a specialized <see cref="DatDatabaseReader"/>
+    /// Used to read / write from the portal database. This is just a specialized <see cref="DatDatabaseReader"/>
     /// that has collections exposed for the contained DBObjs.
     /// </summary>
-    public partial class CellDatabase : DatDatabaseReader {
+    public partial class PortalDatabase : DatDatabaseReader {
         /// <summary>
-        /// Open a <see cref="CellDatabase"/> (client_cell_1.dat)
+        /// Open a <see cref="PortalDatabase"/> (client_portal.dat)
         /// </summary>
         /// <param name="options">An action that lets you configure the options</param>
-        public CellDatabase(Action<DatDatabaseOptions> options) : base(options) {
-            if (BlockAllocator.HasHeaderData && Header.Type != DatFileType.Cell) {
-                throw new ArgumentException($"Tried to open {Options.FilePath} as a cell database, but it's type is {Header.Type}");
+        public PortalDatabase(Action<DatDatabaseOptions> options) : base(options) {
+            if (BlockAllocator.HasHeaderData && Header.Type != DatFileType.Portal) {
+                BlockAllocator.Dispose();
+                Tree.Dispose();
+                throw new ArgumentException($"Tried to open {Options.FilePath} as a portal database, but it's type is {Header.Type}");
             }
         }
 
@@ -28,8 +30,8 @@ namespace ACClientLib.DatReaderWriter {
         /// Open a <see cref="CellDatabase"/> for reading.
         /// </summary>
         /// <param name="datFilePath">The path to the cell dat file</param>
-        public CellDatabase(string datFilePath) : this(options => options.FilePath = datFilePath) {
-        
+        public PortalDatabase(string datFilePath) : this(options => options.FilePath = datFilePath) {
+
         }
     }
 }

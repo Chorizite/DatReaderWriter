@@ -44,6 +44,21 @@ namespace ACClientLib.DatReaderWriter.Attributes {
         public Type Type { get; }
 
         /// <summary>
+        /// Determines if this DBObjType is singular entry
+        /// </summary>
+        public bool IsSingular => FirstId == LastId && FirstId != 0;
+
+        /// <summary>
+        /// Determines if this DBObjType has range of valid ids
+        /// </summary>
+        public bool HasRangeData => FirstId != 0 || LastId != 0;
+
+        /// <summary>
+        /// Determines if this DBObjType uses a mask
+        /// </summary>
+        public bool HasMask => MaskId != 0;
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="type">The DBObj class type</param>
