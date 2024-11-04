@@ -46,6 +46,16 @@ namespace ACClientLib.DatReaderWriter {
         }
 
         /// <summary>
+        /// Throws an exception if this result is an error
+        /// </summary>
+        /// <returns>The value if successful</returns>
+        /// <exception cref="Exception">Thrown when result is an error</exception>
+        public T ThrowIfError() {
+            if (!Success) throw new Exception($"Operation failed: {Error}");
+            return Value!;
+        }
+
+        /// <summary>
         /// Create a result
         /// </summary>
         /// <param name="value"></param>
