@@ -33,7 +33,6 @@ namespace ACClientLib.DatReaderWriter {
         private DBObjCollection<MaterialModifier>? _MaterialModifiers;
         private DBObjCollection<MaterialInstance>? _MaterialInstances;
         private DBObjCollection<DataIdMapper>? _DataIdMappers;
-        private DBObjCollection<ExperienceTable>? _ExperienceTables;
 
         /// <summary>
         /// All GfxObjs in the database.
@@ -96,9 +95,13 @@ namespace ACClientLib.DatReaderWriter {
         public DBObjCollection<DataIdMapper> DataIdMappers => _DataIdMappers ??= new DBObjCollection<DataIdMapper>(this);
 
         /// <summary>
-        /// All ExperienceTables in the database.
+        /// The ExperienceTable DBObj in the database.
         /// </summary>
-        public DBObjCollection<ExperienceTable> ExperienceTables => _ExperienceTables ??= new DBObjCollection<ExperienceTable>(this);
-
+        public ExperienceTable? ExperienceTable {
+            get {
+                TryReadFile<ExperienceTable>(0x0E000018u, out var dbObj);
+                return dbObj;
+            }
+        }
     }
 }
