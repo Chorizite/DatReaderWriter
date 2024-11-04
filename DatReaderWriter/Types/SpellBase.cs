@@ -32,26 +32,13 @@ namespace ACClientLib.DatReaderWriter.Types {
 
         /// <summary>
         /// A list of component ids. You can look these up in the <see cref="SpellComponentTable"/>.
+        /// This is limited to maximum 8 components.
         /// </summary>
         /// <remarks>
         /// These will transparently be encrypted / decrypted.
         /// The encryption key is based on the spell name and description.
         /// </remarks>
-        public uint[] Components {
-            get => _components;
-            set {
-                if (value.Length > 8) {
-                    throw new ArgumentException("Components cannot be longer than 8");
-                }
-                if (value.Length < 8) {
-                    _components = value.Concat(Enumerable.Repeat(0u, 8 - value.Length)).ToArray();
-                }
-                else {
-                    _components = value;
-                }
-
-            }
-        }
+        public List<uint> Components = [];
 
         /// <summary>
         /// The magic school of the spell
@@ -164,12 +151,12 @@ namespace ACClientLib.DatReaderWriter.Types {
         /// Returns a list of decrypted spell component ids.
         /// </summary>
         /// <remarks>From ACE</remarks>
-        private uint[] DecryptComponents(uint[] components) {
-            if (components.Length != 8) {
-                throw new ArgumentException("Components array must contain exactly 8 values.", nameof(components));
+        private List<uint> DecryptComponents(uint[] components) {
+            if (components.Length > 8) {
+                throw new ArgumentException("Components array must contain no more than 8 values.", nameof(components));
             }
             var key = GetHashKey();
-            var comps = new uint[components.Length];
+            var comps = new uint[8];
 
             for (int i = 0; i < components.Length; i++) {
                 uint comp = (components[i] - key);
@@ -183,27 +170,31 @@ namespace ACClientLib.DatReaderWriter.Types {
                 comps[i] = components[i] == 0 ? 0 : comp;
             }
 
-            return comps;
+            return comps.Where(x => x > 0).ToList();
         }
 
         /// <summary>
         /// Encrypts component ids based on the spell's name and description
         /// </summary>
         /// <param name="components">List of component IDs to encrypt. Should always be 8 values. Use 0 for empty slots.</param>
-        private uint[] EncryptComponents(uint[] components) {
-            if (components.Length != 8) {
-                throw new ArgumentException("Components array must contain exactly 8 values.", nameof(components));
+        private List<uint> EncryptComponents(List<uint> components) {
+            if (components.Count > 8) {
+                throw new ArgumentException("Components array must contain no more than 8 values.", nameof(components));
             }
 
             var key = GetHashKey();
-            var encryptedComps = new uint[components.Length];
+            var encryptedComps = new List<uint>(8);
 
-            for (int i = 0; i < components.Length; i++) {
+            for (int i = 0; i < 8; i++) {
+                if (components.Count <= i) {
+                    encryptedComps.Add(0);
+                    continue;
+                }
+
                 if (components[i] > 198 && components[i] != 0) {
                     throw new ArgumentException($"Component ID at index {i} is {components[i]}. Must be <= 198 or 0.", nameof(components));
                 }
-
-                encryptedComps[i] = components[i] == 0 ? 0 : (components[i] + key);
+                encryptedComps.Add(components[i] == 0 ? 0 : (components[i] + key));
             }
 
             return encryptedComps;
