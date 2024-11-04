@@ -20,7 +20,7 @@ namespace ACClientLib.DatReaderWriter.Types {
     /// <summary>
     /// A 32 bit color with alpha/red/green/blue
     /// </summary>
-    public class ColorARGB : IDatObjType {
+    public partial class ColorARGB : IDatObjType {
         /// <summary>
         /// The blue amount from 0-255
         /// </summary>

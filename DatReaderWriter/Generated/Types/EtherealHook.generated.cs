@@ -17,7 +17,7 @@ using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 
 namespace ACClientLib.DatReaderWriter.Types {
-    public class EtherealHook : AnimationHook {
+    public partial class EtherealHook : AnimationHook {
         /// <inheritdoc />
         public override AnimationHookType HookType => AnimationHookType.Ethereal;
 

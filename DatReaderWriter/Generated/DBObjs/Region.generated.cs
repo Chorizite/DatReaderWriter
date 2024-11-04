@@ -23,7 +23,7 @@ namespace ACClientLib.DatReaderWriter.DBObjs {
     /// DB_TYPE_REGION in the client.
     /// </summary>
     [DBObjType(typeof(Region), DatFileType.Portal, DBObjType.Region, DBObjHeaderFlags.HasId, 0x13000000, 0x1300FFFF, 0x00000000)]
-    public class Region : DBObj {
+    public partial class Region : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;
 

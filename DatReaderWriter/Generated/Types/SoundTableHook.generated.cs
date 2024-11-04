@@ -17,7 +17,7 @@ using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 
 namespace ACClientLib.DatReaderWriter.Types {
-    public class SoundTableHook : AnimationHook {
+    public partial class SoundTableHook : AnimationHook {
         /// <inheritdoc />
         public override AnimationHookType HookType => AnimationHookType.SoundTable;
 

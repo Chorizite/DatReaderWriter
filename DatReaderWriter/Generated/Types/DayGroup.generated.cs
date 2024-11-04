@@ -17,7 +17,7 @@ using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 
 namespace ACClientLib.DatReaderWriter.Types {
-    public class DayGroup : IDatObjType {
+    public partial class DayGroup : IDatObjType {
         public float ChanceOfOccur;
 
         public string DayName;

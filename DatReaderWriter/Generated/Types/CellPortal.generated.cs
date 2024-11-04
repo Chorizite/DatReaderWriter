@@ -17,7 +17,7 @@ using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 
 namespace ACClientLib.DatReaderWriter.Types {
-    public class CellPortal : IDatObjType {
+    public partial class CellPortal : IDatObjType {
         public PortalFlags Flags;
 
         public ushort PolygonId;

@@ -247,7 +247,7 @@ namespace DatReaderWriter.SourceGen {
             if (type == "ObjectId" || type == "PackedDWORD" || type == "LandcellId" || type == "DataId") {
                 return "uint";
             }
-            if (type == "WString" || type == "bytestring") {
+            if (type == "WString" || type == "bytestring" || type == "obfuscatedstring") {
                 return "string";
             }
             if (type == "CompressedUInt") {

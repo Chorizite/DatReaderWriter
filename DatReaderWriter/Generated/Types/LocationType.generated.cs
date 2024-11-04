@@ -17,7 +17,7 @@ using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 
 namespace ACClientLib.DatReaderWriter.Types {
-    public class LocationType : IDatObjType {
+    public partial class LocationType : IDatObjType {
         public int PartId;
 
         public Frame Frame;

@@ -23,7 +23,7 @@ namespace ACClientLib.DatReaderWriter.DBObjs {
     /// DB_TYPE_MATERIALINSTANCE in the client.
     /// </summary>
     [DBObjType(typeof(MaterialInstance), DatFileType.Portal, DBObjType.MaterialInstance, DBObjHeaderFlags.HasId, 0x18000000, 0x18FFFFFF, 0x00000000)]
-    public class MaterialInstance : DBObj {
+    public partial class MaterialInstance : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;
 

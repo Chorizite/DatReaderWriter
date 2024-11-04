@@ -17,7 +17,7 @@ using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 
 namespace ACClientLib.DatReaderWriter.Types {
-    public class AnimationFrame : IDatObjType {
+    public partial class AnimationFrame : IDatObjType {
         public List<Frame> Frames = [];
 
         public List<AnimationHook> Hooks = [];

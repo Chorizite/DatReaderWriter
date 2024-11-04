@@ -17,7 +17,7 @@ using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 
 namespace ACClientLib.DatReaderWriter.Types {
-    public class TerrainAlphaMap : IDatObjType {
+    public partial class TerrainAlphaMap : IDatObjType {
         public uint TCode;
 
         public uint TexGID;

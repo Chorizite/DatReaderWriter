@@ -17,7 +17,7 @@ using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 
 namespace ACClientLib.DatReaderWriter.Types {
-    public class TerrainTex : IDatObjType {
+    public partial class TerrainTex : IDatObjType {
         public uint TexGID;
 
         public uint TexTiling;

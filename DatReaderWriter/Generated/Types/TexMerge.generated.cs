@@ -17,7 +17,7 @@ using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 
 namespace ACClientLib.DatReaderWriter.Types {
-    public class TexMerge : IDatObjType {
+    public partial class TexMerge : IDatObjType {
         public uint BaseTexSize;
 
         public List<TerrainAlphaMap> CornerTerrainMaps = [];

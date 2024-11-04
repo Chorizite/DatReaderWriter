@@ -17,7 +17,7 @@ using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 
 namespace ACClientLib.DatReaderWriter.Types {
-    public class MaterialProperty : IDatObjType {
+    public partial class MaterialProperty : IDatObjType {
         public uint NameId;
 
         public RMDataType DataType;

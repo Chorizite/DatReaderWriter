@@ -145,6 +145,11 @@ namespace ACClientLib.DatReaderWriter.Enums {
         RenderTexture,
 
         /// <summary>
+        /// DBObj RenderMaterial - 
+        /// </summary>
+        RenderMaterial,
+
+        /// <summary>
         /// DBObj MaterialModifier - DB_TYPE_MATERIALMODIFIER in the client.
         /// </summary>
         MaterialModifier,
@@ -163,11 +168,6 @@ namespace ACClientLib.DatReaderWriter.Enums {
         /// DBObj SoundTable - DB_TYPE_STABLE in the client.
         /// </summary>
         SoundTable,
-
-        /// <summary>
-        /// DBObj UILayout - DB_TYPE_UI_LAYOUT in the client.
-        /// </summary>
-        UILayout,
 
         /// <summary>
         /// DBObj EnumMapper - DB_TYPE_ENUM_MAPPER in the client.
@@ -288,6 +288,11 @@ namespace ACClientLib.DatReaderWriter.Enums {
         /// DBObj EnvCell - DB_TYPE_CELL in the client.
         /// </summary>
         EnvCell,
+
+        /// <summary>
+        /// DBObj UILayout - DB_TYPE_UI_LAYOUT in the client.
+        /// </summary>
+        UILayout,
 
         /// <summary>
         /// DBObj StringTable - DB_TYPE_STRING_TABLE in the client.

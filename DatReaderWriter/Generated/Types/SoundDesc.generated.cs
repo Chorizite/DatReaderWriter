@@ -17,7 +17,7 @@ using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 
 namespace ACClientLib.DatReaderWriter.Types {
-    public class SoundDesc : IDatObjType {
+    public partial class SoundDesc : IDatObjType {
         public List<AmbientSTBDesc> STBDesc = [];
 
         /// <inheritdoc />

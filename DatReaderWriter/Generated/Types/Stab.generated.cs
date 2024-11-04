@@ -20,7 +20,7 @@ namespace ACClientLib.DatReaderWriter.Types {
     /// <summary>
     /// Information about a static object spawn.
     /// </summary>
-    public class Stab : IDatObjType {
+    public partial class Stab : IDatObjType {
         /// <summary>
         /// The id of this static object
         /// </summary>

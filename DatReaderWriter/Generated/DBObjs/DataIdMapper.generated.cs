@@ -23,7 +23,7 @@ namespace ACClientLib.DatReaderWriter.DBObjs {
     /// DB_TYPE_DID_MAPPER in the client.
     /// </summary>
     [DBObjType(typeof(DataIdMapper), DatFileType.Portal, DBObjType.DataIdMapper, DBObjHeaderFlags.HasId, 0x25000000, 0x25FFFFFF, 0x00000000)]
-    public class DataIdMapper : DBObj {
+    public partial class DataIdMapper : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;
 

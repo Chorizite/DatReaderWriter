@@ -20,7 +20,7 @@ namespace ACClientLib.DatReaderWriter.Types {
     /// <summary>
     /// Building information.
     /// </summary>
-    public class BuildingInfo : IDatObjType {
+    public partial class BuildingInfo : IDatObjType {
         /// <summary>
         /// Either a SetupModel or GfxObj id.
         /// </summary>

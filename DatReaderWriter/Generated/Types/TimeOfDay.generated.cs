@@ -17,7 +17,7 @@ using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 
 namespace ACClientLib.DatReaderWriter.Types {
-    public class TimeOfDay : IDatObjType {
+    public partial class TimeOfDay : IDatObjType {
         public float Start;
 
         public bool IsNight;

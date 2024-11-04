@@ -24,6 +24,7 @@ namespace ACClientLib.DatReaderWriter {
         private DBObjCollection<GfxObj>? _GfxObjs;
         private DBObjCollection<Setup>? _Setups;
         private DBObjCollection<Animation>? _Animations;
+        private DBObjCollection<Palette>? _Palettes;
         private DBObjCollection<SurfaceTexture>? _SurfaceTextures;
         private DBObjCollection<RenderSurface>? _RenderSurfaces;
         private DBObjCollection<Surface>? _Surfaces;
@@ -48,6 +49,11 @@ namespace ACClientLib.DatReaderWriter {
         /// All Animations in the database.
         /// </summary>
         public DBObjCollection<Animation> Animations => _Animations ??= new DBObjCollection<Animation>(this);
+
+        /// <summary>
+        /// All Palettes in the database.
+        /// </summary>
+        public DBObjCollection<Palette> Palettes => _Palettes ??= new DBObjCollection<Palette>(this);
 
         /// <summary>
         /// All SurfaceTextures in the database.
@@ -94,6 +100,24 @@ namespace ACClientLib.DatReaderWriter {
         /// </summary>
         public DBObjCollection<DataIdMapper> DataIdMappers => _DataIdMappers ??= new DBObjCollection<DataIdMapper>(this);
 
+        /// <summary>
+        /// The SpellTable DBObj in the database.
+        /// </summary>
+        public SpellTable? SpellTable {
+            get {
+                TryReadFile<SpellTable>(0x0E00000Eu, out var dbObj);
+                return dbObj;
+            }
+        }
+        /// <summary>
+        /// The SpellComponentTable DBObj in the database.
+        /// </summary>
+        public SpellComponentTable? SpellComponentTable {
+            get {
+                TryReadFile<SpellComponentTable>(0x0E00000Fu, out var dbObj);
+                return dbObj;
+            }
+        }
         /// <summary>
         /// The ExperienceTable DBObj in the database.
         /// </summary>

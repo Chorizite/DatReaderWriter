@@ -17,7 +17,7 @@ using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 
 namespace ACClientLib.DatReaderWriter.Types {
-    public abstract class AnimationHook : IDatObjType {
+    public abstract partial class AnimationHook : IDatObjType {
         public abstract AnimationHookType HookType { get; }
 
         public AnimationHookDir Direction;

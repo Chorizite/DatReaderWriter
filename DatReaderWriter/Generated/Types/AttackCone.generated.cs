@@ -17,7 +17,7 @@ using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 
 namespace ACClientLib.DatReaderWriter.Types {
-    public class AttackCone : IDatObjType {
+    public partial class AttackCone : IDatObjType {
         public uint PartIndex;
 
         public float LeftX;

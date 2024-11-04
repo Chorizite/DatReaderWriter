@@ -33,10 +33,10 @@
             // summary docs and class definition
             WriteSummary(dataType.Text);
             if (dataType.IsAbstractImplementation) {
-                WriteLine("public" + (dataType.IsAbstract ? " abstract" : "") + " class " + dataType.Name + " : " + dataType.ParentType + " {");
+                WriteLine("public" + (dataType.IsAbstract ? " abstract" : "") + " partial class " + dataType.Name + " : " + dataType.ParentType + " {");
             }
             else {
-                WriteLine("public" + (dataType.IsAbstract ? " abstract" : "") + " class " + dataType.Name + " : IDatObjType {");
+                WriteLine("public" + (dataType.IsAbstract ? " abstract" : "") + " partial class " + dataType.Name + " : IDatObjType {");
             }
 
             using (new IndentHelper(this)) {

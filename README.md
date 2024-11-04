@@ -19,39 +19,64 @@ ACClientLib.DatReaderWriter is an open-source library for reading and writing .d
 ## Basic Usage
 
 See Tests for full usage.  
-  
+
+**Update spell names / descriptions**
+```cs
+var portalDat = new PortalDatabase(o => {
+    o.FilePath = Path.Combine(config.clientDir, "client_portal.dat");
+    o.AccessType = DatAccessType.ReadWrite;
+});
+
+var spellTable = portalDat.SpellTable ?? throw new Exception("Failed to read spell table");
+
+// get the decrypted spell component ids, so we can re-encrypt them later with the new key
+var decryptedSpellComponentIds = spellTable.Spells[1].DecryptedComponents();
+
+// update spell name / description (this changes the encryption key for component ids)
+spellTable.Spells[1].Name = "Strength Other I (updated)";
+spellTable.Spells[1].Description = "Increases the target's Strength by 10 points. (updated)";
+
+// set the raw components to the original decrypted spell component ids.
+// this will encrypt the spell components again with the new key
+spellTable.Spells[1].SetRawComponents(decryptedSpellComponentIds);
+decryptedSpellComponentIds = spellTable.Spells[1].DecryptedComponents();
+
+//write the updated spell table
+if (!portalDat.TryWriteFile(spellTable)) {
+    throw new Exception("Failed to write spell table");
+}
+
+// close dat
+portalDat.Dispose();
+```
+
 **Rewrite all MotionTables to be 100x speed:**
 ```cs  
 // open portal dat for writing
-using var portalDat = new DatDatabaseReader(options => {
+using var portalDat = new PortalDatabase(options => {
     options.FilePath = Path.Combine(gameDatDir, "client_portal.dat");
     options.AccessType = DatAccessType.ReadWrite;
 });
 
-// get all MotionTable entries
-var ids = portalDat.Tree.Select(f => f.Id).Where(id => id >= 0x09000000 && id <= 0x0900FFFF);
+// loop through all motion tables and update framerates
+foreach (var mTable in portalDat.MotionTables) {
+    // build a list of all animations
+    var anims = new List<AnimData>();
+    anims.AddRange(mTable.Cycles.Values.SelectMany(c => c.Anims));
+    anims.AddRange(mTable.Modifiers.Values.SelectMany(c => c.Anims));
+    anims.AddRange(mTable.Links.Values.SelectMany(v => v.MotionData.Values.SelectMany(c => c.Anims)));
 
-foreach (var id in ids) {
-    // try to get DBObj from file entry id
-    if (portalDat.TryReadFile<MotionTable>(id, out var mTable)) {
-        // build a list of all animations
-        var anims = new List<AnimData>();
-        anims.AddRange(mTable.Cycles.Values.SelectMany(c => c.Anims));
-        anims.AddRange(mTable.Modifiers.Values.SelectMany(c => c.Anims));
-        anims.AddRange(mTable.Links.Values.SelectMany(v => v.MotionData.Values.SelectMany(c => c.Anims)));
-
-        // update all animation framerates
-        foreach (var anim in anims) {
-            anim.Framerate *= 100f;
-        }  
-  
-        // write MotionTable back to the dat
-        portalDat.TryWriteFile(mTable);
+    // update all animation framerates
+    foreach (var anim in anims) {
+        anim.Framerate *= 100f;
     }
-}  
-  
+
+    // write MotionTable back to the dat
+    portalDat.TryWriteFile(mTable);
+}
+
 // close dat
-dat.Dispose();
+portalDat.Dispose();
 ```
 
 ## Contributing

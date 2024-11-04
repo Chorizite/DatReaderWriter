@@ -17,7 +17,7 @@ using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 
 namespace ACClientLib.DatReaderWriter.Types {
-    public class GameTime : IDatObjType {
+    public partial class GameTime : IDatObjType {
         public double ZeroTimeOfYear;
 
         public uint ZeroYear;

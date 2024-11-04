@@ -17,7 +17,7 @@ using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 
 namespace ACClientLib.DatReaderWriter.Types {
-    public class SkyTimeOfDay : IDatObjType {
+    public partial class SkyTimeOfDay : IDatObjType {
         public float Begin;
 
         public float DirBright;

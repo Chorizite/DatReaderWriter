@@ -23,7 +23,7 @@ namespace ACClientLib.DatReaderWriter.DBObjs {
     /// DB_TYPE_ENVIRONMENT in the client.
     /// </summary>
     [DBObjType(typeof(Environment), DatFileType.Portal, DBObjType.Environment, DBObjHeaderFlags.HasId, 0x0D000000, 0x0D00FFFF, 0x00000000)]
-    public class Environment : DBObj {
+    public partial class Environment : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;
 

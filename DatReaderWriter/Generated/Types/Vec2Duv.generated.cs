@@ -17,7 +17,7 @@ using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 
 namespace ACClientLib.DatReaderWriter.Types {
-    public class Vec2Duv : IDatObjType {
+    public partial class Vec2Duv : IDatObjType {
         public float U;
 
         public float V;

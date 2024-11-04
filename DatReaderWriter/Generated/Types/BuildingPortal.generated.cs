@@ -17,7 +17,7 @@ using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 
 namespace ACClientLib.DatReaderWriter.Types {
-    public class BuildingPortal : IDatObjType {
+    public partial class BuildingPortal : IDatObjType {
         public PortalFlags Flags;
 
         public ushort OtherCellId;

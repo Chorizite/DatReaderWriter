@@ -23,7 +23,7 @@ namespace ACClientLib.DatReaderWriter.DBObjs {
     /// DB_TYPE_LAND_BLOCK in the client.
     /// </summary>
     [DBObjType(typeof(LandBlock), DatFileType.Cell, DBObjType.LandBlock, DBObjHeaderFlags.HasId, 0x00000000, 0x00000000, 0x0000FFFF)]
-    public class LandBlock : DBObj {
+    public partial class LandBlock : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;
 

@@ -17,7 +17,7 @@ using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 
 namespace ACClientLib.DatReaderWriter.Types {
-    public class TMTerrainDesc : IDatObjType {
+    public partial class TMTerrainDesc : IDatObjType {
         public TerrainTextureType TerrainType;
 
         public TerrainTex TerrainTex;

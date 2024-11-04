@@ -3,6 +3,7 @@ using System.Buffers.Binary;
 using System.Drawing;
 using System.IO;
 using System.Numerics;
+using System.Text;
 
 namespace ACClientLib.DatReaderWriter.IO {
     /// <summary>
@@ -267,6 +268,26 @@ namespace ACClientLib.DatReaderWriter.IO {
 
         public void WriteString16LByte(string value) {
             WriteString16L(value, 1, false);
+        }
+
+        /// <summary>
+        /// Writes a string to a binary stream in an obfuscated format.
+        /// The string is stored as a length-prefixed sequence of bytes where each byte has been bit-rotated.
+        /// </summary>
+        public void WriteObfuscatedString(string value) {
+#if NET8_0_OR_GREATER
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+#endif
+            // Convert string to bytes using Windows-1252 encoding
+            byte[] bytes = System.Text.Encoding.GetEncoding(1252).GetBytes(value);
+
+            // Write the string length as UInt16
+            WriteUInt16((ushort)bytes.Length);
+
+            // Obfuscate and write each byte
+            for (int i = 0; i < bytes.Length; i++) {
+                WriteByte((byte)((bytes[i] >> 4) | (bytes[i] << 4)));
+            }
         }
     }
 }

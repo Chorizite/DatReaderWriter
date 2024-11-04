@@ -17,7 +17,7 @@ using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 
 namespace ACClientLib.DatReaderWriter.Types {
-    public class RoadAlphaMap : IDatObjType {
+    public partial class RoadAlphaMap : IDatObjType {
         public uint RCode;
 
         public uint TexGID;

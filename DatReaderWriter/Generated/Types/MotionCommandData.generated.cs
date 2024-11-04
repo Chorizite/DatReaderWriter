@@ -17,7 +17,7 @@ using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 
 namespace ACClientLib.DatReaderWriter.Types {
-    public class MotionCommandData : IDatObjType {
+    public partial class MotionCommandData : IDatObjType {
         public Dictionary<int, MotionData> MotionData = [];
 
         /// <inheritdoc />

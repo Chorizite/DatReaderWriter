@@ -17,7 +17,7 @@ using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 
 namespace ACClientLib.DatReaderWriter.Types {
-    public class RegionMisc : IDatObjType {
+    public partial class RegionMisc : IDatObjType {
         public uint Version;
 
         public uint GameMapID;

@@ -20,7 +20,7 @@ namespace ACClientLib.DatReaderWriter.Types {
     /// <summary>
     /// Positioning information.
     /// </summary>
-    public class Frame : IDatObjType {
+    public partial class Frame : IDatObjType {
         /// <summary>
         /// The origin, offset from the parent
         /// </summary>
