@@ -7,7 +7,6 @@ using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 using System.Text;
 using ACClientLib.DatReaderWriter.DBObjs;
-using System.Collections.Immutable;
 
 namespace ACClientLib.DatReaderWriter.Types {
     /// <summary>
