@@ -44,7 +44,7 @@ namespace DatReaderWriter.Tests.Types {
                 ManaMod = 5, 
                 NonComponentTargetType = 1234,
                 PortalLifetime = 0,
-                RawComponents = [1, 2, 3, 4, 5, 6, 7, 8],
+                Components = [1, 2, 3, 4, 5, 6, 7, 8],
                 RecoveryInterval = 0.1,
                 TargetEffect = 0x12345678
             };
@@ -82,28 +82,9 @@ namespace DatReaderWriter.Tests.Types {
             Assert.AreEqual(writeObj.ManaMod, readObj.ManaMod);
             Assert.AreEqual(writeObj.NonComponentTargetType, readObj.NonComponentTargetType);
             Assert.AreEqual(writeObj.PortalLifetime, readObj.PortalLifetime);
-            CollectionAssert.AreEqual(writeObj.RawComponents, readObj.RawComponents);
+            CollectionAssert.AreEqual(writeObj.Components, readObj.Components);
             Assert.AreEqual(writeObj.RecoveryInterval, readObj.RecoveryInterval);
             Assert.AreEqual(writeObj.TargetEffect, readObj.TargetEffect);
-        }
-
-        [TestMethod]
-        [CombinatorialData]
-        public void CanEncryptAndDecryptComponents(
-            [DataValues(
-                new uint[8] { 1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u },
-                new uint [8] { 81u, 71u, 61u, 51u, 41u, 0u, 0u, 0u }
-            )] uint[] components
-            ) {
-
-            var spellComponentBase = new SpellBase() {
-                Name = "Test",
-                Description = "Test text",
-            };
-
-            spellComponentBase.SetRawComponents(components);
-
-            CollectionAssert.AreEquivalent(components, spellComponentBase.DecryptedComponents());
         }
     }
 }

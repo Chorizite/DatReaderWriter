@@ -1,16 +1,130 @@
-﻿using ACClientLib.DatReaderWriter.DBObjs;
 using System;
-using System.Collections.Generic;
+using System.Numerics;
+using System.IO;
 using System.Linq;
+using System.Collections.Generic;
+using ACClientLib.DatReaderWriter.Enums;
+using ACClientLib.DatReaderWriter.IO;
 using System.Text;
-using System.Threading.Tasks;
+using ACClientLib.DatReaderWriter.DBObjs;
+using System.Collections.Immutable;
 
 namespace ACClientLib.DatReaderWriter.Types {
-    public partial class SpellBase {
+    /// <summary>
+    /// Information about a spell
+    /// </summary>
+    public partial class SpellBase : IDatObjType {
         // S_CONSTANT: Type: 0x108E, Value: (LF_ULONG) 303068800, SPELLBASE_NAME_HASH_KEY
         // S_CONSTANT: Type: 0x108E, Value: (LF_LONG) -1095905467, SPELLBASE_DESC_HASH_KEY
         private const uint SPELLBASE_NAME_HASH_KEY = 0x12107680u;
         private const uint SPELLBASE_DESC_HASH_KEY = 0xBEADCF45u;
+
+        private uint[] _components = new uint[8];
+
+        /// <summary>
+        /// Name of the spell
+        /// </summary>
+        public string Name = "";
+
+        /// <summary>
+        /// Description of the spell
+        /// </summary>
+        public string Description = "";
+
+        /// <summary>
+        /// A list of component ids. You can look these up in the <see cref="SpellComponentTable"/>.
+        /// </summary>
+        /// <remarks>
+        /// These will transparently be encrypted / decrypted.
+        /// The encryption key is based on the spell name and description.
+        /// </remarks>
+        public uint[] Components {
+            get => _components;
+            set {
+                if (value.Length > 8) {
+                    throw new ArgumentException("Components cannot be longer than 8");
+                }
+                if (value.Length < 8) {
+                    _components = value.Concat(Enumerable.Repeat(0u, 8 - value.Length)).ToArray();
+                }
+                else {
+                    _components = value;
+                }
+
+            }
+        }
+
+        /// <summary>
+        /// The magic school of the spell
+        /// </summary>
+        public MagicSchool School;
+
+        /// <summary>
+        /// The data id for the spell icon
+        /// </summary>
+        public uint Icon;
+
+        /// <summary>
+        /// Spell category
+        /// </summary>
+        public SpellCategory Category;
+
+        public uint Bitfield;
+
+        public uint BaseMana;
+
+        public float BaseRangeConstant;
+
+        public float BaseRangeMod;
+
+        public uint Power;
+
+        public float SpellEconomyMod;
+
+        public uint FormulaVersion;
+
+        public float ComponentLoss;
+
+        public SpellType MetaSpellType;
+
+        public uint MetaSpellId;
+
+        /// <summary>
+        /// This is only set when MetaSpellType is SpellType.Enchantment | SpellType.FellowEnchantment.
+        /// </summary>
+        public double Duration;
+
+        /// <summary>
+        /// This is only set when MetaSpellType is SpellType.Enchantment | SpellType.FellowEnchantment.
+        /// </summary>
+        public float DegradeModifier;
+
+        /// <summary>
+        /// This is only set when MetaSpellType is SpellType.Enchantment | SpellType.FellowEnchantment.
+        /// </summary>
+        public float DegradeLimit;
+
+        /// <summary>
+        /// This is only set when MetaSpellType is SpellType.PortalSummon.
+        /// </summary>
+        public double PortalLifetime;
+
+        public uint CasterEffect;
+
+        public uint TargetEffect;
+
+        public uint FizzleEffect;
+
+        public double RecoveryInterval;
+
+        public float RecoveryAmount;
+
+        public uint DisplayOrder;
+
+        public uint NonComponentTargetType;
+
+        public uint ManaMod;
+
 
 
         /// <summary>
@@ -41,7 +155,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         /// Returns a hash key based on the spell's name and description
         /// </summary>
         /// <returns></returns>
-        public uint GetHashKey() {
+        private uint GetHashKey() {
             uint nameHash = GetStringHash(Name);
             uint descHash = GetStringHash(Description);
             return (nameHash % SPELLBASE_NAME_HASH_KEY) + (descHash % SPELLBASE_DESC_HASH_KEY);
@@ -51,12 +165,15 @@ namespace ACClientLib.DatReaderWriter.Types {
         /// Returns a list of decrypted spell component ids.
         /// </summary>
         /// <remarks>From ACE</remarks>
-        public uint[] DecryptedComponents() {
+        private uint[] DecryptComponents(uint[] components) {
+            if (components.Length != 8) {
+                throw new ArgumentException("Components array must contain exactly 8 values.", nameof(components));
+            }
             var key = GetHashKey();
-            var comps = new uint[RawComponents.Length];
+            var comps = new uint[components.Length];
 
-            for (int i = 0; i < RawComponents.Length; i++) {
-                uint comp = (RawComponents[i] - key);
+            for (int i = 0; i < components.Length; i++) {
+                uint comp = (components[i] - key);
 
                 // This seems to correct issues with certain spells with extended characters.
                 // highest comp ID is 198 - "Essence of Kemeroi", for Void Spells
@@ -64,17 +181,17 @@ namespace ACClientLib.DatReaderWriter.Types {
                     comp &= 0xFF;
                 }
 
-                comps[i] = RawComponents[i] == 0 ? 0 : comp;
+                comps[i] = components[i] == 0 ? 0 : comp;
             }
 
             return comps;
         }
 
         /// <summary>
-        /// Encrypts and updates <see cref="RawComponents"/> with the new encrypted values.
+        /// Encrypts component ids based on the spell's name and description
         /// </summary>
         /// <param name="components">List of component IDs to encrypt. Should always be 8 values. Use 0 for empty slots.</param>
-        public void SetRawComponents(uint[] components) {
+        private uint[] EncryptComponents(uint[] components) {
             if (components.Length != 8) {
                 throw new ArgumentException("Components array must contain exactly 8 values.", nameof(components));
             }
@@ -90,7 +207,98 @@ namespace ACClientLib.DatReaderWriter.Types {
                 encryptedComps[i] = components[i] == 0 ? 0 : (components[i] + key);
             }
 
-            RawComponents = encryptedComps;
+            return encryptedComps;
+        }
+
+        /// <inheritdoc />
+        public bool Unpack(DatFileReader reader) {
+            Name = reader.ReadObfuscatedString();
+            reader.Align(4);
+            Description = reader.ReadObfuscatedString();
+            reader.Align(4);
+            School = (MagicSchool)reader.ReadInt32();
+            Icon = reader.ReadUInt32();
+            Category = (SpellCategory)reader.ReadUInt32();
+            Bitfield = reader.ReadUInt32();
+            BaseMana = reader.ReadUInt32();
+            BaseRangeConstant = reader.ReadSingle();
+            BaseRangeMod = reader.ReadSingle();
+            Power = reader.ReadUInt32();
+            SpellEconomyMod = reader.ReadSingle();
+            FormulaVersion = reader.ReadUInt32();
+            ComponentLoss = reader.ReadSingle();
+            MetaSpellType = (SpellType)reader.ReadUInt32();
+            MetaSpellId = reader.ReadUInt32();
+            switch(MetaSpellType) {
+                case SpellType.Enchantment:
+                case SpellType.FellowEnchantment:
+                    Duration = reader.ReadDouble();
+                    DegradeModifier = reader.ReadSingle();
+                    DegradeLimit = reader.ReadSingle();
+                    break;
+                case SpellType.PortalSummon:
+                    PortalLifetime = reader.ReadDouble();
+                    break;
+            }
+            var components = new uint[8];
+            for (var i=0; i < 8; i++) {
+                components[i] = reader.ReadUInt32();
+            }
+            Components = DecryptComponents(components);
+            CasterEffect = reader.ReadUInt32();
+            TargetEffect = reader.ReadUInt32();
+            FizzleEffect = reader.ReadUInt32();
+            RecoveryInterval = reader.ReadDouble();
+            RecoveryAmount = reader.ReadSingle();
+            DisplayOrder = reader.ReadUInt32();
+            NonComponentTargetType = reader.ReadUInt32();
+            ManaMod = reader.ReadUInt32();
+            return true;
+        }
+
+        /// <inheritdoc />
+        public bool Pack(DatFileWriter writer) {
+            writer.WriteObfuscatedString(Name);
+            writer.Align(4);
+            writer.WriteObfuscatedString(Description);
+            writer.Align(4);
+            writer.WriteInt32((int)School);
+            writer.WriteUInt32(Icon);
+            writer.WriteUInt32((uint)Category);
+            writer.WriteUInt32(Bitfield);
+            writer.WriteUInt32(BaseMana);
+            writer.WriteSingle(BaseRangeConstant);
+            writer.WriteSingle(BaseRangeMod);
+            writer.WriteUInt32(Power);
+            writer.WriteSingle(SpellEconomyMod);
+            writer.WriteUInt32(FormulaVersion);
+            writer.WriteSingle(ComponentLoss);
+            writer.WriteUInt32((uint)MetaSpellType);
+            writer.WriteUInt32(MetaSpellId);
+            switch(MetaSpellType) {
+                case SpellType.Enchantment:
+                case SpellType.FellowEnchantment:
+                    writer.WriteDouble(Duration);
+                    writer.WriteSingle(DegradeModifier);
+                    writer.WriteSingle(DegradeLimit);
+                    break;
+                case SpellType.PortalSummon:
+                    writer.WriteDouble(PortalLifetime);
+                    break;
+            }
+            var encryptedComponents = EncryptComponents(Components);
+            for (var i=0; i < 8; i++) {
+                writer.WriteUInt32(encryptedComponents[i]);
+            }
+            writer.WriteUInt32(CasterEffect);
+            writer.WriteUInt32(TargetEffect);
+            writer.WriteUInt32(FizzleEffect);
+            writer.WriteDouble(RecoveryInterval);
+            writer.WriteSingle(RecoveryAmount);
+            writer.WriteUInt32(DisplayOrder);
+            writer.WriteUInt32(NonComponentTargetType);
+            writer.WriteUInt32(ManaMod);
+            return true;
         }
     }
 }

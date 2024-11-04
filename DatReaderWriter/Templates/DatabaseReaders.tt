@@ -16,7 +16,7 @@
         WriteLine("using System.Numerics;");
         WriteLine("using System.IO;");
         WriteLine("using System.Linq;");
-        WriteLine("using System.Collections.Generic;"); 
+        WriteLine("using System.Collections.Generic;");
         WriteLine("using ACClientLib.DatReaderWriter.Enums;");
         WriteLine("using ACClientLib.DatReaderWriter.IO;");
         WriteLine("using ACClientLib.DatReaderWriter.Types;");

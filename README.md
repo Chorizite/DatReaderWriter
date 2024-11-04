@@ -7,20 +7,22 @@ ACClientLib.DatReaderWriter is an open-source library for reading and writing .d
 - [Features](#features)
 - [Installation](#installation)
 - [Basic Usage](#basic-usage)
+    - [Update spell names and descriptions](#update-spell-names-and-descriptions)
+    - [Rewrite all MotionTables to be 100x speed](#rewrite-all-motiontables-to-be-100x-speed)
 - [Contributing](#contributing)
 - [Thanks](#thanks)
 - [License](#license)
 
 ## Features
 
-- Read/Write AC .dat files
-- Full BTree insertion/addition/removal/seeking
+- Read/Write AC .dat files (Including creating new dats)
+- Full Dat BTree seeking / insertion / removal / range queries
 
 ## Basic Usage
 
 See Tests for full usage.  
 
-**Update spell names / descriptions**
+### Update spell names and descriptions
 ```cs
 var portalDat = new PortalDatabase(o => {
     o.FilePath = Path.Combine(config.clientDir, "client_portal.dat");
@@ -29,17 +31,10 @@ var portalDat = new PortalDatabase(o => {
 
 var spellTable = portalDat.SpellTable ?? throw new Exception("Failed to read spell table");
 
-// get the decrypted spell component ids, so we can re-encrypt them later with the new key
-var decryptedSpellComponentIds = spellTable.Spells[1].DecryptedComponents();
-
-// update spell name / description (this changes the encryption key for component ids)
+// update spell name / description (no need to worry about updating Components with newly
+// encrypted values, they will be transparently decrypted/encrypted during (un)packing).
 spellTable.Spells[1].Name = "Strength Other I (updated)";
 spellTable.Spells[1].Description = "Increases the target's Strength by 10 points. (updated)";
-
-// set the raw components to the original decrypted spell component ids.
-// this will encrypt the spell components again with the new key
-spellTable.Spells[1].SetRawComponents(decryptedSpellComponentIds);
-decryptedSpellComponentIds = spellTable.Spells[1].DecryptedComponents();
 
 //write the updated spell table
 if (!portalDat.TryWriteFile(spellTable)) {
@@ -50,7 +45,7 @@ if (!portalDat.TryWriteFile(spellTable)) {
 portalDat.Dispose();
 ```
 
-**Rewrite all MotionTables to be 100x speed:**
+### Rewrite all MotionTables to be 100x speed
 ```cs  
 // open portal dat for writing
 using var portalDat = new PortalDatabase(options => {
