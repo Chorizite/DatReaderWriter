@@ -17,6 +17,9 @@ using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 
 namespace ACClientLib.DatReaderWriter.Types {
+    /// <summary>
+    /// Information about a spell component
+    /// </summary>
     public partial class SpellComponentBase : IDatObjType {
         public string Name;
 

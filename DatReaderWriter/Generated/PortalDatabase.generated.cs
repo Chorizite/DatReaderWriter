@@ -34,72 +34,72 @@ namespace ACClientLib.DatReaderWriter {
         private DBObjCollection<MaterialModifier>? _MaterialModifiers;
         private DBObjCollection<MaterialInstance>? _MaterialInstances;
         private DBObjCollection<DataIdMapper>? _DataIdMappers;
-
+        
         /// <summary>
         /// All GfxObjs in the database.
         /// </summary>
         public DBObjCollection<GfxObj> GfxObjs => _GfxObjs ??= new DBObjCollection<GfxObj>(this);
-
+        
         /// <summary>
         /// All Setups in the database.
         /// </summary>
         public DBObjCollection<Setup> Setups => _Setups ??= new DBObjCollection<Setup>(this);
-
+        
         /// <summary>
         /// All Animations in the database.
         /// </summary>
         public DBObjCollection<Animation> Animations => _Animations ??= new DBObjCollection<Animation>(this);
-
+        
         /// <summary>
         /// All Palettes in the database.
         /// </summary>
         public DBObjCollection<Palette> Palettes => _Palettes ??= new DBObjCollection<Palette>(this);
-
+        
         /// <summary>
         /// All SurfaceTextures in the database.
         /// </summary>
         public DBObjCollection<SurfaceTexture> SurfaceTextures => _SurfaceTextures ??= new DBObjCollection<SurfaceTexture>(this);
-
+        
         /// <summary>
         /// All RenderSurfaces in the database.
         /// </summary>
         public DBObjCollection<RenderSurface> RenderSurfaces => _RenderSurfaces ??= new DBObjCollection<RenderSurface>(this);
-
+        
         /// <summary>
         /// All Surfaces in the database.
         /// </summary>
         public DBObjCollection<Surface> Surfaces => _Surfaces ??= new DBObjCollection<Surface>(this);
-
+        
         /// <summary>
         /// All MotionTables in the database.
         /// </summary>
         public DBObjCollection<MotionTable> MotionTables => _MotionTables ??= new DBObjCollection<MotionTable>(this);
-
+        
         /// <summary>
         /// All Environments in the database.
         /// </summary>
         public DBObjCollection<Environment> Environments => _Environments ??= new DBObjCollection<Environment>(this);
-
+        
         /// <summary>
         /// All Regions in the database.
         /// </summary>
         public DBObjCollection<Region> Regions => _Regions ??= new DBObjCollection<Region>(this);
-
+        
         /// <summary>
         /// All MaterialModifiers in the database.
         /// </summary>
         public DBObjCollection<MaterialModifier> MaterialModifiers => _MaterialModifiers ??= new DBObjCollection<MaterialModifier>(this);
-
+        
         /// <summary>
         /// All MaterialInstances in the database.
         /// </summary>
         public DBObjCollection<MaterialInstance> MaterialInstances => _MaterialInstances ??= new DBObjCollection<MaterialInstance>(this);
-
+        
         /// <summary>
         /// All DataIdMappers in the database.
         /// </summary>
         public DBObjCollection<DataIdMapper> DataIdMappers => _DataIdMappers ??= new DBObjCollection<DataIdMapper>(this);
-
+        
         /// <summary>
         /// The SpellTable DBObj in the database.
         /// </summary>

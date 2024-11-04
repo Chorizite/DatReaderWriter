@@ -23,11 +23,11 @@ namespace ACClientLib.DatReaderWriter.Types {
         public List<AnimationHook> Hooks = [];
 
         private uint NumParts;
-
+        
         public AnimationFrame(uint NumParts) {
             this.NumParts = NumParts;
         }
-
+        
         /// <inheritdoc />
         public bool Unpack(DatFileReader reader) {
             for (var i=0; i < NumParts; i++) {

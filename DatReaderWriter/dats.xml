@@ -2277,14 +2277,14 @@
       <field name="_numSpells" type="int" />
       <vector name="Spells" length="_numSpells" type="List" genericValue="uint" />
     </type>
-    <type name="SpellBase">
-      <field name="Name" type="obfuscatedstring" />
+    <type name="SpellBase" text="Information about a spell">
+      <field name="Name" type="obfuscatedstring" text="The name of the spell" />
       <align size="4" />
-      <field name="Description" type="obfuscatedstring" />
+      <field name="Description" type="obfuscatedstring" text="The description of the spell" />
       <align size="4" />
-      <field name="School" type="MagicSchool" />
-      <field name="Icon" type="uint" />
-      <field name="Category" type="SpellCategory" />
+      <field name="School" type="MagicSchool" text="The magic school the spell belongs to" />
+      <field name="Icon" type="uint" text="The data id of the spell icon" />
+      <field name="Category" type="SpellCategory" text="Spell category" />
       <field name="Bitfield" type="uint" />
       <field name="BaseMana" type="uint" />
       <field name="BaseRangeConstant" type="float" />
@@ -2320,7 +2320,7 @@
       <field name="_numSpellSetTiersBuckets" type="ushort" value="0" />
       <vector name="SpellSetTiers" length="_numSpellSetTiers" type="Dictionary" genericKey="uint" genericValue="SpellSetTiers" />
     </type>
-    <type name="SpellComponentBase">
+    <type name="SpellComponentBase" text="Information about a spell component">
       <field name="Name" type="obfuscatedstring" />
       <align size="4" />
       <field name="Category" type="uint" />

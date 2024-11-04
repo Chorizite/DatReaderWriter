@@ -27,12 +27,12 @@ namespace DatReaderWriter.Tests.DBObjs {
                     { 1, new SpellBase() {
                         Name = "Test Spell",
                         Description = "Test Spell Description",
-                        RawComponents = [1, 2, 3, 4, 5, 6, 7, 8]
+                        Components = [1, 2, 3, 4, 5, 6, 7, 8]
                     } },
                     { 2, new SpellBase() {
                         Name = "Test Spell 2",
                         Description = "Test Spell 2 Description",
-                        RawComponents = [8, 7, 6, 5, 4, 3, 2, 1]
+                        Components = [8, 7, 6, 5, 4, 3, 2, 1]
                     } }
                 }
             };

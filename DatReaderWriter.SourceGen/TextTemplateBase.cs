@@ -862,7 +862,7 @@ namespace DatReaderWriter.SourceGen {
         /// </summary>
         public void WriteLine(string textToAppend) {
             Write(textToAppend);
-            GenerationEnvironment.AppendLine();
+            Write("\r\n");
             _endsWithNewline = true;
         }
 

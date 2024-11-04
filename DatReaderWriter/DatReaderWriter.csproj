@@ -9,9 +9,12 @@
     <DebugSymbols>true</DebugSymbols>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <IsTrimmable>True</IsTrimmable>
-    <IsAotCompatible>True</IsAotCompatible>
     <IsPackable>True</IsPackable>
     <Platforms>AnyCPU</Platforms>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">
+    <IsAotCompatible>True</IsAotCompatible>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -26,21 +29,17 @@
     <RepositoryType>git</RepositoryType>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
-
+  
   <ItemGroup>
     <None Include="../README.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
-    <None Include="Templates\DBObjs.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>DBObjs.tt</DependentUpon>
-    </None>
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net48')) Or $([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'netstandard2.0'))">
     <PackageReference Include="System.Buffers" Version="4.5.1" />
+    <PackageReference Include="System.Collections.Immutable" Version="8.0.0" />
     <PackageReference Include="System.Memory" Version="4.5.5" />
   </ItemGroup>
 
@@ -53,13 +52,13 @@
       <LastGenOutput>Enums.cs</LastGenOutput>
       <Generator>TextTemplatingFileGenerator</Generator>
     </None>
-    <None Update="Templates\DatabaseReaders.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>DatabaseReaders.cs</LastGenOutput>
-    </None>
     <None Update="Templates\Types.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Types.cs</LastGenOutput>
+    </None>
+    <None Update="Templates\DatabaseReaders.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>DatabaseReaders.cs</LastGenOutput>
     </None>
   </ItemGroup>
 
@@ -68,25 +67,20 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="Templates\DBObjs.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>DBObjs.tt</DependentUpon>
+    </None>
     <Compile Update="Templates\DatabaseReaders.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>DatabaseReaders.tt</DependentUpon>
     </Compile>
-    <Compile Update="Templates\DBObjs.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>DBObjs.tt</DependentUpon>
-    </Compile>
     <Compile Update="Templates\Enums.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>Enums.tt</DependentUpon>
-    </Compile>
-    <Compile Update="Templates\PortalDatabase.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>PortalDatabase.tt</DependentUpon>
     </Compile>
     <Compile Update="Templates\Types.cs">
       <DesignTime>True</DesignTime>
@@ -94,5 +88,4 @@
       <DependentUpon>Types.tt</DependentUpon>
     </Compile>
   </ItemGroup>
-
 </Project>
