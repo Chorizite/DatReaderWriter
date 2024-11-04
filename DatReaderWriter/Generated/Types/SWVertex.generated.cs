@@ -17,7 +17,7 @@ using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 
 namespace ACClientLib.DatReaderWriter.Types {
-    public class SWVertex : IDatObjType {
+    public partial class SWVertex : IDatObjType {
         public Vector3 Origin;
 
         public Vector3 Normal;

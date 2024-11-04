@@ -17,7 +17,7 @@ using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 
 namespace ACClientLib.DatReaderWriter.Types {
-    public class SkyObject : IDatObjType {
+    public partial class SkyObject : IDatObjType {
         public float BeginTime;
 
         public float EndTime;

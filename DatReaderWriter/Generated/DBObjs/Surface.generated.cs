@@ -23,7 +23,7 @@ namespace ACClientLib.DatReaderWriter.DBObjs {
     /// DB_TYPE_SURFACE in the client.
     /// </summary>
     [DBObjType(typeof(Surface), DatFileType.Portal, DBObjType.Surface, DBObjHeaderFlags.None, 0x08000000, 0x0800FFFF, 0x00000000)]
-    public class Surface : DBObj {
+    public partial class Surface : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.None;
 

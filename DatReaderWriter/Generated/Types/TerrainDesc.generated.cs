@@ -17,7 +17,7 @@ using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 
 namespace ACClientLib.DatReaderWriter.Types {
-    public class TerrainDesc : IDatObjType {
+    public partial class TerrainDesc : IDatObjType {
         public List<TerrainType> TerrainTypes = [];
 
         public LandSurf LandSurfaces;

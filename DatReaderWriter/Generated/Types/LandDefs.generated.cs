@@ -17,7 +17,7 @@ using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 
 namespace ACClientLib.DatReaderWriter.Types {
-    public class LandDefs : IDatObjType {
+    public partial class LandDefs : IDatObjType {
         public int NumBlockLength;
 
         public int NumBlockWidth;

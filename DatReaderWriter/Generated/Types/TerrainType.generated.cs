@@ -17,7 +17,7 @@ using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 
 namespace ACClientLib.DatReaderWriter.Types {
-    public class TerrainType : IDatObjType {
+    public partial class TerrainType : IDatObjType {
         public string TerrainName;
 
         public ColorARGB TerrainColor;

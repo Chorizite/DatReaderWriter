@@ -17,7 +17,7 @@ using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 
 namespace ACClientLib.DatReaderWriter.Types {
-    public class SceneDesc : IDatObjType {
+    public partial class SceneDesc : IDatObjType {
         public List<SceneType> SceneTypes = [];
 
         /// <inheritdoc />

@@ -17,7 +17,7 @@ using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 
 namespace ACClientLib.DatReaderWriter.Types {
-    public class PortalPoly : IDatObjType {
+    public partial class PortalPoly : IDatObjType {
         public short PortalIndex;
 
         public short PolygonId;

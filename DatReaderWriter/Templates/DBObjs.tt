@@ -31,7 +31,7 @@
             WriteSummary(dataType.Text);
             var datType = (dataType.Parent as DatReaderWriter.SourceGen.Models.ACDat).Type;
             WriteLine($"[DBObjType(typeof({dataType.Name}), {datType}, DBObjType.{dataType.Name}, {dataType.DBObjHeaderFlags}, 0x{dataType.FirstId:X8}, 0x{dataType.LastId:X8}, 0x{dataType.MaskId:X8})]");
-            WriteLine("public class " + dataType.Name + " : DBObj {");
+            WriteLine("public partial class " + dataType.Name + " : DBObj {");
 
             using (new IndentHelper(this)) {
                 var usedPropertyNames = new List<string>();

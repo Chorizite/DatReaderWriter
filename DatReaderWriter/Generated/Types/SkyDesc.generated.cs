@@ -17,7 +17,7 @@ using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 
 namespace ACClientLib.DatReaderWriter.Types {
-    public class SkyDesc : IDatObjType {
+    public partial class SkyDesc : IDatObjType {
         public double TickSize;
 
         public double LightTickSize;

@@ -545,6 +545,8 @@ namespace DatReaderWriter.SourceGen {
                     return "WriteCompressedUInt";
                 case "DataIdOfKnownType":
                     return $"WriteDataIdOfKnownType";
+                case "obfuscatedstring":
+                    return $"WriteObfuscatedString";
                 default:
                     return $"WriteItem<{type}>";
             }
@@ -602,6 +604,8 @@ namespace DatReaderWriter.SourceGen {
                     return "reader.ReadCompressedUInt()";
                 case "DataIdOfKnownType":
                     return $"reader.ReadDataIdOfKnownType({size})";
+                case "obfuscatedstring":
+                    return $"reader.ReadObfuscatedString()";
                 default:
                     return $"reader.ReadItem<{type}>()";
             }

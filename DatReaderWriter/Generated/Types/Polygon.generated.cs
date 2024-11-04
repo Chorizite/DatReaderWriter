@@ -17,7 +17,7 @@ using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 
 namespace ACClientLib.DatReaderWriter.Types {
-    public class Polygon : IDatObjType {
+    public partial class Polygon : IDatObjType {
         public StipplingType Stippling;
 
         public CullMode SidesType;

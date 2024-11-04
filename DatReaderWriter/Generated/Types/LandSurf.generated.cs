@@ -17,7 +17,7 @@ using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 
 namespace ACClientLib.DatReaderWriter.Types {
-    public class LandSurf : IDatObjType {
+    public partial class LandSurf : IDatObjType {
         public uint Type;
 
         public TexMerge TexMerge;

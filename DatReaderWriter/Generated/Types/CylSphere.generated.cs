@@ -17,7 +17,7 @@ using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 
 namespace ACClientLib.DatReaderWriter.Types {
-    public class CylSphere : IDatObjType {
+    public partial class CylSphere : IDatObjType {
         public Vector3 Origin;
 
         public float Radius;

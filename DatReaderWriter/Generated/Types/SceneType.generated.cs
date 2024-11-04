@@ -17,7 +17,7 @@ using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 
 namespace ACClientLib.DatReaderWriter.Types {
-    public class SceneType : IDatObjType {
+    public partial class SceneType : IDatObjType {
         public uint StbIndex;
 
         public List<uint> Scenes = [];

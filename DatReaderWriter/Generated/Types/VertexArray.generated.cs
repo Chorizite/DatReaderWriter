@@ -17,7 +17,7 @@ using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 
 namespace ACClientLib.DatReaderWriter.Types {
-    public class VertexArray : IDatObjType {
+    public partial class VertexArray : IDatObjType {
         public VertexType VertexType;
 
         public Dictionary<ushort, SWVertex> Vertices = [];

@@ -17,7 +17,7 @@ using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 
 namespace ACClientLib.DatReaderWriter.Types {
-    public class SkyObjectReplace : IDatObjType {
+    public partial class SkyObjectReplace : IDatObjType {
         public uint ObjectIndex;
 
         public uint GFXObjId;

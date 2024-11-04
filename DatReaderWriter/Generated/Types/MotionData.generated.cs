@@ -17,7 +17,7 @@ using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 
 namespace ACClientLib.DatReaderWriter.Types {
-    public class MotionData : IDatObjType {
+    public partial class MotionData : IDatObjType {
         public byte Bitfield;
 
         public MotionDataFlags Flags;

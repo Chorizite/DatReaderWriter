@@ -17,7 +17,7 @@ using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 
 namespace ACClientLib.DatReaderWriter.Types {
-    public class CellStruct : IDatObjType {
+    public partial class CellStruct : IDatObjType {
         public VertexArray VertexArray;
 
         public Dictionary<ushort, Polygon> Polygons = [];

@@ -17,7 +17,7 @@ using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 
 namespace ACClientLib.DatReaderWriter.Types {
-    public class TerrainInfo : IDatObjType {
+    public partial class TerrainInfo : IDatObjType {
         /// <summary>
         /// Road type
         /// </summary>

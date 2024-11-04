@@ -17,7 +17,7 @@ using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 
 namespace ACClientLib.DatReaderWriter.Types {
-    public class AnimData : IDatObjType {
+    public partial class AnimData : IDatObjType {
         public uint AnimId;
 
         public int LowFrame;

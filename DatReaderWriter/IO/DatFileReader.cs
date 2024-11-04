@@ -3,6 +3,7 @@ using System.Buffers.Binary;
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using System.Text;
 
 namespace ACClientLib.DatReaderWriter.IO {
     /// <summary>
@@ -262,6 +263,30 @@ namespace ACClientLib.DatReaderWriter.IO {
 
         public string ReadString16LByte() {
             return ReadString16L(1, false);
+        }
+
+        /// <summary>
+        /// Reads an obfuscated string from a binary stream.
+        /// The string is stored as a length-prefixed sequence of bytes where each byte has been bit-rotated.
+        /// </summary>
+        /// <returns>The deobfuscated string</returns>
+        public string ReadObfuscatedString() {
+#if NET8_0_OR_GREATER
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+#endif
+            // Read the string length (stored as UInt16)
+            int stringLength = ReadUInt16();
+
+            // Read the obfuscated bytes
+            byte[] obfuscatedBytes = ReadBytes(stringLength);
+
+            // Deobfuscate each byte by rotating the bits
+            for (int i = 0; i < stringLength; i++) {
+                obfuscatedBytes[i] = (byte)((obfuscatedBytes[i] >> 4) | (obfuscatedBytes[i] << 4));
+            }
+
+            // Convert bytes to string using Windows-1252 encoding
+            return System.Text.Encoding.GetEncoding(1252).GetString(obfuscatedBytes);
         }
     }
 }

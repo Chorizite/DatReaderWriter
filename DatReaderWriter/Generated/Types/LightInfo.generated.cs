@@ -17,7 +17,7 @@ using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 
 namespace ACClientLib.DatReaderWriter.Types {
-    public class LightInfo : IDatObjType {
+    public partial class LightInfo : IDatObjType {
         public Frame ViewSpaceLocation;
 
         public ColorARGB Color;

@@ -23,7 +23,7 @@ namespace ACClientLib.DatReaderWriter.DBObjs {
     /// This holds raw texture data. DB_TYPE_RENDERSURFACE in the client.
     /// </summary>
     [DBObjType(typeof(RenderSurface), DatFileType.Portal, DBObjType.RenderSurface, DBObjHeaderFlags.HasId | DBObjHeaderFlags.HasDataCategory, 0x06000000, 0x07FFFFFF, 0x00000000)]
-    public class RenderSurface : DBObj {
+    public partial class RenderSurface : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId | DBObjHeaderFlags.HasDataCategory;
 

@@ -17,7 +17,7 @@ using ACClientLib.DatReaderWriter.Enums;
 using ACClientLib.DatReaderWriter.IO;
 
 namespace ACClientLib.DatReaderWriter.Types {
-    public class Season : IDatObjType {
+    public partial class Season : IDatObjType {
         public uint Start;
 
         public string Name;
