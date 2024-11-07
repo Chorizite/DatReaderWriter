@@ -60,13 +60,13 @@
                 WriteLine("/// <inheritdoc />");
                     
                 if (dataType.IsAbstractImplementation) {
-                    WriteLine("public override bool Unpack(DatFileReader reader) {");
+                    WriteLine("public override bool Unpack(DatBinReader reader) {");
                 }
                 else if (dataType.IsAbstract) {
-                    WriteLine("public virtual bool Unpack(DatFileReader reader) {");
+                    WriteLine("public virtual bool Unpack(DatBinReader reader) {");
                 }
                 else {
-                    WriteLine("public bool Unpack(DatFileReader reader) {"); 
+                    WriteLine("public bool Unpack(DatBinReader reader) {"); 
                 }
                 using (new IndentHelper(this)) {
                     if (dataType.IsAbstractImplementation) {
@@ -82,13 +82,13 @@
                 // define method that can parse to binary
                 WriteLine("/// <inheritdoc />");
                 if (dataType.IsAbstractImplementation) {
-                    WriteLine("public override bool Pack(DatFileWriter writer) {");
+                    WriteLine("public override bool Pack(DatBinWriter writer) {");
                 }
                 else if (dataType.IsAbstract) {
-                    WriteLine("public virtual bool Pack(DatFileWriter writer) {");
+                    WriteLine("public virtual bool Pack(DatBinWriter writer) {");
                 }
                 else {
-                    WriteLine("public bool Pack(DatFileWriter writer) {");
+                    WriteLine("public bool Pack(DatBinWriter writer) {");
                 }
                 using (new IndentHelper(this)) {
                     if (dataType.IsAbstractImplementation) {
@@ -103,7 +103,7 @@
 
                 if (!string.IsNullOrEmpty(dataType.TypeSwitch)) {
                     WriteSummary("Create a typed instance of this abstract class");
-                    WriteLine($"public static {dataType.Name}? Unpack(DatFileReader reader, {dataType.GetParameterType()} type) {{");
+                    WriteLine($"public static {dataType.Name}? Unpack(DatBinReader reader, {dataType.GetParameterType()} type) {{");
                     using (new IndentHelper(this)) {
                         WriteLine($"{dataType.Name}? instance = null;");
                         WriteLine("switch(type) {");

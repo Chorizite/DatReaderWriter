@@ -50,7 +50,7 @@
 
                 // define method that can parse from binary
                 WriteLine("/// <inheritdoc />");
-                WriteLine("public override bool Unpack(DatFileReader reader) {"); 
+                WriteLine("public override bool Unpack(DatBinReader reader) {"); 
                 using (new IndentHelper(this)) {
                     WriteLine("base.Unpack(reader);");
                     foreach (var child in dataType.Children) {
@@ -62,7 +62,7 @@
 
                 // define method that can parse to binary
                 WriteLine("/// <inheritdoc />");
-                WriteLine("public override bool Pack(DatFileWriter writer) {");
+                WriteLine("public override bool Pack(DatBinWriter writer) {");
                 using (new IndentHelper(this)) {
                     WriteLine("base.Pack(writer);");
                     foreach (var child in dataType.Children) {

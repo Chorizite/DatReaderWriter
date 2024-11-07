@@ -19,7 +19,7 @@ namespace DatReaderWriter.Lib.IO {
         public int Offset => _offset;
 
         /// <summary>
-        /// Create a new instance of this DatFileWriter
+        /// Create a new instance of this DatBinWriter
         /// </summary>
         /// <param name="data">The file data being written</param>
         public DatBinWriter(Memory<byte> data) {
@@ -288,6 +288,29 @@ namespace DatReaderWriter.Lib.IO {
             for (int i = 0; i < bytes.Length; i++) {
                 WriteByte((byte)(bytes[i] >> 4 | bytes[i] << 4));
             }
+        }
+
+        /// <summary>
+        ///  Write a string from the current stream. The string is prefixed with the length,
+        //     encoded as an integer seven bits at a time.
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public void WriteString(string value) {
+#if NET8_0_OR_GREATER
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+#endif
+            var strBytes = Encoding.GetEncoding(1252).GetBytes(value);
+            WriteCompressedUInt((uint)strBytes.Length);
+            WriteBytes(strBytes, strBytes.Length);
+        }
+
+        /// <summary>
+        /// Writes a <see cref="Guid"/> and advance the buffer position accordingly.
+        /// </summary>
+        /// <param name="value"></param>
+        public void WriteGuid(Guid value) {
+            WriteBytes(value.ToByteArray(), 16);
         }
     }
 }

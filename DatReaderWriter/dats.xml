@@ -1816,6 +1816,13 @@
       <value name="TalismanPea" value="5" />
       <value name="TaperPea" value="7" />
     </enum>
+    <enum name="DeviceType" parent="byte">
+      <value name="Invalid" value="0" />
+      <value name="Keyboard" value="1" />
+      <value name="Mouse" value="2" />
+      <value name="Joystick" value="3" />
+      <value name="Virtual" value="4" />
+    </enum>
   </enums>
   <types>
     <type name="DBObj" abstract="true">
@@ -2332,6 +2339,21 @@
       <align size="4" />
       <field name="CDM" type="float" />
     </type>
+    <type name="DeviceKeyMapEntry">
+      <field name="Type" type="DeviceType" />
+      <field name="Guid" type="guid" />
+    </type>
+    <type name="ControlSpecification" text="Key/Mouse binding information">
+      <field name="DeviceIndex" type="byte" text="The index of the device to use" />
+      <field name="SubControl " type="byte" />
+      <field name="Key" type="ushort" text="Keyboard Device / Mouse Device Enumeration (DIK_ / DIMOFS_)" />
+      <field name="Modifiers" type="uint" text="Flags that determine what modifier/meta keys are defined for this binding. These correspond to KeyMap.MetaKeys." />
+    </type>
+    <type name="UserBindingValue">
+      <field name="ActionClass" type="uint" />
+      <field name="ActionName" type="uint" text="These correspond to 0x2200002B enum dat entry" />
+      <field name="ControlSpec" type="ControlSpecification"/>
+    </type>
   </types>
   <dats>
     <dat name="portal" text="client_portal.dat" type="DatFileType.Portal">
@@ -2508,6 +2530,14 @@
         </maskmap>
       </type>
       <type name="Keymap" text="DB_TYPE_KEYMAP in the client." parent="DBObj" first="0x14000000" last="0x1400FFFF" flags="DBObjHeaderFlags.HasId">
+        <field name="Name" type="rawstring" text="The name of the keymap" />
+        <field name="GuidMap" type="guid" />
+        <field name="_numDeviceKeyMapEntries" type="uint" />
+        <vector name="DeviceKeyMapEntries" length="_numDeviceKeyMapEntries" type="List" genericValue="DeviceKeyMapEntry" text="Device list" />
+        <field name="_numMetaKeys" type="uint" />
+        <vector name="MetaKeys" length="_numMetaKeys" type="List" genericValue="ControlSpecification" text="Meta / Modifier key definitions" />
+        <field name="_numUserBindings" type="uint" />
+        <vector name="UserBindings" length="_numUserBindings" type="List" genericValue="UserBindingValue" text="User bindings" />
       </type>
       <type name="RenderTexture" text="DB_TYPE_RENDERTEXTURE in the client." parent="DBObj" first="0x15000000" last="0x15FFFFFF" flags="DBObjHeaderFlags.HasId | DBObjHeaderFlags.HasDataCategory">
       </type>
@@ -2548,6 +2578,18 @@
       <type name="ActionMap" text="DB_TYPE_ACTIONMAP in the client." parent="DBObj" first="0x26000000" last="0x2600FFFF" flags="DBObjHeaderFlags.HasId">
       </type>
       <type name="DualDataIdMapper" text="DB_TYPE_DUAL_DID_MAPPER in the client." parent="DBObj" first="0x27000000" last="0x27FFFFFF" flags="DBObjHeaderFlags.HasId">
+        <field name="ClientIDNumberingType" type="NumberingType" />
+        <field name="_numClientEnumToIDs" type="CompressedUInt" />
+        <vector name="ClientEnumToID" length="_numClientEnumToIDs" type="Dictionary" genericKey="uint" genericValue="uint" />
+        <field name="ClientNameNumberingType" type="NumberingType" />
+        <field name="_numClientEnumToNames" type="CompressedUInt" />
+        <vector name="ClientEnumToName" length="_numClientEnumToNames" type="Dictionary" genericKey="uint" genericValue="bytestring" />
+        <field name="ServerIDNumberingType" type="NumberingType" />
+        <field name="_numServerEnumToIDs" type="CompressedUInt" />
+        <vector name="ServerEnumToID" length="_numServerEnumToIDs" type="Dictionary" genericKey="uint" genericValue="uint" />
+        <field name="ServerNameNumberingType" type="NumberingType" />
+        <field name="_numServerEnumToNames" type="CompressedUInt" />
+        <vector name="ServerEnumToName" length="_numServerEnumToNames" type="Dictionary" genericKey="uint" genericValue="bytestring" />
       </type>
       <type name="LanguageString" text="DB_TYPE_STRING in the client." parent="DBObj" first="0x31000000" last="0x3100FFFF" flags="DBObjHeaderFlags.HasId">
       </type>

@@ -493,6 +493,15 @@ namespace DatReaderWriter.SourceGen {
                 case "bool":
                     WriteLine($"{type} {child.Name} = false;");
                     break;
+                case "string":
+                case "bytestring":
+                case "rawstring":
+                case "WString":
+                    WriteLine($"{type} {child.Name} = \"\";");
+                    break;
+                case "guid":
+                    WriteLine($"{type} {child.Name} = new();");
+                    break;
                 default:
                     WriteLine($"{type} {child.Name} = null;");
                     break;
@@ -531,6 +540,8 @@ namespace DatReaderWriter.SourceGen {
                     return "WriteBool";
                 case "byte":
                     return "WriteByte";
+                case "rawstring":
+                    return "WriteString";
                 case "string":
                     return "WriteString16L";
                 case "bytestring":
@@ -547,6 +558,8 @@ namespace DatReaderWriter.SourceGen {
                     return $"WriteDataIdOfKnownType";
                 case "obfuscatedstring":
                     return $"WriteObfuscatedString";
+                case "guid":
+                    return $"WriteGuid";
                 default:
                     return $"WriteItem<{type}>";
             }
@@ -606,6 +619,10 @@ namespace DatReaderWriter.SourceGen {
                     return $"reader.ReadDataIdOfKnownType({size})";
                 case "obfuscatedstring":
                     return $"reader.ReadObfuscatedString()";
+                case "rawstring":
+                    return $"reader.ReadString()";
+                case "guid":
+                    return $"reader.ReadGuid()";
                 default:
                     return $"reader.ReadItem<{type}>()";
             }
