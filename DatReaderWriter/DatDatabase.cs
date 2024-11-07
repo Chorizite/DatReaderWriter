@@ -51,7 +51,14 @@ namespace DatReaderWriter {
             Options = new DatDatabaseOptions();
             options?.Invoke(Options);
 
-            BlockAllocator = blockAllocator ?? new MemoryMappedBlockAllocator(Options);
+            // use StreamBlockAllocator on x86, to avoid memory mapping using all the address space
+            if (IntPtr.Size == 4) {
+                BlockAllocator = blockAllocator ?? new StreamBlockAllocator(Options);
+            }
+            else {
+                BlockAllocator = blockAllocator ?? new MemoryMappedBlockAllocator(Options);
+            }
+
             Tree = new DatBTreeReaderWriter(BlockAllocator);
 
             if (TryReadFile<Iteration>(0xFFFF0001, out var iteration)) {
