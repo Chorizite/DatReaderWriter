@@ -20,10 +20,12 @@
         WriteLine("using System.IO;");
         WriteLine("using System.Linq;");
         WriteLine("using System.Collections.Generic;"); 
-        WriteLine("using ACClientLib.DatReaderWriter.Enums;");
-        WriteLine("using ACClientLib.DatReaderWriter.IO;");
+        WriteLine("using DatReaderWriter.Enums;");
+        WriteLine("using DatReaderWriter.Lib;");
+        WriteLine("using DatReaderWriter.Lib.Attributes;");
+        WriteLine("using DatReaderWriter.Lib.IO;");
         WriteLine("");
-        WriteLine("namespace ACClientLib.DatReaderWriter.Types {");
+        WriteLine("namespace DatReaderWriter.Types {");
         using (new IndentHelper(this)) {
             var dataType = kv.Value;
         

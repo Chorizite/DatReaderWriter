@@ -9,7 +9,7 @@
 
 
 using System;
-namespace ACClientLib.DatReaderWriter.Enums {
+namespace DatReaderWriter.Enums {
     public enum MotionDataFlags : byte {
         None = 0x00,
 

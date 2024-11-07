@@ -13,10 +13,12 @@ using System.Numerics;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.IO;
+using DatReaderWriter.Enums;
+using DatReaderWriter.Lib;
+using DatReaderWriter.Lib.Attributes;
+using DatReaderWriter.Lib.IO;
 
-namespace ACClientLib.DatReaderWriter.Types {
+namespace DatReaderWriter.Types {
     /// <summary>
     /// Information about a static object spawn.
     /// </summary>
@@ -32,14 +34,14 @@ namespace ACClientLib.DatReaderWriter.Types {
         public Frame Frame;
 
         /// <inheritdoc />
-        public bool Unpack(DatFileReader reader) {
+        public bool Unpack(DatBinReader reader) {
             Id = reader.ReadUInt32();
             Frame = reader.ReadItem<Frame>();
             return true;
         }
 
         /// <inheritdoc />
-        public bool Pack(DatFileWriter writer) {
+        public bool Pack(DatBinWriter writer) {
             writer.WriteUInt32(Id);
             writer.WriteItem<Frame>(Frame);
             return true;

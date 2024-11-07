@@ -13,22 +13,24 @@ using System.Numerics;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.IO;
+using DatReaderWriter.Enums;
+using DatReaderWriter.Lib;
+using DatReaderWriter.Lib.Attributes;
+using DatReaderWriter.Lib.IO;
 
-namespace ACClientLib.DatReaderWriter.Types {
+namespace DatReaderWriter.Types {
     public partial class AnimationDoneHook : AnimationHook {
         /// <inheritdoc />
         public override AnimationHookType HookType => AnimationHookType.AnimationDone;
 
         /// <inheritdoc />
-        public override bool Unpack(DatFileReader reader) {
+        public override bool Unpack(DatBinReader reader) {
             base.Unpack(reader);
             return true;
         }
 
         /// <inheritdoc />
-        public override bool Pack(DatFileWriter writer) {
+        public override bool Pack(DatBinWriter writer) {
             base.Pack(writer);
             return true;
         }

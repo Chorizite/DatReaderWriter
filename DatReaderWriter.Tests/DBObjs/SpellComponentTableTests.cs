@@ -1,9 +1,9 @@
 ﻿using DatReaderWriter.Tests.Lib;
-using ACClientLib.DatReaderWriter;
-using ACClientLib.DatReaderWriter.Options;
-using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.DBObjs;
-using ACClientLib.DatReaderWriter.Types;
+using DatReaderWriter;
+using DatReaderWriter.Options;
+using DatReaderWriter.Enums;
+using DatReaderWriter.DBObjs;
+using DatReaderWriter.Types;
 using System.Numerics;
 using System.Text;
 
@@ -13,7 +13,7 @@ namespace DatReaderWriter.Tests.DBObjs {
         [TestMethod]
         public void CanInsertAndReadSpellComponentTables() {
             var datFilePath = Path.GetTempFileName();
-            using var dat = new DatDatabaseReader(options => {
+            using var dat = new DatDatabase(options => {
                 options.FilePath = datFilePath;
                 options.AccessType = DatAccessType.ReadWrite;
             });

@@ -5,11 +5,11 @@ using System.IO;
 using System.Numerics;
 using System.Text;
 
-namespace ACClientLib.DatReaderWriter.IO {
+namespace DatReaderWriter.Lib.IO {
     /// <summary>
     /// A dat file writer. Used for writing dat block contents to a buffer.
     /// </summary>
-    public class DatFileWriter {
+    public class DatBinWriter {
         private readonly Memory<byte> _data;
         private int _offset;
 
@@ -22,7 +22,7 @@ namespace ACClientLib.DatReaderWriter.IO {
         /// Create a new instance of this DatFileWriter
         /// </summary>
         /// <param name="data">The file data being written</param>
-        public DatFileWriter(Memory<byte> data) {
+        public DatBinWriter(Memory<byte> data) {
             _data = data;
         }
 
@@ -206,14 +206,14 @@ namespace ACClientLib.DatReaderWriter.IO {
             }
             else if (value < 0x4000) {
                 // Fits in 2 bytes (14 bits)
-                WriteByte((byte)((value >> 8) | 0x80));  // Set MSB (0x80)
+                WriteByte((byte)(value >> 8 | 0x80));  // Set MSB (0x80)
                 WriteByte((byte)(value & 0xFF));
             }
             else {
                 // Requires 4 bytes (up to 32 bits)
-                WriteByte((byte)((value >> 24) | 0xC0));  // Set both MSB (0x80) and 2nd MSB (0x40)
-                WriteByte((byte)((value >> 16) & 0xFF));
-                WriteByte((byte)((value >> 8) & 0xFF));
+                WriteByte((byte)(value >> 24 | 0xC0));  // Set both MSB (0x80) and 2nd MSB (0x40)
+                WriteByte((byte)(value >> 16 & 0xFF));
+                WriteByte((byte)(value >> 8 & 0xFF));
                 WriteByte((byte)(value & 0xFF));
             }
         }
@@ -238,7 +238,7 @@ namespace ACClientLib.DatReaderWriter.IO {
 
             if (rawValue > 0x7FFF) { // If the value is larger than 15 bits (0x7FFF)
                                      // Write the higher 16 bits with MSB set, masked with 0x3FFF
-                var higher = (ushort)(0x8000 | ((rawValue >> 16) & 0x3FFF)); // Set MSB and mask to 14 bits
+                var higher = (ushort)(0x8000 | rawValue >> 16 & 0x3FFF); // Set MSB and mask to 14 bits
                 WriteUInt16(higher);
 
                 // Write the lower 16 bits
@@ -252,7 +252,7 @@ namespace ACClientLib.DatReaderWriter.IO {
         }
 
         public void WriteString16L(string value, int sizeOfLength = 2, bool align = true) {
-            var bytes = System.Text.Encoding.Default.GetBytes(value);
+            var bytes = Encoding.Default.GetBytes(value);
             switch (sizeOfLength) {
                 case 1:
                     WriteByte((byte)bytes.Length);
@@ -279,14 +279,14 @@ namespace ACClientLib.DatReaderWriter.IO {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 #endif
             // Convert string to bytes using Windows-1252 encoding
-            byte[] bytes = System.Text.Encoding.GetEncoding(1252).GetBytes(value);
+            byte[] bytes = Encoding.GetEncoding(1252).GetBytes(value);
 
             // Write the string length as UInt16
             WriteUInt16((ushort)bytes.Length);
 
             // Obfuscate and write each byte
             for (int i = 0; i < bytes.Length; i++) {
-                WriteByte((byte)((bytes[i] >> 4) | (bytes[i] << 4)));
+                WriteByte((byte)(bytes[i] >> 4 | bytes[i] << 4));
             }
         }
     }

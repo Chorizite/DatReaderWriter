@@ -1,5 +1,5 @@
-using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.IO;
+using DatReaderWriter.Enums;
+using DatReaderWriter.Lib.IO;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,12 +9,12 @@ using System.Text;
 ///
 /// From ACE
 ///
-namespace ACClientLib.DatReaderWriter.Types {
+namespace DatReaderWriter.Types {
     public class BSPPortal : BSPNode {
         public List<PortalPoly> InPortals { get; } = new List<PortalPoly>();
 
         /// <inheritdoc />
-        public override void Unpack(DatFileReader reader, BSPTreeType treeType) {
+        public override void Unpack(DatBinReader reader, BSPTreeType treeType) {
             Type = Encoding.ASCII.GetString(reader.ReadBytes(4).Reverse().ToArray());
 
             SplittingPlane = reader.ReadPlane();
@@ -40,7 +40,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         }
 
         /// <inheritdoc />
-        public override void Pack(DatFileWriter writer, BSPTreeType treeType) {
+        public override void Pack(DatBinWriter writer, BSPTreeType treeType) {
             var typeBytes = Encoding.ASCII.GetBytes(Type).Reverse().ToArray();
             writer.WriteBytes(typeBytes, typeBytes.Length);
 

@@ -5,12 +5,12 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 
-namespace ACClientLib.DatReaderWriter.IO {
+namespace DatReaderWriter.Lib.IO {
     /// <summary>
     /// Reads / parses dat file bytes. This expects that the raw data buffer
     /// passed already has its blocks followed, and is a contiguous chunk of memory.
     /// </summary>
-    public class DatFileReader {
+    public class DatBinReader {
         private readonly ReadOnlyMemory<byte> _data;
         private int _offset;
 
@@ -23,7 +23,7 @@ namespace ACClientLib.DatReaderWriter.IO {
         /// Create a new instance
         /// </summary>
         /// <param name="data">The file data being parsed</param>
-        public DatFileReader(ReadOnlyMemory<byte> data) {
+        public DatBinReader(ReadOnlyMemory<byte> data) {
             _data = data;
         }
 
@@ -37,7 +37,7 @@ namespace ACClientLib.DatReaderWriter.IO {
         /// </summary>
         /// <param name="v"></param>
         public void Align(int v) {
-            var alignDelta  = _offset % v;
+            var alignDelta = _offset % v;
 
             if (alignDelta > 0) {
                 Skip(v - alignDelta);
@@ -211,10 +211,10 @@ namespace ACClientLib.DatReaderWriter.IO {
 
             var b1 = ReadByte();
             if ((b0 & 0x40) == 0)
-                return (uint)(((b0 & 0x7F) << 8) | b1);
+                return (uint)((b0 & 0x7F) << 8 | b1);
 
             var s = ReadUInt16();
-            return (uint)(((((b0 & 0x3F) << 8) | b1) << 16) | s);
+            return (uint)(((b0 & 0x3F) << 8 | b1) << 16 | s);
         }
 
         /// <summary>
@@ -241,7 +241,7 @@ namespace ACClientLib.DatReaderWriter.IO {
                 return (uint)(knownType + (higher | lower));
             }
 
-            return (knownType + value);
+            return knownType + value;
         }
 
         public string ReadString16L(int sizeOfLength = 2, bool align = true) {
@@ -258,7 +258,7 @@ namespace ACClientLib.DatReaderWriter.IO {
 
             byte[] thestring = ReadBytes(stringlength);
             if (align) Align(4);
-            return System.Text.Encoding.Default.GetString(thestring);
+            return Encoding.Default.GetString(thestring);
         }
 
         public string ReadString16LByte() {
@@ -282,11 +282,11 @@ namespace ACClientLib.DatReaderWriter.IO {
 
             // Deobfuscate each byte by rotating the bits
             for (int i = 0; i < stringLength; i++) {
-                obfuscatedBytes[i] = (byte)((obfuscatedBytes[i] >> 4) | (obfuscatedBytes[i] << 4));
+                obfuscatedBytes[i] = (byte)(obfuscatedBytes[i] >> 4 | obfuscatedBytes[i] << 4);
             }
 
             // Convert bytes to string using Windows-1252 encoding
-            return System.Text.Encoding.GetEncoding(1252).GetString(obfuscatedBytes);
+            return Encoding.GetEncoding(1252).GetString(obfuscatedBytes);
         }
     }
 }

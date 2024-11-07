@@ -1,10 +1,10 @@
-﻿using ACClientLib.DatReaderWriter.DBObjs;
-using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.IO;
-using ACClientLib.DatReaderWriter.IO.BlockAllocators;
-using ACClientLib.DatReaderWriter.IO.DatBTree;
-using ACClientLib.DatReaderWriter.Lib;
-using ACClientLib.DatReaderWriter.Options;
+﻿using DatReaderWriter.DBObjs;
+using DatReaderWriter.Enums;
+using DatReaderWriter.Lib;
+using DatReaderWriter.Options;
+using DatReaderWriter.Lib.IO;
+using DatReaderWriter.Lib.IO.BlockAllocators;
+using DatReaderWriter.Lib.IO.DatBTree;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,12 +12,19 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace ACClientLib.DatReaderWriter {
+namespace DatReaderWriter {
     /// <summary>
     /// Provides read access to a dat database
     /// </summary>
-    public partial class DatDatabaseReader : IDisposable {
+    public partial class DatDatabase : IDisposable {
+        /// <summary>
+        /// Block allocator
+        /// </summary>
         public readonly IDatBlockAllocator BlockAllocator;
+
+        /// <summary>
+        /// Binary Tree
+        /// </summary>
         public readonly DatBTreeReaderWriter Tree;
 
         /// <summary>
@@ -40,7 +47,7 @@ namespace ACClientLib.DatReaderWriter {
         /// </summary>
         /// <param name="options">Options configuration action</param>
         /// <param name="blockAllocator">Block allocator instance to use</param>
-        public DatDatabaseReader(Action<DatDatabaseOptions>? options = null, IDatBlockAllocator? blockAllocator = null) {
+        public DatDatabase(Action<DatDatabaseOptions>? options = null, IDatBlockAllocator? blockAllocator = null) {
             Options = new DatDatabaseOptions();
             options?.Invoke(Options);
 
@@ -110,7 +117,7 @@ namespace ACClientLib.DatReaderWriter {
 
             value = (T)Activator.CreateInstance(typeof(T));
 
-            if (!value.Unpack(new DatFileReader(bytes))) {
+            if (!value.Unpack(new DatBinReader(bytes))) {
                 value = default!;
                 return false;
             }
@@ -135,7 +142,7 @@ namespace ACClientLib.DatReaderWriter {
 
             // TODO: fix this static 5mb buffer...
             var buffer = BaseBlockAllocator.SharedBytes.Rent(1024 * 1024 * 5);
-            var writer = new DatFileWriter(buffer);
+            var writer = new DatBinWriter(buffer);
 
             value.Pack(writer);
             startingBlockId = Tree.BlockAllocator.WriteBlock(buffer, writer.Offset, startingBlockId);

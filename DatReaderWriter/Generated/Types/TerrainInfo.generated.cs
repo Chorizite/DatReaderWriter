@@ -13,10 +13,12 @@ using System.Numerics;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.IO;
+using DatReaderWriter.Enums;
+using DatReaderWriter.Lib;
+using DatReaderWriter.Lib.Attributes;
+using DatReaderWriter.Lib.IO;
 
-namespace ACClientLib.DatReaderWriter.Types {
+namespace DatReaderWriter.Types {
     public partial class TerrainInfo : IDatObjType {
         /// <summary>
         /// Road type
@@ -34,7 +36,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         public ushort Scenery;
 
         /// <inheritdoc />
-        public bool Unpack(DatFileReader reader) {
+        public bool Unpack(DatBinReader reader) {
             var _rawValue = reader.ReadUInt16();
             Road = (byte)(_rawValue & 0x3);
             Type = (TerrainTextureType)((_rawValue & 0x7C) >> 2);
@@ -43,7 +45,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         }
 
         /// <inheritdoc />
-        public bool Pack(DatFileWriter writer) {
+        public bool Pack(DatBinWriter writer) {
             ushort _rawValue = default;
             _rawValue |= (ushort)((ushort)Road & 0x3);
             _rawValue |= (ushort)(((ushort)Type << 2) & 0x7C);

@@ -13,10 +13,12 @@ using System.Numerics;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.IO;
+using DatReaderWriter.Enums;
+using DatReaderWriter.Lib;
+using DatReaderWriter.Lib.Attributes;
+using DatReaderWriter.Lib.IO;
 
-namespace ACClientLib.DatReaderWriter.Types {
+namespace DatReaderWriter.Types {
     public partial class TimeOfDay : IDatObjType {
         public float Start;
 
@@ -25,7 +27,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         public string Name;
 
         /// <inheritdoc />
-        public bool Unpack(DatFileReader reader) {
+        public bool Unpack(DatBinReader reader) {
             Start = reader.ReadSingle();
             IsNight = reader.ReadBool(4);
             Name = reader.ReadString16L();
@@ -34,7 +36,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         }
 
         /// <inheritdoc />
-        public bool Pack(DatFileWriter writer) {
+        public bool Pack(DatBinWriter writer) {
             writer.WriteSingle(Start);
             writer.WriteBool(IsNight, 4);
             writer.WriteString16L(Name);

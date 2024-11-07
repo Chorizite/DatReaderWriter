@@ -13,10 +13,12 @@ using System.Numerics;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.IO;
+using DatReaderWriter.Enums;
+using DatReaderWriter.Lib;
+using DatReaderWriter.Lib.Attributes;
+using DatReaderWriter.Lib.IO;
 
-namespace ACClientLib.DatReaderWriter.Types {
+namespace DatReaderWriter.Types {
     public partial class SkyTimeOfDay : IDatObjType {
         public float Begin;
 
@@ -43,7 +45,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         public List<SkyObjectReplace> SkyObjReplace = [];
 
         /// <inheritdoc />
-        public bool Unpack(DatFileReader reader) {
+        public bool Unpack(DatBinReader reader) {
             Begin = reader.ReadSingle();
             DirBright = reader.ReadSingle();
             DirHeading = reader.ReadSingle();
@@ -63,7 +65,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         }
 
         /// <inheritdoc />
-        public bool Pack(DatFileWriter writer) {
+        public bool Pack(DatBinWriter writer) {
             writer.WriteSingle(Begin);
             writer.WriteSingle(DirBright);
             writer.WriteSingle(DirHeading);

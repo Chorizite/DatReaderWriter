@@ -13,12 +13,13 @@ using System.Numerics;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.IO;
-using ACClientLib.DatReaderWriter.Types;
-using ACClientLib.DatReaderWriter.Attributes;
+using DatReaderWriter.Enums;
+using DatReaderWriter.Types;
+using DatReaderWriter.Lib;
+using DatReaderWriter.Lib.Attributes;
+using DatReaderWriter.Lib.IO;
 
-namespace ACClientLib.DatReaderWriter.DBObjs {
+namespace DatReaderWriter.DBObjs {
     /// <summary>
     /// This holds raw texture data. DB_TYPE_RENDERSURFACE in the client.
     /// </summary>
@@ -56,7 +57,7 @@ namespace ACClientLib.DatReaderWriter.DBObjs {
         public uint DefaultPaletteId;
 
         /// <inheritdoc />
-        public override bool Unpack(DatFileReader reader) {
+        public override bool Unpack(DatBinReader reader) {
             base.Unpack(reader);
             Width = reader.ReadInt32();
             Height = reader.ReadInt32();
@@ -76,7 +77,7 @@ namespace ACClientLib.DatReaderWriter.DBObjs {
         }
 
         /// <inheritdoc />
-        public override bool Pack(DatFileWriter writer) {
+        public override bool Pack(DatBinWriter writer) {
             base.Pack(writer);
             writer.WriteInt32(Width);
             writer.WriteInt32(Height);

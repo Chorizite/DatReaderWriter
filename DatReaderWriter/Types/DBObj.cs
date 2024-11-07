@@ -1,8 +1,8 @@
 using System;
-using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.IO;
+using DatReaderWriter.Enums;
+using DatReaderWriter.Lib.IO;
 
-namespace ACClientLib.DatReaderWriter.Types {
+namespace DatReaderWriter.Types {
     /// <summary>
     /// Base class for all DBObjs
     /// </summary>
@@ -25,7 +25,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         public virtual uint DataCategory { get; set; }
 
         /// <inheritdoc />
-        public virtual bool Unpack(DatFileReader reader) {
+        public virtual bool Unpack(DatBinReader reader) {
             if (HeaderFlags.HasFlag(DBObjHeaderFlags.HasId)) {
                 Id = reader.ReadUInt32();
             }
@@ -36,7 +36,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         }
 
         /// <inheritdoc />
-        public virtual bool Pack(DatFileWriter writer) {
+        public virtual bool Pack(DatBinWriter writer) {
             if (HeaderFlags.HasFlag(DBObjHeaderFlags.HasId)) {
                 writer.WriteUInt32(Id);
             }

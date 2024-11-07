@@ -12,19 +12,15 @@
     <IsPackable>True</IsPackable>
     <Platforms>AnyCPU</Platforms>
   </PropertyGroup>
-  
-  <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">
-    <IsAotCompatible>True</IsAotCompatible>
-  </PropertyGroup>
 
   <PropertyGroup>
-    <Title>ACClientLib.DatReaderWriter</Title>
-    <Product>ACClientLib.DatReaderWriter</Product>
-    <PackageId>ACClientLib.DatReaderWriter</PackageId>
+    <Title>DatReaderWriter</Title>
+    <Product>DatReaderWriter</Product>
+    <PackageId>DatReaderWriter</PackageId>
     <Authors>ACClientLib</Authors>
     <Company>ACClientLib</Company>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Description>ACClientLib.DatReaderWriter is an open-source library for reading and writing .dat files used by the game Asheron's Call.</Description>
+    <Description>DatReaderWriter is an open-source library for reading and writing .dat files used by the game Asheron's Call.</Description>
     <RepositoryUrl>https://github.com/ACClientLib/DatReaderWriter/</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -48,6 +44,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="System.IO.Pipelines" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net48')) Or $([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'netstandard2.0'))">
@@ -88,6 +85,11 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>DatabaseReaders.tt</DependentUpon>
+    </Compile>
+    <Compile Update="Templates\DBObjs.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>DBObjs.tt</DependentUpon>
     </Compile>
     <Compile Update="Templates\Enums.cs">
       <DesignTime>True</DesignTime>

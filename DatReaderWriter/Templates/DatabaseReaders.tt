@@ -17,14 +17,14 @@
         WriteLine("using System.IO;");
         WriteLine("using System.Linq;");
         WriteLine("using System.Collections.Generic;");
-        WriteLine("using ACClientLib.DatReaderWriter.Enums;");
-        WriteLine("using ACClientLib.DatReaderWriter.IO;");
-        WriteLine("using ACClientLib.DatReaderWriter.Types;");
-        WriteLine("using ACClientLib.DatReaderWriter.Attributes;");
-        WriteLine("using ACClientLib.DatReaderWriter.Lib;");
-        WriteLine("using ACClientLib.DatReaderWriter.DBObjs;");
+        WriteLine("using DatReaderWriter.Enums;");
+        WriteLine("using DatReaderWriter.Types;");
+        WriteLine("using DatReaderWriter.Lib;");
+        WriteLine("using DatReaderWriter.Lib.Attributes;");
+        WriteLine("using DatReaderWriter.Lib.IO;");
+        WriteLine("using DatReaderWriter.DBObjs;");
         WriteLine("");
-        WriteLine("namespace ACClientLib.DatReaderWriter {");
+        WriteLine("namespace DatReaderWriter {");
     
         using (new IndentHelper(this)) {
             WriteLine($"public partial class {reader}Database {{");

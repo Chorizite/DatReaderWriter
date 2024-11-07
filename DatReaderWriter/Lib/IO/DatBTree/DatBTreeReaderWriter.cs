@@ -1,5 +1,4 @@
-﻿using ACClientLib.DatReaderWriter.IO.BlockAllocators;
-using ACClientLib.DatReaderWriter.Options;
+﻿using DatReaderWriter.Options;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -8,11 +7,12 @@ using System.Text;
 using System.Xml.Linq;
 using System.Diagnostics;
 using System.Collections;
+using DatReaderWriter.Lib.IO.BlockAllocators;
 
 /*
  *  Heavily based on https://github.com/rsdcastro/btree-dotnet/ and https://github.com/msambol/dsa/blob/master/trees/b_tree.py
  */
-namespace ACClientLib.DatReaderWriter.IO.DatBTree {
+namespace DatReaderWriter.Lib.IO.DatBTree {
     /// <summary>
     /// A dat BTree reader / writer.
     /// </summary>
@@ -44,7 +44,7 @@ namespace ACClientLib.DatReaderWriter.IO.DatBTree {
         /// The maximum amount of file entries that can be stored on a node.
         /// This is <code>(<see cref="Degree"/> * 2) - 1</code>
         /// </summary>
-        public int MaxItems => (Degree * 2) - 1;
+        public int MaxItems => Degree * 2 - 1;
 
         /// <summary>
         /// Create a new DatBTreeReaderWriter instance from a <see cref="IDatBlockAllocator"/>
@@ -66,7 +66,7 @@ namespace ACClientLib.DatReaderWriter.IO.DatBTree {
 
             BlockAllocator.ReadBlock(buffer, blockOffset);
             result = new DatBTreeNode(blockOffset);
-            var success = result.Unpack(new DatFileReader(buffer));
+            var success = result.Unpack(new DatBinReader(buffer));
 
             BaseBlockAllocator.SharedBytes.Return(buffer);
 
@@ -79,7 +79,7 @@ namespace ACClientLib.DatReaderWriter.IO.DatBTree {
         /// <param name="node">The node to write</param>
         private void WriteNode(DatBTreeNode node) {
             var buffer = BaseBlockAllocator.SharedBytes.Rent(DatBTreeNode.SIZE);
-            var writer = new DatFileWriter(buffer);
+            var writer = new DatBinWriter(buffer);
             node.Pack(writer);
             node.Offset = BlockAllocator.WriteBlock(buffer, DatBTreeNode.SIZE, node.Offset);
             BaseBlockAllocator.SharedBytes.Return(buffer);
@@ -556,7 +556,7 @@ namespace ACClientLib.DatReaderWriter.IO.DatBTree {
                 }
 
                 if (successorChild.Files.Count >= Degree) {
-                    var successor = this.DeleteSuccessor(predecessorChild);
+                    var successor = DeleteSuccessor(predecessorChild);
                     node.Files[keyIndexInNode] = successor;
                     WriteNode(node);
                 }
@@ -571,7 +571,7 @@ namespace ACClientLib.DatReaderWriter.IO.DatBTree {
                     WriteNode(node);
                     WriteNode(predecessorChild);
 
-                    this.DeleteInternal(predecessorChild, keyToDelete);
+                    DeleteInternal(predecessorChild, keyToDelete);
                 }
             }
         }

@@ -9,7 +9,7 @@
 
 
 using System;
-namespace ACClientLib.DatReaderWriter.Enums {
+namespace DatReaderWriter.Enums {
     public enum PartsMask : uint {
         HasSoundInfo = 0x01,
 

@@ -9,7 +9,7 @@
 
 
 using System;
-namespace ACClientLib.DatReaderWriter.Enums {
+namespace DatReaderWriter.Enums {
     [Flags]
     public enum StipplingType : byte {
         None = 0x00,

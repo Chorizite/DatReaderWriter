@@ -13,10 +13,12 @@ using System.Numerics;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.IO;
+using DatReaderWriter.Enums;
+using DatReaderWriter.Lib;
+using DatReaderWriter.Lib.Attributes;
+using DatReaderWriter.Lib.IO;
 
-namespace ACClientLib.DatReaderWriter.Types {
+namespace DatReaderWriter.Types {
     public partial class BuildingPortal : IDatObjType {
         public PortalFlags Flags;
 
@@ -27,7 +29,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         public List<ushort> StabList = [];
 
         /// <inheritdoc />
-        public bool Unpack(DatFileReader reader) {
+        public bool Unpack(DatBinReader reader) {
             Flags = (PortalFlags)reader.ReadUInt16();
             OtherCellId = reader.ReadUInt16();
             OtherPortalId = reader.ReadUInt16();
@@ -40,7 +42,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         }
 
         /// <inheritdoc />
-        public bool Pack(DatFileWriter writer) {
+        public bool Pack(DatBinWriter writer) {
             writer.WriteUInt16((ushort)Flags);
             writer.WriteUInt16(OtherCellId);
             writer.WriteUInt16(OtherPortalId);

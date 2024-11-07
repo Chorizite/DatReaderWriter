@@ -13,12 +13,13 @@ using System.Numerics;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.IO;
-using ACClientLib.DatReaderWriter.Types;
-using ACClientLib.DatReaderWriter.Attributes;
+using DatReaderWriter.Enums;
+using DatReaderWriter.Types;
+using DatReaderWriter.Lib;
+using DatReaderWriter.Lib.Attributes;
+using DatReaderWriter.Lib.IO;
 
-namespace ACClientLib.DatReaderWriter.DBObjs {
+namespace DatReaderWriter.DBObjs {
     /// <summary>
     /// DB_TYPE_SPELL_TABLE_0 in the client.
     /// </summary>
@@ -35,7 +36,7 @@ namespace ACClientLib.DatReaderWriter.DBObjs {
         public Dictionary<EquipmentSet, SpellSet> SpellsSets = [];
 
         /// <inheritdoc />
-        public override bool Unpack(DatFileReader reader) {
+        public override bool Unpack(DatBinReader reader) {
             base.Unpack(reader);
             var _numSpells = reader.ReadUInt16();
             var _numSpellBuckets = reader.ReadUInt16();
@@ -55,7 +56,7 @@ namespace ACClientLib.DatReaderWriter.DBObjs {
         }
 
         /// <inheritdoc />
-        public override bool Pack(DatFileWriter writer) {
+        public override bool Pack(DatBinWriter writer) {
             base.Pack(writer);
             writer.WriteUInt16((ushort)Spells.Count());
             writer.WriteUInt16(8192);

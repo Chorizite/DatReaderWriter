@@ -9,7 +9,7 @@
 
 
 using System;
-namespace ACClientLib.DatReaderWriter.Enums {
+namespace DatReaderWriter.Enums {
     public enum ComponentType : uint {
         Undef = 0,
 

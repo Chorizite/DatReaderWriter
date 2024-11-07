@@ -1,8 +1,9 @@
-﻿using DatReaderWriter.Extensions;
+﻿using DatReaderWriter.Lib.Extensions;
+using DatReaderWriter.Lib.IO;
 using System;
 using System.Text;
 
-namespace ACClientLib.DatReaderWriter.IO.DatBTree {
+namespace DatReaderWriter.Lib.IO.DatBTree {
     /// <summary>
     /// A dat file entry. This points to where dat files are stored in the dat,
     /// as well as some other meta data.
@@ -54,7 +55,7 @@ namespace ACClientLib.DatReaderWriter.IO.DatBTree {
         public int GetSize() => SIZE;
 
         /// <inheritdoc/>
-        public bool Unpack(DatFileReader reader) {
+        public bool Unpack(DatBinReader reader) {
             Flags = reader.ReadUInt32();
             Id = reader.ReadUInt32();
             Offset = reader.ReadInt32();
@@ -66,7 +67,7 @@ namespace ACClientLib.DatReaderWriter.IO.DatBTree {
         }
 
         /// <inheritdoc/>
-        public bool Pack(DatFileWriter writer) {
+        public bool Pack(DatBinWriter writer) {
             if (Flags != 0) {
                 writer.WriteUInt32(Flags);
             }

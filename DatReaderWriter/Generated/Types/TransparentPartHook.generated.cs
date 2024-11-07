@@ -13,10 +13,12 @@ using System.Numerics;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.IO;
+using DatReaderWriter.Enums;
+using DatReaderWriter.Lib;
+using DatReaderWriter.Lib.Attributes;
+using DatReaderWriter.Lib.IO;
 
-namespace ACClientLib.DatReaderWriter.Types {
+namespace DatReaderWriter.Types {
     public partial class TransparentPartHook : AnimationHook {
         /// <inheritdoc />
         public override AnimationHookType HookType => AnimationHookType.TransparentPart;
@@ -30,7 +32,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         public float Time;
 
         /// <inheritdoc />
-        public override bool Unpack(DatFileReader reader) {
+        public override bool Unpack(DatBinReader reader) {
             base.Unpack(reader);
             PartIndex = reader.ReadUInt32();
             Start = reader.ReadSingle();
@@ -40,7 +42,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         }
 
         /// <inheritdoc />
-        public override bool Pack(DatFileWriter writer) {
+        public override bool Pack(DatBinWriter writer) {
             base.Pack(writer);
             writer.WriteUInt32(PartIndex);
             writer.WriteSingle(Start);

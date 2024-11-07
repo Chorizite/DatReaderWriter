@@ -9,7 +9,7 @@
 
 
 using System;
-namespace ACClientLib.DatReaderWriter.Enums {
+namespace DatReaderWriter.Enums {
     [Flags]
     public enum AnimationFlags : uint {
         PosFrames = 0x1,

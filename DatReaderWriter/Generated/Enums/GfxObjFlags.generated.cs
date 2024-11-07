@@ -9,7 +9,7 @@
 
 
 using System;
-namespace ACClientLib.DatReaderWriter.Enums {
+namespace DatReaderWriter.Enums {
     [Flags]
     public enum GfxObjFlags : uint {
         HasPhysics = 0x00000001,

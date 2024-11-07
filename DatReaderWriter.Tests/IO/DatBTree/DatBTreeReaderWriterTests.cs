@@ -1,9 +1,9 @@
-﻿using ACClientLib.DatReaderWriter;
-using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.IO;
-using ACClientLib.DatReaderWriter.IO.BlockAllocators;
-using ACClientLib.DatReaderWriter.IO.DatBTree;
-using ACClientLib.DatReaderWriter.Options;
+﻿using DatReaderWriter;
+using DatReaderWriter.Enums;
+using DatReaderWriter.Lib.IO;
+using DatReaderWriter.Options;
+using DatReaderWriter.Lib.IO.BlockAllocators;
+using DatReaderWriter.Lib.IO.DatBTree;
 using DatReaderWriter.Tests.Lib;
 using Moq;
 using System.Data;

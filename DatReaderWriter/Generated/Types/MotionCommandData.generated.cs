@@ -13,15 +13,17 @@ using System.Numerics;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.IO;
+using DatReaderWriter.Enums;
+using DatReaderWriter.Lib;
+using DatReaderWriter.Lib.Attributes;
+using DatReaderWriter.Lib.IO;
 
-namespace ACClientLib.DatReaderWriter.Types {
+namespace DatReaderWriter.Types {
     public partial class MotionCommandData : IDatObjType {
         public Dictionary<int, MotionData> MotionData = [];
 
         /// <inheritdoc />
-        public bool Unpack(DatFileReader reader) {
+        public bool Unpack(DatBinReader reader) {
             var _numCommands = reader.ReadUInt32();
             for (var i=0; i < _numCommands; i++) {
                 var _key = reader.ReadInt32();
@@ -32,7 +34,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         }
 
         /// <inheritdoc />
-        public bool Pack(DatFileWriter writer) {
+        public bool Pack(DatBinWriter writer) {
             writer.WriteUInt32((uint)MotionData.Count());
             foreach (var kv in MotionData) {
                 writer.WriteInt32(kv.Key);

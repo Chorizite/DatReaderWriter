@@ -1,6 +1,6 @@
-using ACClientLib.DatReaderWriter;
-using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.Options;
+using DatReaderWriter;
+using DatReaderWriter.Enums;
+using DatReaderWriter.Options;
 using DatReaderWriter.Tests.Lib;
 using System.Text;
 namespace DatReaderWriter.Tests {
@@ -13,7 +13,7 @@ namespace DatReaderWriter.Tests {
             [DataValues(EORCommonData.PortalName, EORCommonData.CellName, EORCommonData.LanguageName, EORCommonData.HighResName)] string datPath
             ) {
 
-            using var dat = new DatDatabaseReader(options => {
+            using var dat = new DatDatabase(options => {
                 options.FilePath = Path.Combine(EORCommonData.DatDirectory, $"client_{datPath}.dat");
                 options.IndexCachingStrategy = IndexCachingStrategy.Upfront;
             });

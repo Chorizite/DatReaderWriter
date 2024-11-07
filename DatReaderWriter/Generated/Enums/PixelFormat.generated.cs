@@ -9,7 +9,7 @@
 
 
 using System;
-namespace ACClientLib.DatReaderWriter.Enums {
+namespace DatReaderWriter.Enums {
     public enum PixelFormat : uint {
         PFID_UNKNOWN = 0x00000000,
 

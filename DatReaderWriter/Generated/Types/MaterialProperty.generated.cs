@@ -13,10 +13,12 @@ using System.Numerics;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.IO;
+using DatReaderWriter.Enums;
+using DatReaderWriter.Lib;
+using DatReaderWriter.Lib.Attributes;
+using DatReaderWriter.Lib.IO;
 
-namespace ACClientLib.DatReaderWriter.Types {
+namespace DatReaderWriter.Types {
     public partial class MaterialProperty : IDatObjType {
         public uint NameId;
 
@@ -31,7 +33,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         public byte DataLength4;
 
         /// <inheritdoc />
-        public bool Unpack(DatFileReader reader) {
+        public bool Unpack(DatBinReader reader) {
             NameId = reader.ReadUInt32();
             DataType = (RMDataType)reader.ReadUInt16();
             reader.Align(4);
@@ -43,7 +45,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         }
 
         /// <inheritdoc />
-        public bool Pack(DatFileWriter writer) {
+        public bool Pack(DatBinWriter writer) {
             writer.WriteUInt32(NameId);
             writer.WriteUInt16((ushort)DataType);
             writer.Align(4);

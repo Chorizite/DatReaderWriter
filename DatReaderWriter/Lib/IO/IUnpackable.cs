@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ACClientLib.DatReaderWriter.IO {
+namespace DatReaderWriter.Lib.IO {
     /// <summary>
     /// Can be unpacked from a dat file
     /// </summary>
@@ -10,6 +10,6 @@ namespace ACClientLib.DatReaderWriter.IO {
         /// </summary>
         /// <param name="reader">The reader to read from</param>
         /// <returns>true if successful</returns>
-        public bool Unpack(DatFileReader reader);
+        public bool Unpack(DatBinReader reader);
     }
 }

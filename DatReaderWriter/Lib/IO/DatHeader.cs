@@ -1,9 +1,9 @@
-﻿using ACClientLib.DatReaderWriter.Enums;
+﻿using DatReaderWriter.Enums;
 using System;
 using System.Linq;
 using System.Text;
 
-namespace ACClientLib.DatReaderWriter.IO {
+namespace DatReaderWriter.Lib.IO {
 
     /// <summary>
     /// The header of a dat file
@@ -160,7 +160,7 @@ namespace ACClientLib.DatReaderWriter.IO {
 
         internal void WriteEmptyTransaction() {
             Transactions = new byte[64];
-            var writer = new DatFileWriter(Transactions);
+            var writer = new DatBinWriter(Transactions);
             writer.WriteBytes([0x00, 0x50, 0x4C, 0x00], 4);
         }
 
@@ -169,7 +169,7 @@ namespace ACClientLib.DatReaderWriter.IO {
 
         /// <returns>True if successful (the magic was good)</returns>
         /// <inheritdoc/>
-        public bool Unpack(DatFileReader reader) {
+        public bool Unpack(DatBinReader reader) {
             Version = Encoding.ASCII.GetString(reader.ReadBytes(256)).TrimEnd('\0');
             Transactions = reader.ReadBytes(64);
             Magic = reader.ReadInt32();
@@ -194,7 +194,7 @@ namespace ACClientLib.DatReaderWriter.IO {
         }
 
         /// <inheritdoc/>
-        public bool Pack(DatFileWriter writer) {
+        public bool Pack(DatBinWriter writer) {
             var versionBytes = new byte[256];
             versionBytes[0] = 0;
             if (Version is not null) {

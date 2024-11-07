@@ -1,4 +1,4 @@
-﻿using ACClientLib.DatReaderWriter;
+﻿using DatReaderWriter;
 using DatReaderWriter.Tests.Lib;
 using System;
 using System.Collections.Generic;

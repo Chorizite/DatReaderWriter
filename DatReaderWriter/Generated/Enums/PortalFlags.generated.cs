@@ -9,7 +9,7 @@
 
 
 using System;
-namespace ACClientLib.DatReaderWriter.Enums {
+namespace DatReaderWriter.Enums {
     [Flags]
     public enum PortalFlags : ushort {
         ExactMatch = 0x0001,

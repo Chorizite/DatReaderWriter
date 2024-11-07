@@ -13,10 +13,12 @@ using System.Numerics;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.IO;
+using DatReaderWriter.Enums;
+using DatReaderWriter.Lib;
+using DatReaderWriter.Lib.Attributes;
+using DatReaderWriter.Lib.IO;
 
-namespace ACClientLib.DatReaderWriter.Types {
+namespace DatReaderWriter.Types {
     public partial class SkyObjectReplace : IDatObjType {
         public uint ObjectIndex;
 
@@ -31,7 +33,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         public float MaxBright;
 
         /// <inheritdoc />
-        public bool Unpack(DatFileReader reader) {
+        public bool Unpack(DatBinReader reader) {
             ObjectIndex = reader.ReadUInt32();
             GFXObjId = reader.ReadUInt32();
             Rotate = reader.ReadSingle();
@@ -42,7 +44,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         }
 
         /// <inheritdoc />
-        public bool Pack(DatFileWriter writer) {
+        public bool Pack(DatBinWriter writer) {
             writer.WriteUInt32(ObjectIndex);
             writer.WriteUInt32(GFXObjId);
             writer.WriteSingle(Rotate);

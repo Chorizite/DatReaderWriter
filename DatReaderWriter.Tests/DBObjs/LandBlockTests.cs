@@ -1,9 +1,9 @@
 ﻿using DatReaderWriter.Tests.Lib;
-using ACClientLib.DatReaderWriter;
-using ACClientLib.DatReaderWriter.Options;
-using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.DBObjs;
-using ACClientLib.DatReaderWriter.Types;
+using DatReaderWriter;
+using DatReaderWriter.Options;
+using DatReaderWriter.Enums;
+using DatReaderWriter.DBObjs;
+using DatReaderWriter.Types;
 
 namespace DatReaderWriter.Tests.DBObjs {
     [TestClass]
@@ -11,7 +11,7 @@ namespace DatReaderWriter.Tests.DBObjs {
         [TestMethod]
         public void CanInsertAndReadLandblocks() {
             var datFilePath = Path.GetTempFileName();
-            using var dat = new DatDatabaseReader(options => {
+            using var dat = new DatDatabase(options => {
                 options.FilePath = datFilePath;
                 options.AccessType = DatAccessType.ReadWrite;
             });
@@ -92,7 +92,7 @@ namespace DatReaderWriter.Tests.DBObjs {
         [TestMethod]
         [TestCategory("EOR")]
         public void CanReadEORLandblocks() {
-            using var dat = new DatDatabaseReader(options => {
+            using var dat = new DatDatabase(options => {
                 options.FilePath = Path.Combine(EORCommonData.DatDirectory, $"client_cell_1.dat");
                 options.IndexCachingStrategy = IndexCachingStrategy.Never;
             });

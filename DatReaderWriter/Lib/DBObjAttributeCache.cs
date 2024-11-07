@@ -1,8 +1,7 @@
-﻿
-using ACClientLib.DatReaderWriter.Attributes;
-using ACClientLib.DatReaderWriter.DBObjs;
-using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.Types;
+﻿using DatReaderWriter.DBObjs;
+using DatReaderWriter.Enums;
+using DatReaderWriter.Types;
+using DatReaderWriter.Lib.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -10,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ACClientLib.DatReaderWriter.Lib {
+namespace DatReaderWriter.Lib {
     internal static class DBObjAttributeCache {
         private static Dictionary<Type, DBObjTypeAttribute>? _typeCache;
         private static Dictionary<Type, DBObjTypeAttribute>? _typeCacheMasks;
