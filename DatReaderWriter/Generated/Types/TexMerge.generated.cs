@@ -13,10 +13,12 @@ using System.Numerics;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.IO;
+using DatReaderWriter.Enums;
+using DatReaderWriter.Lib;
+using DatReaderWriter.Lib.Attributes;
+using DatReaderWriter.Lib.IO;
 
-namespace ACClientLib.DatReaderWriter.Types {
+namespace DatReaderWriter.Types {
     public partial class TexMerge : IDatObjType {
         public uint BaseTexSize;
 
@@ -29,7 +31,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         public List<TMTerrainDesc> TerrainDesc = [];
 
         /// <inheritdoc />
-        public bool Unpack(DatFileReader reader) {
+        public bool Unpack(DatBinReader reader) {
             BaseTexSize = reader.ReadUInt32();
             var _numCornerTerrainMaps = reader.ReadUInt32();
             for (var i=0; i < _numCornerTerrainMaps; i++) {
@@ -51,7 +53,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         }
 
         /// <inheritdoc />
-        public bool Pack(DatFileWriter writer) {
+        public bool Pack(DatBinWriter writer) {
             writer.WriteUInt32(BaseTexSize);
             writer.WriteUInt32((uint)CornerTerrainMaps.Count());
             foreach (var item in CornerTerrainMaps) {

@@ -13,10 +13,12 @@ using System.Numerics;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.IO;
+using DatReaderWriter.Enums;
+using DatReaderWriter.Lib;
+using DatReaderWriter.Lib.Attributes;
+using DatReaderWriter.Lib.IO;
 
-namespace ACClientLib.DatReaderWriter.Types {
+namespace DatReaderWriter.Types {
     /// <summary>
     /// Information about a spell component
     /// </summary>
@@ -38,7 +40,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         public float CDM;
 
         /// <inheritdoc />
-        public bool Unpack(DatFileReader reader) {
+        public bool Unpack(DatBinReader reader) {
             Name = reader.ReadObfuscatedString();
             reader.Align(4);
             Category = reader.ReadUInt32();
@@ -53,7 +55,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         }
 
         /// <inheritdoc />
-        public bool Pack(DatFileWriter writer) {
+        public bool Pack(DatBinWriter writer) {
             writer.WriteObfuscatedString(Name);
             writer.Align(4);
             writer.WriteUInt32(Category);

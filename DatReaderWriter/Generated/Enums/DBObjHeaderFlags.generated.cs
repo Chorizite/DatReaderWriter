@@ -9,7 +9,7 @@
 
 
 using System;
-namespace ACClientLib.DatReaderWriter.Enums {
+namespace DatReaderWriter.Enums {
     [Flags]
     public enum DBObjHeaderFlags : uint {
         None = 0x00,

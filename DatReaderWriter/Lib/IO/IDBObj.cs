@@ -1,6 +1,6 @@
-﻿using ACClientLib.DatReaderWriter.Enums;
+﻿using DatReaderWriter.Enums;
 
-namespace ACClientLib.DatReaderWriter.IO {
+namespace DatReaderWriter.Lib.IO {
     /// <summary>
     /// A file stored in the dat
     /// </summary>

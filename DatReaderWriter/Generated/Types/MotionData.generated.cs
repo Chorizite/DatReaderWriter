@@ -13,10 +13,12 @@ using System.Numerics;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.IO;
+using DatReaderWriter.Enums;
+using DatReaderWriter.Lib;
+using DatReaderWriter.Lib.Attributes;
+using DatReaderWriter.Lib.IO;
 
-namespace ACClientLib.DatReaderWriter.Types {
+namespace DatReaderWriter.Types {
     public partial class MotionData : IDatObjType {
         public byte Bitfield;
 
@@ -29,7 +31,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         public Vector3 Omega;
 
         /// <inheritdoc />
-        public bool Unpack(DatFileReader reader) {
+        public bool Unpack(DatBinReader reader) {
             var _numAnims = reader.ReadByte();
             Bitfield = reader.ReadByte();
             Flags = (MotionDataFlags)reader.ReadByte();
@@ -47,7 +49,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         }
 
         /// <inheritdoc />
-        public bool Pack(DatFileWriter writer) {
+        public bool Pack(DatBinWriter writer) {
             writer.WriteByte((byte)Anims.Count());
             writer.WriteByte(Bitfield);
             writer.WriteByte((byte)Flags);

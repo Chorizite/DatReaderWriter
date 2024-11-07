@@ -13,17 +13,19 @@ using System.Numerics;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.IO;
+using DatReaderWriter.Enums;
+using DatReaderWriter.Lib;
+using DatReaderWriter.Lib.Attributes;
+using DatReaderWriter.Lib.IO;
 
-namespace ACClientLib.DatReaderWriter.Types {
+namespace DatReaderWriter.Types {
     public partial class VertexArray : IDatObjType {
         public VertexType VertexType;
 
         public Dictionary<ushort, SWVertex> Vertices = [];
 
         /// <inheritdoc />
-        public bool Unpack(DatFileReader reader) {
+        public bool Unpack(DatBinReader reader) {
             VertexType = (VertexType)reader.ReadInt32();
             var _numVertices = reader.ReadUInt32();
             for (var i=0; i < _numVertices; i++) {
@@ -35,7 +37,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         }
 
         /// <inheritdoc />
-        public bool Pack(DatFileWriter writer) {
+        public bool Pack(DatBinWriter writer) {
             writer.WriteInt32((int)VertexType);
             writer.WriteUInt32((uint)Vertices.Count());
             foreach (var kv in Vertices) {

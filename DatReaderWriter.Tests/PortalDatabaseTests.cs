@@ -1,6 +1,6 @@
-﻿using ACClientLib.DatReaderWriter;
-using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.Options;
+﻿using DatReaderWriter;
+using DatReaderWriter.Enums;
+using DatReaderWriter.Options;
 using DatReaderWriter.Tests.Lib;
 using System;
 using System.Collections.Generic;

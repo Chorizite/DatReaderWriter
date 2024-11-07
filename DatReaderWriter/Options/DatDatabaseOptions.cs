@@ -1,6 +1,6 @@
-﻿namespace ACClientLib.DatReaderWriter.Options {
+﻿namespace DatReaderWriter.Options {
     /// <summary>
-    /// <see cref="ACClientLib.DatReaderWriter.IO.BlockAllocators.BaseBlockAllocator"/> Options
+    /// <see cref="Lib.IO.BlockAllocators.BaseBlockAllocator"/> Options
     /// </summary>
     public class DatDatabaseOptions {
         /// <summary>

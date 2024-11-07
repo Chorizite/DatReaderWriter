@@ -1,8 +1,8 @@
 ﻿using DatReaderWriter.Tests.Lib;
-using ACClientLib.DatReaderWriter;
-using ACClientLib.DatReaderWriter.Options;
-using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.DBObjs;
+using DatReaderWriter;
+using DatReaderWriter.Options;
+using DatReaderWriter.Enums;
+using DatReaderWriter.DBObjs;
 
 namespace DatReaderWriter.Tests.DBObjs {
     [TestClass]
@@ -10,7 +10,7 @@ namespace DatReaderWriter.Tests.DBObjs {
         [TestMethod]
         public void CanInsertAndReadTextures() {
             var datFilePath = Path.GetTempFileName();
-            using var dat = new DatDatabaseReader(options => {
+            using var dat = new DatDatabase(options => {
                 options.FilePath = datFilePath;
                 options.AccessType = DatAccessType.ReadWrite;
             });
@@ -69,7 +69,7 @@ namespace DatReaderWriter.Tests.DBObjs {
         [TestMethod]
         [TestCategory("EOR")]
         public void CanReadEORTextures() {
-            using var dat = new DatDatabaseReader(options => {
+            using var dat = new DatDatabase(options => {
                 options.FilePath = Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat");
                 options.IndexCachingStrategy = IndexCachingStrategy.OnDemand;
             });

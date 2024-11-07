@@ -13,10 +13,12 @@ using System.Numerics;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.IO;
+using DatReaderWriter.Enums;
+using DatReaderWriter.Lib;
+using DatReaderWriter.Lib.Attributes;
+using DatReaderWriter.Lib.IO;
 
-namespace ACClientLib.DatReaderWriter.Types {
+namespace DatReaderWriter.Types {
     /// <summary>
     /// Building information.
     /// </summary>
@@ -36,7 +38,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         public List<BuildingPortal> Portals = [];
 
         /// <inheritdoc />
-        public bool Unpack(DatFileReader reader) {
+        public bool Unpack(DatBinReader reader) {
             ModelId = reader.ReadUInt32();
             Frame = reader.ReadItem<Frame>();
             NumLeaves = reader.ReadUInt32();
@@ -48,7 +50,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         }
 
         /// <inheritdoc />
-        public bool Pack(DatFileWriter writer) {
+        public bool Pack(DatBinWriter writer) {
             writer.WriteUInt32(ModelId);
             writer.WriteItem<Frame>(Frame);
             writer.WriteUInt32(NumLeaves);

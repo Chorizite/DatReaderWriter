@@ -13,17 +13,19 @@ using System.Numerics;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.IO;
+using DatReaderWriter.Enums;
+using DatReaderWriter.Lib;
+using DatReaderWriter.Lib.Attributes;
+using DatReaderWriter.Lib.IO;
 
-namespace ACClientLib.DatReaderWriter.Types {
+namespace DatReaderWriter.Types {
     public partial class SceneType : IDatObjType {
         public uint StbIndex;
 
         public List<uint> Scenes = [];
 
         /// <inheritdoc />
-        public bool Unpack(DatFileReader reader) {
+        public bool Unpack(DatBinReader reader) {
             StbIndex = reader.ReadUInt32();
             var _numScenes = reader.ReadUInt32();
             for (var i=0; i < _numScenes; i++) {
@@ -33,7 +35,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         }
 
         /// <inheritdoc />
-        public bool Pack(DatFileWriter writer) {
+        public bool Pack(DatBinWriter writer) {
             writer.WriteUInt32(StbIndex);
             writer.WriteUInt32((uint)Scenes.Count());
             foreach (var item in Scenes) {

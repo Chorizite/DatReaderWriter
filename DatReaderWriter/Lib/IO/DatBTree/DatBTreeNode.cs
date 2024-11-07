@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualBasic;
+﻿using DatReaderWriter.Lib.IO;
+using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -6,7 +7,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 
-namespace ACClientLib.DatReaderWriter.IO.DatBTree {
+namespace DatReaderWriter.Lib.IO.DatBTree {
     /// <summary>
     /// A node / directory entry in the dat file.
     /// </summary>
@@ -53,7 +54,7 @@ namespace ACClientLib.DatReaderWriter.IO.DatBTree {
         public int GetSize() => SIZE;
 
         /// <inheritdoc/>
-        unsafe public bool Unpack(DatFileReader reader) {
+        unsafe public bool Unpack(DatBinReader reader) {
             Span<int> iSpan = [0];
 
             bool didFindEnd = false;
@@ -88,7 +89,7 @@ namespace ACClientLib.DatReaderWriter.IO.DatBTree {
         }
 
         /// <inheritdoc/>
-        public bool Pack(DatFileWriter writer) {
+        public bool Pack(DatBinWriter writer) {
             for (var i = 0; i < 62; i++) {
                 if (Branches.Count > i) {
                     writer.WriteInt32(Branches[i]);

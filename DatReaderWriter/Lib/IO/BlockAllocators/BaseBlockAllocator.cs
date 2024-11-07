@@ -1,12 +1,13 @@
-﻿using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.Options;
+﻿using DatReaderWriter.Enums;
+using DatReaderWriter.Options;
+using DatReaderWriter.Lib.IO;
 using System;
 using System.Buffers;
 using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Text;
 
-namespace ACClientLib.DatReaderWriter.IO.BlockAllocators {
+namespace DatReaderWriter.Lib.IO.BlockAllocators {
     /// <summary>
     /// Base block allocator class.
     /// </summary>
@@ -82,7 +83,7 @@ namespace ACClientLib.DatReaderWriter.IO.BlockAllocators {
         protected void TryReadHeader() {
             var buffer = SharedBytes.Rent(DatHeader.SIZE);
             ReadBytes(buffer, 0, 0, DatHeader.SIZE);
-            Header.Unpack(new DatFileReader(buffer));
+            Header.Unpack(new DatBinReader(buffer));
             SharedBytes.Return(buffer);
 
             if (Header.Magic == DatHeader.RETAIL_MAGIC) {
@@ -106,8 +107,8 @@ namespace ACClientLib.DatReaderWriter.IO.BlockAllocators {
             }
 
             var offset = Header.FileSize;
-            Expand(Header.FileSize + (numBlocksToAllocate * Header.BlockSize));
-            
+            Expand(Header.FileSize + numBlocksToAllocate * Header.BlockSize);
+
             if (Header.FreeBlockCount == 0) {
                 Header.FirstFreeBlock = offset;
             }
@@ -142,7 +143,7 @@ namespace ACClientLib.DatReaderWriter.IO.BlockAllocators {
         protected void WriteHeader() {
             var headerBuffer = SharedBytes.Rent(DatHeader.SIZE);
             Header.WriteEmptyTransaction();
-            Header.Pack(new DatFileWriter(headerBuffer));
+            Header.Pack(new DatBinWriter(headerBuffer));
             WriteBytes(headerBuffer, 0, DatHeader.SIZE);
             SharedBytes.Return(headerBuffer);
         }

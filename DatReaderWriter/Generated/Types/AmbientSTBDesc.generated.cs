@@ -13,17 +13,19 @@ using System.Numerics;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.IO;
+using DatReaderWriter.Enums;
+using DatReaderWriter.Lib;
+using DatReaderWriter.Lib.Attributes;
+using DatReaderWriter.Lib.IO;
 
-namespace ACClientLib.DatReaderWriter.Types {
+namespace DatReaderWriter.Types {
     public partial class AmbientSTBDesc : IDatObjType {
         public uint STBId;
 
         public List<AmbientSoundDesc> AmbientSounds = [];
 
         /// <inheritdoc />
-        public bool Unpack(DatFileReader reader) {
+        public bool Unpack(DatBinReader reader) {
             STBId = reader.ReadUInt32();
             var _numAmbientSounds = reader.ReadUInt32();
             for (var i=0; i < _numAmbientSounds; i++) {
@@ -33,7 +35,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         }
 
         /// <inheritdoc />
-        public bool Pack(DatFileWriter writer) {
+        public bool Pack(DatBinWriter writer) {
             writer.WriteUInt32(STBId);
             writer.WriteUInt32((uint)AmbientSounds.Count());
             foreach (var item in AmbientSounds) {

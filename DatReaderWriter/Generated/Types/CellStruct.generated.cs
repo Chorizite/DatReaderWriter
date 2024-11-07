@@ -13,10 +13,12 @@ using System.Numerics;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.IO;
+using DatReaderWriter.Enums;
+using DatReaderWriter.Lib;
+using DatReaderWriter.Lib.Attributes;
+using DatReaderWriter.Lib.IO;
 
-namespace ACClientLib.DatReaderWriter.Types {
+namespace DatReaderWriter.Types {
     public partial class CellStruct : IDatObjType {
         public VertexArray VertexArray;
 
@@ -33,7 +35,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         public DrawingBSPTree DrawingBSP;
 
         /// <inheritdoc />
-        public bool Unpack(DatFileReader reader) {
+        public bool Unpack(DatBinReader reader) {
             var _numPolys = reader.ReadUInt32();
             var _numPhysicsPolys = reader.ReadUInt32();
             var _numPortals = reader.ReadUInt32();
@@ -63,7 +65,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         }
 
         /// <inheritdoc />
-        public bool Pack(DatFileWriter writer) {
+        public bool Pack(DatBinWriter writer) {
             writer.WriteUInt32((uint)Polygons.Count());
             writer.WriteUInt32((uint)PhysicsPolygons.Count());
             writer.WriteUInt32((uint)Portals.Count());

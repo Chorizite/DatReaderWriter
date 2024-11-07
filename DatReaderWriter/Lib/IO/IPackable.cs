@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ACClientLib.DatReaderWriter.IO {
+namespace DatReaderWriter.Lib.IO {
     /// <summary>
     /// Can be packed to a dat file
     /// </summary>
@@ -10,6 +10,6 @@ namespace ACClientLib.DatReaderWriter.IO {
         /// </summary>
         /// <param name="writer">The writer to write to</param>
         /// <returns>true if successful</returns>
-        public bool Pack(DatFileWriter writer);
+        public bool Pack(DatBinWriter writer);
     }
 }

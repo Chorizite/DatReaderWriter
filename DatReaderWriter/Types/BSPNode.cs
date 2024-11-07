@@ -1,5 +1,5 @@
-using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.IO;
+using DatReaderWriter.Enums;
+using DatReaderWriter.Lib.IO;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,7 +9,7 @@ using System.Text;
 ///
 /// From ACE
 ///
-namespace ACClientLib.DatReaderWriter.Types {
+namespace DatReaderWriter.Types {
     public class BSPNode {
         public string Type { get; set; }
         public Plane SplittingPlane { get; set; }
@@ -18,7 +18,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         public Sphere Sphere { get; set; } = new Sphere();
         public List<ushort> InPolys { get; set; } = []; // List of PolygonIds
 
-        public virtual void Unpack(DatFileReader reader, BSPTreeType treeType) {
+        public virtual void Unpack(DatBinReader reader, BSPTreeType treeType) {
             Type = Encoding.ASCII.GetString(reader.ReadBytes(4).Reverse().ToArray());
 
             switch (Type) {
@@ -63,7 +63,7 @@ namespace ACClientLib.DatReaderWriter.Types {
                 InPolys.Add(reader.ReadUInt16());
         }
 
-        public static BSPNode ReadNode(DatFileReader reader, BSPTreeType treeType) {
+        public static BSPNode ReadNode(DatBinReader reader, BSPTreeType treeType) {
             // We peek forward to get the type, then revert our position.
             var type = Encoding.ASCII.GetString(reader.ReadBytes(4).Reverse().ToArray());
             reader.Skip(-4);
@@ -95,7 +95,7 @@ namespace ACClientLib.DatReaderWriter.Types {
             return node;
         }
 
-        public virtual void Pack(DatFileWriter writer, BSPTreeType treeType) {
+        public virtual void Pack(DatBinWriter writer, BSPTreeType treeType) {
             var typeBytes = Encoding.ASCII.GetBytes(Type).Reverse().ToArray();
             writer.WriteBytes(typeBytes, typeBytes.Length);
 

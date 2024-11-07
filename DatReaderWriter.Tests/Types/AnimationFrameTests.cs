@@ -1,6 +1,6 @@
-﻿using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.IO;
-using ACClientLib.DatReaderWriter.Types;
+﻿using DatReaderWriter.Enums;
+using DatReaderWriter.Lib.IO;
+using DatReaderWriter.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,11 +27,11 @@ namespace DatReaderWriter.Tests.Types {
             };
 
             var buffer = new byte[5_000_000];
-            var writer = new DatFileWriter(buffer);
+            var writer = new DatBinWriter(buffer);
             writeObj.Pack(writer);
 
             var readObj = new AnimationFrame(1);
-            var reader = new DatFileReader(buffer);
+            var reader = new DatBinReader(buffer);
             readObj.Unpack(reader);
 
             Assert.AreEqual(writeObj.Frames.Count, readObj.Frames.Count);

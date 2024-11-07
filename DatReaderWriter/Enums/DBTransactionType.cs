@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ACClientLib.DatReaderWriter.Enums {
+namespace DatReaderWriter.Enums {
     /// <summary>
     /// Dat BTree transaction type. Used when writing transactions header during tree modifications.
     /// </summary>

@@ -1,4 +1,5 @@
-﻿using ACClientLib.DatReaderWriter.IO;
+﻿using DatReaderWriter.Lib.IO;
+using DatReaderWriter.Lib.IO;
 using DatReaderWriter.Tests.Lib;
 using System;
 using System.Buffers.Binary;
@@ -8,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 namespace DatReaderWriter.Tests.IO {
     [TestClass]
-    public class DatFileReaderTests {
+    public class DatBinReaderTests {
         private static Random _rnd = new Random();
 
         [TestMethod]
@@ -19,7 +20,7 @@ namespace DatReaderWriter.Tests.IO {
             BinaryPrimitives.WriteInt32LittleEndian(bSpan.Slice(4), -1);
             BinaryPrimitives.WriteUInt32LittleEndian(bSpan.Slice(8), 0);
 
-            var reader = new DatFileReader(bytes);
+            var reader = new DatBinReader(bytes);
 
             Assert.AreEqual(0, reader.Offset);
 
@@ -41,7 +42,7 @@ namespace DatReaderWriter.Tests.IO {
             BinaryPrimitives.WriteInt32LittleEndian(bSpan.Slice(4), -1);
             BinaryPrimitives.WriteUInt32LittleEndian(bSpan.Slice(8), 0);
 
-            var reader = new DatFileReader(bytes);
+            var reader = new DatBinReader(bytes);
 
             Assert.AreEqual(0, reader.Offset);
 
@@ -64,7 +65,7 @@ namespace DatReaderWriter.Tests.IO {
 #else
             BinaryPrimitives.WriteSingleLittleEndian(bytes, number);
 #endif
-            var reader = new DatFileReader(bytes);
+            var reader = new DatBinReader(bytes);
             Assert.AreEqual(0, reader.Offset);
 
             Assert.AreEqual(number, reader.ReadSingle());
@@ -80,7 +81,7 @@ namespace DatReaderWriter.Tests.IO {
 #else
             BinaryPrimitives.WriteDoubleLittleEndian(bytes, number);
 #endif
-            var reader = new DatFileReader(bytes);
+            var reader = new DatBinReader(bytes);
             Assert.AreEqual(0, reader.Offset);
 
             Assert.AreEqual(number, reader.ReadDouble());
@@ -93,7 +94,7 @@ namespace DatReaderWriter.Tests.IO {
             var bytes = new byte[sizeof(ushort)];
             BinaryPrimitives.WriteUInt16LittleEndian(bytes, number);
 
-            var reader = new DatFileReader(bytes);
+            var reader = new DatBinReader(bytes);
             Assert.AreEqual(0, reader.Offset);
 
             Assert.AreEqual(number, reader.ReadUInt16());
@@ -106,7 +107,7 @@ namespace DatReaderWriter.Tests.IO {
             var bytes = new byte[sizeof(short)];
             BinaryPrimitives.WriteInt16LittleEndian(bytes, number);
 
-            var reader = new DatFileReader(bytes);
+            var reader = new DatBinReader(bytes);
             Assert.AreEqual(0, reader.Offset);
 
             Assert.AreEqual(number, reader.ReadInt16());
@@ -119,7 +120,7 @@ namespace DatReaderWriter.Tests.IO {
             var bytes = new byte[sizeof(uint)];
             BinaryPrimitives.WriteUInt32LittleEndian(bytes, number);
 
-            var reader = new DatFileReader(bytes);
+            var reader = new DatBinReader(bytes);
             Assert.AreEqual(0, reader.Offset);
 
             Assert.AreEqual(number, reader.ReadUInt32());
@@ -132,7 +133,7 @@ namespace DatReaderWriter.Tests.IO {
             var bytes = new byte[sizeof(int)];
             BinaryPrimitives.WriteInt32LittleEndian(bytes, number);
 
-            var reader = new DatFileReader(bytes);
+            var reader = new DatBinReader(bytes);
             Assert.AreEqual(0, reader.Offset);
 
             Assert.AreEqual(number, reader.ReadInt32());
@@ -145,7 +146,7 @@ namespace DatReaderWriter.Tests.IO {
             var bytes = new byte[sizeof(long)];
             BinaryPrimitives.WriteInt64LittleEndian(bytes, number);
 
-            var reader = new DatFileReader(bytes);
+            var reader = new DatBinReader(bytes);
             Assert.AreEqual(0, reader.Offset);
 
             Assert.AreEqual(number, reader.ReadInt64());
@@ -158,7 +159,7 @@ namespace DatReaderWriter.Tests.IO {
             var bytes = new byte[sizeof(ulong)];
             BinaryPrimitives.WriteUInt64LittleEndian(bytes, number);
 
-            var reader = new DatFileReader(bytes);
+            var reader = new DatBinReader(bytes);
             Assert.AreEqual(0, reader.Offset);
 
             Assert.AreEqual(number, reader.ReadUInt64());
@@ -171,7 +172,7 @@ namespace DatReaderWriter.Tests.IO {
             var bytes = new byte[4];
             BinaryPrimitives.WriteUInt32LittleEndian(bytes, number);
 
-            var reader = new DatFileReader(bytes);
+            var reader = new DatBinReader(bytes);
             Assert.AreEqual(number != 0, reader.ReadBool());
         }
 
@@ -196,7 +197,7 @@ namespace DatReaderWriter.Tests.IO {
                     throw new ArgumentOutOfRangeException(nameof(size), size, null);
             }
 
-            var reader = new DatFileReader(bytes);
+            var reader = new DatBinReader(bytes);
             Assert.IsTrue(reader.ReadBool(size));
         }
 
@@ -206,14 +207,14 @@ namespace DatReaderWriter.Tests.IO {
             var bytes = new byte[size];
             bytes.AsSpan().Fill(0);
 
-            var reader = new DatFileReader(bytes);
+            var reader = new DatBinReader(bytes);
             Assert.IsFalse(reader.ReadBool(size));
         }
 
         [TestMethod]
         public void CanAlignToBoundary() {
             var bytes = new byte[100];
-            var reader = new DatFileReader(bytes);
+            var reader = new DatBinReader(bytes);
             Assert.AreEqual(0, reader.Offset);
 
             reader.Align(4);
@@ -235,7 +236,7 @@ namespace DatReaderWriter.Tests.IO {
             var bytes = new byte[100];
             _rnd.NextBytes(bytes);
 
-            var reader = new DatFileReader(bytes);
+            var reader = new DatBinReader(bytes);
             Assert.AreEqual(0, reader.Offset);
 
             var readBytes = new byte[100];
@@ -251,7 +252,7 @@ namespace DatReaderWriter.Tests.IO {
             var bytes = new byte[100];
             _rnd.NextBytes(bytes);
 
-            var reader = new DatFileReader(bytes);
+            var reader = new DatBinReader(bytes);
             Assert.AreEqual(0, reader.Offset);
 
             var readBytes = reader.ReadBytes(bytes.Length);

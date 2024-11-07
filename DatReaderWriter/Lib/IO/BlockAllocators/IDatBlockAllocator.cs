@@ -1,8 +1,9 @@
-﻿using ACClientLib.DatReaderWriter.Enums;
+﻿using DatReaderWriter.Enums;
+using DatReaderWriter.Lib.IO;
 using System;
 using System.Collections.Generic;
 
-namespace ACClientLib.DatReaderWriter.IO.BlockAllocators {
+namespace DatReaderWriter.Lib.IO.BlockAllocators {
     /// <summary>
     /// A dat block allocator. Responsible for managing dat blocks and keeping
     /// the backing dat header up to date as things change. Used for reading and 

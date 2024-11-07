@@ -1,8 +1,8 @@
-﻿using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.Lib;
+﻿using DatReaderWriter.Enums;
+using DatReaderWriter.Lib;
 using System;
 
-namespace ACClientLib.DatReaderWriter.Attributes {
+namespace DatReaderWriter.Lib.Attributes {
     /// <summary>
     /// Mark a DBObj with definitions
     /// </summary>

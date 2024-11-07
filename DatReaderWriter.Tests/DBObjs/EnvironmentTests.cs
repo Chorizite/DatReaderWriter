@@ -1,10 +1,10 @@
 ﻿using DatReaderWriter.Tests.Lib;
-using ACClientLib.DatReaderWriter;
-using ACClientLib.DatReaderWriter.Options;
-using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.DBObjs;
-using Environment = ACClientLib.DatReaderWriter.DBObjs.Environment;
-using ACClientLib.DatReaderWriter.Types;
+using DatReaderWriter;
+using DatReaderWriter.Options;
+using DatReaderWriter.Enums;
+using DatReaderWriter.DBObjs;
+using Environment = DatReaderWriter.DBObjs.Environment;
+using DatReaderWriter.Types;
 using System.Numerics;
 
 namespace DatReaderWriter.Tests.DBObjs {
@@ -13,7 +13,7 @@ namespace DatReaderWriter.Tests.DBObjs {
         [TestMethod]
         public void CanInsertAndReadEnvironments() {
             var datFilePath = Path.GetTempFileName();
-            using var dat = new DatDatabaseReader(options => {
+            using var dat = new DatDatabase(options => {
                 options.FilePath = datFilePath;
                 options.AccessType = DatAccessType.ReadWrite;
             });
@@ -154,7 +154,7 @@ namespace DatReaderWriter.Tests.DBObjs {
         [TestMethod]
         [TestCategory("EOR")]
         public void CanReadEOREnvironments() {
-            using var dat = new DatDatabaseReader(options => {
+            using var dat = new DatDatabase(options => {
                 options.FilePath = Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat");
                 options.IndexCachingStrategy = IndexCachingStrategy.OnDemand;
             });

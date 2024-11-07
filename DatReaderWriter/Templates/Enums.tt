@@ -13,7 +13,7 @@
         manager.StartNewFile($"../Generated/Enums/{kv.Key}.generated.cs"); 
         PrintLocalModificationWarning();
         WriteLine("using System;");
-        WriteLine("namespace ACClientLib.DatReaderWriter.Enums {");
+        WriteLine("namespace DatReaderWriter.Enums {");
         using (new IndentHelper(this)) {
             WriteSummary(kv.Value.Text);
 
@@ -39,7 +39,7 @@
     manager.StartNewFile($"../Generated/Enums/DBObjType.generated.cs"); 
     PrintLocalModificationWarning();
     WriteLine("using System;");
-    WriteLine("namespace ACClientLib.DatReaderWriter.Enums {");
+    WriteLine("namespace DatReaderWriter.Enums {");
     using (new IndentHelper(this)) {
         WriteSummary("DBObjTypes");
 

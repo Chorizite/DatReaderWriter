@@ -13,10 +13,12 @@ using System.Numerics;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.IO;
+using DatReaderWriter.Enums;
+using DatReaderWriter.Lib;
+using DatReaderWriter.Lib.Attributes;
+using DatReaderWriter.Lib.IO;
 
-namespace ACClientLib.DatReaderWriter.Types {
+namespace DatReaderWriter.Types {
     public partial class LandDefs : IDatObjType {
         public int NumBlockLength;
 
@@ -37,7 +39,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         public float[] LandHeightTable = [];
 
         /// <inheritdoc />
-        public bool Unpack(DatFileReader reader) {
+        public bool Unpack(DatBinReader reader) {
             NumBlockLength = reader.ReadInt32();
             NumBlockWidth = reader.ReadInt32();
             SquareLength = reader.ReadSingle();
@@ -54,7 +56,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         }
 
         /// <inheritdoc />
-        public bool Pack(DatFileWriter writer) {
+        public bool Pack(DatBinWriter writer) {
             writer.WriteInt32(NumBlockLength);
             writer.WriteInt32(NumBlockWidth);
             writer.WriteSingle(SquareLength);

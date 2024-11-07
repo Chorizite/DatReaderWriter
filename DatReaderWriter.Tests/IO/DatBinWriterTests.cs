@@ -1,4 +1,5 @@
-﻿using ACClientLib.DatReaderWriter.IO;
+﻿using DatReaderWriter.Lib.IO;
+using DatReaderWriter.Lib.IO;
 using DatReaderWriter.Tests.Lib;
 using System;
 using System.Buffers.Binary;
@@ -9,14 +10,14 @@ using System.Threading.Tasks;
 
 namespace DatReaderWriter.Tests.IO {
     [TestClass]
-    public class DatFileWriterTests {
+    public class DatBinWriterTests {
         private static Random _rnd = new Random();
 
         [TestMethod]
         public void CanWriteMultipleValues() {
             var bytes = new byte[12];
 
-            var writer = new DatFileWriter(bytes);
+            var writer = new DatBinWriter(bytes);
 
             var randomBytes = new byte[4];
             _rnd.NextBytes(randomBytes);
@@ -43,7 +44,7 @@ namespace DatReaderWriter.Tests.IO {
         public void CanSkipAndWrite() {
             var bytes = new byte[12];
 
-            var writer = new DatFileWriter(bytes);
+            var writer = new DatBinWriter(bytes);
             Assert.AreEqual(0, writer.Offset);
 
             writer.Skip(4);
@@ -65,7 +66,7 @@ namespace DatReaderWriter.Tests.IO {
         [CombinatorialData]
         public void CanWriteUInt32([DataValues(1234u, 5678u, 0u, 1u, 0xFFFFFFFFu)] uint number) {
             var bytes = new byte[4];
-            var writer = new DatFileWriter(bytes);
+            var writer = new DatBinWriter(bytes);
 
             Assert.AreEqual(0, writer.Offset);
             writer.WriteUInt32(number);
@@ -78,7 +79,7 @@ namespace DatReaderWriter.Tests.IO {
         [CombinatorialData]
         public void CanWriteInt32([DataValues(-1234, 5678, 0, 1, unchecked((int)0xFFFFFFFF))] int number) {
             var bytes = new byte[4];
-            var writer = new DatFileWriter(bytes);
+            var writer = new DatBinWriter(bytes);
 
             Assert.AreEqual(0, writer.Offset);
             writer.WriteInt32(number);
@@ -93,7 +94,7 @@ namespace DatReaderWriter.Tests.IO {
             var randomBytes = new byte[100];
             _rnd.NextBytes(randomBytes);
 
-            var writer = new DatFileWriter(randomBytes);
+            var writer = new DatBinWriter(randomBytes);
 
             Assert.AreEqual(0, writer.Offset);
             writer.WriteBytes(bytes, randomBytes.Length);

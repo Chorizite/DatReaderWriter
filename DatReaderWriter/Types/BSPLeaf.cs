@@ -1,5 +1,5 @@
-using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.IO;
+using DatReaderWriter.Enums;
+using DatReaderWriter.Lib.IO;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,12 +8,12 @@ using System.Text;
 ///
 /// From ACE
 ///
-namespace ACClientLib.DatReaderWriter.Types {
+namespace DatReaderWriter.Types {
     public class BSPLeaf : BSPNode {
         public int LeafIndex { get; private set; }
         public int Solid { get; private set; }
 
-        public override void Unpack(DatFileReader reader, BSPTreeType treeType) {
+        public override void Unpack(DatBinReader reader, BSPTreeType treeType) {
             Type = Encoding.ASCII.GetString(reader.ReadBytes(4).Reverse().ToArray());
 
             LeafIndex = reader.ReadInt32();
@@ -32,7 +32,7 @@ namespace ACClientLib.DatReaderWriter.Types {
             }
         }
 
-        public override void Pack(DatFileWriter writer, BSPTreeType treeType) {
+        public override void Pack(DatBinWriter writer, BSPTreeType treeType) {
             var typeBytes = Encoding.ASCII.GetBytes(Type).Reverse().ToArray();
             writer.WriteBytes(typeBytes, typeBytes.Length);
 

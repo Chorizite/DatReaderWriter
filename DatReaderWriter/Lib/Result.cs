@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ACClientLib.DatReaderWriter {
+namespace DatReaderWriter.Lib {
     public readonly struct Result<T, E> {
         private readonly bool _success;
 
@@ -33,7 +33,7 @@ namespace ACClientLib.DatReaderWriter {
         /// <param name="value"></param>
         /// <returns></returns>
         public static Result<T, E> FromSuccess(T value) {
-            return new(value, default(E), true);
+            return new(value, default, true);
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace ACClientLib.DatReaderWriter {
         /// <param name="error"></param>
         /// <returns></returns>
         public static Result<T, E> FromError(E error) {
-            return new(default(T), error, false);
+            return new(default, error, false);
         }
 
         /// <summary>
@@ -59,13 +59,13 @@ namespace ACClientLib.DatReaderWriter {
         /// Create a result
         /// </summary>
         /// <param name="value"></param>
-        public static implicit operator Result<T, E>(T value) => new(value, default(E), true);
+        public static implicit operator Result<T, E>(T value) => new(value, default, true);
 
         /// <summary>
         /// Create a failed result
         /// </summary>
         /// <param name="error"></param>
-        public static implicit operator Result<T, E>(E error) => new(default(T), error, false);
+        public static implicit operator Result<T, E>(E error) => new(default, error, false);
 
         /// <summary>
         /// Create a result

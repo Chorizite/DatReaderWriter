@@ -12,14 +12,14 @@ using System.Numerics;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.IO;
-using ACClientLib.DatReaderWriter.Types;
-using ACClientLib.DatReaderWriter.Attributes;
-using ACClientLib.DatReaderWriter.Lib;
-using ACClientLib.DatReaderWriter.DBObjs;
+using DatReaderWriter.Enums;
+using DatReaderWriter.Types;
+using DatReaderWriter.Lib;
+using DatReaderWriter.Lib.Attributes;
+using DatReaderWriter.Lib.IO;
+using DatReaderWriter.DBObjs;
 
-namespace ACClientLib.DatReaderWriter {
+namespace DatReaderWriter {
     public partial class CellDatabase {
         private DBObjCollection<LandBlock>? _LandBlocks;
         private DBObjCollection<LandBlockInfo>? _LandBlockInfos;

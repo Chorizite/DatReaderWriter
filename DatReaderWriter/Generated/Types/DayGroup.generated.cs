@@ -13,10 +13,12 @@ using System.Numerics;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.IO;
+using DatReaderWriter.Enums;
+using DatReaderWriter.Lib;
+using DatReaderWriter.Lib.Attributes;
+using DatReaderWriter.Lib.IO;
 
-namespace ACClientLib.DatReaderWriter.Types {
+namespace DatReaderWriter.Types {
     public partial class DayGroup : IDatObjType {
         public float ChanceOfOccur;
 
@@ -27,7 +29,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         public List<SkyTimeOfDay> SkyTime = [];
 
         /// <inheritdoc />
-        public bool Unpack(DatFileReader reader) {
+        public bool Unpack(DatBinReader reader) {
             ChanceOfOccur = reader.ReadSingle();
             DayName = reader.ReadString16L();
             reader.Align(4);
@@ -43,7 +45,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         }
 
         /// <inheritdoc />
-        public bool Pack(DatFileWriter writer) {
+        public bool Pack(DatBinWriter writer) {
             writer.WriteSingle(ChanceOfOccur);
             writer.WriteString16L(DayName);
             writer.Align(4);

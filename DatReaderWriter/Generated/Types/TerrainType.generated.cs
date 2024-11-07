@@ -13,10 +13,12 @@ using System.Numerics;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.IO;
+using DatReaderWriter.Enums;
+using DatReaderWriter.Lib;
+using DatReaderWriter.Lib.Attributes;
+using DatReaderWriter.Lib.IO;
 
-namespace ACClientLib.DatReaderWriter.Types {
+namespace DatReaderWriter.Types {
     public partial class TerrainType : IDatObjType {
         public string TerrainName;
 
@@ -25,7 +27,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         public List<uint> SceneTypes = [];
 
         /// <inheritdoc />
-        public bool Unpack(DatFileReader reader) {
+        public bool Unpack(DatBinReader reader) {
             TerrainName = reader.ReadString16L();
             reader.Align(4);
             TerrainColor = reader.ReadItem<ColorARGB>();
@@ -37,7 +39,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         }
 
         /// <inheritdoc />
-        public bool Pack(DatFileWriter writer) {
+        public bool Pack(DatBinWriter writer) {
             writer.WriteString16L(TerrainName);
             writer.Align(4);
             writer.WriteItem<ColorARGB>(TerrainColor);

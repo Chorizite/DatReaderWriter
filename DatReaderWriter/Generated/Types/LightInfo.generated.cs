@@ -13,10 +13,12 @@ using System.Numerics;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.IO;
+using DatReaderWriter.Enums;
+using DatReaderWriter.Lib;
+using DatReaderWriter.Lib.Attributes;
+using DatReaderWriter.Lib.IO;
 
-namespace ACClientLib.DatReaderWriter.Types {
+namespace DatReaderWriter.Types {
     public partial class LightInfo : IDatObjType {
         public Frame ViewSpaceLocation;
 
@@ -29,7 +31,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         public float ConeAngle;
 
         /// <inheritdoc />
-        public bool Unpack(DatFileReader reader) {
+        public bool Unpack(DatBinReader reader) {
             ViewSpaceLocation = reader.ReadItem<Frame>();
             Color = reader.ReadItem<ColorARGB>();
             Intensity = reader.ReadSingle();
@@ -39,7 +41,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         }
 
         /// <inheritdoc />
-        public bool Pack(DatFileWriter writer) {
+        public bool Pack(DatBinWriter writer) {
             writer.WriteItem<Frame>(ViewSpaceLocation);
             writer.WriteItem<ColorARGB>(Color);
             writer.WriteSingle(Intensity);

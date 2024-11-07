@@ -13,24 +13,26 @@ using System.Numerics;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.IO;
+using DatReaderWriter.Enums;
+using DatReaderWriter.Lib;
+using DatReaderWriter.Lib.Attributes;
+using DatReaderWriter.Lib.IO;
 
-namespace ACClientLib.DatReaderWriter.Types {
+namespace DatReaderWriter.Types {
     public abstract partial class AnimationHook : IDatObjType {
         public abstract AnimationHookType HookType { get; }
 
         public AnimationHookDir Direction;
 
         /// <inheritdoc />
-        public virtual bool Unpack(DatFileReader reader) {
+        public virtual bool Unpack(DatBinReader reader) {
             var _hookType = (AnimationHookType)reader.ReadUInt32();
             Direction = (AnimationHookDir)reader.ReadUInt32();
             return true;
         }
 
         /// <inheritdoc />
-        public virtual bool Pack(DatFileWriter writer) {
+        public virtual bool Pack(DatBinWriter writer) {
             writer.WriteUInt32((uint)HookType);
             writer.WriteUInt32((uint)Direction);
             return true;
@@ -39,7 +41,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         /// <summary>
         /// Create a typed instance of this abstract class
         /// </summary>
-        public static AnimationHook? Unpack(DatFileReader reader, AnimationHookType type) {
+        public static AnimationHook? Unpack(DatBinReader reader, AnimationHookType type) {
             AnimationHook? instance = null;
             switch(type) {
                 case AnimationHookType.Sound:

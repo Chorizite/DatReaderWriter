@@ -1,7 +1,7 @@
-﻿using ACClientLib.DatReaderWriter;
-using ACClientLib.DatReaderWriter.Attributes;
-using ACClientLib.DatReaderWriter.IO;
-using ACClientLib.DatReaderWriter.Options;
+﻿using DatReaderWriter;
+using DatReaderWriter.Options;
+using DatReaderWriter.Lib.Attributes;
+using DatReaderWriter.Lib.IO;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,21 +9,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ACClientLib.DatReaderWriter.Lib {
+namespace DatReaderWriter.Lib {
     /// <summary>
     /// A queryable collection of <see cref="IDBObj"/>s
     /// </summary>
     /// <typeparam name="T">The type of DBObjs in the collection</typeparam>
     public class DBObjCollection<T> : IEnumerable<T> where T : IDBObj {
         private readonly DBObjTypeAttribute _typeAttr;
-        private readonly DatDatabaseReader _dat;
+        private readonly DatDatabase _dat;
 
         /// <summary>
         /// Creates a new DBObjCollection
         /// </summary>
         /// <param name="dat"></param>
         /// <exception cref="Exception"></exception>
-        public DBObjCollection(DatDatabaseReader dat) {
+        public DBObjCollection(DatDatabase dat) {
             _dat = dat;
 
             if (!DBObjAttributeCache.TypeCache.TryGetValue(typeof(T), out var typeAttr)) {

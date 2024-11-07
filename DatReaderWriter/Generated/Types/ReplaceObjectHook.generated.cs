@@ -13,10 +13,12 @@ using System.Numerics;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.IO;
+using DatReaderWriter.Enums;
+using DatReaderWriter.Lib;
+using DatReaderWriter.Lib.Attributes;
+using DatReaderWriter.Lib.IO;
 
-namespace ACClientLib.DatReaderWriter.Types {
+namespace DatReaderWriter.Types {
     public partial class ReplaceObjectHook : AnimationHook {
         /// <inheritdoc />
         public override AnimationHookType HookType => AnimationHookType.ReplaceObject;
@@ -26,7 +28,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         public uint PartId;
 
         /// <inheritdoc />
-        public override bool Unpack(DatFileReader reader) {
+        public override bool Unpack(DatBinReader reader) {
             base.Unpack(reader);
             PartIndex = reader.ReadUInt16();
             PartId = reader.ReadDataIdOfKnownType(0x01000000);
@@ -34,7 +36,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         }
 
         /// <inheritdoc />
-        public override bool Pack(DatFileWriter writer) {
+        public override bool Pack(DatBinWriter writer) {
             base.Pack(writer);
             writer.WriteUInt16(PartIndex);
             writer.WriteDataIdOfKnownType(PartId, 0x01000000);

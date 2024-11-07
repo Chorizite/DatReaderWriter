@@ -1,10 +1,11 @@
-﻿using ACClientLib.DatReaderWriter.Options;
+﻿using DatReaderWriter.Options;
+using DatReaderWriter.Lib.IO;
 using System;
 using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.IO;
 
-namespace ACClientLib.DatReaderWriter.IO.BlockAllocators {
+namespace DatReaderWriter.Lib.IO.BlockAllocators {
     /// <summary>
     /// A block allocator that uses file streams for reading and writing.
     /// </summary>
@@ -52,20 +53,20 @@ namespace ACClientLib.DatReaderWriter.IO.BlockAllocators {
             lock (_streamLock) {
                 while (bufferIndex < numBytes) {
                     var size = Math.Min(Header.BlockSize - 4, numBytes - bufferIndex);
-                    
+
                     // Write the block data
                     _datStream.Position = currentBlock + 4;
                     _datStream.Write(buffer, bufferIndex, size);
-                    
+
                     bufferIndex += size;
-                    
+
                     // Prepare next block pointer
                     var oldOffset = currentBlock;
                     if (bufferIndex < numBytes) {
                         _datStream.Position = currentBlock;
                         _datStream.Read(nextBlockBuffer, 0, 4);
                         var nextBlock = BinaryPrimitives.ReadInt32LittleEndian(nextBlockBuffer);
-                        
+
                         if (nextBlock <= 0) {
                             currentBlock = ReserveBlock();
                         }
@@ -107,7 +108,7 @@ namespace ACClientLib.DatReaderWriter.IO.BlockAllocators {
             lock (_streamLock) {
                 while (currentBlock != 0 && totalRead < buffer.Length) {
                     var bytesToRead = Math.Min(Header.BlockSize - 4, buffer.Length - totalRead);
-                    
+
                     // Read block data
                     _datStream.Position = currentBlock + 4;
                     var bytesRead = _datStream.Read(buffer, totalRead, bytesToRead);
@@ -134,7 +135,7 @@ namespace ACClientLib.DatReaderWriter.IO.BlockAllocators {
             lock (_streamLock) {
                 while (currentBlock != 0) {
                     fileBlocks.Add(currentBlock);
-                    
+
                     _datStream.Position = currentBlock;
                     _datStream.Read(nextBlockBuffer, 0, 4);
                     currentBlock = BinaryPrimitives.ReadInt32LittleEndian(nextBlockBuffer);

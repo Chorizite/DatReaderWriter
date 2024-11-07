@@ -13,10 +13,12 @@ using System.Numerics;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.IO;
+using DatReaderWriter.Enums;
+using DatReaderWriter.Lib;
+using DatReaderWriter.Lib.Attributes;
+using DatReaderWriter.Lib.IO;
 
-namespace ACClientLib.DatReaderWriter.Types {
+namespace DatReaderWriter.Types {
     public partial class SWVertex : IDatObjType {
         public Vector3 Origin;
 
@@ -25,7 +27,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         public List<Vec2Duv> UVs = [];
 
         /// <inheritdoc />
-        public bool Unpack(DatFileReader reader) {
+        public bool Unpack(DatBinReader reader) {
             var _numUVs = reader.ReadUInt16();
             Origin = reader.ReadVector3();
             Normal = reader.ReadVector3();
@@ -36,7 +38,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         }
 
         /// <inheritdoc />
-        public bool Pack(DatFileWriter writer) {
+        public bool Pack(DatBinWriter writer) {
             writer.WriteUInt16((ushort)UVs.Count());
             writer.WriteVector3(Origin);
             writer.WriteVector3(Normal);

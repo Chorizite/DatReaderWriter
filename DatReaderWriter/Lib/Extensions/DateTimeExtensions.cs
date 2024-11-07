@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DatReaderWriter.Extensions {
+namespace DatReaderWriter.Lib.Extensions {
     /// <summary>
     /// Extension methods for <see cref="DateTime"/>
     /// </summary>
@@ -15,7 +15,7 @@ namespace DatReaderWriter.Extensions {
         /// <param name="dateTime"></param>
         /// <returns></returns>
         public static uint ToUnixTimestamp(this DateTime dateTime) {
-            DateTime unixStart = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
+            DateTime unixStart = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
             long unixTimeStampInTicks = (dateTime.ToUniversalTime() - unixStart).Ticks;
             return (uint)(unixTimeStampInTicks / TimeSpan.TicksPerSecond);
         }

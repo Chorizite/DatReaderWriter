@@ -1,14 +1,14 @@
-﻿using ACClientLib.DatReaderWriter.Attributes;
-using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.IO;
-using ACClientLib.DatReaderWriter.Types;
+﻿using DatReaderWriter.Lib.Attributes;
+using DatReaderWriter.Enums;
+using DatReaderWriter.Types;
+using DatReaderWriter.Lib.IO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ACClientLib.DatReaderWriter.DBObjs {
+namespace DatReaderWriter.DBObjs {
     /// <summary>
     /// Database iteration (versioning) data
     /// </summary>
@@ -35,7 +35,7 @@ namespace ACClientLib.DatReaderWriter.DBObjs {
         public Dictionary<int, int> Iterations = [];
 
         /// <inheritdoc/>
-        public override bool Unpack(DatFileReader reader) {
+        public override bool Unpack(DatBinReader reader) {
             base.Unpack(reader);
             CurrentIteration = reader.ReadInt32();
             var _numIterations = CurrentIteration;
@@ -51,7 +51,7 @@ namespace ACClientLib.DatReaderWriter.DBObjs {
         }
 
         /// <inheritdoc />
-        public override bool Pack(DatFileWriter writer) {
+        public override bool Pack(DatBinWriter writer) {
             base.Pack(writer);
 
             // i dunno about this...

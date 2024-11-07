@@ -13,10 +13,12 @@ using System.Numerics;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.IO;
+using DatReaderWriter.Enums;
+using DatReaderWriter.Lib;
+using DatReaderWriter.Lib.Attributes;
+using DatReaderWriter.Lib.IO;
 
-namespace ACClientLib.DatReaderWriter.Types {
+namespace DatReaderWriter.Types {
     public partial class GameTime : IDatObjType {
         public double ZeroTimeOfYear;
 
@@ -35,7 +37,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         public List<Season> Seasons = [];
 
         /// <inheritdoc />
-        public bool Unpack(DatFileReader reader) {
+        public bool Unpack(DatBinReader reader) {
             ZeroTimeOfYear = reader.ReadDouble();
             ZeroYear = reader.ReadUInt32();
             DayLength = reader.ReadSingle();
@@ -58,7 +60,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         }
 
         /// <inheritdoc />
-        public bool Pack(DatFileWriter writer) {
+        public bool Pack(DatBinWriter writer) {
             writer.WriteDouble(ZeroTimeOfYear);
             writer.WriteUInt32(ZeroYear);
             writer.WriteSingle(DayLength);

@@ -1,6 +1,6 @@
-# ACClientLib.DatReaderWriter
+# DatReaderWriter
 
-ACClientLib.DatReaderWriter is an open-source library for reading and writing .dat files used by the game Asheron's Call. This tool allows players and developers to access and modify game data files for various purposes, such as creating mods or analyzing game content.
+DatReaderWriter is an open-source library for reading and writing .dat files used by the game Asheron's Call. This tool allows players and developers to access and modify game data files for various purposes, such as creating mods or analyzing game content.
 
 ## Table of Contents
 
@@ -24,11 +24,7 @@ See Tests for full usage.
 
 ### Update spell names and descriptions
 ```cs
-var portalDat = new PortalDatabase(o => {
-    o.FilePath = Path.Combine(config.clientDir, "client_portal.dat");
-    o.AccessType = DatAccessType.ReadWrite;
-});
-
+var portalDat = new PortalDatabase(Path.Combine(config.clientDir, "client_portal.dat"), DatAccessType.ReadWrite);
 var spellTable = portalDat.SpellTable ?? throw new Exception("Failed to read spell table");
 
 // update spell name / description (no need to worry about updating Components with newly
@@ -47,11 +43,7 @@ portalDat.Dispose();
 
 ### Rewrite all MotionTables to be 100x speed
 ```cs  
-// open portal dat for writing
-using var portalDat = new PortalDatabase(options => {
-    options.FilePath = Path.Combine(gameDatDir, "client_portal.dat");
-    options.AccessType = DatAccessType.ReadWrite;
-});
+var portalDat = new PortalDatabase(Path.Combine(config.clientDir, "client_portal.dat"), DatAccessType.ReadWrite);
 
 // loop through all motion tables and update framerates
 foreach (var mTable in portalDat.MotionTables) {
@@ -76,7 +68,7 @@ portalDat.Dispose();
 
 ## Contributing
 
-We welcome contributions from the community! If you would like to contribute to ACClientLib.DatReaderWriter, please follow these steps:
+We welcome contributions from the community! If you would like to contribute to DatReaderWriter, please follow these steps:
 
 1. Fork the repository.
 2. Create a new branch (git checkout -b feature-branch).

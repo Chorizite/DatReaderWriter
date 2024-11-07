@@ -1,7 +1,7 @@
-﻿using ACClientLib.DatReaderWriter;
-using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.IO;
-using ACClientLib.DatReaderWriter.IO.DatBTree;
+﻿using DatReaderWriter;
+using DatReaderWriter.Enums;
+using DatReaderWriter.Lib.IO;
+using DatReaderWriter.Lib.IO.DatBTree;
 using System;
 using System.Collections;
 using System.Collections.Generic;

@@ -13,10 +13,12 @@ using System.Numerics;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using ACClientLib.DatReaderWriter.Enums;
-using ACClientLib.DatReaderWriter.IO;
+using DatReaderWriter.Enums;
+using DatReaderWriter.Lib;
+using DatReaderWriter.Lib.Attributes;
+using DatReaderWriter.Lib.IO;
 
-namespace ACClientLib.DatReaderWriter.Types {
+namespace DatReaderWriter.Types {
     public partial class AttackCone : IDatObjType {
         public uint PartIndex;
 
@@ -33,7 +35,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         public float Height;
 
         /// <inheritdoc />
-        public bool Unpack(DatFileReader reader) {
+        public bool Unpack(DatBinReader reader) {
             PartIndex = reader.ReadUInt32();
             LeftX = reader.ReadSingle();
             LeftY = reader.ReadSingle();
@@ -45,7 +47,7 @@ namespace ACClientLib.DatReaderWriter.Types {
         }
 
         /// <inheritdoc />
-        public bool Pack(DatFileWriter writer) {
+        public bool Pack(DatBinWriter writer) {
             writer.WriteUInt32(PartIndex);
             writer.WriteSingle(LeftX);
             writer.WriteSingle(LeftY);
