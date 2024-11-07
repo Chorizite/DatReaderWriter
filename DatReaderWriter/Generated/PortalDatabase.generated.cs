@@ -31,9 +31,11 @@ namespace DatReaderWriter {
         private DBObjCollection<MotionTable>? _MotionTables;
         private DBObjCollection<Environment>? _Environments;
         private DBObjCollection<Region>? _Regions;
+        private DBObjCollection<Keymap>? _Keymaps;
         private DBObjCollection<MaterialModifier>? _MaterialModifiers;
         private DBObjCollection<MaterialInstance>? _MaterialInstances;
         private DBObjCollection<DataIdMapper>? _DataIdMappers;
+        private DBObjCollection<DualDataIdMapper>? _DualDataIdMappers;
         
         /// <summary>
         /// All GfxObjs in the database.
@@ -86,6 +88,11 @@ namespace DatReaderWriter {
         public DBObjCollection<Region> Regions => _Regions ??= new DBObjCollection<Region>(this);
         
         /// <summary>
+        /// All Keymaps in the database.
+        /// </summary>
+        public DBObjCollection<Keymap> Keymaps => _Keymaps ??= new DBObjCollection<Keymap>(this);
+        
+        /// <summary>
         /// All MaterialModifiers in the database.
         /// </summary>
         public DBObjCollection<MaterialModifier> MaterialModifiers => _MaterialModifiers ??= new DBObjCollection<MaterialModifier>(this);
@@ -99,6 +106,11 @@ namespace DatReaderWriter {
         /// All DataIdMappers in the database.
         /// </summary>
         public DBObjCollection<DataIdMapper> DataIdMappers => _DataIdMappers ??= new DBObjCollection<DataIdMapper>(this);
+        
+        /// <summary>
+        /// All DualDataIdMappers in the database.
+        /// </summary>
+        public DBObjCollection<DualDataIdMapper> DualDataIdMappers => _DualDataIdMappers ??= new DBObjCollection<DualDataIdMapper>(this);
         
         /// <summary>
         /// The SpellTable DBObj in the database.

@@ -247,7 +247,7 @@ namespace DatReaderWriter.SourceGen {
             if (type == "ObjectId" || type == "PackedDWORD" || type == "LandcellId" || type == "DataId") {
                 return "uint";
             }
-            if (type == "WString" || type == "bytestring" || type == "obfuscatedstring") {
+            if (type == "WString" || type == "bytestring" || type == "obfuscatedstring" || type=="rawstring") {
                 return "string";
             }
             if (type == "CompressedUInt") {
@@ -255,6 +255,9 @@ namespace DatReaderWriter.SourceGen {
             }
             if (type == "DataIdOfKnownType") {
                 return "uint";
+            }
+            if (type == "guid") {
+                return "Guid";
             }
             return type;
         }

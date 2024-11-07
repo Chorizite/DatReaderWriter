@@ -288,5 +288,28 @@ namespace DatReaderWriter.Lib.IO {
             // Convert bytes to string using Windows-1252 encoding
             return Encoding.GetEncoding(1252).GetString(obfuscatedBytes);
         }
+
+        /// <summary>
+        ///  Reads a string from the current stream. The string is prefixed with the length,
+        //     encoded as an integer seven bits at a time.
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public string ReadString() {
+#if NET8_0_OR_GREATER
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+#endif
+            var length = ReadCompressedUInt();
+            var bytes = ReadBytes((int)length);
+            return Encoding.GetEncoding(1252).GetString(bytes);
+        }
+
+        /// <summary>
+        /// Reads a <see cref="Guid"/> from the current stream.
+        /// </summary>
+        /// <returns></returns>
+        public Guid ReadGuid() {
+            return new Guid(ReadBytes(16));
+        }
     }
 }
