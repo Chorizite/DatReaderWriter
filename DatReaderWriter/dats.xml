@@ -2476,6 +2476,10 @@
         <vector name="Links" length="_numLinks" type="Dictionary" genericKey="int" genericValue="MotionCommandData" />
       </type>
       <type name="Wave" text="DB_TYPE_WAVE in the client." parent="DBObj" first="0xA000000" last="0xA00FFFF" flags="DBObjHeaderFlags.HasId">
+        <field name="_headerSize" type="int" />
+        <field name="_dataSize" type="int" />
+        <vector name="Header" length="_headerSize" type="byte" />
+        <vector name="Data" length="_dataSize" type="byte" />
       </type>
       <type name="Environment" text="DB_TYPE_ENVIRONMENT in the client." parent="DBObj" first="0xD000000" last="0xD00FFFF" flags="DBObjHeaderFlags.HasId">
         <field type="uint" name="_cellCount" />

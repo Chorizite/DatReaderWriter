@@ -29,6 +29,7 @@ namespace DatReaderWriter {
         private DBObjCollection<RenderSurface>? _RenderSurfaces;
         private DBObjCollection<Surface>? _Surfaces;
         private DBObjCollection<MotionTable>? _MotionTables;
+        private DBObjCollection<Wave>? _Waves;
         private DBObjCollection<Environment>? _Environments;
         private DBObjCollection<Region>? _Regions;
         private DBObjCollection<Keymap>? _Keymaps;
@@ -76,6 +77,11 @@ namespace DatReaderWriter {
         /// All MotionTables in the database.
         /// </summary>
         public DBObjCollection<MotionTable> MotionTables => _MotionTables ??= new DBObjCollection<MotionTable>(this);
+        
+        /// <summary>
+        /// All Waves in the database.
+        /// </summary>
+        public DBObjCollection<Wave> Waves => _Waves ??= new DBObjCollection<Wave>(this);
         
         /// <summary>
         /// All Environments in the database.
