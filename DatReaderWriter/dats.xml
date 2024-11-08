@@ -2354,6 +2354,49 @@
       <field name="ActionName" type="uint" text="These correspond to 0x2200002B enum dat entry" />
       <field name="ControlSpec" type="ControlSpecification"/>
     </type>
+    <type name="ObjectDesc">
+      <field name="ObjectId" type="uint" />
+      <field name="BaseLoc" type="Frame" />
+      <field name="Frequency" type="float"/>
+      <field name="DisplaceX" type="float"/>
+      <field name="DisplaceY" type="float"/>
+      <field name="MinScale" type="float"/>
+      <field name="MaxScale" type="float"/>
+      <field name="MaxRotation" type="float"/>
+      <field name="MinSlope" type="float"/>
+      <field name="MaxSlope" type="float"/>
+      <field name="Align" type="int" />
+      <field name="Orient" type="int" />
+      <field name="WeenieObj" type="uint" />
+    </type>
+    <type name="ClothingBaseEffect">
+      <field name="_numCloObjectEffects" type="uint" />
+      <vector name="CloObjectEffects" length="_numCloObjectEffects" type="List" genericValue="CloObjectEffect" />
+    </type>
+    <type name="CloObjectEffect">
+      <field name="Index" type="uint" />
+      <field name="ModelId" type="uint" />
+      <field name="_numCloTextureEffects" type="uint" />
+      <vector name="CloTextureEffects" length="_numCloTextureEffects" type="List" genericValue="CloTextureEffect" />
+    </type>
+    <type name="CloTextureEffect">
+      <field name="OldTexture" type="uint" />
+      <field name="NewTexture" type="uint" />
+    </type>
+    <type name="CloSubPalEffect">
+      <field name="Icon" type="uint" />
+      <field name="_numCloSubPalettes" type="uint" />
+      <vector name="CloSubPalettes" length="_numCloSubPalettes" type="List" genericValue="CloSubPalette" />
+    </type>
+    <type name="CloSubPalette">
+      <field name="_numRanges" type="uint" />
+      <vector name="Ranges" length="_numRanges" type="List" genericValue="CloSubPaletteRange" />
+      <field name="PaletteSet" type="uint" />
+    </type>
+    <type name="CloSubPaletteRange">
+      <field name="Offset" type="uint" />
+      <field name="NumColors" type="uint" />
+    </type>
   </types>
   <dats>
     <dat name="portal" text="client_portal.dat" type="DatFileType.Portal">
@@ -2500,12 +2543,22 @@
       <type name="MonitoredProperties" text="DB_TYPE_MONITOREDPROPERTIES in the client." parent="DBObj" first="0xE020000" last="0xE02FFFF" flags="DBObjHeaderFlags.HasId">
       </type>
       <type name="PaletteSet" text="DB_TYPE_PAL_SET in the client." parent="DBObj" first="0xF000000" last="0xF00FFFF" flags="DBObjHeaderFlags.HasId">
+        <field name="_numPalettes" type="uint" />
+        <vector name="Palettes" length="_numPalettes" type="List" genericValue="uint" />
       </type>
       <type name="Clothing" text="DB_TYPE_CLOTHING in the client." parent="DBObj" first="0x10000000" last="0x1000FFFF" flags="DBObjHeaderFlags.HasId">
+        <field name="_numClothingBaseEffects" type="ushort" />
+        <field name="_numClothingBaseEffectsBuckets" type="ushort" value="8" />
+        <vector name="ClothingBaseEffects" length="_numClothingBaseEffects" type="Dictionary" genericKey="uint" genericValue="ClothingBaseEffect" />
+        <field name="_numClothingSubPalEffects" type="ushort" />
+        <field name="_numClothingSubPalEffectsBuckets" type="ushort" value="32" />
+        <vector name="ClothingSubPalEffects" length="_numClothingSubPalEffects" type="Dictionary" genericKey="uint" genericValue="CloSubPalEffect" />
       </type>
       <type name="DegradeInfo" text="DB_TYPE_DEGRADEINFO in the client." parent="DBObj" first="0x11000000" last="0x1100FFFF" flags="DBObjHeaderFlags.HasId">
       </type>
       <type name="Scene" text="DB_TYPE_SCENE in the client." parent="DBObj" first="0x12000000" last="0x1200FFFF" flags="DBObjHeaderFlags.HasId">
+        <field name="_numObjects" type="uint" />
+        <vector name="Objects" length="_numObjects" type="List" genericValue="ObjectDesc" />
       </type>
       <type name="Region" text="DB_TYPE_REGION in the client." parent="DBObj" first="0x13000000" last="0x1300FFFF" flags="DBObjHeaderFlags.HasId">
         <field name="RegionNumber" type="uint" />

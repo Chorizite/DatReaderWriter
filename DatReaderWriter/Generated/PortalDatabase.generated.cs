@@ -31,6 +31,9 @@ namespace DatReaderWriter {
         private DBObjCollection<MotionTable>? _MotionTables;
         private DBObjCollection<Wave>? _Waves;
         private DBObjCollection<Environment>? _Environments;
+        private DBObjCollection<PaletteSet>? _PaletteSets;
+        private DBObjCollection<Clothing>? _Clothings;
+        private DBObjCollection<Scene>? _Scenes;
         private DBObjCollection<Region>? _Regions;
         private DBObjCollection<Keymap>? _Keymaps;
         private DBObjCollection<MaterialModifier>? _MaterialModifiers;
@@ -87,6 +90,21 @@ namespace DatReaderWriter {
         /// All Environments in the database.
         /// </summary>
         public DBObjCollection<Environment> Environments => _Environments ??= new DBObjCollection<Environment>(this);
+        
+        /// <summary>
+        /// All PaletteSets in the database.
+        /// </summary>
+        public DBObjCollection<PaletteSet> PaletteSets => _PaletteSets ??= new DBObjCollection<PaletteSet>(this);
+        
+        /// <summary>
+        /// All Clothings in the database.
+        /// </summary>
+        public DBObjCollection<Clothing> Clothings => _Clothings ??= new DBObjCollection<Clothing>(this);
+        
+        /// <summary>
+        /// All Scenes in the database.
+        /// </summary>
+        public DBObjCollection<Scene> Scenes => _Scenes ??= new DBObjCollection<Scene>(this);
         
         /// <summary>
         /// All Regions in the database.

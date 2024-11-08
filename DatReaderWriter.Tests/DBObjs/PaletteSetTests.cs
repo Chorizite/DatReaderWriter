@@ -10,9 +10,9 @@ using DatReaderWriter.Lib.IO;
 
 namespace DatReaderWriter.Tests.DBObjs {
     [TestClass]
-    public class WaveTests {
+    public class PaletteSetTests {
         [TestMethod]
-        public void CanInsertAndReaWaves() {
+        public void CanInsertAndReadPaletteSets() {
             var datFilePath = Path.GetTempFileName();
             using var dat = new DatDatabase(options => {
                 options.FilePath = datFilePath;
@@ -21,26 +21,21 @@ namespace DatReaderWriter.Tests.DBObjs {
 
             dat.BlockAllocator.InitNew(DatFileType.Portal, 0);
 
-            var writeWave = new Wave() {
-                Id = 0xA000001,
-                Header = [4, 3, 2, 1],
-                Data = [1, 2, 3, 4, 5, 6, 7]
+            var writeObj = new PaletteSet() {
+                Id = 0xF000001,
+                Palettes = [1, 2, 3, 4, 5, 6, 7]
             };
 
-            var res = dat.TryWriteFile(writeWave);
+            var res = dat.TryWriteFile(writeObj);
             Assert.IsTrue(res);
 
-            var res2 = dat.TryReadFile<Wave>(0xA000001, out var readWave);
+            var res2 = dat.TryReadFile<PaletteSet>(0xF000001, out var readObj);
             Assert.IsTrue(res2);
-            Assert.IsNotNull(readWave);
+            Assert.IsNotNull(readObj);
 
-            Assert.AreEqual(0xA000001u, readWave.Id);
+            Assert.AreEqual(0xF000001u, readObj.Id);
 
-            Assert.AreEqual(writeWave.Header.Length, readWave.Header.Length);
-            Assert.AreEqual(writeWave.Data.Length, readWave.Data.Length);
-
-            CollectionAssert.AreEqual(writeWave.Header, readWave.Header);
-            CollectionAssert.AreEqual(writeWave.Data, readWave.Data);
+            CollectionAssert.AreEqual(writeObj.Palettes, readObj.Palettes);
 
             dat.Dispose();
             File.Delete(datFilePath);
@@ -48,19 +43,20 @@ namespace DatReaderWriter.Tests.DBObjs {
 
         [TestMethod]
         [TestCategory("EOR")]
-        public void CanReadEORWave() {
+        public void CanReadEORPaletteSet() {
             using var dat = new DatDatabase(options => {
                 options.FilePath = Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat");
                 options.IndexCachingStrategy = IndexCachingStrategy.Never;
             });
 
 
-            var res = dat.TryReadFile<Wave>(0x0A000002, out var wave1);
+            var res = dat.TryReadFile<PaletteSet>(0xF000001, out var readObj);
             Assert.IsTrue(res);
-            Assert.IsNotNull(wave1);
-            Assert.AreEqual(0x0A000002u, wave1.Id);
-            Assert.AreEqual(18, wave1.Header.Length);
-            Assert.AreEqual(7046, wave1.Data.Length);
+            Assert.IsNotNull(readObj);
+            Assert.AreEqual(0xF000001u, readObj.Id);
+            Assert.AreEqual(4, readObj.Palettes.Count);
+
+            CollectionAssert.AreEqual(new uint[] { 0x040005F3, 0x040005F4, 0x040005F5, 0x040005F2 }, readObj.Palettes);
 
             dat.Dispose();
         }
@@ -68,7 +64,7 @@ namespace DatReaderWriter.Tests.DBObjs {
         [TestMethod]
         [TestCategory("EOR")]
         public void CanReadEORWaveAndWriteIdentical() {
-            TestHelpers.CanReadAndWriteIdentical<Wave>(Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat"), 0x0A000014);
+            TestHelpers.CanReadAndWriteIdentical<PaletteSet>(Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat"), 0xF000001);
         }
     }
 }
