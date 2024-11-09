@@ -1823,6 +1823,27 @@
       <value name="Joystick" value="3" />
       <value name="Virtual" value="4" />
     </enum>
+    <enum name="EmitterType" parent="int">
+      <value name="Unknown" value="0x00000000" />
+      <value name="BirthratePerSec" value="0x00000001" />
+      <value name="BirthratePerMeter" value="0x00000002" />
+    </enum>
+    <enum name="ParticleType" parent="int">
+      <value name="Unknown" value="0x00000000" />
+      <value name="Still" value="0x00000001" />
+      <value name="LocalVelocity" value="0x00000002" />
+      <value name="ParabolicLVGA" value="0x00000003" />
+      <value name="ParabolicLVGAGR" value="0x00000004" />
+      <value name="Swarm" value="0x00000005" />
+      <value name="Explode" value="0x00000006" />
+      <value name="Implode" value="0x00000007" />
+      <value name="ParabolicLVLA" value="0x00000008" />
+      <value name="ParabolicLVLALR" value="0x00000009" />
+      <value name="ParabolicGVGA" value="0x0000000A" />
+      <value name="ParabolicGVGAGR" value="0x0000000B" />
+      <value name="GlobalVelocity" value="0x0000000C" />
+      <value name="NumParticleType" value="0x0000000D" />
+    </enum>
   </enums>
   <types>
     <type name="DBObj" abstract="true">
@@ -2354,6 +2375,62 @@
       <field name="ActionName" type="uint" text="These correspond to 0x2200002B enum dat entry" />
       <field name="ControlSpec" type="ControlSpecification"/>
     </type>
+    <type name="ObjectDesc">
+      <field name="ObjectId" type="uint" />
+      <field name="BaseLoc" type="Frame" />
+      <field name="Frequency" type="float"/>
+      <field name="DisplaceX" type="float"/>
+      <field name="DisplaceY" type="float"/>
+      <field name="MinScale" type="float"/>
+      <field name="MaxScale" type="float"/>
+      <field name="MaxRotation" type="float"/>
+      <field name="MinSlope" type="float"/>
+      <field name="MaxSlope" type="float"/>
+      <field name="Align" type="int" />
+      <field name="Orient" type="int" />
+      <field name="WeenieObj" type="uint" />
+    </type>
+    <type name="ClothingBaseEffect">
+      <field name="_numCloObjectEffects" type="uint" />
+      <vector name="CloObjectEffects" length="_numCloObjectEffects" type="List" genericValue="CloObjectEffect" />
+    </type>
+    <type name="CloObjectEffect">
+      <field name="Index" type="uint" />
+      <field name="ModelId" type="uint" />
+      <field name="_numCloTextureEffects" type="uint" />
+      <vector name="CloTextureEffects" length="_numCloTextureEffects" type="List" genericValue="CloTextureEffect" />
+    </type>
+    <type name="CloTextureEffect">
+      <field name="OldTexture" type="uint" />
+      <field name="NewTexture" type="uint" />
+    </type>
+    <type name="CloSubPalEffect">
+      <field name="Icon" type="uint" />
+      <field name="_numCloSubPalettes" type="uint" />
+      <vector name="CloSubPalettes" length="_numCloSubPalettes" type="List" genericValue="CloSubPalette" />
+    </type>
+    <type name="CloSubPalette">
+      <field name="_numRanges" type="uint" />
+      <vector name="Ranges" length="_numRanges" type="List" genericValue="CloSubPaletteRange" />
+      <field name="PaletteSet" type="uint" />
+    </type>
+    <type name="CloSubPaletteRange">
+      <field name="Offset" type="uint" />
+      <field name="NumColors" type="uint" />
+    </type>
+    <type name="ChatEmoteData">
+      <field name="MyEmote" type="string" />
+      <field name="OtherEmote" type="string" />
+    </type>
+    <type name="BannedPatterns">
+      <field name="_numPatterns" type="ushort" />
+      <field name="_numPatternsBuckets" type="ushort" value="32" />
+      <vector name="Patterns" length="_numPatterns" type="Dictionary" genericKey="uint" genericValue="string" />
+    </type>
+    <type name="PhysicsScriptData">
+      <field name="StartTime" type="double" />
+      <field name="Hook" type="AnimationHook" />
+    </type>
   </types>
   <dats>
     <dat name="portal" text="client_portal.dat" type="DatFileType.Portal">
@@ -2476,16 +2553,29 @@
         <vector name="Links" length="_numLinks" type="Dictionary" genericKey="int" genericValue="MotionCommandData" />
       </type>
       <type name="Wave" text="DB_TYPE_WAVE in the client." parent="DBObj" first="0xA000000" last="0xA00FFFF" flags="DBObjHeaderFlags.HasId">
+        <field name="_headerSize" type="int" />
+        <field name="_dataSize" type="int" />
+        <vector name="Header" length="_headerSize" type="byte" />
+        <vector name="Data" length="_dataSize" type="byte" />
       </type>
       <type name="Environment" text="DB_TYPE_ENVIRONMENT in the client." parent="DBObj" first="0xD000000" last="0xD00FFFF" flags="DBObjHeaderFlags.HasId">
         <field type="uint" name="_cellCount" />
         <vector name="Cells" length="_cellCount" type="Dictionary" genericKey="uint" genericValue="CellStruct" text="The cells in this environment" />
       </type>
       <type name="ChatPoseTable" text="DB_TYPE_CHAT_POSE_TABLE in the client." parent="DBObj" first="0xE000007" last="0xE000007" flags="DBObjHeaderFlags.HasId">
+        <field name="_numChatPoseHashes" type="ushort" />
+        <field name="_numChatPoseHashBuckets" type="ushort" value="32" />
+        <vector name="ChatPoseHash" length="_numChatPoseHashes" type="Dictionary" genericKey="string" genericValue="string" />
+        <field name="_numChatEmoteHashes" type="ushort" />
+        <field name="_numChatEmoteHashBuckets" type="ushort" value="32" />
+        <vector name="ChatEmoteHash" length="_numChatEmoteHashes" type="Dictionary" genericKey="string" genericValue="ChatEmoteData" />
       </type>
       <type name="ObjectHierarchy" text="DB_TYPE_OBJECT_HIERARCHY in the client." parent="DBObj" first="0xE00000D" last="0xE00000D" flags="DBObjHeaderFlags.HasId">
       </type>
       <type name="BadDataTable" text="DB_TYPE_BADDATA in the client." parent="DBObj" first="0xE00001A" last="0xE00001A" flags="DBObjHeaderFlags.HasId">
+        <field name="_numBadIds" type="ushort" />
+        <field name="_numBadIdBuckets" type="ushort" value="32" />
+        <vector name="BadIds" length="_numBadIds" type="Dictionary" genericKey="uint" genericValue="uint" />
       </type>
       <type name="TabooTable" text="DB_TYPE_TABOO_TABLE in the client." parent="DBObj" first="0xE00001E" last="0xE00001E" flags="DBObjHeaderFlags.HasId">
       </type>
@@ -2496,12 +2586,22 @@
       <type name="MonitoredProperties" text="DB_TYPE_MONITOREDPROPERTIES in the client." parent="DBObj" first="0xE020000" last="0xE02FFFF" flags="DBObjHeaderFlags.HasId">
       </type>
       <type name="PaletteSet" text="DB_TYPE_PAL_SET in the client." parent="DBObj" first="0xF000000" last="0xF00FFFF" flags="DBObjHeaderFlags.HasId">
+        <field name="_numPalettes" type="uint" />
+        <vector name="Palettes" length="_numPalettes" type="List" genericValue="uint" />
       </type>
       <type name="Clothing" text="DB_TYPE_CLOTHING in the client." parent="DBObj" first="0x10000000" last="0x1000FFFF" flags="DBObjHeaderFlags.HasId">
+        <field name="_numClothingBaseEffects" type="ushort" />
+        <field name="_numClothingBaseEffectsBuckets" type="ushort" value="8" />
+        <vector name="ClothingBaseEffects" length="_numClothingBaseEffects" type="Dictionary" genericKey="uint" genericValue="ClothingBaseEffect" />
+        <field name="_numClothingSubPalEffects" type="ushort" />
+        <field name="_numClothingSubPalEffectsBuckets" type="ushort" value="32" />
+        <vector name="ClothingSubPalEffects" length="_numClothingSubPalEffects" type="Dictionary" genericKey="uint" genericValue="CloSubPalEffect" />
       </type>
       <type name="DegradeInfo" text="DB_TYPE_DEGRADEINFO in the client." parent="DBObj" first="0x11000000" last="0x1100FFFF" flags="DBObjHeaderFlags.HasId">
       </type>
       <type name="Scene" text="DB_TYPE_SCENE in the client." parent="DBObj" first="0x12000000" last="0x1200FFFF" flags="DBObjHeaderFlags.HasId">
+        <field name="_numObjects" type="uint" />
+        <vector name="Objects" length="_numObjects" type="List" genericValue="ObjectDesc" />
       </type>
       <type name="Region" text="DB_TYPE_REGION in the client." parent="DBObj" first="0x13000000" last="0x1300FFFF" flags="DBObjHeaderFlags.HasId">
         <field name="RegionNumber" type="uint" />
@@ -2560,6 +2660,10 @@
       <type name="SoundTable" text="DB_TYPE_STABLE in the client." parent="DBObj" first="0x20000000" last="0x2000FFFF" flags="DBObjHeaderFlags.HasId">
       </type>
       <type name="EnumMapper" text="DB_TYPE_ENUM_MAPPER in the client." parent="DBObj" first="0x22000000" last="0x22FFFFFF" flags="DBObjHeaderFlags.HasId">
+        <field name="BaseEnumMap" type="uint" />
+        <field name="NumberingType" type="NumberingType" />
+        <field name="_numIdToStringMaps" type="CompressedUInt" />
+        <vector name="IdToStringMap" length="_numIdToStringMaps" type="Dictionary" genericKey="uint" genericValue="bytestring" />
       </type>
       <type name="DataIdMapper" text="DB_TYPE_DID_MAPPER in the client." parent="DBObj" first="0x25000000" last="0x25FFFFFF" flags="DBObjHeaderFlags.HasId">
         <field name="ClientIDNumberingType" type="NumberingType" />
@@ -2592,10 +2696,44 @@
         <vector name="ServerEnumToName" length="_numServerEnumToNames" type="Dictionary" genericKey="uint" genericValue="bytestring" />
       </type>
       <type name="LanguageString" text="DB_TYPE_STRING in the client." parent="DBObj" first="0x31000000" last="0x3100FFFF" flags="DBObjHeaderFlags.HasId">
+        <field name="Value" type="compressedstring" />
       </type>
       <type name="ParticleEmitter" text="DB_TYPE_PARTICLE_EMITTER in the client." parent="DBObj" first="0x32000000" last="0x3200FFFF" flags="DBObjHeaderFlags.HasId">
+        <field name="Unknown" type="uint" />
+        <field name="EmitterType" type="EmitterType" />
+        <field name="ParticleType" type="ParticleType" />
+        <field name="GfxObjId" type="uint" />
+        <field name="HwGfxObjId" type="uint" />
+        <field name="Birthrate" type="double" />
+        <field name="MaxParticles" type="int" />
+        <field name="InitialParticles" type="int" />
+        <field name="TotalParticles" type="int" />
+        <field name="TotalSeconds" type="double" />
+        <field name="Lifespan" type="double" />
+        <field name="LifespanRand" type="double" />
+        <field name="OffsetDir" type="Vector3" />
+        <field name="MinOffset" type="float" />
+        <field name="MaxOffset" type="float" />
+        <field name="A" type="Vector3" />
+        <field name="MinA" type="float" />
+        <field name="MaxA" type="float" />
+        <field name="B" type="Vector3" />
+        <field name="MinB" type="float" />
+        <field name="MaxB" type="float" />
+        <field name="C" type="Vector3" />
+        <field name="MinC" type="float" />
+        <field name="MaxC" type="float" />
+        <field name="StartScale" type="float" />
+        <field name="FinalScale" type="float" />
+        <field name="ScaleRand" type="float" />
+        <field name="StartTrans" type="float" />
+        <field name="FinalTrans" type="float" />
+        <field name="TransRand" type="float" />
+        <field name="IsParentLocal" type="bool" />
       </type>
       <type name="PhysicsScript" text="DB_TYPE_PHYSICS_SCRIPT in the client." parent="DBObj" first="0x33000000" last="0x3300FFFF" flags="DBObjHeaderFlags.HasId">
+        <field name="_numScriptDatas" type="uint" />
+        <vector name="ScriptData" length="_numScriptDatas" type="List" genericValue="PhysicsScriptData" />
       </type>
       <type name="PhysicsScriptTable" text="DB_TYPE_PHYSICS_SCRIPT_TABLE in the client." parent="DBObj" first="0x34000000" last="0x3400FFFF" flags="DBObjHeaderFlags.HasId">
       </type>
@@ -2621,7 +2759,7 @@
       </type>
       <type name="SpellComponentTable" text="DB_TYPE_SPELLCOMPONENT_TABLE_0 in the client." parent="DBObj" first="0xE00000F" last="0xE00000F" flags="DBObjHeaderFlags.HasId">
         <field name="_numComponents" type="ushort" />
-        <align type="uint" />
+        <field name="_numComponentsBuckets" type="ushort" value="256" />
         <vector name="Components" length="_numComponents" type="Dictionary" genericKey="uint" genericValue="SpellComponentBase" />
       </type>
       <type name="ExperienceTable" text="Holds the experience required for different attributes/vitals/skill/levels, as well as the amount of skill credits obtained for each level. DB_TYPE_XP_TABLE_0 in the client." parent="DBObj" first="0xE000018" last="0xE000018" flags="DBObjHeaderFlags.HasId">
@@ -2662,7 +2800,7 @@
         <vector name="Buildings" length="_numBuildings" type="List" genericValue="BuildingInfo" />
         <if condition="_hasRestrictionsTable" writeCondition="RestrictionTable != null &amp;&amp; RestrictionTable.Count() > 0">
           <field type="ushort" name="_numRestrictionTableEntries" />
-          <field type="ushort" name="_numBuckets" value="0" />
+          <field type="ushort" name="_numBuckets" value="8" />
           <vector name="RestrictionTable" length="_numRestrictionTableEntries" type="Dictionary" genericKey="uint" genericValue="uint" />
         </if>
       </type>

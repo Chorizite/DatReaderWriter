@@ -37,7 +37,7 @@ namespace DatReaderWriter.DBObjs {
         public override bool Unpack(DatBinReader reader) {
             base.Unpack(reader);
             var _numComponents = reader.ReadUInt16();
-            reader.Align(4);
+            var _numComponentsBuckets = reader.ReadUInt16();
             for (var i=0; i < _numComponents; i++) {
                 var _key = reader.ReadUInt32();
                 var _val = reader.ReadItem<SpellComponentBase>();
@@ -50,7 +50,7 @@ namespace DatReaderWriter.DBObjs {
         public override bool Pack(DatBinWriter writer) {
             base.Pack(writer);
             writer.WriteUInt16((ushort)Components.Count());
-            writer.Align(4);
+            writer.WriteUInt16(256);
             foreach (var kv in Components) {
                 writer.WriteUInt32(kv.Key);
                 writer.WriteItem<SpellComponentBase>(kv.Value);

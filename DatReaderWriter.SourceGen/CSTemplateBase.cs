@@ -496,14 +496,12 @@ namespace DatReaderWriter.SourceGen {
                 case "string":
                 case "bytestring":
                 case "rawstring":
+                case "compressedstring":
                 case "WString":
                     WriteLine($"{type} {child.Name} = \"\";");
                     break;
-                case "guid":
-                    WriteLine($"{type} {child.Name} = new();");
-                    break;
                 default:
-                    WriteLine($"{type} {child.Name} = null;");
+                    WriteLine($"{type} {child.Name} = new();");
                     break;
             }
         }
@@ -544,6 +542,8 @@ namespace DatReaderWriter.SourceGen {
                     return "WriteString";
                 case "string":
                     return "WriteString16L";
+                case "compressedstring":
+                    return "WriteStringCompressed";
                 case "bytestring":
                     return "WriteString16LByte";
                 case "WString":
@@ -601,6 +601,8 @@ namespace DatReaderWriter.SourceGen {
                     return "reader.ReadString16L()";
                 case "bytestring":
                     return "reader.ReadString16LByte()";
+                case "compressedstring":
+                    return "reader.ReadStringCompressed()";
                 case "WString":
                     return "reader.ReadString32L()";
                 case "PackedWORD":

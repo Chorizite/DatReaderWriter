@@ -113,7 +113,7 @@ namespace DatReaderWriter {
         /// <param name="value">The unpacked file</param>
         /// <returns></returns>
 #if (NET8_0_OR_GREATER)
-            public bool TryReadFile<T>(uint fileId, [MaybeNullWhen(false)] out T value) where T : IUnpackable {
+            public bool TryReadFile<T>(uint fileId, [MaybeNullWhen(false)] out T value) where T : IDBObj {
 #else
         public bool TryReadFile<T>(uint fileId, out T value) where T : IDBObj {
 #endif

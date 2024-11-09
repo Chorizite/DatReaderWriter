@@ -29,13 +29,21 @@ namespace DatReaderWriter {
         private DBObjCollection<RenderSurface>? _RenderSurfaces;
         private DBObjCollection<Surface>? _Surfaces;
         private DBObjCollection<MotionTable>? _MotionTables;
+        private DBObjCollection<Wave>? _Waves;
         private DBObjCollection<Environment>? _Environments;
+        private DBObjCollection<PaletteSet>? _PaletteSets;
+        private DBObjCollection<Clothing>? _Clothings;
+        private DBObjCollection<Scene>? _Scenes;
         private DBObjCollection<Region>? _Regions;
         private DBObjCollection<Keymap>? _Keymaps;
         private DBObjCollection<MaterialModifier>? _MaterialModifiers;
         private DBObjCollection<MaterialInstance>? _MaterialInstances;
+        private DBObjCollection<EnumMapper>? _EnumMappers;
         private DBObjCollection<DataIdMapper>? _DataIdMappers;
         private DBObjCollection<DualDataIdMapper>? _DualDataIdMappers;
+        private DBObjCollection<LanguageString>? _LanguageStrings;
+        private DBObjCollection<ParticleEmitter>? _ParticleEmitters;
+        private DBObjCollection<PhysicsScript>? _PhysicsScripts;
         
         /// <summary>
         /// All GfxObjs in the database.
@@ -78,9 +86,47 @@ namespace DatReaderWriter {
         public DBObjCollection<MotionTable> MotionTables => _MotionTables ??= new DBObjCollection<MotionTable>(this);
         
         /// <summary>
+        /// All Waves in the database.
+        /// </summary>
+        public DBObjCollection<Wave> Waves => _Waves ??= new DBObjCollection<Wave>(this);
+        
+        /// <summary>
         /// All Environments in the database.
         /// </summary>
         public DBObjCollection<Environment> Environments => _Environments ??= new DBObjCollection<Environment>(this);
+        
+        /// <summary>
+        /// The ChatPoseTable DBObj in the database.
+        /// </summary>
+        public ChatPoseTable? ChatPoseTable {
+            get {
+                TryReadFile<ChatPoseTable>(0x0E000007u, out var dbObj);
+                return dbObj;
+            }
+        }
+        /// <summary>
+        /// The BadDataTable DBObj in the database.
+        /// </summary>
+        public BadDataTable? BadDataTable {
+            get {
+                TryReadFile<BadDataTable>(0x0E00001Au, out var dbObj);
+                return dbObj;
+            }
+        }
+        /// <summary>
+        /// All PaletteSets in the database.
+        /// </summary>
+        public DBObjCollection<PaletteSet> PaletteSets => _PaletteSets ??= new DBObjCollection<PaletteSet>(this);
+        
+        /// <summary>
+        /// All Clothings in the database.
+        /// </summary>
+        public DBObjCollection<Clothing> Clothings => _Clothings ??= new DBObjCollection<Clothing>(this);
+        
+        /// <summary>
+        /// All Scenes in the database.
+        /// </summary>
+        public DBObjCollection<Scene> Scenes => _Scenes ??= new DBObjCollection<Scene>(this);
         
         /// <summary>
         /// All Regions in the database.
@@ -103,6 +149,11 @@ namespace DatReaderWriter {
         public DBObjCollection<MaterialInstance> MaterialInstances => _MaterialInstances ??= new DBObjCollection<MaterialInstance>(this);
         
         /// <summary>
+        /// All EnumMappers in the database.
+        /// </summary>
+        public DBObjCollection<EnumMapper> EnumMappers => _EnumMappers ??= new DBObjCollection<EnumMapper>(this);
+        
+        /// <summary>
         /// All DataIdMappers in the database.
         /// </summary>
         public DBObjCollection<DataIdMapper> DataIdMappers => _DataIdMappers ??= new DBObjCollection<DataIdMapper>(this);
@@ -111,6 +162,21 @@ namespace DatReaderWriter {
         /// All DualDataIdMappers in the database.
         /// </summary>
         public DBObjCollection<DualDataIdMapper> DualDataIdMappers => _DualDataIdMappers ??= new DBObjCollection<DualDataIdMapper>(this);
+        
+        /// <summary>
+        /// All LanguageStrings in the database.
+        /// </summary>
+        public DBObjCollection<LanguageString> LanguageStrings => _LanguageStrings ??= new DBObjCollection<LanguageString>(this);
+        
+        /// <summary>
+        /// All ParticleEmitters in the database.
+        /// </summary>
+        public DBObjCollection<ParticleEmitter> ParticleEmitters => _ParticleEmitters ??= new DBObjCollection<ParticleEmitter>(this);
+        
+        /// <summary>
+        /// All PhysicsScripts in the database.
+        /// </summary>
+        public DBObjCollection<PhysicsScript> PhysicsScripts => _PhysicsScripts ??= new DBObjCollection<PhysicsScript>(this);
         
         /// <summary>
         /// The SpellTable DBObj in the database.

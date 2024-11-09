@@ -86,27 +86,7 @@ namespace DatReaderWriter.Tests.DBObjs {
         [TestMethod]
         [TestCategory("EOR")]
         public void CanReadEORSpellTableAndWriteIdentical() {
-            using var dat = new DatDatabase(options => {
-                options.FilePath = Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat");
-                options.IndexCachingStrategy = IndexCachingStrategy.Never;
-            });
-
-            dat.Tree.TryGetFile(0x0E00000E, out var originalEntry);
-            Assert.IsNotNull(originalEntry);
-            var res = dat.TryReadFile<SpellTable>(0x0E00000E, out var spellTable);
-            Assert.IsNotNull(spellTable);
-
-            var originalBytes = new byte[originalEntry.Size];
-            dat.BlockAllocator.ReadBlock(originalBytes, originalEntry.Offset);
-
-            var writtenBytes = new byte[originalEntry.Size];
-            var writer = new DatBinWriter(writtenBytes);
-            spellTable.Pack(writer);
-
-            Assert.AreEqual((int)originalEntry.Size, writer.Offset);
-            CollectionAssert.AreEqual(originalBytes, writtenBytes);
-
-            dat.Dispose();
+            TestHelpers.CanReadAndWriteIdentical<SpellTable>(Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat"), 0x0E00000E);
         }
     }
 }

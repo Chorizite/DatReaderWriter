@@ -31,14 +31,26 @@ namespace DatReaderWriter.DBObjs {
         /// <inheritdoc />
         public override DBObjType DBObjType => DBObjType.Keymap;
 
+        /// <summary>
+        /// The name of the keymap
+        /// </summary>
         public string Name;
 
         public Guid GuidMap;
 
+        /// <summary>
+        /// Device list
+        /// </summary>
         public List<DeviceKeyMapEntry> DeviceKeyMapEntries = [];
 
+        /// <summary>
+        /// Meta / Modifier key definitions
+        /// </summary>
         public List<ControlSpecification> MetaKeys = [];
 
+        /// <summary>
+        /// User bindings
+        /// </summary>
         public List<UserBindingValue> UserBindings = [];
 
         /// <inheritdoc />

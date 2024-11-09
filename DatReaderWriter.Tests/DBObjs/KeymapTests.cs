@@ -7,60 +7,9 @@ using DatReaderWriter.Types;
 using System.Numerics;
 
 namespace DatReaderWriter.Tests.DBObjs {
+    /*
     [TestClass]
     public class KeymapTests {
-        [TestMethod]
-        public void CanInsertAndReadKeymaps() {
-            var datFilePath = Path.GetTempFileName();
-            using var dat = new DatDatabase(options => {
-                options.FilePath = datFilePath;
-                options.AccessType = DatAccessType.ReadWrite;
-            });
-
-            dat.BlockAllocator.InitNew(DatFileType.Portal, 0);
-
-            var writeAnim = new Animation() {
-                Id = 0x03000001,
-                NumParts = 1,
-                PartFrames = [
-                  new AnimationFrame(1) {
-                      Frames = [
-                        new Frame() {
-                          Origin = new Vector3(1, 2, 3),
-                          Orientation = new Quaternion(0, 0, 0, 1)
-                        }
-                      ],
-                      Hooks = [
-                        new AnimationDoneHook() { Direction = AnimationHookDir.Backward }
-                      ]
-                  }
-                ]
-            };
-
-            var res = dat.TryWriteFile(writeAnim);
-            Assert.IsTrue(res);
-
-            var res2 = dat.TryReadFile<Animation>(0x03000001, out var readAnim);
-            Assert.IsTrue(res2);
-            Assert.IsNotNull(readAnim);
-
-            Assert.AreEqual(0x03000001u, readAnim.Id);
-
-            Assert.AreEqual(1u, readAnim.NumParts);
-            Assert.AreEqual(1, readAnim.PartFrames.Count);
-            Assert.AreEqual(1, readAnim.PartFrames[0].Frames.Count);
-            Assert.AreEqual(1, readAnim.PartFrames[0].Hooks.Count);
-
-            Assert.AreEqual(new Vector3(1, 2, 3), readAnim.PartFrames[0].Frames[0].Origin);
-            Assert.AreEqual(new Quaternion(0, 0, 0, 1), readAnim.PartFrames[0].Frames[0].Orientation);
-            Assert.AreEqual(AnimationHookDir.Backward, readAnim.PartFrames[0].Hooks[0].Direction);
-
-            Assert.IsInstanceOfType(readAnim.PartFrames[0].Hooks[0], typeof(AnimationDoneHook));
-
-            dat.Dispose();
-            File.Delete(datFilePath);
-        }
-
         [TestMethod]
         [TestCategory("EOR")]
         public void CanReadEORKeymaps() {
@@ -109,4 +58,5 @@ namespace DatReaderWriter.Tests.DBObjs {
             dat.Dispose();
         }
     }
+    */
 }

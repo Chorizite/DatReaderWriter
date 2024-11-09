@@ -20,7 +20,7 @@ using DatReaderWriter.Lib.IO;
 
 namespace DatReaderWriter.Types {
     /// <summary>
-    /// Represents a Meta key like ctrl/shift/win/etc
+    /// Key/Mouse binding information
     /// </summary>
     public partial class ControlSpecification : IDatObjType {
         /// <summary>
@@ -36,7 +36,7 @@ namespace DatReaderWriter.Types {
         public ushort Key;
 
         /// <summary>
-        /// Flags that determine what modifier/meta keys are defined for this binding.
+        /// Flags that determine what modifier/meta keys are defined for this binding. These correspond to KeyMap.MetaKeys.
         /// </summary>
         public uint Modifiers;
 

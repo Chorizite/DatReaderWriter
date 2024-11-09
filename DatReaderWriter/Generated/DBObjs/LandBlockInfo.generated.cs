@@ -85,7 +85,7 @@ namespace DatReaderWriter.DBObjs {
             }
             if (RestrictionTable != null && RestrictionTable.Count() > 0) {
                 writer.WriteUInt16((ushort)RestrictionTable.Count());
-                writer.WriteUInt16(0);
+                writer.WriteUInt16(8);
                 foreach (var kv in RestrictionTable) {
                     writer.WriteUInt32(kv.Key);
                     writer.WriteUInt32(kv.Value);
