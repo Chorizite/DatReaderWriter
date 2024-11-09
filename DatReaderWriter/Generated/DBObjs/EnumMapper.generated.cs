@@ -21,27 +21,32 @@ using DatReaderWriter.Lib.IO;
 
 namespace DatReaderWriter.DBObjs {
     /// <summary>
-    /// DB_TYPE_SPELLCOMPONENT_TABLE_0 in the client.
+    /// DB_TYPE_ENUM_MAPPER in the client.
     /// </summary>
-    [DBObjType(typeof(SpellComponentTable), DatFileType.Portal, DBObjType.SpellComponentTable, DBObjHeaderFlags.HasId, 0x0E00000F, 0x0E00000F, 0x00000000)]
-    public partial class SpellComponentTable : DBObj {
+    [DBObjType(typeof(EnumMapper), DatFileType.Portal, DBObjType.EnumMapper, DBObjHeaderFlags.HasId, 0x22000000, 0x22FFFFFF, 0x00000000)]
+    public partial class EnumMapper : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;
 
         /// <inheritdoc />
-        public override DBObjType DBObjType => DBObjType.SpellComponentTable;
+        public override DBObjType DBObjType => DBObjType.EnumMapper;
 
-        public Dictionary<uint, SpellComponentBase> Components = [];
+        public uint BaseEnumMap;
+
+        public NumberingType NumberingType;
+
+        public Dictionary<uint, string> IdToStringMap = [];
 
         /// <inheritdoc />
         public override bool Unpack(DatBinReader reader) {
             base.Unpack(reader);
-            var _numComponents = reader.ReadUInt16();
-            var _numComponentsBuckets = reader.ReadUInt16();
-            for (var i=0; i < _numComponents; i++) {
+            BaseEnumMap = reader.ReadUInt32();
+            NumberingType = (NumberingType)reader.ReadByte();
+            var _numIdToStringMaps = reader.ReadCompressedUInt();
+            for (var i=0; i < _numIdToStringMaps; i++) {
                 var _key = reader.ReadUInt32();
-                var _val = reader.ReadItem<SpellComponentBase>();
-                Components.Add(_key, _val);
+                var _val = reader.ReadString16LByte();
+                IdToStringMap.Add(_key, _val);
             }
             return true;
         }
@@ -49,11 +54,12 @@ namespace DatReaderWriter.DBObjs {
         /// <inheritdoc />
         public override bool Pack(DatBinWriter writer) {
             base.Pack(writer);
-            writer.WriteUInt16((ushort)Components.Count());
-            writer.WriteUInt16(256);
-            foreach (var kv in Components) {
+            writer.WriteUInt32(BaseEnumMap);
+            writer.WriteByte((byte)NumberingType);
+            writer.WriteCompressedUInt((uint)IdToStringMap.Count());
+            foreach (var kv in IdToStringMap) {
                 writer.WriteUInt32(kv.Key);
-                writer.WriteItem<SpellComponentBase>(kv.Value);
+                writer.WriteString16LByte(kv.Value);
             }
             return true;
         }

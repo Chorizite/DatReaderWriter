@@ -247,7 +247,7 @@ namespace DatReaderWriter.SourceGen {
             if (type == "ObjectId" || type == "PackedDWORD" || type == "LandcellId" || type == "DataId") {
                 return "uint";
             }
-            if (type == "WString" || type == "bytestring" || type == "obfuscatedstring" || type=="rawstring") {
+            if (type == "WString" || type == "bytestring" || type == "obfuscatedstring" || type=="rawstring" || type == "compressedstring") {
                 return "string";
             }
             if (type == "CompressedUInt") {
@@ -573,6 +573,26 @@ namespace DatReaderWriter.SourceGen {
         /// <param name="member"></param>
         public void GenerateMemberReader(ACDataMember member) {
             bool isVector = member.HasParentOfType(typeof(ACVector));
+
+
+            var type = XMLDefParser.ACDataTypes.Values
+                   .FirstOrDefault(t => t.Name == member.MemberType);
+            if (type != null && type.IsAbstract) {
+                var field = type.Children
+                    .FirstOrDefault(c => c is ACDataMember m && m.Name == type.TypeSwitch)
+                    as ACDataMember;
+
+                if (XMLDefParser.ACEnums.TryGetValue(field.MemberType, out var en)) {
+                    var reader = GetBinaryReaderForType(XMLDefParser.ACEnums[field.MemberType].ParentType, null);
+                    WriteLine($"var _peekedValue = (" + field.MemberType + ")" + reader + ";");
+                }
+                else {
+                    WriteLine($"var _peekedValue = {GetBinaryReaderForType(field.MemberType, null)};");
+                }
+                WriteLine($"reader.Skip(-sizeof({field.MemberType}));");
+                WriteLine($"{member.Name} = {member.MemberType}.Unpack(reader, _peekedValue);");
+                return;
+            }
 
             if (XMLDefParser.ACEnums.ContainsKey(member.MemberType)) {
                 WriteEnumReader(member);

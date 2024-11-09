@@ -311,5 +311,19 @@ namespace DatReaderWriter.Lib.IO {
         public Guid ReadGuid() {
             return new Guid(ReadBytes(16));
         }
+
+        /// <summary>
+        /// Reads a string from the current stream. The string is prefixed with the compressed uint length.,
+        /// </summary>
+        /// <returns></returns>
+        public string ReadStringCompressed() {
+#if NET8_0_OR_GREATER
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+#endif
+            var length = ReadCompressedUInt();
+            if (length == 0) return string.Empty;
+            var bytes = ReadBytes((int)length);
+            return Encoding.GetEncoding(1252).GetString(bytes);
+        }
     }
 }

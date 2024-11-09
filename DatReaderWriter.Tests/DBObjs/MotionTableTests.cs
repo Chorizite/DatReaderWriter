@@ -75,5 +75,11 @@ namespace DatReaderWriter.Tests.DBObjs {
 
             dat.Dispose();
         }
+
+        [TestMethod]
+        [TestCategory("EOR")]
+        public void CanReadEORAndWriteIdentical() {
+            TestHelpers.CanReadAndWriteIdentical<MotionTable>(Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat"), 0x09000202);
+        }
     }
 }

@@ -11,6 +11,38 @@ namespace DatReaderWriter.Tests.DBObjs {
     public class MaterialInstanceTests {
         [TestMethod]
         public void CanInsertAndReadMaterialInstances() {
+            var datFilePath = Path.GetTempFileName();
+            using var dat = new DatDatabase(options => {
+                options.FilePath = datFilePath;
+                options.AccessType = DatAccessType.ReadWrite;
+            });
+
+            dat.BlockAllocator.InitNew(DatFileType.Portal, 0);
+
+            var writeObj = new MaterialInstance() {
+                Id = 0x18000000u,
+                MaterialId = 0x1000001,
+                MaterialType = 2,
+                WantDiscardGeometry = true,
+                AllowStencilShadows = true,
+                ModifierRefs = [1, 2, 3, 4, 5, 6]
+            };
+
+            var res = dat.TryWriteFile(writeObj);
+
+            var res2 = dat.TryReadFile<MaterialInstance>(0x18000000u, out var readObj);
+            Assert.IsTrue(res2);
+            Assert.IsNotNull(readObj);
+
+            Assert.AreEqual(0x18000000u, readObj.Id);
+            Assert.AreEqual(0x1000001u, readObj.MaterialId);
+            Assert.AreEqual(2u, readObj.MaterialType);
+            Assert.IsTrue(readObj.WantDiscardGeometry);
+            Assert.IsTrue(readObj.AllowStencilShadows);
+            CollectionAssert.AreEqual(writeObj.ModifierRefs, readObj.ModifierRefs);
+
+            dat.Dispose();
+            File.Delete(datFilePath);
         }
 
         [TestMethod]
@@ -21,37 +53,24 @@ namespace DatReaderWriter.Tests.DBObjs {
                 options.IndexCachingStrategy = IndexCachingStrategy.Never;
             });
 
-            foreach (var f in dat.Tree) {
-                if (f.Id >= 0x18000000 && f.Id <= 0x18FFFFFF) {
-                    Console.WriteLine($"{f.Id:X8}  (bytes: {f.Size})");
-                    var materialInstance = dat.TryReadFile<MaterialInstance>(f.Id, out var mi);
-                    Console.WriteLine($"MaterialInstance: 0x{mi.Id:X8}");
-                    Console.WriteLine($"\t MaterialId: 0x{mi.MaterialId:X8}");
-                    Console.WriteLine($"\t Type: {mi.MaterialType}");
-                    Console.WriteLine($"\t ModifierRefs: [ {string.Join(",", mi.ModifierRefs.Select(v => $"0x{v:X8}"))} ]");
-                    Console.WriteLine($"\t AllowStencelShadows: {mi.AllowStencilShadows}");
-                    Console.WriteLine($"\t WantDiscardGeometry: {mi.WantDiscardGeometry}");
-                }
-            }
-
-            return;
-
-            var res = dat.TryReadFile<Animation>(0x03000514, out var anim);
+            var res = dat.TryReadFile<MaterialInstance>(0x18000000, out var readObj);
             Assert.IsTrue(res);
-            Assert.IsNotNull(anim);
-            Assert.AreEqual(0x03000514u, anim.Id);
+            Assert.IsNotNull(readObj);
+            Assert.AreEqual(0x18000000u, readObj.Id);
 
-            Assert.AreEqual(17u, anim.NumParts);
-            Assert.AreEqual(44, anim.PartFrames.Count);
-            Assert.AreEqual(1, anim.PartFrames[0].Hooks.Count);
-
-            Assert.IsInstanceOfType(anim.PartFrames[0].Hooks[0], typeof(SoundTableHook));
-            var soundTableHook = (SoundTableHook)anim.PartFrames[0].Hooks[0];
-            Assert.IsNotNull(soundTableHook);
-            Assert.AreEqual(AnimationHookDir.Forward, soundTableHook.Direction);
-            Assert.AreEqual(Sound.Death1, soundTableHook.SoundType);
+            Assert.AreEqual(0x16000000u, readObj.MaterialId);
+            Assert.AreEqual(2u, readObj.MaterialType);
+            CollectionAssert.AreEqual(new uint[] { 0x17000000 }, readObj.ModifierRefs);
+            Assert.AreEqual(true, readObj.AllowStencilShadows);
+            Assert.AreEqual(false, readObj.WantDiscardGeometry);
 
             dat.Dispose();
+        }
+
+        [TestMethod]
+        [TestCategory("EOR")]
+        public void CanReadEORAndWriteIdentical() {
+            TestHelpers.CanReadAndWriteIdentical<MaterialInstance>(Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat"), 0x18000000);
         }
     }
 }

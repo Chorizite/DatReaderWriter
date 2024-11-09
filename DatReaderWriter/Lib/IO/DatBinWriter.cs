@@ -312,5 +312,20 @@ namespace DatReaderWriter.Lib.IO {
         public void WriteGuid(Guid value) {
             WriteBytes(value.ToByteArray(), 16);
         }
+
+        /// <summary>
+        /// Writes a string from the current stream. The string is prefixed with a compressed uint length.
+        /// </summary>
+        /// <param name="value"></param>
+        public void WriteStringCompressed(string value) {
+#if NET8_0_OR_GREATER
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+#endif
+            WriteCompressedUInt((uint)value.Length);
+            if (value.Length > 0) {
+                var strBytes = Encoding.GetEncoding(1252).GetBytes(value);
+                WriteBytes(strBytes, strBytes.Length);
+            }
+        }
     }
 }

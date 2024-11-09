@@ -124,5 +124,11 @@ namespace DatReaderWriter.Tests.DBObjs {
 
             dat.Dispose();
         }
+
+        [TestMethod]
+        [TestCategory("EOR")]
+        public void CanReadEORAndWriteIdentical() {
+            TestHelpers.CanReadAndWriteIdentical<Surface>(Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat"), 0x08000219);
+        }
     }
 }

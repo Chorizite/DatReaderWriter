@@ -21,27 +21,27 @@ using DatReaderWriter.Lib.IO;
 
 namespace DatReaderWriter.DBObjs {
     /// <summary>
-    /// DB_TYPE_SPELLCOMPONENT_TABLE_0 in the client.
+    /// DB_TYPE_BADDATA in the client.
     /// </summary>
-    [DBObjType(typeof(SpellComponentTable), DatFileType.Portal, DBObjType.SpellComponentTable, DBObjHeaderFlags.HasId, 0x0E00000F, 0x0E00000F, 0x00000000)]
-    public partial class SpellComponentTable : DBObj {
+    [DBObjType(typeof(BadDataTable), DatFileType.Portal, DBObjType.BadDataTable, DBObjHeaderFlags.HasId, 0x0E00001A, 0x0E00001A, 0x00000000)]
+    public partial class BadDataTable : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;
 
         /// <inheritdoc />
-        public override DBObjType DBObjType => DBObjType.SpellComponentTable;
+        public override DBObjType DBObjType => DBObjType.BadDataTable;
 
-        public Dictionary<uint, SpellComponentBase> Components = [];
+        public Dictionary<uint, uint> BadIds = [];
 
         /// <inheritdoc />
         public override bool Unpack(DatBinReader reader) {
             base.Unpack(reader);
-            var _numComponents = reader.ReadUInt16();
-            var _numComponentsBuckets = reader.ReadUInt16();
-            for (var i=0; i < _numComponents; i++) {
+            var _numBadIds = reader.ReadUInt16();
+            var _numBadIdBuckets = reader.ReadUInt16();
+            for (var i=0; i < _numBadIds; i++) {
                 var _key = reader.ReadUInt32();
-                var _val = reader.ReadItem<SpellComponentBase>();
-                Components.Add(_key, _val);
+                var _val = reader.ReadUInt32();
+                BadIds.Add(_key, _val);
             }
             return true;
         }
@@ -49,11 +49,11 @@ namespace DatReaderWriter.DBObjs {
         /// <inheritdoc />
         public override bool Pack(DatBinWriter writer) {
             base.Pack(writer);
-            writer.WriteUInt16((ushort)Components.Count());
-            writer.WriteUInt16(256);
-            foreach (var kv in Components) {
+            writer.WriteUInt16((ushort)BadIds.Count());
+            writer.WriteUInt16(32);
+            foreach (var kv in BadIds) {
                 writer.WriteUInt32(kv.Key);
-                writer.WriteItem<SpellComponentBase>(kv.Value);
+                writer.WriteUInt32(kv.Value);
             }
             return true;
         }

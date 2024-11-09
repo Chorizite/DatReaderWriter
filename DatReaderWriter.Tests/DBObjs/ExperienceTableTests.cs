@@ -90,5 +90,11 @@ namespace DatReaderWriter.Tests.DBObjs {
 
             dat.Dispose();
         }
+
+        [TestMethod]
+        [TestCategory("EOR")]
+        public void CanReadEORAndWriteIdentical() {
+            TestHelpers.CanReadAndWriteIdentical<ExperienceTable>(Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat"), 0xE000018);
+        }
     }
 }

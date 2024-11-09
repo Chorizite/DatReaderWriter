@@ -21,27 +21,24 @@ using DatReaderWriter.Lib.IO;
 
 namespace DatReaderWriter.DBObjs {
     /// <summary>
-    /// DB_TYPE_SPELLCOMPONENT_TABLE_0 in the client.
+    /// DB_TYPE_PHYSICS_SCRIPT in the client.
     /// </summary>
-    [DBObjType(typeof(SpellComponentTable), DatFileType.Portal, DBObjType.SpellComponentTable, DBObjHeaderFlags.HasId, 0x0E00000F, 0x0E00000F, 0x00000000)]
-    public partial class SpellComponentTable : DBObj {
+    [DBObjType(typeof(PhysicsScript), DatFileType.Portal, DBObjType.PhysicsScript, DBObjHeaderFlags.HasId, 0x33000000, 0x3300FFFF, 0x00000000)]
+    public partial class PhysicsScript : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;
 
         /// <inheritdoc />
-        public override DBObjType DBObjType => DBObjType.SpellComponentTable;
+        public override DBObjType DBObjType => DBObjType.PhysicsScript;
 
-        public Dictionary<uint, SpellComponentBase> Components = [];
+        public List<PhysicsScriptData> ScriptData = [];
 
         /// <inheritdoc />
         public override bool Unpack(DatBinReader reader) {
             base.Unpack(reader);
-            var _numComponents = reader.ReadUInt16();
-            var _numComponentsBuckets = reader.ReadUInt16();
-            for (var i=0; i < _numComponents; i++) {
-                var _key = reader.ReadUInt32();
-                var _val = reader.ReadItem<SpellComponentBase>();
-                Components.Add(_key, _val);
+            var _numScriptDatas = reader.ReadUInt32();
+            for (var i=0; i < _numScriptDatas; i++) {
+                ScriptData.Add(reader.ReadItem<PhysicsScriptData>());
             }
             return true;
         }
@@ -49,11 +46,9 @@ namespace DatReaderWriter.DBObjs {
         /// <inheritdoc />
         public override bool Pack(DatBinWriter writer) {
             base.Pack(writer);
-            writer.WriteUInt16((ushort)Components.Count());
-            writer.WriteUInt16(256);
-            foreach (var kv in Components) {
-                writer.WriteUInt32(kv.Key);
-                writer.WriteItem<SpellComponentBase>(kv.Value);
+            writer.WriteUInt32((uint)ScriptData.Count());
+            foreach (var item in ScriptData) {
+                writer.WriteItem<PhysicsScriptData>(item);
             }
             return true;
         }
