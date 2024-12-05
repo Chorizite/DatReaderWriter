@@ -2513,6 +2513,138 @@
       <field name="LowerBound" type="double" />
       <field name="LearnMod" type="double" />
     </type>
+    <type name="StartingArea" text="Information about a starting area available during character creation">
+      <field name="Name" type="rawstring" />
+      <field name="_numLocations" type="CompressedUInt" />
+      <vector name="Locations" length="_numLocations" type="List" genericValue="Position" />
+    </type>
+    <type name="Position" text="Information about an ingame position containing a cell id and a frame">
+      <field name="CellId" type="uint" text="The full id of the landcell" />
+      <field name="Frame" type="Frame" />
+    </type>
+    <type name="SubPalette">
+      <field name="SubId" type="DataIdOfKnownType" knownType="0x04000000" />
+      <field name="Offset" type="byte" />
+      <field name="NumColors" type="byte" />
+    </type>
+    <type name="TextureMapChange">
+      <field name="PartIndex" type="byte" />
+      <field name="OldTexture" type="DataIdOfKnownType" knownType="0x05000000" />
+      <field name="NewTexture" type="DataIdOfKnownType" knownType="0x05000000" />
+    </type>
+    <type name="AnimationPartChange">
+      <field name="PartIndex" type="byte" />
+      <field name="PartId" type="DataIdOfKnownType" knownType="0x01000000" />
+    </type>
+    <type name="HairStyleCG">
+      <field name="IconId" type="uint" />
+      <field name="Bald" type="bool" size="1" />
+      <field name="AlternateSetup" type="uint" />
+      <field name="ObjDesc" type="ObjDesc" />
+    </type>
+    <type name="EyeStripCG">
+      <field name="IconId" type="uint" />
+      <field name="BaldIconId" type="uint" />
+      <field name="ObjDesc" type="ObjDesc" />
+      <field name="BaldObjDesc" type="ObjDesc" />
+    </type>
+    <type name="FaceStripCG">
+      <field name="IconId" type="uint" />
+      <field name="ObjDesc" type="ObjDesc" />
+    </type>
+    <type name="GearCG">
+      <field name="Name" type="rawstring" />
+      <field name="ClothingTable" type="uint" />
+      <field name="WeenieDefault" type="uint" />
+    </type>
+    <type name="ObjDesc">
+      <align type="uint" />
+      <field name="UnknownByte" type="byte" />
+      <field name="_numSubPalettes" type="byte" />
+      <field name="_numTextureMapChanges" type="byte" />
+      <field name="_numAnimPartChanges" type="byte" />
+      <if condition="_numSubPalettes > 0" writeCondition="SubPalettes != null &amp;&amp; SubPalettes.Count() > 0">
+        <field name="PaletteId" type="DataIdOfKnownType" knownType="0x04000000" />
+      </if>
+      <vector name="SubPalettes" length="_numSubPalettes" type="List" genericValue="SubPalette" />
+      <vector name="TextureChanges" length="_numTextureMapChanges" type="List" genericValue="TextureMapChange" />
+      <vector name="AnimPartChanges" length="_numAnimPartChanges" type="List" genericValue="AnimationPartChange" />
+      <align type="uint" />
+    </type>
+    <type name="SexCG">
+      <field name="Name" type="rawstring" />
+      <field name="Scale" type="uint" />
+      <field name="SetupId" type="uint" />
+      <field name="SoundTable" type="uint" />
+      <field name="IconId" type="uint" />
+      <field name="BasePalette" type="uint" />
+      <field name="SkinPalSet" type="uint" />
+      <field name="PhysicsTable" type="uint" />
+      <field name="MotionTable" type="uint" />
+      <field name="CombatTable" type="uint" />
+      <field name="BaseObjDesc" type="ObjDesc" />
+      <field name="_numHairColors" type="CompressedUInt" />
+      <vector name="HairColors" length="_numHairColors" type="List" genericValue="uint" />
+      <field name="_numHairStyles" type="CompressedUInt" />
+      <vector name="HairStyles" length="_numHairStyles" type="List" genericValue="HairStyleCG" />
+      <field name="_numEyeColors" type="CompressedUInt" />
+      <vector name="EyeColors" length="_numEyeColors" type="List" genericValue="uint" />
+      <field name="_numEyeStrips" type="CompressedUInt" />
+      <vector name="EyeStrips" length="_numEyeStrips" type="List" genericValue="EyeStripCG" />
+      <field name="_numNoseStrips" type="CompressedUInt" />
+      <vector name="NoseStrips" length="_numNoseStrips" type="List" genericValue="FaceStripCG" />
+      <field name="_numMouthStrips" type="CompressedUInt" />
+      <vector name="MouthStrips" length="_numMouthStrips" type="List" genericValue="FaceStripCG" />
+      <field name="_numHeadgears" type="CompressedUInt" />
+      <vector name="Headgears" length="_numHeadgears" type="List" genericValue="GearCG" />
+      <field name="_numShirts" type="CompressedUInt" />
+      <vector name="Shirts" length="_numShirts" type="List" genericValue="GearCG" />
+      <field name="_numPants" type="CompressedUInt" />
+      <vector name="Pants" length="_numPants" type="List" genericValue="GearCG" />
+      <field name="_numFootwear" type="CompressedUInt" />
+      <vector name="Footwear" length="_numFootwear" type="List" genericValue="GearCG" />
+      <field name="_numClothingColors" type="CompressedUInt" />
+      <vector name="ClothingColors" length="_numClothingColors" type="List" genericValue="uint" />
+    </type>
+    <type name="SkillCG">
+      <field name="Id" type="SkillId" />
+      <field name="NormalCost" type="int" />
+      <field name="PrimaryCost" type="int" />
+    </type>
+    <type name="TemplateCG">
+      <field name="Name" type="rawstring" />
+      <field name="IconId" type="uint" />
+      <field name="Title" type="uint" />
+      <field name="Strength" type="int" />
+      <field name="Endurance" type="int" />
+      <field name="Coordination" type="int" />
+      <field name="Quickness" type="int" />
+      <field name="Focus" type="int" />
+      <field name="Self" type="int" />
+      <field name="_numNormalSkills" type="CompressedUInt" />
+      <vector name="NormalSkills" length="_numNormalSkills" type="List" genericValue="SkillId" />
+      <field name="_numPrimarySkills" type="CompressedUInt" />
+      <vector name="PrimarySkills" length="_numPrimarySkills" type="List" genericValue="SkillId" />
+    </type>
+    <type name="HeritageGroupCG" text="Information about a heritage group, used during character creation">
+      <field name="Name" type="rawstring" />
+      <field name="IconId" type="uint" />
+      <field name="SetupId" type="uint" text="Basic character model" />
+      <field name="EnvironmentSetupId" type="uint" text="This is the background environment used during character creation" />
+      <field name="AttributeCredits" type="uint" text="Starting attribute credits" />
+      <field name="SkillCredits" type="uint" text="Starting skill credits" />
+      <field name="_numPrimaryStartAreas" type="CompressedUInt" />
+      <vector name="PrimaryStartAreas" length="_numPrimaryStartAreas" type="List" genericValue="int" />
+      <field name="_numSecondaryStartAreas" type="CompressedUInt" />
+      <vector name="SecondaryStartAreas" length="_numSecondaryStartAreas" type="List" genericValue="int" />
+      <field name="_numSkills" type="CompressedUInt" />
+      <vector name="Skills" length="_numSkills" type="List" genericValue="SkillCG" />
+      <field name="_numTemplates" type="CompressedUInt" />
+      <vector name="Templates" length="_numTemplates" type="List" genericValue="TemplateCG" />
+      <field name="UnknownByte" type="byte" />
+      <field name="_numGenders" type="CompressedUInt" />
+      <vector name="Genders" length="_numGenders" type="Dictionary" genericKey="int" genericValue="SexCG" />
+    </type>
   </types>
   <dats>
     <dat name="portal" text="client_portal.dat" type="DatFileType.Portal">
@@ -2826,6 +2958,12 @@
       <type name="DBProperties" text="DB_TYPE_DBPROPERTIES in the client." parent="DBObj" first="0x78000000" last="0x7FFFFFFF" flags="DBObjHeaderFlags.HasId">
       </type>
       <type name="CharGen" text="DB_TYPE_CHAR_GEN_0 in the client." parent="DBObj" first="0xE000002" last="0xE000002" flags="DBObjHeaderFlags.HasId">
+        <field name="Unknown" type="uint" />
+        <field name="_numStarterAreas" type="CompressedUInt" />
+        <vector name="StartingAreas" length="_numStarterAreas" type="List" genericValue="StartingArea" text="A list of starting areas available during character creation" />
+        <field name="UnknownByte" type="byte" />
+        <field name="_numHeritageGroups" type="CompressedUInt" />
+        <vector name="HeritageGroups" length="_numHeritageGroups" type="Dictionary" genericKey="uint" genericValue="HeritageGroupCG" />
       </type>
       <type name="VitalTable" text="DB_TYPE_ATTRIBUTE_2ND_TABLE_0 in the client." parent="DBObj" first="0xE000003" last="0xE000003" flags="DBObjHeaderFlags.HasId">
         <field name="Health" type="SkillFormula" />

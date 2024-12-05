@@ -14,15 +14,21 @@ namespace DatReaderWriter.Tests.Lib {
 
             dat.Tree.TryGetFile(objId, out var originalEntry);
             Assert.IsNotNull(originalEntry);
-            var res = dat.TryReadFile<T>(objId, out var spellTable);
-            Assert.IsNotNull(spellTable);
+            var res = dat.TryReadFile<T>(objId, out var file);
+            Assert.IsNotNull(file);
 
             var originalBytes = new byte[originalEntry.Size];
             dat.BlockAllocator.ReadBlock(originalBytes, originalEntry.Offset);
 
             var writtenBytes = new byte[originalEntry.Size];
             var writer = new DatBinWriter(writtenBytes);
-            spellTable.Pack(writer);
+            file.Pack(writer);
+
+            var max = Math.Min(writtenBytes.Length, originalBytes.Length);
+            var i = 0;
+            while (i < max && originalBytes[i] == writtenBytes[i]) i++;
+
+            Console.WriteLine($"First difference at {i}");
 
             Assert.AreEqual((int)originalEntry.Size, writer.Offset);
             CollectionAssert.AreEqual(originalBytes, writtenBytes);
