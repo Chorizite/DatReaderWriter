@@ -20,6 +20,11 @@ namespace DatReaderWriter.Lib.IO {
         public int Offset => _offset;
 
         /// <summary>
+        /// The total length of the buffer
+        /// </summary>
+        public int Length => _data.Length;
+
+        /// <summary>
         /// Create a new instance
         /// </summary>
         /// <param name="data">The file data being parsed</param>

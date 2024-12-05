@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema text="AC dat object definitions / documentation. Heavily based off of ACE.DatReader FileTypes">
   <enums>
-    <enum name="DatFileType" parent="int">
+    <enum name="DatFileType" parent="int" shared="true">
       <value name="Undefined" value="0" />
       <value name="Portal" value="1" />
       <value name="Cell" value="2" />
@@ -66,6 +66,80 @@
       <value name="PFID_R8G8_B8G8" value="0x47424752" />
       <value name="PFID_UYVY" value="0x59565955" />
       <value name="PFID_INVALID" value="0x7FFFFFFF" />
+    </enum>
+    <enum name="SkillId" parent="int" text="The Skill identifies a specific Character skill." shared="true">
+      <value value="0x01" name="Axe" />
+      <value value="0x02" name="Bow" />
+      <value value="0x03" name="Crossbow" />
+      <value value="0x04" name="Dagger" />
+      <value value="0x05" name="Mace" />
+      <value value="0x06" name="MeleeDefense" />
+      <value value="0x07" name="MissileDefense" />
+      <value value="0x08" name="Sling" />
+      <value value="0x09" name="Spear" />
+      <value value="0x0A" name="Staff" />
+      <value value="0x0B" name="Sword" />
+      <value value="0x0C" name="ThrownWeapons" />
+      <value value="0x0D" name="UnarmedCombat" />
+      <value value="0x0E" name="ArcaneLore" />
+      <value value="0x0F" name="MagicDefense" />
+      <value value="0x10" name="ManaConversion" />
+      <value value="0x11" name="Spellcraft" />
+      <value value="0x12" name="ItemTinkering" />
+      <value value="0x13" name="AssessPerson" />
+      <value value="0x14" name="Deception" />
+      <value value="0x15" name="Healing" />
+      <value value="0x16" name="Jump" />
+      <value value="0x17" name="Lockpick" />
+      <value value="0x18" name="Run" />
+      <value value="0x19" name="Awareness" />
+      <value value="0x1A" name="ArmorRepair" />
+      <value value="0x1B" name="AssessCreature" />
+      <value value="0x1C" name="WeaponTinkering" />
+      <value value="0x1D" name="ArmorTinkering" />
+      <value value="0x1E" name="MagicItemTinkering" />
+      <value value="0x1F" name="CreatureEnchantment" />
+      <value value="0x20" name="ItemEnchantment" />
+      <value value="0x21" name="LifeMagic" />
+      <value value="0x22" name="WarMagic" />
+      <value value="0x23" name="Leadership" />
+      <value value="0x24" name="Loyalty" />
+      <value value="0x25" name="Fletching" />
+      <value value="0x26" name="Alchemy" />
+      <value value="0x27" name="Cooking" />
+      <value value="0x28" name="Salvaging" />
+      <value value="0x29" name="TwoHandedCombat" />
+      <value value="0x2A" name="Gearcraft" />
+      <value value="0x2B" name="VoidMagic" />
+      <value value="0x2C" name="HeavyWeapons" />
+      <value value="0x2D" name="LightWeapons" />
+      <value value="0x2E" name="FinesseWeapons" />
+      <value value="0x2F" name="MissleWeapons" />
+      <value value="0x31" name="DualWield" />
+      <value value="0x32" name="Recklessness" />
+      <value value="0x33" name="SneakAttack" />
+      <value value="0x34" name="DirtyFighting" />
+      <value value="0x35" name="Challenge" />
+      <value value="0x36" name="Summoning" />
+    </enum>
+    <enum name="SkillCategory" parent="uint" shared="true">
+      <value value="0x00" name="Undefined" />
+      <value value="0x01" name="Combat" />
+      <value value="0x02" name="Other" />
+      <value value="0x03" name="Magic" />
+    </enum>
+    <enum name="AttributeId" parent="uint" text="The AttributeId identifies a specific Character attribute." shared="true">
+      <value value="0x01" name="Strength" />
+      <value value="0x02" name="Endurance" />
+      <value value="0x03" name="Quickness" />
+      <value value="0x04" name="Coordination" />
+      <value value="0x05" name="Focus" />
+      <value value="0x06" name="Self" />
+    </enum>
+    <enum name="VitalId" parent="uint" text="The VitalId identifies a specific Character vital (secondary attribute)." shared="true">
+      <value value="0x01" name="MaximumHealth" />
+      <value value="0x03" name="MaximumStamina" />
+      <value value="0x05" name="MaximumMana" />
     </enum>
     <enum name="GfxObjFlags" parent="uint" mask="true">
       <value name="HasPhysics" value="0x00000001" />
@@ -189,7 +263,7 @@
       <value name="Unknown" value="0xFFFFFFFE" />
       <value name="Backward" value="0xFFFFFFFF" />
     </enum>
-    <enum name="ParentLocation" parent="int">
+    <enum name="ParentLocation" parent="int" shared="true">
       <value name="None" value="0x00000000" />
       <value name="RightHand" value="0x00000001" />
       <value name="LeftHand" value="0x00000002" />
@@ -201,7 +275,7 @@
       <value name="LeftWeapon" value="0x00000008" />
       <value name="LeftUnarmed" value="0x00000009" />
     </enum>
-    <enum name="Placement" parent="uint">
+    <enum name="Placement" parent="uint" shared="true">
       <value name="Default" value="0x00000000" />
       <value name="RightHandCombat" value="0x00000001" />
       <value name="RightHandNonCombat" value="0x00000002" />
@@ -211,22 +285,11 @@
       <value name="Shield" value="0x00000006" />
       <value name="LeftWeapon" value="0x00000007" />
       <value name="LeftUnarmed" value="0x00000008" />
-      <value name="XXXUnknownA" value="0x0000000A" />
-      <value name="XXXUnknownF" value="0x0000000F" />
-      <value name="XXXUnknown14" value="0x00000014" />
-      <value name="XXXUnknown1E" value="0x0000001E" />
-      <value name="XXXUnknown20" value="0x00000020" />
       <value name="SpecialCrowssbowBolt" value="0x00000033" />
       <value name="MissileFlight" value="0x00000034" />
-      <value name="XXXUnknown3C" value="0x0000003C" />
-      <value name="XXXUnknown63" value="0x00000063" />
       <value name="Resting" value="0x00000065" />
       <value name="Other" value="0x00000066" />
       <value name="Hook" value="0x00000067" />
-      <value name="XXXUnknown68" value="0x00000068" />
-      <value name="XXXUnknown69" value="0x00000069" />
-      <value name="XXXUnknown6A" value="0x0000006A" />
-      <value name="XXXUnknown78" value="0x00000078" />
       <value name="Random1" value="0x00000079" />
       <value name="Random2" value="0x0000007A" />
       <value name="Random3" value="0x0000007B" />
@@ -237,11 +300,8 @@
       <value name="Random8" value="0x00000080" />
       <value name="Random9" value="0x00000081" />
       <value name="Random10" value="0x00000082" />
-      <value name="XXXUnknown84" value="0x00000084" />
-      <value name="XXXUnknownF0" value="0x000000F0" />
-      <value name="XXXUnknown3F2" value="0x000003F2" />
     </enum>
-    <enum name="Sound" parent="uint">
+    <enum name="Sound" parent="uint" shared="true">
       <value name="Invalid" value="0x00000000" />
       <value name="Speak1" value="0x00000001" />
       <value name="Random" value="0x00000002" />
@@ -1047,7 +1107,7 @@
       <value name="ParagonCaster" value="0x0000008B" />
       <value name="ParagonMelee" value="0x0000008C" />
     </enum>
-    <enum name="MagicSchool" parent="int">
+    <enum name="MagicSchool" parent="int" shared="true">
       <value name="None" value="0x00000000" />
       <value name="WarMagic" value="0x00000001" />
       <value name="LifeMagic" value="0x00000002" />
@@ -1055,7 +1115,7 @@
       <value name="CreatureEnchantment" value="0x00000004" />
       <value name="VoidMagic" value="0x00000005" />
     </enum>
-    <enum name="SpellCategory" parent="uint">
+    <enum name="SpellCategory" parent="uint" shared="true">
       <value name="Undef" value="0x00000000" />
       <value name="StrengthRaising" value="0x00000001" />
       <value name="StrengthLowering" value="0x00000002" />
@@ -2431,6 +2491,28 @@
       <field name="StartTime" type="double" />
       <field name="Hook" type="AnimationHook" />
     </type>
+    <type name="SkillFormula" text="Formula that dictates how to calculate a skill `(Attribute1 + Attribute2?) / Divisor`.">
+      <field name="Unknown" type="uint" />
+      <field name="HasSecondAttribute" type="bool" size="4" text="True if this formula uses a second attribute for the calculation" />
+      <field name="UseFormula" type="bool" size="4" text="If this is false, dont use this formula just use the base value of the skill" />
+      <field name="Divisor" type="int" text="The divisor used in the formula." />
+      <field name="Attribute1" type="AttributeId" text="The first attribute to use" />
+      <field name="Attribute2" type="AttributeId" text="The second attribute to use. Only valid if HasSecondAttribute is true" />
+    </type>
+    <type name="SkillBase">
+      <field name="Description" type="string" />
+      <field name="Name" type="string" />
+      <field name="IconId" type="uint" />
+      <field name="TrainedCost" type="int" />
+      <field name="SpecializedCost" type="int" />
+      <field name="Category" type="SkillCategory" />
+      <field name="ChargenUse" type="bool" size="4" />
+      <field name="MinLevel" type="uint" />
+      <field name="Formula" type="SkillFormula" />
+      <field name="UpperBound" type="double" />
+      <field name="LowerBound" type="double" />
+      <field name="LearnMod" type="double" />
+    </type>
   </types>
   <dats>
     <dat name="portal" text="client_portal.dat" type="DatFileType.Portal">
@@ -2746,8 +2828,14 @@
       <type name="CharGen" text="DB_TYPE_CHAR_GEN_0 in the client." parent="DBObj" first="0xE000002" last="0xE000002" flags="DBObjHeaderFlags.HasId">
       </type>
       <type name="VitalTable" text="DB_TYPE_ATTRIBUTE_2ND_TABLE_0 in the client." parent="DBObj" first="0xE000003" last="0xE000003" flags="DBObjHeaderFlags.HasId">
+        <field name="Health" type="SkillFormula" />
+        <field name="Stamina" type="SkillFormula" />
+        <field name="Mana" type="SkillFormula" />
       </type>
       <type name="SkillTable" text="DB_TYPE_SKILL_TABLE_0 in the client." parent="DBObj" first="0xE000004" last="0xE000004" flags="DBObjHeaderFlags.HasId">
+        <field name="_numSkills" type="ushort" />
+        <field name="_numSkillBuckets" type="ushort" value="32" />
+        <vector name="Skills" length="_numSkills" type="Dictionary" genericKey="SkillId" genericValue="SkillBase" />
       </type>
       <type name="SpellTable" text="DB_TYPE_SPELL_TABLE_0 in the client." parent="DBObj" first="0xE00000E" last="0xE00000E" flags="DBObjHeaderFlags.HasId">
         <field name="_numSpells" type="ushort" />
