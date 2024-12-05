@@ -7,7 +7,6 @@ using DatReaderWriter.Types;
 using System.Numerics;
 
 namespace DatReaderWriter.Tests.DBObjs {
-    /*
     [TestClass]
     public class KeymapTests {
         [TestMethod]
@@ -22,7 +21,7 @@ namespace DatReaderWriter.Tests.DBObjs {
                 Console.WriteLine($"{keymap.Id:X8}");
                 Console.WriteLine($"\t Name: {keymap.Name}");
                 Console.WriteLine($"\t GuidMap: {keymap.GuidMap}");
-
+                /*
                 Console.WriteLine($"\t DeviceKeyMapEntries:");
                 var i = 0;
                 foreach (var entry in keymap.DeviceKeyMapEntries) {
@@ -53,10 +52,10 @@ namespace DatReaderWriter.Tests.DBObjs {
                     Console.WriteLine($"\t\t\t\t\t Key: {entry.ControlSpec.Key:X4}");
                     Console.WriteLine($"\t\t\t\t\t Modifiers: {entry.ControlSpec.Modifiers:X8}");
                 }
+                */
             }
 
             dat.Dispose();
         }
     }
-    */
 }
