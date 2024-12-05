@@ -430,7 +430,13 @@ namespace DatReaderWriter.SourceGen {
                 else if (string.IsNullOrEmpty(vector.GenericKey)) {
                     WriteLine($"foreach (var item in {vector.Name}) {{");
                     Indent();
-                    WriteLine($"writer.{GetBinaryWriterForType(vector.GenericValue)}(item);");
+
+                    if (XMLDefParser.ACEnums.ContainsKey(vector.GenericValue)) {
+                        WriteLine($"writer.{GetBinaryWriterForType(XMLDefParser.ACEnums[vector.GenericValue].ParentType)}(({XMLDefParser.ACEnums[vector.GenericValue].ParentType})item);");
+                    }
+                    else {
+                        WriteLine($"writer.{GetBinaryWriterForType(vector.GenericValue)}(item);");
+                    }
                     Outdent();
                     WriteLine("}");
                 }

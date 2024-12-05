@@ -294,6 +294,21 @@ namespace DatReaderWriter.Lib.IO {
             return Encoding.GetEncoding(1252).GetString(obfuscatedBytes);
         }
 
+        private int ReadVariableLengthInt() {
+            int result = 0;
+            int shift = 0;
+            byte byteRead;
+
+            do {
+                byteRead = ReadByte();
+                result |= (byteRead & 0x7F) << shift;
+                shift += 7;
+            }
+            while ((byteRead & 0x80) != 0);
+
+            return result;
+        }
+
         /// <summary>
         ///  Reads a string from the current stream. The string is prefixed with the length,
         //     encoded as an integer seven bits at a time.
@@ -304,8 +319,8 @@ namespace DatReaderWriter.Lib.IO {
 #if NET8_0_OR_GREATER
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 #endif
-            var length = ReadCompressedUInt();
-            var bytes = ReadBytes((int)length);
+            var length = ReadVariableLengthInt();
+            var bytes = ReadBytes(length);
             return Encoding.GetEncoding(1252).GetString(bytes);
         }
 

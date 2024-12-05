@@ -3,6 +3,7 @@ using System.Buffers.Binary;
 using System.Drawing;
 using System.IO;
 using System.Numerics;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 
 namespace DatReaderWriter.Lib.IO {
@@ -234,7 +235,7 @@ namespace DatReaderWriter.Lib.IO {
         /// </summary>
         public void WriteDataIdOfKnownType(uint dataID, uint knownType) {
             // Subtract the known type to get the raw value
-            var rawValue = dataID - knownType;
+            var rawValue = dataID >= knownType ? dataID - knownType : dataID;
 
             if (rawValue > 0x7FFF) { // If the value is larger than 15 bits (0x7FFF)
                                      // Write the higher 16 bits with MSB set, masked with 0x3FFF
@@ -289,6 +290,19 @@ namespace DatReaderWriter.Lib.IO {
                 WriteByte((byte)(bytes[i] >> 4 | bytes[i] << 4));
             }
         }
+        private void WriteVariableLengthInt(int value) {
+            do {
+                byte byteToWrite = (byte)(value & 0x7F);
+                value >>= 7;
+
+                if (value > 0) {
+                    byteToWrite |= 0x80; // Set the continuation bit
+                }
+
+                WriteByte(byteToWrite);
+            }
+            while (value > 0);
+        }
 
         /// <summary>
         ///  Write a string from the current stream. The string is prefixed with the length,
@@ -301,7 +315,7 @@ namespace DatReaderWriter.Lib.IO {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 #endif
             var strBytes = Encoding.GetEncoding(1252).GetBytes(value);
-            WriteCompressedUInt((uint)strBytes.Length);
+            WriteVariableLengthInt(strBytes.Length);
             WriteBytes(strBytes, strBytes.Length);
         }
 

@@ -179,6 +179,15 @@ namespace DatReaderWriter {
         public DBObjCollection<PhysicsScript> PhysicsScripts => _PhysicsScripts ??= new DBObjCollection<PhysicsScript>(this);
         
         /// <summary>
+        /// The CharGen DBObj in the database.
+        /// </summary>
+        public CharGen? CharGen {
+            get {
+                TryReadFile<CharGen>(0x0E000002u, out var dbObj);
+                return dbObj;
+            }
+        }
+        /// <summary>
         /// The VitalTable DBObj in the database.
         /// </summary>
         public VitalTable? VitalTable {

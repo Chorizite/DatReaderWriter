@@ -413,7 +413,13 @@ namespace DatReaderWriter.SourceGen {
                         WriteLine($"{vector.Name}.Add(_val);");
                     }
                     else {
-                        WriteLine($"{vector.Name}.Add({GetBinaryReaderForType(vector.GenericValue)});");
+
+                        if (XMLDefParser.ACEnums.TryGetValue(vector.GenericValue, out var en)) {
+                            WriteLine($"{vector.Name}.Add(({vector.GenericValue}){GetBinaryReaderForType(en.ParentType)});");
+                        }
+                        else {
+                            WriteLine($"{vector.Name}.Add({GetBinaryReaderForType(vector.GenericValue)});");
+                        }
                     }
                 }
             }
