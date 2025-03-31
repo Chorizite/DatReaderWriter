@@ -25,7 +25,7 @@ jobs:
       - run: dotnet build -c Release --no-restore    # build
       - run: 'dotnet test -c Release --no-build --verbosity normal --filter TestCategory!=EOR --logger "trx;LogFileName=test-results.trx"' # run tests
       - run: 'cp "${{ github.workspace }}/DatReaderWriter.Tests/TestResults/test-results.trx" "${{ github.workspace }}/test-results.xml" '
-      - uses: actions/upload-artifact@v3  # upload test results
+      - uses: actions/upload-artifact@v4  # upload test results
         if: success() || failure()        # run this step even if previous step failed
         with:
           name: test-results
