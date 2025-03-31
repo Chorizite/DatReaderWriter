@@ -53,27 +53,27 @@ namespace DatReaderWriter.Enums {
 
         WaterDeepSea = 0x00000014,
 
-        Reserved21 = 0x00000015,
+        ForestFloor = 0x00000015,
 
-        Reserved22 = 0x00000016,
+        FauxWaterRunning = 0x00000016,
 
-        Reserved23 = 0x00000017,
+        SeaSlime = 0x00000017,
 
-        Reserved24 = 0x00000018,
+        Argila = 0x00000018,
 
-        Reserved25 = 0x00000019,
+        Volcano1 = 0x00000019,
 
-        Reserved26 = 0x0000001A,
+        Volcano2 = 0x0000001A,
 
-        Reserved27 = 0x0000001B,
+        BlueIce = 0x0000001B,
 
-        Reserved28 = 0x0000001C,
+        Moss = 0x0000001C,
 
-        Reserved29 = 0x0000001D,
+        DarkMoss = 0x0000001D,
 
-        Reserved30 = 0x0000001E,
+        Olthoi = 0x0000001E,
 
-        Reserved31 = 0x0000001F,
+        DesolateLands = 0x0000001F,
 
         RoadType = 0x00000020,
 

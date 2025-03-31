@@ -199,17 +199,17 @@
       <value name="WaterShallowSea" value="0x00000012" />
       <value name="WaterShallowStillSea" value="0x00000013" />
       <value name="WaterDeepSea" value="0x00000014" />
-      <value name="Reserved21" value="0x00000015" />
-      <value name="Reserved22" value="0x00000016" />
-      <value name="Reserved23" value="0x00000017" />
-      <value name="Reserved24" value="0x00000018" />
-      <value name="Reserved25" value="0x00000019" />
-      <value name="Reserved26" value="0x0000001A" />
-      <value name="Reserved27" value="0x0000001B" />
-      <value name="Reserved28" value="0x0000001C" />
-      <value name="Reserved29" value="0x0000001D" />
-      <value name="Reserved30" value="0x0000001E" />
-      <value name="Reserved31" value="0x0000001F" />
+      <value name="ForestFloor" value="0x00000015" />
+      <value name="FauxWaterRunning" value="0x00000016" />
+      <value name="SeaSlime" value="0x00000017" />
+      <value name="Argila" value="0x00000018" />
+      <value name="Volcano1" value="0x00000019" />
+      <value name="Volcano2" value="0x0000001A" />
+      <value name="BlueIce" value="0x0000001B" />
+      <value name="Moss" value="0x0000001C" />
+      <value name="DarkMoss" value="0x0000001D" />
+      <value name="Olthoi" value="0x0000001E" />
+      <value name="DesolateLands" value="0x0000001F" />
       <value name="RoadType" value="0x00000020" />
     </enum>
     <enum name="PortalFlags" parent="ushort" mask="true">
