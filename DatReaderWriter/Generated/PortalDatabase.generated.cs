@@ -114,6 +114,15 @@ namespace DatReaderWriter {
             }
         }
         /// <summary>
+        /// The NameFilterTable DBObj in the database.
+        /// </summary>
+        public NameFilterTable? NameFilterTable {
+            get {
+                TryReadFile<NameFilterTable>(0x0E000020u, out var dbObj);
+                return dbObj;
+            }
+        }
+        /// <summary>
         /// All PaletteSets in the database.
         /// </summary>
         public DBObjCollection<PaletteSet> PaletteSets => _PaletteSets ??= new DBObjCollection<PaletteSet>(this);
