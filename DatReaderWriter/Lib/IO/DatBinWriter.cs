@@ -341,5 +341,16 @@ namespace DatReaderWriter.Lib.IO {
                 WriteBytes(strBytes, strBytes.Length);
             }
         }
+
+        /// <summary>
+        /// Writes a PStringBase[ushort] from the current stream
+        /// </summary>
+        /// <returns></returns>
+        public void WriteUShortString(string value) {
+            WriteCompressedUInt((uint)value.Length);
+            foreach (char c in value) {
+                WriteUInt16((ushort)c);
+            }
+        }
     }
 }

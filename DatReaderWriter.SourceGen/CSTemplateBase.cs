@@ -503,6 +503,7 @@ namespace DatReaderWriter.SourceGen {
                 case "bytestring":
                 case "rawstring":
                 case "compressedstring":
+                case "ushortstring":
                 case "WString":
                     WriteLine($"{type} {child.Name} = \"\";");
                     break;
@@ -544,6 +545,8 @@ namespace DatReaderWriter.SourceGen {
                     return "WriteBool";
                 case "byte":
                     return "WriteByte";
+                case "ushortstring":
+                    return "WriteUShortString";
                 case "rawstring":
                     return "WriteString";
                 case "string":
@@ -629,6 +632,8 @@ namespace DatReaderWriter.SourceGen {
                     return $"reader.ReadObfuscatedString()";
                 case "rawstring":
                     return $"reader.ReadString()";
+                case "ushortstring":
+                    return $"reader.ReadUShortString()";
                 case "guid":
                     return $"reader.ReadGuid()";
                 default:

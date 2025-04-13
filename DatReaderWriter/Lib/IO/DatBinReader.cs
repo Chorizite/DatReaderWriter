@@ -345,5 +345,18 @@ namespace DatReaderWriter.Lib.IO {
             var bytes = ReadBytes((int)length);
             return Encoding.GetEncoding(1252).GetString(bytes);
         }
+
+        /// <summary>
+        /// Reads a PStringBase[ushort] from the current stream
+        /// </summary>
+        /// <returns></returns>
+        public string ReadUShortString() {
+            var length = ReadCompressedUInt();
+            var str = new StringBuilder();
+            for (int i = 0; i < length; i++) {
+                str.Append(Convert.ToChar(ReadUInt16()));
+            }
+            return str.ToString();
+        }
     }
 }

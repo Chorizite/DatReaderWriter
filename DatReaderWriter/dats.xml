@@ -2645,6 +2645,15 @@
       <field name="_numGenders" type="CompressedUInt" />
       <vector name="Genders" length="_numGenders" type="Dictionary" genericKey="int" genericValue="SexCG" />
     </type>
+	<type name="NameFilterLanguageData">
+		<field name="MaximumSameCharactersInARow" type="uint" />
+		<field name="MaximumVowelsInARow" type="uint" />
+		<field name="FirstNCharactersMustHaveAVowel" type="uint" />
+		<field name="VowelContainingSubstringLength" type="uint" />
+		<field name="ExtraAllowedCharacters" type="ushortstring" />
+		<field name="_numCompoundLetterGroups" type="uint" />
+		<vector name="CompoundLetterGroups" length="_numCompoundLetterGroups" type="List" genericValue="ushortstring" />
+	</type>
   </types>
   <dats>
     <dat name="portal" text="client_portal.dat" type="DatFileType.Portal">
@@ -2796,6 +2805,9 @@
       <type name="FileToId" text="DB_TYPE_FILE2ID_TABLE in the client." parent="DBObj" first="0xE00001F" last="0xE00001F" flags="DBObjHeaderFlags.HasId">
       </type>
       <type name="NameFilterTable" text="DB_TYPE_NAME_FILTER_TABLE in the client." parent="DBObj" first="0xE000020" last="0xE000020" flags="DBObjHeaderFlags.HasId">
+		  <field name="_numNameFilterLanguageDatas" type="byte" />
+		  <field name="_numNameFilterLanguageDataBuckets" type="byte" value="1" />
+		  <vector name="LanguageData" length="_numNameFilterLanguageDatas" type="Dictionary" genericKey="uint" genericValue="NameFilterLanguageData" />
       </type>
       <type name="MonitoredProperties" text="DB_TYPE_MONITOREDPROPERTIES in the client." parent="DBObj" first="0xE020000" last="0xE02FFFF" flags="DBObjHeaderFlags.HasId">
       </type>
