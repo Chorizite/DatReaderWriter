@@ -2802,8 +2802,6 @@
       </type>
       <type name="TabooTable" text="DB_TYPE_TABOO_TABLE in the client." parent="DBObj" first="0xE00001E" last="0xE00001E" flags="DBObjHeaderFlags.HasId">
       </type>
-      <type name="FileToId" text="DB_TYPE_FILE2ID_TABLE in the client." parent="DBObj" first="0xE00001F" last="0xE00001F" flags="DBObjHeaderFlags.HasId">
-      </type>
       <type name="NameFilterTable" text="DB_TYPE_NAME_FILTER_TABLE in the client." parent="DBObj" first="0xE000020" last="0xE000020" flags="DBObjHeaderFlags.HasId">
 		  <field name="_numNameFilterLanguageDatas" type="byte" />
 		  <field name="_numNameFilterLanguageDataBuckets" type="byte" value="1" />
