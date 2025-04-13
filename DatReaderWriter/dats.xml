@@ -2807,8 +2807,6 @@
 		  <field name="_numNameFilterLanguageDataBuckets" type="byte" value="1" />
 		  <vector name="LanguageData" length="_numNameFilterLanguageDatas" type="Dictionary" genericKey="uint" genericValue="NameFilterLanguageData" />
       </type>
-      <type name="MonitoredProperties" text="DB_TYPE_MONITOREDPROPERTIES in the client." parent="DBObj" first="0xE020000" last="0xE02FFFF" flags="DBObjHeaderFlags.HasId">
-      </type>
       <type name="PaletteSet" text="DB_TYPE_PAL_SET in the client." parent="DBObj" first="0xF000000" last="0xF00FFFF" flags="DBObjHeaderFlags.HasId">
         <field name="_numPalettes" type="uint" />
         <vector name="Palettes" length="_numPalettes" type="List" genericValue="uint" />
