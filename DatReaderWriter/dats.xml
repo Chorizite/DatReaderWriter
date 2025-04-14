@@ -2670,6 +2670,22 @@
       <field type="float" name="IdealDist" />
       <field type="float" name="MaxDist" />
     </type>
+    <type name="SoundHashData">
+      <field type="float" name="Priority" />
+      <field type="float" name="Probability" />
+      <field type="float" name="Volume" />
+    </type>
+	<type name="SoundEntry">
+	  <field type="uint" name="Id" text="A 0x0A sound entry" />
+	  <field type="float" name="Priority" />
+	  <field type="float" name="Probability" />
+	  <field type="float" name="Volume" />
+	  <field type="int" name="Unknown" />
+	</type>
+    <type name="SoundData">
+	  <field type="uint" name="_numEntries" />
+	  <vector name="Entries" length="_numEntries" type="List" genericValue="SoundEntry" />
+    </type>
   </types>
   <dats>
     <dat name="portal" text="client_portal.dat" type="DatFileType.Portal">
@@ -2902,6 +2918,11 @@
       <type name="RenderMesh" text="DB_TYPE_RENDER_MESH in the client." parent="DBObj" first="0x19000000" last="0x19FFFFFF" flags="DBObjHeaderFlags.HasId">
       </type>
       <type name="SoundTable" text="DB_TYPE_STABLE in the client." parent="DBObj" first="0x20000000" last="0x2000FFFF" flags="DBObjHeaderFlags.HasId">
+		  <field name="Unknown" type="int"/>
+		  <field name="_numHashes" type="int" />
+		  <vector name="Hashes" length="_numHashes" type="Dictionary" genericKey="uint" genericValue="SoundHashData" />
+		  <field name="_numSounds" type="int" />
+		  <vector name="Sounds" length="_numSounds" type="Dictionary" genericKey="Sound" genericValue="SoundData" />
       </type>
       <type name="EnumMapper" text="DB_TYPE_ENUM_MAPPER in the client." parent="DBObj" first="0x22000000" last="0x22FFFFFF" flags="DBObjHeaderFlags.HasId">
         <field name="BaseEnumMap" type="uint" />

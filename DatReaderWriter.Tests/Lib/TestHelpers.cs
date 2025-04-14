@@ -29,6 +29,12 @@ namespace DatReaderWriter.Tests.Lib {
             while (i < max && originalBytes[i] == writtenBytes[i]) i++;
 
             Assert.AreEqual((int)originalEntry.Size, writer.Offset);
+
+            //Console.WriteLine($"Original size: {originalEntry.Size} bytes");
+            //Console.WriteLine($"{string.Join(" ", originalBytes.Select(b => b.ToString("X2")))}");
+            //Console.WriteLine($"Written size: {writer.Offset} bytes");
+            //Console.WriteLine($"{string.Join(" ", writtenBytes.Select(b => b.ToString("X2")))}");
+
             CollectionAssert.AreEqual(originalBytes, writtenBytes);
 
             dat.Dispose();
