@@ -2872,6 +2872,9 @@
         <vector name="UserBindings" length="_numUserBindings" type="List" genericValue="UserBindingValue" text="User bindings" />
       </type>
       <type name="RenderTexture" text="DB_TYPE_RENDERTEXTURE in the client." parent="DBObj" first="0x15000000" last="0x15FFFFFF" flags="DBObjHeaderFlags.HasId | DBObjHeaderFlags.HasDataCategory">
+		  <field type="TextureType" name="TextureType" />
+		  <field type="uint" name="_numSourceLevels" />
+		  <vector name="SourceLevels" length="_numSourceLevels" type="List" genericValue="uint" />
       </type>
       <type name="RenderMaterial" text="" parent="DBObj" first="0x16000000" last="0x16FFFFFF" flags="DBObjHeaderFlags.HasId">
       </type>

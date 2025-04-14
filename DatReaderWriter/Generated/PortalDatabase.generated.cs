@@ -36,6 +36,7 @@ namespace DatReaderWriter {
         private DBObjCollection<Scene>? _Scenes;
         private DBObjCollection<Region>? _Regions;
         private DBObjCollection<Keymap>? _Keymaps;
+        private DBObjCollection<RenderTexture>? _RenderTextures;
         private DBObjCollection<MaterialModifier>? _MaterialModifiers;
         private DBObjCollection<MaterialInstance>? _MaterialInstances;
         private DBObjCollection<EnumMapper>? _EnumMappers;
@@ -105,6 +106,15 @@ namespace DatReaderWriter {
             }
         }
         /// <summary>
+        /// The ObjectHierarchy DBObj in the database.
+        /// </summary>
+        public ObjectHierarchy? ObjectHierarchy {
+            get {
+                TryReadFile<ObjectHierarchy>(0x0E00000Du, out var dbObj);
+                return dbObj;
+            }
+        }
+        /// <summary>
         /// The BadDataTable DBObj in the database.
         /// </summary>
         public BadDataTable? BadDataTable {
@@ -146,6 +156,11 @@ namespace DatReaderWriter {
         /// All Keymaps in the database.
         /// </summary>
         public DBObjCollection<Keymap> Keymaps => _Keymaps ??= new DBObjCollection<Keymap>(this);
+        
+        /// <summary>
+        /// All RenderTextures in the database.
+        /// </summary>
+        public DBObjCollection<RenderTexture> RenderTextures => _RenderTextures ??= new DBObjCollection<RenderTexture>(this);
         
         /// <summary>
         /// All MaterialModifiers in the database.
