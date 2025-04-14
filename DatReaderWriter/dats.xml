@@ -2645,24 +2645,31 @@
       <field name="_numGenders" type="CompressedUInt" />
       <vector name="Genders" length="_numGenders" type="Dictionary" genericKey="int" genericValue="SexCG" />
     </type>
-	<type name="NameFilterLanguageData">
-		<field name="MaximumSameCharactersInARow" type="uint" />
-		<field name="MaximumVowelsInARow" type="uint" />
-		<field name="FirstNCharactersMustHaveAVowel" type="uint" />
-		<field name="VowelContainingSubstringLength" type="uint" />
-		<field name="ExtraAllowedCharacters" type="ushortstring" />
-		<field name="_numCompoundLetterGroups" type="uint" />
-		<vector name="CompoundLetterGroups" length="_numCompoundLetterGroups" type="List" genericValue="ushortstring" />
-	</type>
-	  <type name="ObjHierarchyNode">
-		<field type="obfuscatedstring" name="MenuName" />
-		<align type="uint" />
-		<field type="uint" name="WCID" />
-		<field type="int" name="_numChildren" />
+    <type name="NameFilterLanguageData">
+      <field name="MaximumSameCharactersInARow" type="uint" />
+      <field name="MaximumVowelsInARow" type="uint" />
+      <field name="FirstNCharactersMustHaveAVowel" type="uint" />
+      <field name="VowelContainingSubstringLength" type="uint" />
+      <field name="ExtraAllowedCharacters" type="ushortstring" />
+      <field name="_numCompoundLetterGroups" type="uint" />
+      <vector name="CompoundLetterGroups" length="_numCompoundLetterGroups" type="List" genericValue="ushortstring" />
+    </type>
+    <type name="ObjHierarchyNode">
+      <field type="obfuscatedstring" name="MenuName" />
+      <align type="uint" />
+      <field type="uint" name="WCID" />
+      <field type="int" name="_numChildren" />
 
-		<vector name="Children" length="_numChildren" type="List" genericValue="ObjHierarchyNode" text="Child hierarchy nodes" />
-		<align type="uint" />
-	  </type>
+      <vector name="Children" length="_numChildren" type="List" genericValue="ObjHierarchyNode" text="Child hierarchy nodes" />
+      <align type="uint" />
+    </type>
+    <type name="GfxObjInfo">
+      <field type="uint" name="Id" text="Id of a GfxObj" />
+      <field type="uint" name="DegradeMode" />
+      <field type="float" name="MinDist" />
+      <field type="float" name="IdealDist" />
+      <field type="float" name="MaxDist" />
+    </type>
   </types>
   <dats>
     <dat name="portal" text="client_portal.dat" type="DatFileType.Portal">
@@ -2803,7 +2810,7 @@
         <vector name="ChatEmoteHash" length="_numChatEmoteHashes" type="Dictionary" genericKey="string" genericValue="ChatEmoteData" />
       </type>
       <type name="ObjectHierarchy" text="DB_TYPE_OBJECT_HIERARCHY in the client." parent="DBObj" first="0xE00000D" last="0xE00000D" flags="DBObjHeaderFlags.HasId">
-		<field type="ObjHierarchyNode" name="RootNode" />
+        <field type="ObjHierarchyNode" name="RootNode" />
       </type>
       <type name="BadDataTable" text="DB_TYPE_BADDATA in the client." parent="DBObj" first="0xE00001A" last="0xE00001A" flags="DBObjHeaderFlags.HasId">
         <field name="_numBadIds" type="ushort" />
@@ -2813,9 +2820,9 @@
       <type name="TabooTable" text="DB_TYPE_TABOO_TABLE in the client." parent="DBObj" first="0xE00001E" last="0xE00001E" flags="DBObjHeaderFlags.HasId">
       </type>
       <type name="NameFilterTable" text="DB_TYPE_NAME_FILTER_TABLE in the client." parent="DBObj" first="0xE000020" last="0xE000020" flags="DBObjHeaderFlags.HasId">
-		  <field name="_numNameFilterLanguageDatas" type="byte" />
-		  <field name="_numNameFilterLanguageDataBuckets" type="byte" value="1" />
-		  <vector name="LanguageData" length="_numNameFilterLanguageDatas" type="Dictionary" genericKey="uint" genericValue="NameFilterLanguageData" />
+          <field name="_numNameFilterLanguageDatas" type="byte" />
+          <field name="_numNameFilterLanguageDataBuckets" type="byte" value="1" />
+          <vector name="LanguageData" length="_numNameFilterLanguageDatas" type="Dictionary" genericKey="uint" genericValue="NameFilterLanguageData" />
       </type>
       <type name="PaletteSet" text="DB_TYPE_PAL_SET in the client." parent="DBObj" first="0xF000000" last="0xF00FFFF" flags="DBObjHeaderFlags.HasId">
         <field name="_numPalettes" type="uint" />
@@ -2829,7 +2836,9 @@
         <field name="_numClothingSubPalEffectsBuckets" type="ushort" value="32" />
         <vector name="ClothingSubPalEffects" length="_numClothingSubPalEffects" type="Dictionary" genericKey="uint" genericValue="CloSubPalEffect" />
       </type>
-      <type name="DegradeInfo" text="DB_TYPE_DEGRADEINFO in the client." parent="DBObj" first="0x11000000" last="0x1100FFFF" flags="DBObjHeaderFlags.HasId">
+      <type name="GfxObjDegradeInfo" text="DB_TYPE_DEGRADEINFO in the client." parent="DBObj" first="0x11000000" last="0x1100FFFF" flags="DBObjHeaderFlags.HasId">
+          <field type="uint" name="_numDegrades" />
+          <vector name="Degrades" length="_numDegrades" type="List" genericValue="GfxObjInfo" />
       </type>
       <type name="Scene" text="DB_TYPE_SCENE in the client." parent="DBObj" first="0x12000000" last="0x1200FFFF" flags="DBObjHeaderFlags.HasId">
         <field name="_numObjects" type="uint" />
@@ -2872,9 +2881,9 @@
         <vector name="UserBindings" length="_numUserBindings" type="List" genericValue="UserBindingValue" text="User bindings" />
       </type>
       <type name="RenderTexture" text="DB_TYPE_RENDERTEXTURE in the client." parent="DBObj" first="0x15000000" last="0x15FFFFFF" flags="DBObjHeaderFlags.HasId | DBObjHeaderFlags.HasDataCategory">
-		  <field type="TextureType" name="TextureType" />
-		  <field type="uint" name="_numSourceLevels" />
-		  <vector name="SourceLevels" length="_numSourceLevels" type="List" genericValue="uint" />
+          <field type="TextureType" name="TextureType" />
+          <field type="uint" name="_numSourceLevels" />
+          <vector name="SourceLevels" length="_numSourceLevels" type="List" genericValue="uint" />
       </type>
       <type name="RenderMaterial" text="" parent="DBObj" first="0x16000000" last="0x16FFFFFF" flags="DBObjHeaderFlags.HasId">
       </type>

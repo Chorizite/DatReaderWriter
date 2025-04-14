@@ -33,6 +33,7 @@ namespace DatReaderWriter {
         private DBObjCollection<Environment>? _Environments;
         private DBObjCollection<PaletteSet>? _PaletteSets;
         private DBObjCollection<Clothing>? _Clothings;
+        private DBObjCollection<GfxObjDegradeInfo>? _GfxObjDegradeInfos;
         private DBObjCollection<Scene>? _Scenes;
         private DBObjCollection<Region>? _Regions;
         private DBObjCollection<Keymap>? _Keymaps;
@@ -141,6 +142,11 @@ namespace DatReaderWriter {
         /// All Clothings in the database.
         /// </summary>
         public DBObjCollection<Clothing> Clothings => _Clothings ??= new DBObjCollection<Clothing>(this);
+        
+        /// <summary>
+        /// All GfxObjDegradeInfos in the database.
+        /// </summary>
+        public DBObjCollection<GfxObjDegradeInfo> GfxObjDegradeInfos => _GfxObjDegradeInfos ??= new DBObjCollection<GfxObjDegradeInfo>(this);
         
         /// <summary>
         /// All Scenes in the database.
