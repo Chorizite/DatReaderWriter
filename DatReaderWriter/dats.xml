@@ -2654,6 +2654,15 @@
 		<field name="_numCompoundLetterGroups" type="uint" />
 		<vector name="CompoundLetterGroups" length="_numCompoundLetterGroups" type="List" genericValue="ushortstring" />
 	</type>
+	  <type name="ObjHierarchyNode">
+		<field type="obfuscatedstring" name="MenuName" />
+		<align type="uint" />
+		<field type="uint" name="WCID" />
+		<field type="int" name="_numChildren" />
+
+		<vector name="Children" length="_numChildren" type="List" genericValue="ObjHierarchyNode" text="Child hierarchy nodes" />
+		<align type="uint" />
+	  </type>
   </types>
   <dats>
     <dat name="portal" text="client_portal.dat" type="DatFileType.Portal">
@@ -2794,6 +2803,7 @@
         <vector name="ChatEmoteHash" length="_numChatEmoteHashes" type="Dictionary" genericKey="string" genericValue="ChatEmoteData" />
       </type>
       <type name="ObjectHierarchy" text="DB_TYPE_OBJECT_HIERARCHY in the client." parent="DBObj" first="0xE00000D" last="0xE00000D" flags="DBObjHeaderFlags.HasId">
+		<field type="ObjHierarchyNode" name="RootNode" />
       </type>
       <type name="BadDataTable" text="DB_TYPE_BADDATA in the client." parent="DBObj" first="0xE00001A" last="0xE00001A" flags="DBObjHeaderFlags.HasId">
         <field name="_numBadIds" type="ushort" />

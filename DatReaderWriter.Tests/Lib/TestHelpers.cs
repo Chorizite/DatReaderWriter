@@ -28,8 +28,6 @@ namespace DatReaderWriter.Tests.Lib {
             var i = 0;
             while (i < max && originalBytes[i] == writtenBytes[i]) i++;
 
-            Console.WriteLine($"First difference at {i}");
-
             Assert.AreEqual((int)originalEntry.Size, writer.Offset);
             CollectionAssert.AreEqual(originalBytes, writtenBytes);
 
