@@ -95,19 +95,9 @@ namespace DatReaderWriter.Enums {
         TabooTable,
 
         /// <summary>
-        /// DBObj FileToId - DB_TYPE_FILE2ID_TABLE in the client.
-        /// </summary>
-        FileToId,
-
-        /// <summary>
         /// DBObj NameFilterTable - DB_TYPE_NAME_FILTER_TABLE in the client.
         /// </summary>
         NameFilterTable,
-
-        /// <summary>
-        /// DBObj MonitoredProperties - DB_TYPE_MONITOREDPROPERTIES in the client.
-        /// </summary>
-        MonitoredProperties,
 
         /// <summary>
         /// DBObj PaletteSet - DB_TYPE_PAL_SET in the client.
@@ -120,9 +110,9 @@ namespace DatReaderWriter.Enums {
         Clothing,
 
         /// <summary>
-        /// DBObj DegradeInfo - DB_TYPE_DEGRADEINFO in the client.
+        /// DBObj GfxObjDegradeInfo - DB_TYPE_DEGRADEINFO in the client.
         /// </summary>
-        DegradeInfo,
+        GfxObjDegradeInfo,
 
         /// <summary>
         /// DBObj Scene - DB_TYPE_SCENE in the client.

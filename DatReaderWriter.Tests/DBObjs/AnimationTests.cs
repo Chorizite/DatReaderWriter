@@ -69,7 +69,6 @@ namespace DatReaderWriter.Tests.DBObjs {
                 options.IndexCachingStrategy = IndexCachingStrategy.Never;
             });
 
-
             var res = dat.TryReadFile<Animation>(0x03000514, out var anim);
             Assert.IsTrue(res);
             Assert.IsNotNull(anim);

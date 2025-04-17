@@ -66,6 +66,20 @@ foreach (var mTable in portalDat.MotionTables) {
 portalDat.Dispose();
 ```
 
+## Todo:
+- BSP trees are broken (reading and writing)
+- CharGen is unable to write identical eor entry
+- DBObjs left to implement:
+    - RenderMaterial
+    - DBProperties
+    - MasterProperty
+    - TabooTable
+    - RenderMesh
+    - ActionMap
+    - UILayout
+    - FontLocal
+    - StringState
+
 ## Contributing
 
 We welcome contributions from the community! If you would like to contribute to DatReaderWriter, please follow these steps:

@@ -33,17 +33,22 @@ namespace DatReaderWriter {
         private DBObjCollection<Environment>? _Environments;
         private DBObjCollection<PaletteSet>? _PaletteSets;
         private DBObjCollection<Clothing>? _Clothings;
+        private DBObjCollection<GfxObjDegradeInfo>? _GfxObjDegradeInfos;
         private DBObjCollection<Scene>? _Scenes;
         private DBObjCollection<Region>? _Regions;
         private DBObjCollection<Keymap>? _Keymaps;
+        private DBObjCollection<RenderTexture>? _RenderTextures;
         private DBObjCollection<MaterialModifier>? _MaterialModifiers;
         private DBObjCollection<MaterialInstance>? _MaterialInstances;
+        private DBObjCollection<SoundTable>? _SoundTables;
         private DBObjCollection<EnumMapper>? _EnumMappers;
         private DBObjCollection<DataIdMapper>? _DataIdMappers;
         private DBObjCollection<DualDataIdMapper>? _DualDataIdMappers;
         private DBObjCollection<LanguageString>? _LanguageStrings;
         private DBObjCollection<ParticleEmitter>? _ParticleEmitters;
         private DBObjCollection<PhysicsScript>? _PhysicsScripts;
+        private DBObjCollection<PhysicsScriptTable>? _PhysicsScriptTables;
+        private DBObjCollection<Font>? _Fonts;
         
         /// <summary>
         /// All GfxObjs in the database.
@@ -105,6 +110,15 @@ namespace DatReaderWriter {
             }
         }
         /// <summary>
+        /// The ObjectHierarchy DBObj in the database.
+        /// </summary>
+        public ObjectHierarchy? ObjectHierarchy {
+            get {
+                TryReadFile<ObjectHierarchy>(0x0E00000Du, out var dbObj);
+                return dbObj;
+            }
+        }
+        /// <summary>
         /// The BadDataTable DBObj in the database.
         /// </summary>
         public BadDataTable? BadDataTable {
@@ -133,6 +147,11 @@ namespace DatReaderWriter {
         public DBObjCollection<Clothing> Clothings => _Clothings ??= new DBObjCollection<Clothing>(this);
         
         /// <summary>
+        /// All GfxObjDegradeInfos in the database.
+        /// </summary>
+        public DBObjCollection<GfxObjDegradeInfo> GfxObjDegradeInfos => _GfxObjDegradeInfos ??= new DBObjCollection<GfxObjDegradeInfo>(this);
+        
+        /// <summary>
         /// All Scenes in the database.
         /// </summary>
         public DBObjCollection<Scene> Scenes => _Scenes ??= new DBObjCollection<Scene>(this);
@@ -148,6 +167,11 @@ namespace DatReaderWriter {
         public DBObjCollection<Keymap> Keymaps => _Keymaps ??= new DBObjCollection<Keymap>(this);
         
         /// <summary>
+        /// All RenderTextures in the database.
+        /// </summary>
+        public DBObjCollection<RenderTexture> RenderTextures => _RenderTextures ??= new DBObjCollection<RenderTexture>(this);
+        
+        /// <summary>
         /// All MaterialModifiers in the database.
         /// </summary>
         public DBObjCollection<MaterialModifier> MaterialModifiers => _MaterialModifiers ??= new DBObjCollection<MaterialModifier>(this);
@@ -156,6 +180,11 @@ namespace DatReaderWriter {
         /// All MaterialInstances in the database.
         /// </summary>
         public DBObjCollection<MaterialInstance> MaterialInstances => _MaterialInstances ??= new DBObjCollection<MaterialInstance>(this);
+        
+        /// <summary>
+        /// All SoundTables in the database.
+        /// </summary>
+        public DBObjCollection<SoundTable> SoundTables => _SoundTables ??= new DBObjCollection<SoundTable>(this);
         
         /// <summary>
         /// All EnumMappers in the database.
@@ -186,6 +215,16 @@ namespace DatReaderWriter {
         /// All PhysicsScripts in the database.
         /// </summary>
         public DBObjCollection<PhysicsScript> PhysicsScripts => _PhysicsScripts ??= new DBObjCollection<PhysicsScript>(this);
+        
+        /// <summary>
+        /// All PhysicsScriptTables in the database.
+        /// </summary>
+        public DBObjCollection<PhysicsScriptTable> PhysicsScriptTables => _PhysicsScriptTables ??= new DBObjCollection<PhysicsScriptTable>(this);
+        
+        /// <summary>
+        /// All Fonts in the database.
+        /// </summary>
+        public DBObjCollection<Font> Fonts => _Fonts ??= new DBObjCollection<Font>(this);
         
         /// <summary>
         /// The CharGen DBObj in the database.
