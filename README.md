@@ -69,7 +69,16 @@ portalDat.Dispose();
 ## Todo:
 - BSP trees are broken (reading and writing)
 - CharGen is unable to write identical eor entry
-- RenderMaterial isnt implemented
+- DBObjs left to implement:
+    - RenderMaterial
+    - DBProperties
+    - MasterProperty
+    - TabooTable
+    - RenderMesh
+    - ActionMap
+    - UILayout
+    - FontLocal
+    - StringState
 
 ## Contributing
 

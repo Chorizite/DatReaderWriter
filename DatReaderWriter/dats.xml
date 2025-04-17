@@ -2880,6 +2880,17 @@
       <field type="byte" name="HorizontalOffsetAfter" />
       <field type="byte" name="VerticalOffsetBefore" />
     </type>
+    <type name="StringTableData">
+      <field type="ushort" name="_numVarNames" />
+      <vector name="VarNames" length="_numVarNames" type="List" genericValue="ushortstring" />
+      <field type="ushort" name="_numVars" />
+      <vector name="Vars" length="_numVars" type="List" genericValue="ushortstring" />
+      <field type="uint" name="_numStrings" />
+      <vector name="Strings" length="_numStrings" type="List" genericValue="ushortstring" />
+      <field type="uint" name="_numComments" />
+      <vector name="Comments" length="_numComments" type="List" genericValue="uint" />
+      <field type="byte" name="Unknown" />
+    </type>
   </types>
   <dats>
     <dat name="portal" text="client_portal.dat" type="DatFileType.Portal">
@@ -3313,6 +3324,10 @@
       <type name="UILayout" text="DB_TYPE_UI_LAYOUT in the client." parent="DBObj" first="0x21000000" last="0x21FFFFFF" flags="DBObjHeaderFlags.HasId">
       </type>
       <type name="StringTable" text="DB_TYPE_STRING_TABLE in the client." parent="DBObj" first="0x23000000" last="0x24FFFFFF" flags="DBObjHeaderFlags.HasId">
+        <field type="uint" name="Language" text="This should always be 1 for English" />
+        <field type="byte" name="Unknown" />
+        <field type="CompressedUInt" name="_numEntries" />
+        <vector name="StringTableData" length="_numEntries" type="Dictionary" genericKey="uint" genericValue="StringTableData" />
       </type>
       <type name="FontLocal" text="DB_TYPE_FONT_LOCAL in the client." parent="DBObj" first="0x40001000" last="0x40FFFFFF" flags="DBObjHeaderFlags.HasId">
       </type>
