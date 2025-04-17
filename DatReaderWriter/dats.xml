@@ -2862,14 +2862,24 @@
       <field type="uint" name="_numEntries" />
       <vector name="Entries" length="_numEntries" type="List" genericValue="SoundEntry" />
     </type>
-	<type name="ScriptAndModData">
-		<field type="float" name="Mod" />
-		<field type="uint" name="ScriptId" />
-	</type>
-	<type name="PhysicsScriptTableData">
+    <type name="ScriptAndModData">
+      <field type="float" name="Mod" />
+      <field type="uint" name="ScriptId" />
+    </type>
+    <type name="PhysicsScriptTableData">
       <field type="uint" name="_numScripts" />
       <vector name="Scripts" length="_numScripts" type="List" genericValue="ScriptAndModData" />
-	</type>
+    </type>
+    <type name="FontCharDesc">
+      <field type="ushort" name="Unicode" />
+      <field type="ushort" name="OffsetX" />
+      <field type="ushort" name="OffsetY" />
+      <field type="byte" name="Width" />
+      <field type="byte" name="Height" />
+      <field type="byte" name="HorizontalOffsetBefore" />
+      <field type="byte" name="HorizontalOffsetAfter" />
+      <field type="byte" name="VerticalOffsetBefore" />
+    </type>
   </types>
   <dats>
     <dat name="portal" text="client_portal.dat" type="DatFileType.Portal">
@@ -3191,6 +3201,15 @@
       <type name="MasterProperty" text="DB_TYPE_MASTER_PROPERTY in the client." parent="DBObj" first="0x39000000" last="0x39FFFFFF" flags="DBObjHeaderFlags.HasId">
       </type>
       <type name="Font" text="DB_TYPE_FONT in the client." parent="DBObj" first="0x40000000" last="0x40000FFF" flags="DBObjHeaderFlags.HasId">
+        <field name="MaxCharHeight" type="uint" />
+        <field name="MaxCharWidth" type="uint" />
+        <field name="_numCharDescs" type="uint" />
+        <vector name="CharDescs" length="_numCharDescs" type="List" genericValue="FontCharDesc" />
+        <field name="NumHorizontalBorderPixels" type="uint" />
+        <field name="NumVerticalBorderPixels" type="uint" />
+        <field name="BaselineOffset" type="uint" />
+        <field name="ForegroundSurfaceDataId" type="uint" />
+        <field name="BackgroundSurfaceDataId" type="uint" />
       </type>
       <type name="DBProperties" text="DB_TYPE_DBPROPERTIES in the client." parent="DBObj" first="0x78000000" last="0x7FFFFFFF" flags="DBObjHeaderFlags.HasId">
       </type>

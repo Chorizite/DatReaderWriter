@@ -48,6 +48,7 @@ namespace DatReaderWriter {
         private DBObjCollection<ParticleEmitter>? _ParticleEmitters;
         private DBObjCollection<PhysicsScript>? _PhysicsScripts;
         private DBObjCollection<PhysicsScriptTable>? _PhysicsScriptTables;
+        private DBObjCollection<Font>? _Fonts;
         
         /// <summary>
         /// All GfxObjs in the database.
@@ -219,6 +220,11 @@ namespace DatReaderWriter {
         /// All PhysicsScriptTables in the database.
         /// </summary>
         public DBObjCollection<PhysicsScriptTable> PhysicsScriptTables => _PhysicsScriptTables ??= new DBObjCollection<PhysicsScriptTable>(this);
+        
+        /// <summary>
+        /// All Fonts in the database.
+        /// </summary>
+        public DBObjCollection<Font> Fonts => _Fonts ??= new DBObjCollection<Font>(this);
         
         /// <summary>
         /// The CharGen DBObj in the database.
