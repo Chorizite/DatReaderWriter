@@ -3331,7 +3331,47 @@
       </type>
       <type name="FontLocal" text="DB_TYPE_FONT_LOCAL in the client." parent="DBObj" first="0x40001000" last="0x40FFFFFF" flags="DBObjHeaderFlags.HasId">
       </type>
-      <type name="StringState" text="DB_TYPE_STRING_STATE in the client." parent="DBObj" first="0x41000000" last="0x41FFFFFF" flags="DBObjHeaderFlags.HasId">
+      <type name="LanguageInfo" text="DB_TYPE_STRING_STATE in the client." parent="DBObj" first="0x41000000" last="0x41FFFFFF" flags="DBObjHeaderFlags.None">
+        <field type="int" name="Version" />
+        <field type="ushort" name="Base" />
+        <field type="ushort" name="NumDecimalDigits" />
+        <field type="bool" name="LeadingZero" size="1" />
+        <field type="ushort" name="GroupingSize" />
+        <field type="ushortstring" name="Numerals" />
+        <field type="ushortstring" name="DecimalSeperator" />
+        <field type="ushortstring" name="GroupingSeperator" />
+        <field type="ushortstring" name="NegativeNumberFormat" />
+        <field type="bool" name="IsZeroSingular" size="1" />
+        <field type="bool" name="IsOneSingular" size="1" />
+        <field type="bool" name="IsNegativeOneSingular" size="1" />
+        <field type="bool" name="IsTwoOrMoreSingular" size="1" />
+        <field type="bool" name="IsNegativeTwoOrLessSingular" size="1" />
+        <align size="4" />
+        <field type="ushortstring" name="TreasurePrefixLetters" />
+        <field type="ushortstring" name="TreasureMiddleLetters" />
+        <field type="ushortstring" name="TreasureSuffixLetters" />
+        <field type="ushortstring" name="MalePlayerLetters" />
+        <field type="ushortstring" name="FemalePlayerLetters" />
+        <field type="uint" name="IMEEnabledSetting" />
+        <field type="uint" name="SymbolColor" />
+        <field type="uint" name="SymbolColorText" />
+        <field type="uint" name="SymbolHeight" />
+        <field type="uint" name="SymbolTranslucence" />
+        <field type="uint" name="SymbolPlacement" />
+        <field type="uint" name="CandColorBase" />
+        <field type="uint" name="CandColorBorder" />
+        <field type="uint" name="CandColorText" />
+        <field type="uint" name="CompColorInput" />
+        <field type="uint" name="CompColorTargetConv" />
+        <field type="uint" name="CompColorConverted" />
+        <field type="uint" name="CompColorTargetNotConv" />
+        <field type="uint" name="CompColorInputErr" />
+        <field type="uint" name="CompTranslucence" />
+        <field type="uint" name="CompColorText" />
+        <field type="uint" name="OtherIME" />
+        <field type="int" name="WordWrapOnSpace" />
+        <field type="bytestring" name="AdditionalSettings" />
+        <field type="uint" name="AdditionalFlags" />
       </type>
     </dat>
   </dats>

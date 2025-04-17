@@ -78,7 +78,6 @@ portalDat.Dispose();
     - ActionMap
     - UILayout
     - FontLocal
-    - StringState
 
 ## Contributing
 

@@ -5,6 +5,8 @@ using DatReaderWriter.Enums;
 using DatReaderWriter.DBObjs;
 using DatReaderWriter.Types;
 using System.Numerics;
+using DatReaderWriter.Lib.IO.DatBTree;
+using DatReaderWriter.Lib.IO.BlockAllocators;
 
 namespace DatReaderWriter.Tests.DBObjs {
     [TestClass]

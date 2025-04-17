@@ -295,9 +295,9 @@ namespace DatReaderWriter.Enums {
         FontLocal,
 
         /// <summary>
-        /// DBObj StringState - DB_TYPE_STRING_STATE in the client.
+        /// DBObj LanguageInfo - DB_TYPE_STRING_STATE in the client.
         /// </summary>
-        StringState,
+        LanguageInfo,
 
     };
 }
