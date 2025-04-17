@@ -6,7 +6,7 @@
 <#@include file="MultipleOutputHelper.ttinclude"#>
 <#
     var manager = Manager.Create(Host, GenerationEnvironment);
-    var readers = new List<string>() { "Portal", "Cell" };
+    var readers = new List<string>() { "Portal", "Cell", "Local" };
     
     SetupMessageParser(this.Host.ResolvePath("../dats.xml"));
     foreach (var reader in readers) {
