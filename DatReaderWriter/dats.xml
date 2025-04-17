@@ -508,6 +508,182 @@
       <value name="RegenDownVoid" value="0x000000CB" />
       <value name="SkillDownVoid" value="0x000000CC" />
     </enum>
+    <enum name="PlayScript" parent="uint" shared="true">
+      <value name="Invalid" value="0x00000000" />
+      <value name="Test1" value="0x00000001" />
+      <value name="Test2" value="0x00000002" />
+      <value name="Test3" value="0x00000003" />
+      <value name="Launch" value="0x00000004" />
+      <value name="Explode" value="0x00000005" />
+      <value name="AttribUpRed" value="0x00000006" />
+      <value name="AttribDownRed" value="0x00000007" />
+      <value name="AttribUpOrange" value="0x00000008" />
+      <value name="AttribDownOrange" value="0x00000009" />
+      <value name="AttribUpYellow" value="0x0000000A" />
+      <value name="AttribDownYellow" value="0x0000000B" />
+      <value name="AttribUpGreen" value="0x0000000C" />
+      <value name="AttribDownGreen" value="0x0000000D" />
+      <value name="AttribUpBlue" value="0x0000000E" />
+      <value name="AttribDownBlue" value="0x0000000F" />
+      <value name="AttribUpPurple" value="0x00000010" />
+      <value name="AttribDownPurple" value="0x00000011" />
+      <value name="SkillUpRed" value="0x00000012" />
+      <value name="SkillDownRed" value="0x00000013" />
+      <value name="SkillUpOrange" value="0x00000014" />
+      <value name="SkillDownOrange" value="0x00000015" />
+      <value name="SkillUpYellow" value="0x00000016" />
+      <value name="SkillDownYellow" value="0x00000017" />
+      <value name="SkillUpGreen" value="0x00000018" />
+      <value name="SkillDownGreen" value="0x00000019" />
+      <value name="SkillUpBlue" value="0x0000001A" />
+      <value name="SkillDownBlue" value="0x0000001B" />
+      <value name="SkillUpPurple" value="0x0000001C" />
+      <value name="SkillDownPurple" value="0x0000001D" />
+      <value name="SkillDownBlack" value="0x0000001E" />
+      <value name="HealthUpRed" value="0x0000001F" />
+      <value name="HealthDownRed" value="0x00000020" />
+      <value name="HealthUpBlue" value="0x00000021" />
+      <value name="HealthDownBlue" value="0x00000022" />
+      <value name="HealthUpYellow" value="0x00000023" />
+      <value name="HealthDownYellow" value="0x00000024" />
+      <value name="RegenUpRed" value="0x00000025" />
+      <value name="RegenDownREd" value="0x00000026" />
+      <value name="RegenUpBlue" value="0x00000027" />
+      <value name="RegenDownBlue" value="0x00000028" />
+      <value name="RegenUpYellow" value="0x00000029" />
+      <value name="RegenDownYellow" value="0x0000002A" />
+      <value name="ShieldUpRed" value="0x0000002B" />
+      <value name="ShieldDownRed" value="0x0000002C" />
+      <value name="ShieldUpOrange" value="0x0000002D" />
+      <value name="ShieldDownOrange" value="0x0000002E" />
+      <value name="ShieldUpYellow" value="0x0000002F" />
+      <value name="ShieldDownYellow" value="0x00000030" />
+      <value name="ShieldUpGreen" value="0x00000031" />
+      <value name="ShieldDownGreen" value="0x00000032" />
+      <value name="ShieldUpBlue" value="0x00000033" />
+      <value name="ShieldDownBlue" value="0x00000034" />
+      <value name="ShieldUpPurple" value="0x00000035" />
+      <value name="ShieldDownPurple" value="0x00000036" />
+      <value name="ShieldUpGrey" value="0x00000037" />
+      <value name="ShieldDownGrey" value="0x00000038" />
+      <value name="EnchantUpRed" value="0x00000039" />
+      <value name="EnchantDownRed" value="0x0000003A" />
+      <value name="EnchantUpOrange" value="0x0000003B" />
+      <value name="EnchantDownOrange" value="0x0000003C" />
+      <value name="EnchantUpYellow" value="0x0000003D" />
+      <value name="EnchantDownYellow" value="0x0000003E" />
+      <value name="EnchantUpGreen" value="0x0000003F" />
+      <value name="EnchantDownGreen" value="0x00000040" />
+      <value name="EnchantUpBlue" value="0x00000041" />
+      <value name="EnchantDownBlue" value="0x00000042" />
+      <value name="EnchantUpPurple" value="0x00000043" />
+      <value name="EnchantDownPurple" value="0x00000044" />
+      <value name="VitaeUpWhite" value="0x00000045" />
+      <value name="VitaeDownBlack" value="0x00000046" />
+      <value name="VisionUpWhite" value="0x00000047" />
+      <value name="VisionDownBlack" value="0x00000048" />
+      <value name="SwapHealth_Red_To_Yellow" value="0x00000049" />
+      <value name="SwapHealth_Red_To_Blue" value="0x0000004A" />
+      <value name="SwapHealth_Yellow_To_Red" value="0x0000004B" />
+      <value name="SwapHealth_Yellow_To_Blue" value="0x0000004C" />
+      <value name="SwapHealth_Blue_To_Red" value="0x0000004D" />
+      <value name="SwapHealth_Blue_To_Yellow" value="0x0000004E" />
+      <value name="TransUpWhite" value="0x0000004F" />
+      <value name="TransDownBlack" value="0x00000050" />
+      <value name="Fizzle" value="0x00000051" />
+      <value name="PortalEntry" value="0x00000052" />
+      <value name="PortalExit" value="0x00000053" />
+      <value name="BreatheFlame" value="0x00000054" />
+      <value name="BreatheFrost" value="0x00000055" />
+      <value name="BreatheAcid" value="0x00000056" />
+      <value name="BreatheLightning" value="0x00000057" />
+      <value name="Create" value="0x00000058" />
+      <value name="Destroy" value="0x00000059" />
+      <value name="ProjectileCollision" value="0x0000005A" />
+      <value name="SplatterLowLeftBack" value="0x0000005B" />
+      <value name="SplatterLowLeftFront" value="0x0000005C" />
+      <value name="SplatterLowRightBack" value="0x0000005D" />
+      <value name="SplatterLowRightFront" value="0x0000005E" />
+      <value name="SplatterMidLeftBack" value="0x0000005F" />
+      <value name="SplatterMidLeftFront" value="0x00000060" />
+      <value name="SplatterMidRightBack" value="0x00000061" />
+      <value name="SplatterMidRightFront" value="0x00000062" />
+      <value name="SplatterUpLeftBack" value="0x00000063" />
+      <value name="SplatterUpLeftFront" value="0x00000064" />
+      <value name="SplatterUpRightBack" value="0x00000065" />
+      <value name="SplatterUpRightFront" value="0x00000066" />
+      <value name="SparkLowLeftBack" value="0x00000067" />
+      <value name="SparkLowLeftFront" value="0x00000068" />
+      <value name="SparkLowRightBack" value="0x00000069" />
+      <value name="SparkLowRightFront" value="0x0000006A" />
+      <value name="SparkMidLeftBack" value="0x0000006B" />
+      <value name="SparkMidLeftFront" value="0x0000006C" />
+      <value name="SparkMidRightBack" value="0x0000006D" />
+      <value name="SparkMidRightFront" value="0x0000006E" />
+      <value name="SparkUpLeftBack" value="0x0000006F" />
+      <value name="SparkUpLeftFront" value="0x00000070" />
+      <value name="SparkUpRightBack" value="0x00000071" />
+      <value name="SparkUpRightFront" value="0x00000072" />
+      <value name="PortalStorm" value="0x00000073" />
+      <value name="Hide" value="0x00000074" />
+      <value name="UnHide" value="0x00000075" />
+      <value name="Hidden" value="0x00000076" />
+      <value name="DisappearDestroy" value="0x00000077" />
+      <value name="SpecialState1" value="0x00000078" />
+      <value name="SpecialState2" value="0x00000079" />
+      <value name="SpecialState3" value="0x0000007A" />
+      <value name="SpecialState4" value="0x0000007B" />
+      <value name="SpecialState5" value="0x0000007C" />
+      <value name="SpecialState6" value="0x0000007D" />
+      <value name="SpecialState7" value="0x0000007E" />
+      <value name="SpecialState8" value="0x0000007F" />
+      <value name="SpecialState9" value="0x00000080" />
+      <value name="SpecialState0" value="0x00000081" />
+      <value name="SpecialStateRed" value="0x00000082" />
+      <value name="SpecialStateOrange" value="0x00000083" />
+      <value name="SpecialStateYellow" value="0x00000084" />
+      <value name="SpecialStateGreen" value="0x00000085" />
+      <value name="SpecialStateBlue" value="0x00000086" />
+      <value name="SpecialStatePurple" value="0x00000087" />
+      <value name="SpecialStateWhite" value="0x00000088" />
+      <value name="SpecialStateBlack" value="0x00000089" />
+      <value name="LevelUp" value="0x0000008A" />
+      <value name="EnchantUpGrey" value="0x0000008B" />
+      <value name="EnchantDownGrey" value="0x0000008C" />
+      <value name="WeddingBliss" value="0x0000008D" />
+      <value name="EnchantUpWhite" value="0x0000008E" />
+      <value name="EnchantDownWhite" value="0x0000008F" />
+      <value name="CampingMastery" value="0x00000090" />
+      <value name="CampingIneptitude" value="0x00000091" />
+      <value name="DispelLife" value="0x00000092" />
+      <value name="DispelCreature" value="0x00000093" />
+      <value name="DispelAll" value="0x00000094" />
+      <value name="BunnySmite" value="0x00000095" />
+      <value name="BaelZharonSmite" value="0x00000096" />
+      <value name="WeddingSteele" value="0x00000097" />
+      <value name="RestrictionEffectBlue" value="0x00000098" />
+      <value name="RestrictionEffectGreen" value="0x00000099" />
+      <value name="RestrictionEffectGold" value="0x0000009A" />
+      <value name="LayingofHands" value="0x0000009B" />
+      <value name="AugmentationUseAttribute" value="0x0000009C" />
+      <value name="AugmentationUseSkill" value="0x0000009D" />
+      <value name="AugmentationUseResistances" value="0x0000009E" />
+      <value name="AugmentationUseOther" value="0x0000009F" />
+      <value name="BlackMadness" value="0x000000A0" />
+      <value name="AetheriaLevelUp" value="0x000000A1" />
+      <value name="AetheriaSurgeDestruction" value="0x000000A2" />
+      <value name="AetheriaSurgeProtection" value="0x000000A3" />
+      <value name="AetheriaSurgeRegeneration" value="0x000000A4" />
+      <value name="AetheriaSurgeAffliction" value="0x000000A5" />
+      <value name="AetheriaSurgeFestering" value="0x000000A6" />
+      <value name="HealthDownVoid" value="0x000000A7" />
+      <value name="RegenDownVoid" value="0x000000A8" />
+      <value name="SkillDownVoid" value="0x000000A9" />
+      <value name="DirtyFightingHealDebuff" value="0x000000AA" />
+      <value name="DirtyFightingAttackDebuff" value="0x000000AB" />
+      <value name="DirtyFightingDefenseDebuff" value="0x000000AC" />
+      <value name="DirtyFightingDamageOverTime" value="0x000000AD" />
+    </enum>
     <enum name="AnimationFlags" parent="uint" mask="true">
       <value name="PosFrames" value="0x1" />
     </enum>
@@ -2675,17 +2851,25 @@
       <field type="float" name="Probability" />
       <field type="float" name="Volume" />
     </type>
-	<type name="SoundEntry">
-	  <field type="uint" name="Id" text="A 0x0A sound entry" />
-	  <field type="float" name="Priority" />
-	  <field type="float" name="Probability" />
-	  <field type="float" name="Volume" />
-	  <field type="int" name="Unknown" />
-	</type>
-    <type name="SoundData">
-	  <field type="uint" name="_numEntries" />
-	  <vector name="Entries" length="_numEntries" type="List" genericValue="SoundEntry" />
+    <type name="SoundEntry">
+      <field type="uint" name="Id" text="A 0x0A sound entry" />
+      <field type="float" name="Priority" />
+      <field type="float" name="Probability" />
+      <field type="float" name="Volume" />
+      <field type="int" name="Unknown" />
     </type>
+    <type name="SoundData">
+      <field type="uint" name="_numEntries" />
+      <vector name="Entries" length="_numEntries" type="List" genericValue="SoundEntry" />
+    </type>
+	<type name="ScriptAndModData">
+		<field type="float" name="Mod" />
+		<field type="uint" name="ScriptId" />
+	</type>
+	<type name="PhysicsScriptTableData">
+      <field type="uint" name="_numScripts" />
+      <vector name="Scripts" length="_numScripts" type="List" genericValue="ScriptAndModData" />
+	</type>
   </types>
   <dats>
     <dat name="portal" text="client_portal.dat" type="DatFileType.Portal">
@@ -2918,11 +3102,11 @@
       <type name="RenderMesh" text="DB_TYPE_RENDER_MESH in the client." parent="DBObj" first="0x19000000" last="0x19FFFFFF" flags="DBObjHeaderFlags.HasId">
       </type>
       <type name="SoundTable" text="DB_TYPE_STABLE in the client." parent="DBObj" first="0x20000000" last="0x2000FFFF" flags="DBObjHeaderFlags.HasId">
-		  <field name="Unknown" type="int"/>
-		  <field name="_numHashes" type="int" />
-		  <vector name="Hashes" length="_numHashes" type="Dictionary" genericKey="uint" genericValue="SoundHashData" />
-		  <field name="_numSounds" type="int" />
-		  <vector name="Sounds" length="_numSounds" type="Dictionary" genericKey="Sound" genericValue="SoundData" />
+          <field name="Unknown" type="int"/>
+          <field name="_numHashes" type="int" />
+          <vector name="Hashes" length="_numHashes" type="Dictionary" genericKey="uint" genericValue="SoundHashData" />
+          <field name="_numSounds" type="int" />
+          <vector name="Sounds" length="_numSounds" type="Dictionary" genericKey="Sound" genericValue="SoundData" />
       </type>
       <type name="EnumMapper" text="DB_TYPE_ENUM_MAPPER in the client." parent="DBObj" first="0x22000000" last="0x22FFFFFF" flags="DBObjHeaderFlags.HasId">
         <field name="BaseEnumMap" type="uint" />
@@ -3001,6 +3185,8 @@
         <vector name="ScriptData" length="_numScriptDatas" type="List" genericValue="PhysicsScriptData" />
       </type>
       <type name="PhysicsScriptTable" text="DB_TYPE_PHYSICS_SCRIPT_TABLE in the client." parent="DBObj" first="0x34000000" last="0x3400FFFF" flags="DBObjHeaderFlags.HasId">
+        <field name="_numPhysicsScriptTables" type="uint" />
+        <vector name="ScriptTable" length="_numPhysicsScriptTables" type="Dictionary" genericKey="PlayScript" genericValue="PhysicsScriptTableData" />
       </type>
       <type name="MasterProperty" text="DB_TYPE_MASTER_PROPERTY in the client." parent="DBObj" first="0x39000000" last="0x39FFFFFF" flags="DBObjHeaderFlags.HasId">
       </type>

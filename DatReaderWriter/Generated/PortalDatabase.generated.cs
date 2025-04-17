@@ -40,12 +40,14 @@ namespace DatReaderWriter {
         private DBObjCollection<RenderTexture>? _RenderTextures;
         private DBObjCollection<MaterialModifier>? _MaterialModifiers;
         private DBObjCollection<MaterialInstance>? _MaterialInstances;
+        private DBObjCollection<SoundTable>? _SoundTables;
         private DBObjCollection<EnumMapper>? _EnumMappers;
         private DBObjCollection<DataIdMapper>? _DataIdMappers;
         private DBObjCollection<DualDataIdMapper>? _DualDataIdMappers;
         private DBObjCollection<LanguageString>? _LanguageStrings;
         private DBObjCollection<ParticleEmitter>? _ParticleEmitters;
         private DBObjCollection<PhysicsScript>? _PhysicsScripts;
+        private DBObjCollection<PhysicsScriptTable>? _PhysicsScriptTables;
         
         /// <summary>
         /// All GfxObjs in the database.
@@ -179,6 +181,11 @@ namespace DatReaderWriter {
         public DBObjCollection<MaterialInstance> MaterialInstances => _MaterialInstances ??= new DBObjCollection<MaterialInstance>(this);
         
         /// <summary>
+        /// All SoundTables in the database.
+        /// </summary>
+        public DBObjCollection<SoundTable> SoundTables => _SoundTables ??= new DBObjCollection<SoundTable>(this);
+        
+        /// <summary>
         /// All EnumMappers in the database.
         /// </summary>
         public DBObjCollection<EnumMapper> EnumMappers => _EnumMappers ??= new DBObjCollection<EnumMapper>(this);
@@ -207,6 +214,11 @@ namespace DatReaderWriter {
         /// All PhysicsScripts in the database.
         /// </summary>
         public DBObjCollection<PhysicsScript> PhysicsScripts => _PhysicsScripts ??= new DBObjCollection<PhysicsScript>(this);
+        
+        /// <summary>
+        /// All PhysicsScriptTables in the database.
+        /// </summary>
+        public DBObjCollection<PhysicsScriptTable> PhysicsScriptTables => _PhysicsScriptTables ??= new DBObjCollection<PhysicsScriptTable>(this);
         
         /// <summary>
         /// The CharGen DBObj in the database.
