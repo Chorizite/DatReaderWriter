@@ -290,11 +290,6 @@ namespace DatReaderWriter.Enums {
         StringTable,
 
         /// <summary>
-        /// DBObj FontLocal - DB_TYPE_FONT_LOCAL in the client.
-        /// </summary>
-        FontLocal,
-
-        /// <summary>
         /// DBObj LanguageInfo - DB_TYPE_STRING_STATE in the client.
         /// </summary>
         LanguageInfo,
