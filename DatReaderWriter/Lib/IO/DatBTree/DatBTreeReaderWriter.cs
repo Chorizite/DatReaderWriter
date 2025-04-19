@@ -664,7 +664,7 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
         /// <inheritdoc/>
         protected virtual void Dispose(bool disposing) {
             if (disposing) {
-                BlockAllocator.Dispose();
+
             }
         }
     }

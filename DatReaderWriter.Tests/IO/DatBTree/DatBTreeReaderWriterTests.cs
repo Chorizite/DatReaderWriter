@@ -205,6 +205,7 @@ namespace DatReaderWriter.Tests.IO.DatBTree {
             }
 
             tree.Dispose();
+            allocator.Dispose();
 
             File.Delete(datFilePath);
         }
@@ -251,6 +252,7 @@ namespace DatReaderWriter.Tests.IO.DatBTree {
             Assert.AreEqual(min, tree.GetFilesInRange(1, (uint)min).Count());
 
             tree.Dispose();
+            allocator.Dispose();
 
             File.Delete(datFilePath);
         }
@@ -320,6 +322,7 @@ namespace DatReaderWriter.Tests.IO.DatBTree {
             Assert.AreEqual(0, newFileCount);
 
             tree.Dispose();
+            allocator.Dispose();
 
             File.Delete(datFilePath);
         }
@@ -363,6 +366,7 @@ namespace DatReaderWriter.Tests.IO.DatBTree {
             Assert.AreEqual(56789u, retrievedFile.Size);
 
             tree.Dispose();
+            allocator.Dispose();
 
             File.Delete(file);
         }
