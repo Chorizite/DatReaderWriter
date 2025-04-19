@@ -2979,6 +2979,12 @@
       <field type="Position" name="LocationNPCEnd" />
       <field type="Position" name="LocationQuestArea" />
     </type>
+    <type name="TabooTableEntry">
+      <field type="uint" name="Unknown1" />
+      <field type="ushort" name="Unknown2" />
+      <field type="uint" name="_numBannedPatterns" />
+      <vector name="BannedPatterns" length="_numBannedPatterns" type="List" genericValue="rawstring" />
+    </type>
   </types>
   <dats>
     <dat name="portal" text="client_portal.dat" type="DatFileType.Portal">
@@ -3127,6 +3133,9 @@
         <vector name="BadIds" length="_numBadIds" type="Dictionary" genericKey="uint" genericValue="uint" />
       </type>
       <type name="TabooTable" text="DB_TYPE_TABOO_TABLE in the client." parent="DBObj" first="0xE00001E" last="0xE00001E" flags="DBObjHeaderFlags.HasId">
+        <field name="_numEntriesBuckets" type="byte" value="1" />
+        <field name="_numEntries" type="byte" />
+        <vector name="Entries" length="_numEntries" type="Dictionary" genericKey="uint" genericValue="TabooTableEntry" />
       </type>
       <type name="NameFilterTable" text="DB_TYPE_NAME_FILTER_TABLE in the client." parent="DBObj" first="0xE000020" last="0xE000020" flags="DBObjHeaderFlags.HasId">
           <field name="_numNameFilterLanguageDatas" type="byte" />

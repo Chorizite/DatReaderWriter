@@ -130,6 +130,15 @@ namespace DatReaderWriter {
             }
         }
         /// <summary>
+        /// The TabooTable DBObj in the database.
+        /// </summary>
+        public TabooTable? TabooTable {
+            get {
+                TryReadFile<TabooTable>(0x0E00001Eu, out var dbObj);
+                return dbObj;
+            }
+        }
+        /// <summary>
         /// The NameFilterTable DBObj in the database.
         /// </summary>
         public NameFilterTable? NameFilterTable {
