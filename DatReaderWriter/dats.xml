@@ -3194,7 +3194,7 @@
           <field type="uint" name="_numSourceLevels" />
           <vector name="SourceLevels" length="_numSourceLevels" type="List" genericValue="uint" />
       </type>
-      <type name="RenderMaterial" text="" parent="DBObj" first="0x16000000" last="0x16FFFFFF" flags="DBObjHeaderFlags.HasId">
+      <type name="RenderMaterial" text="DB_TYPE_RENDERMATERIAL in the client" parent="DBObj" first="0x16000000" last="0x16FFFFFF" flags="DBObjHeaderFlags.HasId">
       </type>
       <type name="MaterialModifier" text="DB_TYPE_MATERIALMODIFIER in the client." parent="DBObj" first="0x17000000" last="0x17FFFFFF" flags="DBObjHeaderFlags.HasId">
         <field name="_numMaterialProperties" type="uint" />
@@ -3207,8 +3207,6 @@
         <vector name="ModifierRefs" length="_numModifierRefs" type="List" genericValue="uint" />
         <field name="AllowStencilShadows" type="bool" size="1" />
         <field name="WantDiscardGeometry" type="bool" size="1" />
-      </type>
-      <type name="RenderMesh" text="DB_TYPE_RENDER_MESH in the client." parent="DBObj" first="0x19000000" last="0x19FFFFFF" flags="DBObjHeaderFlags.HasId">
       </type>
       <type name="SoundTable" text="DB_TYPE_STABLE in the client." parent="DBObj" first="0x20000000" last="0x2000FFFF" flags="DBObjHeaderFlags.HasId">
           <field name="Unknown" type="int"/>
