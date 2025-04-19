@@ -2648,21 +2648,6 @@
       <align size="4" />
       <field name="CDM" type="float" />
     </type>
-    <type name="DeviceKeyMapEntry">
-      <field name="Type" type="DeviceType" />
-      <field name="Guid" type="guid" />
-    </type>
-    <type name="ControlSpecification" text="Key/Mouse binding information">
-      <field name="DeviceIndex" type="byte" text="The index of the device to use" />
-      <field name="SubControl " type="byte" />
-      <field name="Key" type="ushort" text="Keyboard Device / Mouse Device Enumeration (DIK_ / DIMOFS_)" />
-      <field name="Modifiers" type="uint" text="Flags that determine what modifier/meta keys are defined for this binding. These correspond to KeyMap.MetaKeys." />
-    </type>
-    <type name="UserBindingValue">
-      <field name="ActionClass" type="uint" />
-      <field name="ActionName" type="uint" text="These correspond to 0x2200002B enum dat entry" />
-      <field name="ControlSpec" type="ControlSpecification"/>
-    </type>
     <type name="ObjectDesc">
       <field name="ObjectId" type="uint" />
       <field name="BaseLoc" type="Frame" />
@@ -2985,6 +2970,23 @@
       <field type="uint" name="_numBannedPatterns" />
       <vector name="BannedPatterns" length="_numBannedPatterns" type="List" genericValue="rawstring" />
     </type>
+    <type name="DeviceKeyMapEntry">
+      <field type="DeviceType" name="Type" />
+      <field type="guid" name="Guid" />
+    </type>
+    <type name="ControlSpecification">
+      <field type="uint" name="Key" />
+      <field type="uint" name="Modifier" />
+    </type>
+    <type name="QualifiedControl">
+      <field type="ControlSpecification" name="Key" />
+      <field type="uint" name="Activation" />
+      <field type="uint" name="Unknown" />
+    </type>
+    <type name="CInputMap">
+      <field type="uint" name="_numMappings" />
+      <vector name="Mappings" length="_numMappings" type="List" genericValue="QualifiedControl" />
+    </type>
   </types>
   <dats>
     <dat name="portal" text="client_portal.dat" type="DatFileType.Portal">
@@ -3188,15 +3190,15 @@
           </mask>
         </maskmap>
       </type>
-      <type name="Keymap" text="DB_TYPE_KEYMAP in the client." parent="DBObj" first="0x14000000" last="0x1400FFFF" flags="DBObjHeaderFlags.HasId">
+      <type name="MasterInputMap" text="DB_TYPE_KEYMAP in the client." parent="DBObj" first="0x14000000" last="0x1400FFFF" flags="DBObjHeaderFlags.HasId">
         <field name="Name" type="rawstring" text="The name of the keymap" />
         <field name="GuidMap" type="guid" />
-        <field name="_numDeviceKeyMapEntries" type="uint" />
-        <vector name="DeviceKeyMapEntries" length="_numDeviceKeyMapEntries" type="List" genericValue="DeviceKeyMapEntry" text="Device list" />
+        <field name="_numDeviceEntries" type="uint" />
+        <vector name="Devices" length="_numDeviceEntries" type="List" genericValue="DeviceKeyMapEntry" text="Device list" />
         <field name="_numMetaKeys" type="uint" />
         <vector name="MetaKeys" length="_numMetaKeys" type="List" genericValue="ControlSpecification" text="Meta / Modifier key definitions" />
-        <field name="_numUserBindings" type="uint" />
-        <vector name="UserBindings" length="_numUserBindings" type="List" genericValue="UserBindingValue" text="User bindings" />
+        <field name="_numInputMaps" type="uint" />
+        <vector name="InputMaps" length="_numInputMaps" type="Dictionary" genericKey="uint" genericValue="CInputMap" />
       </type>
       <type name="RenderTexture" text="DB_TYPE_RENDERTEXTURE in the client." parent="DBObj" first="0x15000000" last="0x15FFFFFF" flags="DBObjHeaderFlags.HasId | DBObjHeaderFlags.HasDataCategory">
           <field type="TextureType" name="TextureType" />

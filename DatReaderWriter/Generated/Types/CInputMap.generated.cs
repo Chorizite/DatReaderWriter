@@ -20,17 +20,23 @@ using DatReaderWriter.Lib.IO;
 
 namespace DatReaderWriter.Types {
     public partial class CInputMap : IDatObjType {
-        public UserBindingValue Binding;
+        public List<QualifiedControl> Mappings = [];
 
         /// <inheritdoc />
         public bool Unpack(DatBinReader reader) {
-            Binding = reader.ReadItem<UserBindingValue>();
+            var _numMappings = reader.ReadUInt32();
+            for (var i=0; i < _numMappings; i++) {
+                Mappings.Add(reader.ReadItem<QualifiedControl>());
+            }
             return true;
         }
 
         /// <inheritdoc />
         public bool Pack(DatBinWriter writer) {
-            writer.WriteItem<UserBindingValue>(Binding);
+            writer.WriteUInt32((uint)Mappings.Count());
+            foreach (var item in Mappings) {
+                writer.WriteItem<QualifiedControl>(item);
+            }
             return true;
         }
 

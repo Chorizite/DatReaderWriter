@@ -19,22 +19,26 @@ using DatReaderWriter.Lib.Attributes;
 using DatReaderWriter.Lib.IO;
 
 namespace DatReaderWriter.Types {
-    public partial class ControlSpecification : IDatObjType {
-        public uint Key;
+    public partial class QualifiedControl : IDatObjType {
+        public ControlSpecification Key;
 
-        public uint Modifier;
+        public uint Activation;
+
+        public uint Unknown;
 
         /// <inheritdoc />
         public bool Unpack(DatBinReader reader) {
-            Key = reader.ReadUInt32();
-            Modifier = reader.ReadUInt32();
+            Key = reader.ReadItem<ControlSpecification>();
+            Activation = reader.ReadUInt32();
+            Unknown = reader.ReadUInt32();
             return true;
         }
 
         /// <inheritdoc />
         public bool Pack(DatBinWriter writer) {
-            writer.WriteUInt32(Key);
-            writer.WriteUInt32(Modifier);
+            writer.WriteItem<ControlSpecification>(Key);
+            writer.WriteUInt32(Activation);
+            writer.WriteUInt32(Unknown);
             return true;
         }
 

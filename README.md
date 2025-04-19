@@ -73,7 +73,6 @@ portalDat.Dispose();
     - DBProperties
     - MasterProperty
     - ActionMap
-    - Keymap (needs finishing, its missing some data...)
     - UILayout
 
 ## Contributing

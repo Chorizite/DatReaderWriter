@@ -23,13 +23,13 @@ namespace DatReaderWriter.DBObjs {
     /// <summary>
     /// DB_TYPE_KEYMAP in the client.
     /// </summary>
-    [DBObjType(typeof(Keymap), DatFileType.Portal, DBObjType.Keymap, DBObjHeaderFlags.HasId, 0x14000000, 0x1400FFFF, 0x00000000)]
-    public partial class Keymap : DBObj {
+    [DBObjType(typeof(MasterInputMap), DatFileType.Portal, DBObjType.MasterInputMap, DBObjHeaderFlags.HasId, 0x14000000, 0x1400FFFF, 0x00000000)]
+    public partial class MasterInputMap : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;
 
         /// <inheritdoc />
-        public override DBObjType DBObjType => DBObjType.Keymap;
+        public override DBObjType DBObjType => DBObjType.MasterInputMap;
 
         /// <summary>
         /// The name of the keymap
@@ -41,34 +41,33 @@ namespace DatReaderWriter.DBObjs {
         /// <summary>
         /// Device list
         /// </summary>
-        public List<DeviceKeyMapEntry> DeviceKeyMapEntries = [];
+        public List<DeviceKeyMapEntry> Devices = [];
 
         /// <summary>
         /// Meta / Modifier key definitions
         /// </summary>
         public List<ControlSpecification> MetaKeys = [];
 
-        /// <summary>
-        /// User bindings
-        /// </summary>
-        public List<UserBindingValue> UserBindings = [];
+        public Dictionary<uint, CInputMap> InputMaps = [];
 
         /// <inheritdoc />
         public override bool Unpack(DatBinReader reader) {
             base.Unpack(reader);
             Name = reader.ReadString();
             GuidMap = reader.ReadGuid();
-            var _numDeviceKeyMapEntries = reader.ReadUInt32();
-            for (var i=0; i < _numDeviceKeyMapEntries; i++) {
-                DeviceKeyMapEntries.Add(reader.ReadItem<DeviceKeyMapEntry>());
+            var _numDeviceEntries = reader.ReadUInt32();
+            for (var i=0; i < _numDeviceEntries; i++) {
+                Devices.Add(reader.ReadItem<DeviceKeyMapEntry>());
             }
             var _numMetaKeys = reader.ReadUInt32();
             for (var i=0; i < _numMetaKeys; i++) {
                 MetaKeys.Add(reader.ReadItem<ControlSpecification>());
             }
-            var _numUserBindings = reader.ReadUInt32();
-            for (var i=0; i < _numUserBindings; i++) {
-                UserBindings.Add(reader.ReadItem<UserBindingValue>());
+            var _numInputMaps = reader.ReadUInt32();
+            for (var i=0; i < _numInputMaps; i++) {
+                var _key = reader.ReadUInt32();
+                var _val = reader.ReadItem<CInputMap>();
+                InputMaps.Add(_key, _val);
             }
             return true;
         }
@@ -78,17 +77,18 @@ namespace DatReaderWriter.DBObjs {
             base.Pack(writer);
             writer.WriteString(Name);
             writer.WriteGuid(GuidMap);
-            writer.WriteUInt32((uint)DeviceKeyMapEntries.Count());
-            foreach (var item in DeviceKeyMapEntries) {
+            writer.WriteUInt32((uint)Devices.Count());
+            foreach (var item in Devices) {
                 writer.WriteItem<DeviceKeyMapEntry>(item);
             }
             writer.WriteUInt32((uint)MetaKeys.Count());
             foreach (var item in MetaKeys) {
                 writer.WriteItem<ControlSpecification>(item);
             }
-            writer.WriteUInt32((uint)UserBindings.Count());
-            foreach (var item in UserBindings) {
-                writer.WriteItem<UserBindingValue>(item);
+            writer.WriteUInt32((uint)InputMaps.Count());
+            foreach (var kv in InputMaps) {
+                writer.WriteUInt32(kv.Key);
+                writer.WriteItem<CInputMap>(kv.Value);
             }
             return true;
         }
