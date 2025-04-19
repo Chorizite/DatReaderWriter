@@ -233,22 +233,19 @@ namespace DatReaderWriter.Lib.IO {
         /// If the dataID minus knownType is larger than 0x7FFF, it writes it in two UInt16 values.
         /// If it is smaller or equal to 0x7FFF, it writes it as a single UInt16 value.
         /// </summary>
-        public void WriteDataIdOfKnownType(uint dataID, uint knownType) {
-            // Subtract the known type to get the raw value
-            var rawValue = dataID >= knownType ? dataID - knownType : dataID;
+        public void WriteDataIdOfKnownType(uint dataId, uint knownType) {
+            uint offset = dataId - knownType;
 
-            if (rawValue > 0x7FFF) { // If the value is larger than 15 bits (0x7FFF)
-                                     // Write the higher 16 bits with MSB set, masked with 0x3FFF
-                var higher = (ushort)(0x8000 | rawValue >> 16 & 0x3FFF); // Set MSB and mask to 14 bits
-                WriteUInt16(higher);
-
-                // Write the lower 16 bits
-                var lower = (ushort)(rawValue & 0xFFFF);
-                WriteUInt16(lower);
+            if (offset <= 0x7FFF && offset < 0x4000) {
+                // short form
+                WriteUInt16((ushort)offset);
             }
             else {
-                // Write the raw value directly as a 16-bit value
-                WriteUInt16((ushort)rawValue);
+                ushort higher = (ushort)(((offset >> 16) & 0x3FFF) | 0x8000);
+                ushort lower = (ushort)(offset & 0xFFFF);
+
+                WriteUInt16(higher);
+                WriteUInt16(lower);
             }
         }
 
