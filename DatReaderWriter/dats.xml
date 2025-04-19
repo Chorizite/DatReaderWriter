@@ -3271,6 +3271,28 @@
       <type name="QuestsTable" text="DB_TYPE_QUEST_DEF_DB_0 in the client." parent="DBObj" first="0xE00001B" last="0xE00001B" flags="DBObjHeaderFlags.HasId">
       </type>
       <type name="QualityFilter" text="DB_TYPE_QUALITY_FILTER_0 in the client." parent="DBObj" first="0xE010000" last="0xE01FFFF" flags="DBObjHeaderFlags.HasId">
+        <field type="uint" name="_numInts" />
+        <field type="uint" name="_numInt64" />
+        <field type="uint" name="_numBools" />
+        <field type="uint" name="_numFloats" />
+        <field type="uint" name="_numDataIds" />
+        <field type="uint" name="_numInstanceIds" />
+        <field type="uint" name="_numStrings" />
+        <field type="uint" name="_numPositions" />
+        <vector name="IntStatFilter" length="_numInts" type="uint" />
+        <vector name="Int64StatFilter" length="_numInt64" type="uint" />
+        <vector name="BoolStatFilter" length="_numBools" type="uint" />
+        <vector name="FloatStatFilter" length="_numFloats" type="uint" />
+        <vector name="DataIdStatFilter" length="_numDataIds" type="uint" />
+        <vector name="InstanceIdStatFilter" length="_numInstanceIds" type="uint" />
+        <vector name="StringStatFilter" length="_numStrings" type="uint" />
+        <vector name="PositionStatFilter" length="_numPositions" type="uint" />
+        <field type="uint" name="_numAttributes" />
+        <field type="uint" name="_numAttribute2nds" />
+        <field type="uint" name="_numSkills" />
+        <vector name="AttributeStatFilter" length="_numAttributes" type="uint" />
+        <vector name="Attribute2ndStatFilter" length="_numAttribute2nds" type="uint" />
+        <vector name="SkillStatFilter" length="_numSkills" type="uint" />
       </type>
       <type name="CombatTable" text="DB_TYPE_COMBAT_TABLE_0 in the client." parent="DBObj" first="0x30000000" last="0x3000FFFF" flags="DBObjHeaderFlags.HasId">
       </type>
@@ -3328,8 +3350,6 @@
         <field type="byte" name="Unknown" />
         <field type="CompressedUInt" name="_numEntries" />
         <vector name="StringTableData" length="_numEntries" type="Dictionary" genericKey="uint" genericValue="StringTableData" />
-      </type>
-      <type name="FontLocal" text="DB_TYPE_FONT_LOCAL in the client." parent="DBObj" first="0x40001000" last="0x40FFFFFF" flags="DBObjHeaderFlags.HasId">
       </type>
       <type name="LanguageInfo" text="DB_TYPE_STRING_STATE in the client." parent="DBObj" first="0x41000000" last="0x41FFFFFF" flags="DBObjHeaderFlags.None">
         <field type="int" name="Version" />

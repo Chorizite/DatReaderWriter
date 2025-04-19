@@ -49,6 +49,7 @@ namespace DatReaderWriter {
         private DBObjCollection<PhysicsScript>? _PhysicsScripts;
         private DBObjCollection<PhysicsScriptTable>? _PhysicsScriptTables;
         private DBObjCollection<Font>? _Fonts;
+        private DBObjCollection<QualityFilter>? _QualityFilters;
         
         /// <summary>
         /// All GfxObjs in the database.
@@ -280,5 +281,10 @@ namespace DatReaderWriter {
                 return dbObj;
             }
         }
+        /// <summary>
+        /// All QualityFilters in the database.
+        /// </summary>
+        public DBObjCollection<QualityFilter> QualityFilters => _QualityFilters ??= new DBObjCollection<QualityFilter>(this);
+        
     }
 }
