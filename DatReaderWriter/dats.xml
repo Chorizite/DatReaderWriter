@@ -2080,6 +2080,58 @@
       <value name="GlobalVelocity" value="0x0000000C" />
       <value name="NumParticleType" value="0x0000000D" />
     </enum>
+    <enum name="MotionStance" parent="uint">
+      <value name="Invalid" value="0x80000000" />
+      <value name="HandCombat" value="0x8000003C" />
+      <value name="NonCombat" value="0x8000003D" />
+      <value name="SwordCombat" value="0x8000003E" />
+      <value name="BowCombat" value="0x8000003F" />
+      <value name="SwordShieldCombat" value="0x80000040" />
+      <value name="CrossbowCombat" value="0x80000041" />
+      <value name="UnusedCombat" value="0x80000042" />
+      <value name="SlingCombat" value="0x80000043" />
+      <value name="TwoHandedSwordCombat" value="0x80000044" />
+      <value name="TwoHandedStaffCombat" value="0x80000045" />
+      <value name="DualWieldCombat" value="0x80000046" />
+      <value name="ThrownWeaponCombat" value="0x80000047" />
+      <value name="Graze" value="0x80000048" />
+      <value name="Magic" value="0x80000049" />
+      <value name="BowNoAmmo" value="0x800000E8" />
+      <value name="CrossBowNoAmmo" value="0x800000E9" />
+      <value name="AtlatlCombat" value="0x8000013B" />
+      <value name="ThrownShieldCombat" value="0x8000013C" />
+    </enum>
+    <enum name="AttackHeight" parent="int">
+      <value name="High" value="0x00000001" />
+      <value name="Medium" value="0x00000002" />
+      <value name="Low" value="0x00000003" />
+    </enum>
+    <enum name="AttackType" parent="int">
+      <value name="Undef" value="0x00000000" />
+      <value name="Punch" value="0x00000001" />
+      <value name="Thrust" value="0x00000002" />
+      <value name="Slash" value="0x00000004" />
+      <value name="Kick" value="0x00000008" />
+      <value name="OffhandPunch" value="0x00000010" />
+      <value name="Punches" value="0x00000011" />
+      <value name="Unarmed" value="0x00000019" />
+      <value name="DoubleSlash" value="0x00000020" />
+      <value name="TripleSlash" value="0x00000040" />
+      <value name="DoubleThrust" value="0x00000080" />
+      <value name="TripleThrust" value="0x00000100" />
+      <value name="OffhandThrust" value="0x00000200" />
+      <value name="OffhandSlash" value="0x00000400" />
+      <value name="OffhandDoubleSlash" value="0x00000800" />
+      <value name="OffhandTripleSlash" value="0x00001000" />
+      <value name="Slashes" value="0x00001C64" />
+      <value name="OffhandDoubleThrust" value="0x00002000" />
+      <value name="DoubleStrike" value="0x000028A0" />
+      <value name="OffhandTripleThrust" value="0x00004000" />
+      <value name="TripleStrike" value="0x00005140" />
+      <value name="Thrusts" value="0x00006382" />
+      <value name="MultiStrike" value="0x000079E0" />
+      <value name="Offhand" value="0x00007E00" />
+    </enum>
   </enums>
   <types>
     <type name="DBObj" abstract="true">
@@ -2891,6 +2943,48 @@
       <vector name="Comments" length="_numComments" type="List" genericValue="uint" />
       <field type="byte" name="Unknown" />
     </type>
+    <type name="CombatManeuver">
+      <field type="MotionStance" name="Style" />
+      <field type="AttackHeight" name="AttackHeight" />
+      <field type="AttackType" name="AttackType" />
+      <field type="uint" name="MinSkillLevel" />
+      <field type="MotionCommand" name="Motion" />
+    </type>
+    <type name="Contract">
+      <field type="uint" name="Version" />
+      <field type="uint" name="ContractId" />
+      <field type="string" name="ContractName" />
+      <align size="4" />
+      <field type="string" name="Description" />
+      <align size="4" />
+      <field type="string" name="DescriptionProgress" />
+      <align size="4" />
+      <field type="string" name="NameNPCStart" />
+      <align size="4" />
+      <field type="string" name="NameNPCEnd" />
+      <align size="4" />
+      <field type="string" name="QuestflagStamped" />
+      <align size="4" />
+      <field type="string" name="QuestflagStarted" />
+      <align size="4" />
+      <field type="string" name="QuestflagFinished" />
+      <align size="4" />
+      <field type="string" name="QuestflagProgress" />
+      <align size="4" />
+      <field type="string" name="QuestflagTimer" />
+      <align size="4" />
+      <field type="string" name="QuestflagRepeatTime" />
+      <align size="4" />
+      <field type="Position" name="LocationNPCStart" />
+      <field type="Position" name="LocationNPCEnd" />
+      <field type="Position" name="LocationQuestArea" />
+    </type>
+    <type name="TabooTableEntry">
+      <field type="uint" name="Unknown1" />
+      <field type="ushort" name="Unknown2" />
+      <field type="uint" name="_numBannedPatterns" />
+      <vector name="BannedPatterns" length="_numBannedPatterns" type="List" genericValue="rawstring" />
+    </type>
   </types>
   <dats>
     <dat name="portal" text="client_portal.dat" type="DatFileType.Portal">
@@ -3039,6 +3133,9 @@
         <vector name="BadIds" length="_numBadIds" type="Dictionary" genericKey="uint" genericValue="uint" />
       </type>
       <type name="TabooTable" text="DB_TYPE_TABOO_TABLE in the client." parent="DBObj" first="0xE00001E" last="0xE00001E" flags="DBObjHeaderFlags.HasId">
+        <field name="_numEntriesBuckets" type="byte" value="1" />
+        <field name="_numEntries" type="byte" />
+        <vector name="Entries" length="_numEntries" type="Dictionary" genericKey="uint" genericValue="TabooTableEntry" />
       </type>
       <type name="NameFilterTable" text="DB_TYPE_NAME_FILTER_TABLE in the client." parent="DBObj" first="0xE000020" last="0xE000020" flags="DBObjHeaderFlags.HasId">
           <field name="_numNameFilterLanguageDatas" type="byte" />
@@ -3106,7 +3203,7 @@
           <field type="uint" name="_numSourceLevels" />
           <vector name="SourceLevels" length="_numSourceLevels" type="List" genericValue="uint" />
       </type>
-      <type name="RenderMaterial" text="" parent="DBObj" first="0x16000000" last="0x16FFFFFF" flags="DBObjHeaderFlags.HasId">
+      <type name="RenderMaterial" text="DB_TYPE_RENDERMATERIAL in the client" parent="DBObj" first="0x16000000" last="0x16FFFFFF" flags="DBObjHeaderFlags.HasId">
       </type>
       <type name="MaterialModifier" text="DB_TYPE_MATERIALMODIFIER in the client." parent="DBObj" first="0x17000000" last="0x17FFFFFF" flags="DBObjHeaderFlags.HasId">
         <field name="_numMaterialProperties" type="uint" />
@@ -3119,8 +3216,6 @@
         <vector name="ModifierRefs" length="_numModifierRefs" type="List" genericValue="uint" />
         <field name="AllowStencilShadows" type="bool" size="1" />
         <field name="WantDiscardGeometry" type="bool" size="1" />
-      </type>
-      <type name="RenderMesh" text="DB_TYPE_RENDER_MESH in the client." parent="DBObj" first="0x19000000" last="0x19FFFFFF" flags="DBObjHeaderFlags.HasId">
       </type>
       <type name="SoundTable" text="DB_TYPE_STABLE in the client." parent="DBObj" first="0x20000000" last="0x2000FFFF" flags="DBObjHeaderFlags.HasId">
           <field name="Unknown" type="int"/>
@@ -3268,13 +3363,38 @@
         <vector name="Levels" length="_levelCount" lengthmod="1" type="ulong" text="The amount of experience required to level a character" />
         <vector name="SkillCredits" length="_levelCount" lengthmod="1" type="uint" text="The amount of skill credits per level" />
       </type>
-      <type name="QuestsTable" text="DB_TYPE_QUEST_DEF_DB_0 in the client." parent="DBObj" first="0xE00001B" last="0xE00001B" flags="DBObjHeaderFlags.HasId">
-      </type>
       <type name="QualityFilter" text="DB_TYPE_QUALITY_FILTER_0 in the client." parent="DBObj" first="0xE010000" last="0xE01FFFF" flags="DBObjHeaderFlags.HasId">
+        <field type="uint" name="_numInts" />
+        <field type="uint" name="_numInt64" />
+        <field type="uint" name="_numBools" />
+        <field type="uint" name="_numFloats" />
+        <field type="uint" name="_numDataIds" />
+        <field type="uint" name="_numInstanceIds" />
+        <field type="uint" name="_numStrings" />
+        <field type="uint" name="_numPositions" />
+        <vector name="IntStatFilter" length="_numInts" type="uint" />
+        <vector name="Int64StatFilter" length="_numInt64" type="uint" />
+        <vector name="BoolStatFilter" length="_numBools" type="uint" />
+        <vector name="FloatStatFilter" length="_numFloats" type="uint" />
+        <vector name="DataIdStatFilter" length="_numDataIds" type="uint" />
+        <vector name="InstanceIdStatFilter" length="_numInstanceIds" type="uint" />
+        <vector name="StringStatFilter" length="_numStrings" type="uint" />
+        <vector name="PositionStatFilter" length="_numPositions" type="uint" />
+        <field type="uint" name="_numAttributes" />
+        <field type="uint" name="_numAttribute2nds" />
+        <field type="uint" name="_numSkills" />
+        <vector name="AttributeStatFilter" length="_numAttributes" type="uint" />
+        <vector name="Attribute2ndStatFilter" length="_numAttribute2nds" type="uint" />
+        <vector name="SkillStatFilter" length="_numSkills" type="uint" />
       </type>
       <type name="CombatTable" text="DB_TYPE_COMBAT_TABLE_0 in the client." parent="DBObj" first="0x30000000" last="0x3000FFFF" flags="DBObjHeaderFlags.HasId">
+        <field type="uint" name="_numCombatManeuvers" />
+        <vector name="CombatManeuvers" length="_numCombatManeuvers" type="List" genericValue="CombatManeuver" />
       </type>
       <type name="ContractTable" text="DB_TYPE_CONTRACT_TABLE_0 in the client." parent="DBObj" first="0xE00001D" last="0xE00001D" flags="DBObjHeaderFlags.HasId">
+        <field type="ushort" name="_numContracts" />
+        <field type="ushort" name="_numBuckets" value="4096" />
+        <vector name="Contracts" length="_numContracts" type="Dictionary" genericKey="uint" genericValue="Contract" />
       </type>
     </dat>
     <dat name="cell" text="client_cell_1.dat" type="DatFileType.Cell">
@@ -3328,8 +3448,6 @@
         <field type="byte" name="Unknown" />
         <field type="CompressedUInt" name="_numEntries" />
         <vector name="StringTableData" length="_numEntries" type="Dictionary" genericKey="uint" genericValue="StringTableData" />
-      </type>
-      <type name="FontLocal" text="DB_TYPE_FONT_LOCAL in the client." parent="DBObj" first="0x40001000" last="0x40FFFFFF" flags="DBObjHeaderFlags.HasId">
       </type>
       <type name="LanguageInfo" text="DB_TYPE_STRING_STATE in the client." parent="DBObj" first="0x41000000" last="0x41FFFFFF" flags="DBObjHeaderFlags.None">
         <field type="int" name="Version" />

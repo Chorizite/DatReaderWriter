@@ -49,6 +49,8 @@ namespace DatReaderWriter {
         private DBObjCollection<PhysicsScript>? _PhysicsScripts;
         private DBObjCollection<PhysicsScriptTable>? _PhysicsScriptTables;
         private DBObjCollection<Font>? _Fonts;
+        private DBObjCollection<QualityFilter>? _QualityFilters;
+        private DBObjCollection<CombatTable>? _CombatTables;
         
         /// <summary>
         /// All GfxObjs in the database.
@@ -124,6 +126,15 @@ namespace DatReaderWriter {
         public BadDataTable? BadDataTable {
             get {
                 TryReadFile<BadDataTable>(0x0E00001Au, out var dbObj);
+                return dbObj;
+            }
+        }
+        /// <summary>
+        /// The TabooTable DBObj in the database.
+        /// </summary>
+        public TabooTable? TabooTable {
+            get {
+                TryReadFile<TabooTable>(0x0E00001Eu, out var dbObj);
                 return dbObj;
             }
         }
@@ -277,6 +288,25 @@ namespace DatReaderWriter {
         public ExperienceTable? ExperienceTable {
             get {
                 TryReadFile<ExperienceTable>(0x0E000018u, out var dbObj);
+                return dbObj;
+            }
+        }
+        /// <summary>
+        /// All QualityFilters in the database.
+        /// </summary>
+        public DBObjCollection<QualityFilter> QualityFilters => _QualityFilters ??= new DBObjCollection<QualityFilter>(this);
+        
+        /// <summary>
+        /// All CombatTables in the database.
+        /// </summary>
+        public DBObjCollection<CombatTable> CombatTables => _CombatTables ??= new DBObjCollection<CombatTable>(this);
+        
+        /// <summary>
+        /// The ContractTable DBObj in the database.
+        /// </summary>
+        public ContractTable? ContractTable {
+            get {
+                TryReadFile<ContractTable>(0x0E00001Du, out var dbObj);
                 return dbObj;
             }
         }
