@@ -36,7 +36,7 @@ namespace DatReaderWriter {
         private DBObjCollection<GfxObjDegradeInfo>? _GfxObjDegradeInfos;
         private DBObjCollection<Scene>? _Scenes;
         private DBObjCollection<Region>? _Regions;
-        private DBObjCollection<Keymap>? _Keymaps;
+        private DBObjCollection<MasterInputMap>? _MasterInputMaps;
         private DBObjCollection<RenderTexture>? _RenderTextures;
         private DBObjCollection<MaterialModifier>? _MaterialModifiers;
         private DBObjCollection<MaterialInstance>? _MaterialInstances;
@@ -173,9 +173,9 @@ namespace DatReaderWriter {
         public DBObjCollection<Region> Regions => _Regions ??= new DBObjCollection<Region>(this);
         
         /// <summary>
-        /// All Keymaps in the database.
+        /// All MasterInputMaps in the database.
         /// </summary>
-        public DBObjCollection<Keymap> Keymaps => _Keymaps ??= new DBObjCollection<Keymap>(this);
+        public DBObjCollection<MasterInputMap> MasterInputMaps => _MasterInputMaps ??= new DBObjCollection<MasterInputMap>(this);
         
         /// <summary>
         /// All RenderTextures in the database.

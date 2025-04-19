@@ -125,9 +125,9 @@ namespace DatReaderWriter.Enums {
         Region,
 
         /// <summary>
-        /// DBObj Keymap - DB_TYPE_KEYMAP in the client.
+        /// DBObj MasterInputMap - DB_TYPE_KEYMAP in the client.
         /// </summary>
-        Keymap,
+        MasterInputMap,
 
         /// <summary>
         /// DBObj RenderTexture - DB_TYPE_RENDERTEXTURE in the client.
@@ -135,7 +135,7 @@ namespace DatReaderWriter.Enums {
         RenderTexture,
 
         /// <summary>
-        /// DBObj RenderMaterial - 
+        /// DBObj RenderMaterial - DB_TYPE_RENDERMATERIAL in the client
         /// </summary>
         RenderMaterial,
 
@@ -148,11 +148,6 @@ namespace DatReaderWriter.Enums {
         /// DBObj MaterialInstance - DB_TYPE_MATERIALINSTANCE in the client.
         /// </summary>
         MaterialInstance,
-
-        /// <summary>
-        /// DBObj RenderMesh - DB_TYPE_RENDER_MESH in the client.
-        /// </summary>
-        RenderMesh,
 
         /// <summary>
         /// DBObj SoundTable - DB_TYPE_STABLE in the client.
