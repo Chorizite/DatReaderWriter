@@ -245,11 +245,6 @@ namespace DatReaderWriter.Enums {
         ExperienceTable,
 
         /// <summary>
-        /// DBObj QuestsTable - DB_TYPE_QUEST_DEF_DB_0 in the client.
-        /// </summary>
-        QuestsTable,
-
-        /// <summary>
         /// DBObj QualityFilter - DB_TYPE_QUALITY_FILTER_0 in the client.
         /// </summary>
         QualityFilter,

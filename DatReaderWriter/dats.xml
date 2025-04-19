@@ -2950,6 +2950,35 @@
       <field type="uint" name="MinSkillLevel" />
       <field type="MotionCommand" name="Motion" />
     </type>
+    <type name="Contract">
+      <field type="uint" name="Version" />
+      <field type="uint" name="ContractId" />
+      <field type="string" name="ContractName" />
+      <align size="4" />
+      <field type="string" name="Description" />
+      <align size="4" />
+      <field type="string" name="DescriptionProgress" />
+      <align size="4" />
+      <field type="string" name="NameNPCStart" />
+      <align size="4" />
+      <field type="string" name="NameNPCEnd" />
+      <align size="4" />
+      <field type="string" name="QuestflagStamped" />
+      <align size="4" />
+      <field type="string" name="QuestflagStarted" />
+      <align size="4" />
+      <field type="string" name="QuestflagFinished" />
+      <align size="4" />
+      <field type="string" name="QuestflagProgress" />
+      <align size="4" />
+      <field type="string" name="QuestflagTimer" />
+      <align size="4" />
+      <field type="string" name="QuestflagRepeatTime" />
+      <align size="4" />
+      <field type="Position" name="LocationNPCStart" />
+      <field type="Position" name="LocationNPCEnd" />
+      <field type="Position" name="LocationQuestArea" />
+    </type>
   </types>
   <dats>
     <dat name="portal" text="client_portal.dat" type="DatFileType.Portal">
@@ -3327,8 +3356,6 @@
         <vector name="Levels" length="_levelCount" lengthmod="1" type="ulong" text="The amount of experience required to level a character" />
         <vector name="SkillCredits" length="_levelCount" lengthmod="1" type="uint" text="The amount of skill credits per level" />
       </type>
-      <type name="QuestsTable" text="DB_TYPE_QUEST_DEF_DB_0 in the client." parent="DBObj" first="0xE00001B" last="0xE00001B" flags="DBObjHeaderFlags.HasId">
-      </type>
       <type name="QualityFilter" text="DB_TYPE_QUALITY_FILTER_0 in the client." parent="DBObj" first="0xE010000" last="0xE01FFFF" flags="DBObjHeaderFlags.HasId">
         <field type="uint" name="_numInts" />
         <field type="uint" name="_numInt64" />
@@ -3358,6 +3385,9 @@
         <vector name="CombatManeuvers" length="_numCombatManeuvers" type="List" genericValue="CombatManeuver" />
       </type>
       <type name="ContractTable" text="DB_TYPE_CONTRACT_TABLE_0 in the client." parent="DBObj" first="0xE00001D" last="0xE00001D" flags="DBObjHeaderFlags.HasId">
+        <field type="ushort" name="_numContracts" />
+        <field type="ushort" name="_numBuckets" value="4096" />
+        <vector name="Contracts" length="_numContracts" type="Dictionary" genericKey="uint" genericValue="Contract" />
       </type>
     </dat>
     <dat name="cell" text="client_cell_1.dat" type="DatFileType.Cell">

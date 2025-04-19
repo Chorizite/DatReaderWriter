@@ -292,5 +292,14 @@ namespace DatReaderWriter {
         /// </summary>
         public DBObjCollection<CombatTable> CombatTables => _CombatTables ??= new DBObjCollection<CombatTable>(this);
         
+        /// <summary>
+        /// The ContractTable DBObj in the database.
+        /// </summary>
+        public ContractTable? ContractTable {
+            get {
+                TryReadFile<ContractTable>(0x0E00001Du, out var dbObj);
+                return dbObj;
+            }
+        }
     }
 }
