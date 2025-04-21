@@ -9,7 +9,7 @@
     
     SetupMessageParser(this.Host.ResolvePath("../dats.xml"));
     foreach (var kv in this.XMLDefParser.ACDataTypes) {
-        if (kv.Key == "Vector3" || kv.Key == "Quaternion" || kv.Key == "Plane" || kv.Key == "DBObj" || kv.Key == "SpellBase") {
+        if (kv.Key == "Vector3" || kv.Key == "Quaternion" || kv.Key == "Plane" || kv.Key == "DBObj" || kv.Key == "SpellBase" || kv.Key == "BaseProperty" || kv.Key == "ArrayBaseProperty" || kv.Key == "StructBaseProperty") {
             continue;
         }
 

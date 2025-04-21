@@ -124,7 +124,7 @@ namespace DatReaderWriter {
 
             value = (T)Activator.CreateInstance(typeof(T));
 
-            if (!value.Unpack(new DatBinReader(bytes))) {
+            if (!value.Unpack(new DatBinReader(bytes, this))) {
                 value = default!;
                 return false;
             }
@@ -149,7 +149,7 @@ namespace DatReaderWriter {
 
             // TODO: fix this static 5mb buffer...
             var buffer = BaseBlockAllocator.SharedBytes.Rent(1024 * 1024 * 5);
-            var writer = new DatBinWriter(buffer);
+            var writer = new DatBinWriter(buffer, this);
 
             value.Pack(writer);
             startingBlockId = Tree.BlockAllocator.WriteBlock(buffer, writer.Offset, startingBlockId);

@@ -25,11 +25,18 @@ namespace DatReaderWriter.Lib.IO {
         public int Length => _data.Length;
 
         /// <summary>
+        /// The current DatDatabase (may be null)
+        /// </summary>
+        public readonly DatDatabase? Database;
+
+        /// <summary>
         /// Create a new instance
         /// </summary>
         /// <param name="data">The file data being parsed</param>
-        public DatBinReader(ReadOnlyMemory<byte> data) {
+        /// <param name="db"></param>
+        public DatBinReader(ReadOnlyMemory<byte> data, DatDatabase? db = null) {
             _data = data;
+            Database = db;
         }
 
         unsafe private ReadOnlySpan<byte> ReadBytesInternal(int numBytes) {

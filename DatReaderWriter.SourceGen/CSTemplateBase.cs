@@ -431,21 +431,53 @@ namespace DatReaderWriter.SourceGen {
                 else {
                     WriteLine($"var _key = {GetBinaryReaderForType(vector.GenericKey)};");
                 }
-                XMLDefParser.ACDataTypes.TryGetValue(vector.GenericValue, out var vType);
-                if (vType is not null && vType.AllChildren.Any(c => c is ACVector m && m.Length.Contains("parent."))) {
-                    var child = vType.AllChildren.First(c => c is ACVector m && m.Length.Contains("parent.")) as ACVector;
-                    WriteLine($"var _val = {GetBinaryReaderForType(vector.GenericValue).TrimEnd(')')}{child.Length.Substring(7)});");
-                }
-                else {
-                    if (XMLDefParser.ACEnums.ContainsKey(vector.GenericValue)) {
-                        var reader = GetBinaryReaderForType(XMLDefParser.ACEnums[vector.GenericValue].ParentType);
-                        WriteLine("var _val = (" + vector.GenericValue + ")" + reader + ";");
+
+                var type = XMLDefParser.ACDataTypes.Values
+                    .FirstOrDefault(t => t.Name == vector.GenericValue);
+                if (type != null && type.IsAbstract) {
+                    var field = type.Children
+                        .FirstOrDefault(c => c is ACDataMember m && m.Name == type.TypeSwitch)
+                        as ACDataMember;
+
+
+                    if (!string.IsNullOrEmpty(field.Size)) {
+                        WriteLine($"reader.ReadBytes({field.Size});");
+                    }
+
+                    if (XMLDefParser.ACEnums.TryGetValue(field.MemberType, out var en)) {
+                        var reader = GetBinaryReaderForType(XMLDefParser.ACEnums[field.MemberType].ParentType);
+                        WriteLine($"var _peekedValue = (" + field.MemberType + ")" + reader + ";");
                     }
                     else {
-                        WriteLine($"var _val = {GetBinaryReaderForType(vector.GenericValue)};");
+                        WriteLine($"var _peekedValue = {GetBinaryReaderForType(field.MemberType)};");
                     }
+
+                    if (!string.IsNullOrEmpty(field.Size)) {
+                        WriteLine($"reader.Skip(-sizeof({field.MemberType}) + {field.Size});");
+                    }
+                    else {
+                        WriteLine($"reader.Skip(-sizeof({field.MemberType}));");
+                    }
+                    WriteLine($"var _val = {vector.GenericValue}.Unpack(reader, _peekedValue);");
+                    WriteLine($"{vector.Name}.Add(_key, _val);");
                 }
-                WriteLine($"{vector.Name}.Add(_key, _val);");
+                else {
+                    XMLDefParser.ACDataTypes.TryGetValue(vector.GenericValue, out var vType);
+                    if (vType is not null && vType.AllChildren.Any(c => c is ACVector m && m.Length.Contains("parent."))) {
+                        var child = vType.AllChildren.First(c => c is ACVector m && m.Length.Contains("parent.")) as ACVector;
+                        WriteLine($"var _val = {GetBinaryReaderForType(vector.GenericValue).TrimEnd(')')}{child.Length.Substring(7)});");
+                    }
+                    else {
+                        if (XMLDefParser.ACEnums.ContainsKey(vector.GenericValue)) {
+                            var reader = GetBinaryReaderForType(XMLDefParser.ACEnums[vector.GenericValue].ParentType);
+                            WriteLine("var _val = (" + vector.GenericValue + ")" + reader + ";");
+                        }
+                        else {
+                            WriteLine($"var _val = {GetBinaryReaderForType(vector.GenericValue)};");
+                        }
+                    }
+                    WriteLine($"{vector.Name}.Add(_key, _val);");
+                }
             }
         }
 
