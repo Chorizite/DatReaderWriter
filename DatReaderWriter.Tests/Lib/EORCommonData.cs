@@ -19,7 +19,7 @@ namespace DatReaderWriter.Tests.Lib {
     }
 
     internal static class EORCommonData {
-        internal const string DatDirectory = @"C:\ac\dats\EoR\";
+        internal const string DatDirectory = @"C:\Turbine\Asheron's Call\";
 
         internal const string PortalName = @"portal";
         internal const string CellName = @"cell_1";

@@ -2132,6 +2132,102 @@
       <value name="MultiStrike" value="0x000079E0" />
       <value name="Offhand" value="0x00007E00" />
     </enum>
+    <enum name="BasePropertyType" parent="int" text="This enum comes from MasterProperty.Properties">
+      <value name="Invalid" value="0x00000000" />
+      <value name="Bool" value="0x00000001" />
+      <value name="Integer" value="0x00000002" />
+      <value name="LongInteger" value="0x00000003" />
+      <value name="Float" value="0x00000004" />
+      <value name="Vector" value="0x00000005" />
+      <value name="Color" value="0x00000006" />
+      <value name="String" value="0x00000007" />
+      <value name="StringInfo" value="0x00000008" />
+      <value name="Enum" value="0x00000009" />
+      <value name="DataId" value="0x0000000A" />
+      <value name="Waveform" value="0x0000000B" />
+      <value name="InstanceId" value="0x0000000C" />
+      <value name="Position" value="0x0000000D" />
+      <value name="TimeStamp" value="0x0000000E" />
+      <value name="Bitfield32" value="0x0000000F" />
+      <value name="Bitfield64" value="0x00000010" />
+      <value name="Array" value="0x00000011" />
+      <value name="Struct" value="0x00000012" />
+      <value name="StringToken" value="0x00000013" />
+      <value name="PropertyName" value="0x00000014" />
+      <value name="TriState" value="0x00000015" />
+    </enum>
+    <enum name="StringInfoOverrideFlag" parent="byte">
+      <value name="None" value="0x0" />
+      <value name="Literal" value="0x1" />
+      <value name="AutoGen" value="0x2" />
+    </enum>
+    <enum name="PropertyGroupName" parent="int">
+      <value name="Invalid" value="0x00000000" />
+      <value name="UICoreButton" value="0x00000001" />
+      <value name="UICoreBrowser" value="0x00000002" />
+      <value name="UICoreColorPicker" value="0x00000003" />
+      <value name="UICoreComboBox" value="0x00000004" />
+      <value name="UICoreContextMenu" value="0x00000005" />
+      <value name="UICoreDialog" value="0x00000006" />
+      <value name="UICoreDragbar" value="0x00000007" />
+      <value name="UICoreElement" value="0x00000008" />
+      <value name="UICoreField" value="0x00000009" />
+      <value name="UICoreFrame" value="0x0000000A" />
+      <value name="UICoreGroupBox" value="0x0000000B" />
+      <value name="UICoreListBox" value="0x0000000C" />
+      <value name="UICoreMenu" value="0x0000000D" />
+      <value name="UICoreMeter" value="0x0000000E" />
+      <value name="UICorePanel" value="0x0000000F" />
+      <value name="UICoreResizebar" value="0x00000010" />
+      <value name="UICoreScrollable" value="0x00000011" />
+      <value name="UICoreScrollbar" value="0x00000012" />
+      <value name="UICoreText" value="0x00000013" />
+      <value name="UICoreViewport" value="0x00000014" />
+      <value name="GameplayOptions" value="0x00000016" />
+      <value name="Wb_AllWorkspaces" value="0x00000017" />
+      <value name="Wb_Avatar" value="0x00000018" />
+      <value name="Wb_Camera" value="0x00000019" />
+      <value name="Wb_CursorSelection" value="0x0000001A" />
+      <value name="Wb_DungeonWorkspace" value="0x0000001B" />
+      <value name="Wb_EntityWorkspace" value="0x0000001C" />
+      <value name="Wb_Grid" value="0x0000001D" />
+      <value name="Wb_Misc" value="0x0000001E" />
+      <value name="Wb_RenderOptions" value="0x0000001F" />
+      <value name="Wb_WorldWorkspace" value="0x00000020" />
+      <value name="Tools" value="0x00000021" />
+      <value name="Physics" value="0x00000022" />
+      <value name="Ethereal" value="0x00000023" />
+      <value name="Link" value="0x00000024" />
+      <value name="PregameUI" value="0x10000001" />
+      <value name="GameUI" value="0x10000002" />
+      <value name="SmartBoxWrapper" value="0x10000003" />
+    </enum>
+    <enum name="PatchFlags" parent="int">
+      <value name="EmapperId" value="3" />
+    </enum>
+    <enum name="PropertyDatFileType" parent="byte">
+      <value name="ClientOnlyData" value="0x0" />
+      <value name="ServerOnlyData" value="0x1" />
+      <value name="SharedData" value="0x2" />
+    </enum>
+    <enum name="PropertyInheritanceType" parent="byte">
+      <value name="ClassOnly" value="0x0" />
+      <value name="InstanceOnly" value="0x1" />
+      <value name="Either" value="0x2" />
+    </enum>
+    <enum name="PropertyPropagationType" parent="byte">
+      <value name="NetPredictedSharedVisually" value="0x0" />
+      <value name="NetPredictedSharedPrivately" value="0x1" />
+      <value name="NetSharedVisually" value="0x2" />
+      <value name="NetSharedPrivately" value="0x3" />
+      <value name="NetNotShared" value="0x4" />
+      <value name="WorldSharedWithServers" value="0x5" />
+      <value name="WorldSharedWithServersAndClients" value="0x6" />
+    </enum>
+    <enum name="PropertyCachingType" parent="byte">
+      <value name="Global" value="0x0" />
+      <value name="Internal" value="0x1" />
+    </enum>
   </enums>
   <types>
     <type name="DBObj" abstract="true">
@@ -2987,6 +3083,68 @@
       <field type="uint" name="_numMappings" />
       <vector name="Mappings" length="_numMappings" type="List" genericValue="QualifiedControl" />
     </type>
+    <type name="StringInfo">
+      <field type="byte" name="Token" />
+      <field type="uint" name="StringId" text="This is the hashed string value, which is the key in TableId" />
+      <field type="uint" name="TableId" text="The StringTable (0x23) used to look up the StringId in" />
+      <field type="StringInfoOverrideFlag" name="Override" />
+      <field type="bytestring" name="English" />
+      <field type="bytestring" name="Comment" />
+    </type>
+    <type name="BaseProperty" abstract="true">
+      <field name="_propertyType" type="BasePropertyType" />
+      <typeswitch name="_propertyType">
+        <type name="EnumBaseProperty" value="BasePropertyType.Enum">
+          <field name="Value" type="uint" />
+        </type>
+        <type name="BoolBaseProperty" value="BasePropertyType.Bool">
+          <field name="Value" type="bool" size="1" />
+        </type>
+        <type name="DataIdBaseProperty" value="BasePropertyType.DataId">
+          <field name="Value" type="uint" />
+        </type>
+        <type name="FloatBaseProperty" value="BasePropertyType.Float">
+          <field name="Value" type="float" />
+        </type>
+        <type name="IntegerBaseProperty" value="BasePropertyType.Integer">
+          <field name="Value" type="int" />
+        </type>
+        <type name="StringInfoBaseProperty" value="BasePropertyType.StringInfo">
+          <field name="Value" type="StringInfo" />
+        </type>
+        <type name="ColorBaseProperty" value="BasePropertyType.Color">
+          <field name="Value" type="ColorARGB" />
+        </type>
+        <type name="ArrayBaseProperty" value="BasePropertyType.Array">
+          <field type="uint" name="_numValues" />
+          <vector name="Value" length="_numValues" type="List" genericValue="BaseProperty" />
+        </type>
+        <type name="StructBaseProperty" value="BasePropertyType.Struct">
+          <field type="byte" name="_bucketSize" value="1" />
+          <field type="byte" name="_numValues" />
+          <vector name="Value" length="_numValues" type="Dictionary" genericKey="uint" genericValue="BaseProperty" />
+        </type>
+        <type name="VectorBaseProperty" value="BasePropertyType.Vector">
+          <field name="Value" type="Vector3" />
+        </type>
+        <type name="Bitfield32BaseProperty" value="BasePropertyType.Bitfield32">
+          <field name="Value" type="uint" />
+        </type>
+        <type name="Bitfield64BaseProperty" value="BasePropertyType.Bitfield64">
+          <field name="Value" type="ulong" />
+        </type>
+        <type name="InstanceIdBaseProperty" value="BasePropertyType.InstanceId">
+          <field name="Value" type="uint" />
+        </type>
+      </typeswitch>
+    </type>
+    <type name="EnumMapperData">
+      <field name="BaseEnumMap" type="uint" />
+      <field name="Unknown" type="uint" />
+      <field name="_bucketSize" type="byte" value="5" />
+      <field name="_numIdToStringMaps" type="CompressedUInt" />
+      <vector name="IdToStringMap" length="_numIdToStringMaps" type="Dictionary" genericKey="uint" genericValue="bytestring" />
+    </type>
   </types>
   <dats>
     <dat name="portal" text="client_portal.dat" type="DatFileType.Portal">
@@ -3307,6 +3465,9 @@
         <vector name="ScriptTable" length="_numPhysicsScriptTables" type="Dictionary" genericKey="PlayScript" genericValue="PhysicsScriptTableData" />
       </type>
       <type name="MasterProperty" text="DB_TYPE_MASTER_PROPERTY in the client." parent="DBObj" first="0x39000000" last="0x39FFFFFF" flags="DBObjHeaderFlags.HasId">
+        <field type="EnumMapperData" name="EnumMapper" />
+        <field type="CompressedUInt" name="_numProperties" />
+        <vector name="Properties" length="_numProperties" type="Dictionary" genericKey="uint" genericValue="BasePropertyDesc" />
       </type>
       <type name="Font" text="DB_TYPE_FONT in the client." parent="DBObj" first="0x40000000" last="0x40000FFF" flags="DBObjHeaderFlags.HasId">
         <field name="MaxCharHeight" type="uint" />
@@ -3320,6 +3481,9 @@
         <field name="BackgroundSurfaceDataId" type="uint" />
       </type>
       <type name="DBProperties" text="DB_TYPE_DBPROPERTIES in the client." parent="DBObj" first="0x78000000" last="0x7FFFFFFF" flags="DBObjHeaderFlags.HasId">
+        <field name="_bucketSize" type="byte" value="1" />
+        <field name="_numProperties" type="byte" />
+        <vector name="Properties" length="_numProperties" type="Dictionary" genericKey="uint" genericValue="BaseProperty" />
       </type>
       <type name="CharGen" text="DB_TYPE_CHAR_GEN_0 in the client." parent="DBObj" first="0xE000002" last="0xE000002" flags="DBObjHeaderFlags.HasId">
         <field name="Unknown" type="uint" />

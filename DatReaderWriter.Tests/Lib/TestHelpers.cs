@@ -21,14 +21,12 @@ namespace DatReaderWriter.Tests.Lib {
             dat.BlockAllocator.ReadBlock(originalBytes, originalEntry.Offset);
 
             var writtenBytes = new byte[originalEntry.Size];
-            var writer = new DatBinWriter(writtenBytes);
+            var writer = new DatBinWriter(writtenBytes, dat);
             file.Pack(writer);
 
             var max = Math.Min(writtenBytes.Length, originalBytes.Length);
             var i = 0;
             while (i < max && originalBytes[i] == writtenBytes[i]) i++;
-
-            //Assert.AreEqual((int)originalEntry.Size, writer.Offset, "Written size does not match original size");
 
             Console.WriteLine($"Original size: {originalEntry.Size} bytes");
             Console.WriteLine($"{string.Join(" ", originalBytes.Select(b => b.ToString("X2")))}");
@@ -36,6 +34,8 @@ namespace DatReaderWriter.Tests.Lib {
             Console.WriteLine($"{string.Join(" ", writtenBytes.Select(b => b.ToString("X2")))}");
 
             CollectionAssert.AreEqual(originalBytes, writtenBytes);
+
+            Assert.AreEqual((int)originalEntry.Size, writer.Offset, "Written size does not match original size");
 
             dat.Dispose();
         }

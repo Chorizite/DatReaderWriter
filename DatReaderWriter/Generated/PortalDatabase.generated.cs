@@ -48,7 +48,9 @@ namespace DatReaderWriter {
         private DBObjCollection<ParticleEmitter>? _ParticleEmitters;
         private DBObjCollection<PhysicsScript>? _PhysicsScripts;
         private DBObjCollection<PhysicsScriptTable>? _PhysicsScriptTables;
+        private DBObjCollection<MasterProperty>? _MasterPropertys;
         private DBObjCollection<Font>? _Fonts;
+        private DBObjCollection<DBProperties>? _DBPropertiess;
         private DBObjCollection<QualityFilter>? _QualityFilters;
         private DBObjCollection<CombatTable>? _CombatTables;
         
@@ -233,9 +235,19 @@ namespace DatReaderWriter {
         public DBObjCollection<PhysicsScriptTable> PhysicsScriptTables => _PhysicsScriptTables ??= new DBObjCollection<PhysicsScriptTable>(this);
         
         /// <summary>
+        /// All MasterPropertys in the database.
+        /// </summary>
+        public DBObjCollection<MasterProperty> MasterPropertys => _MasterPropertys ??= new DBObjCollection<MasterProperty>(this);
+        
+        /// <summary>
         /// All Fonts in the database.
         /// </summary>
         public DBObjCollection<Font> Fonts => _Fonts ??= new DBObjCollection<Font>(this);
+        
+        /// <summary>
+        /// All DBPropertiess in the database.
+        /// </summary>
+        public DBObjCollection<DBProperties> DBPropertiess => _DBPropertiess ??= new DBObjCollection<DBProperties>(this);
         
         /// <summary>
         /// The CharGen DBObj in the database.

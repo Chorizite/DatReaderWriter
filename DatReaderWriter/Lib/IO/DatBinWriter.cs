@@ -12,6 +12,9 @@ namespace DatReaderWriter.Lib.IO {
     /// </summary>
     public class DatBinWriter {
         private readonly Memory<byte> _data;
+
+        public DatDatabase? Database { get; set; }
+
         private int _offset;
 
         /// <summary>
@@ -23,8 +26,10 @@ namespace DatReaderWriter.Lib.IO {
         /// Create a new instance of this DatBinWriter
         /// </summary>
         /// <param name="data">The file data being written</param>
-        public DatBinWriter(Memory<byte> data) {
+        /// <param name="db"></param>
+        public DatBinWriter(Memory<byte> data, DatDatabase? db = null) {
             _data = data;
+            Database = db;
         }
 
         unsafe private Span<byte> GetSpanAndAdvanceOffset(int numBytes) {

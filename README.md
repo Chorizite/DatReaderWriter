@@ -9,6 +9,7 @@ DatReaderWriter is an open-source library for reading and writing .dat files use
 - [Basic Usage](#basic-usage)
     - [Update spell names and descriptions](#update-spell-names-and-descriptions)
     - [Rewrite all MotionTables to be 100x speed](#rewrite-all-motiontables-to-be-100x-speed)
+- [Todo](#todo)
 - [Contributing](#contributing)
 - [Thanks](#thanks)
 - [License](#license)
@@ -66,7 +67,7 @@ foreach (var mTable in portalDat.MotionTables) {
 portalDat.Dispose();
 ```
 
-## Todo:
+## Todo
 - BSP trees are broken (reading and writing)
 - DBObjs left to implement:
     - RenderMaterial
