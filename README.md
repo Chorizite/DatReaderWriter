@@ -71,8 +71,6 @@ portalDat.Dispose();
 - BSP trees are broken (reading and writing)
 - DBObjs left to implement:
     - RenderMaterial
-    - DBProperties
-    - MasterProperty
     - ActionMap
     - UILayout
 
