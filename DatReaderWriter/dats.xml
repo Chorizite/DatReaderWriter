@@ -3088,8 +3088,8 @@
       <field type="uint" name="StringId" text="This is the hashed string value, which is the key in TableId" />
       <field type="uint" name="TableId" text="The StringTable (0x23) used to look up the StringId in" />
       <field type="StringInfoOverrideFlag" name="Override" />
-      <field type="bytestring" name="English" />
-      <field type="bytestring" name="Comment" />
+      <field type="byte" name="English" />
+      <field type="byte" name="Comment" />
     </type>
     <type name="BaseProperty" abstract="true">
       <field name="_propertyType" type="BasePropertyType" />
