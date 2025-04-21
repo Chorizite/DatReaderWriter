@@ -85,15 +85,12 @@ namespace DatReaderWriter.Tests.DBObjs {
             Assert.AreEqual(0, chargen.HeritageGroups[13].Skills.First().NormalCost);
             Assert.AreEqual(2, chargen.HeritageGroups[13].Skills.First().PrimaryCost);
 
-            Console.WriteLine(JsonConvert.SerializeObject(chargen, Formatting.Indented));
-
             dat.Dispose();
         }
 
         [TestMethod]
         [TestCategory("EOR")]
         public void CanReadEORAndWriteIdentical() {
-            // todo something broken with writing data ids of known types?
             TestHelpers.CanReadAndWriteIdentical<CharGen>(Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat"), 0xE000002);
         }
     }
