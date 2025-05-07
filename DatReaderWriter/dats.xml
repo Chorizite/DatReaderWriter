@@ -2228,6 +2228,27 @@
       <value name="Global" value="0x0" />
       <value name="Internal" value="0x1" />
     </enum>
+	<enum name="SpellIndex" parent="int">
+		<value name="Undef" value="0x0" />
+		<value name="Resistable" value="0x1" />
+		<value name="PKSensitive" value="0x2" />
+		<value name="Beneficial" value="0x4" />
+		<value name="SelfTargeted" value=" 0x8" />
+		<value name="Reversed" value="0x10" />
+		<value name="NotIndoor" value="0x20" />
+		<value name="NotOutdoor" value="0x40" />
+		<value name="NotResearchable" value="0x80" />
+		<value name="Projectile" value="0x100" />
+		<value name="CreatureSpell" value="0x200" />
+		<value name="ExcludedFromItemDescriptions" value="0x400" />
+		<value name="IgnoresManaConversion" value="0x800" />
+		<value name="NonTrackingProjectile" value="0x1000" />
+		<value name="FellowshipSpell" value="0x2000" />
+		<value name="FastCast" value="0x4000" />
+		<value name="IndoorLongRange" value="0x8000" />
+		<value name="DamageOverTime" value="0x10000" />
+		<value name="FORCE_SpellIndex_32_BIT" value="0x7FFFFFFF" />
+    </enum>
   </enums>
   <types>
     <type name="DBObj" abstract="true">
@@ -2697,7 +2718,7 @@
       <field name="School" type="MagicSchool" text="The magic school the spell belongs to" />
       <field name="Icon" type="uint" text="The data id of the spell icon" />
       <field name="Category" type="SpellCategory" text="Spell category" />
-      <field name="Bitfield" type="uint" />
+      <field name="Bitfield" type="SpellIndex" />
       <field name="BaseMana" type="uint" />
       <field name="BaseRangeConstant" type="float" />
       <field name="BaseRangeMod" type="float" />

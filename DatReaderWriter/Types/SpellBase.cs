@@ -55,7 +55,7 @@ namespace DatReaderWriter.Types {
         /// </summary>
         public SpellCategory Category;
 
-        public uint Bitfield;
+        public SpellIndex Bitfield;
 
         public uint BaseMana;
 
@@ -209,7 +209,7 @@ namespace DatReaderWriter.Types {
             School = (MagicSchool)reader.ReadInt32();
             Icon = reader.ReadUInt32();
             Category = (SpellCategory)reader.ReadUInt32();
-            Bitfield = reader.ReadUInt32();
+            Bitfield = (SpellIndex)reader.ReadInt32();
             BaseMana = reader.ReadUInt32();
             BaseRangeConstant = reader.ReadSingle();
             BaseRangeMod = reader.ReadSingle();
@@ -255,7 +255,7 @@ namespace DatReaderWriter.Types {
             writer.WriteInt32((int)School);
             writer.WriteUInt32(Icon);
             writer.WriteUInt32((uint)Category);
-            writer.WriteUInt32(Bitfield);
+            writer.WriteInt32((int)Bitfield);
             writer.WriteUInt32(BaseMana);
             writer.WriteSingle(BaseRangeConstant);
             writer.WriteSingle(BaseRangeMod);
