@@ -43,6 +43,11 @@ namespace DatReaderWriter {
         public Iteration Iteration { get; }
 
         /// <summary>
+        /// The dat collection this dat database belongs to, if any
+        /// </summary>
+        public DatCollection? DatCollection { get; internal set; }
+
+        /// <summary>
         /// Create a new DatDatabase
         /// </summary>
         /// <param name="options">Options configuration action</param>

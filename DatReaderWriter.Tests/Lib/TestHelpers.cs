@@ -8,10 +8,13 @@ using System.Threading.Tasks;
 
 namespace DatReaderWriter.Tests.Lib {
     internal static class TestHelpers {
-        internal static void CanReadAndWriteIdentical<T>(string datPath, uint objId) where T : IDBObj {
-            using var dat = new DatDatabase(options => {
-                options.FilePath = datPath;
-            });
+        internal static void CanReadAndWriteIdentical<T>(string datPath, uint objId, DatDatabase? existingDat = null) where T : IDBObj {
+            DatDatabase dat = existingDat;
+            if (dat == null) {
+                dat = new DatDatabase(options => {
+                    options.FilePath = datPath;
+                });
+            }
 
             dat.Tree.TryGetFile(objId, out var originalEntry);
             Assert.IsNotNull(originalEntry);
@@ -19,6 +22,9 @@ namespace DatReaderWriter.Tests.Lib {
             var res = dat.TryReadFile<T>(objId, out var file);
             Assert.IsTrue(res);
             Assert.IsNotNull(file);
+
+            var originalFileJson = JsonConvert.SerializeObject(file, Formatting.Indented);
+            //Console.WriteLine(originalFileJson);
 
             var originalBytes = new byte[originalEntry.Size];
             dat.BlockAllocator.ReadBlock(originalBytes, originalEntry.Offset);
@@ -40,7 +46,6 @@ namespace DatReaderWriter.Tests.Lib {
             //Console.WriteLine($"Written size: {writer.Offset} bytes");
             //Console.WriteLine($"{string.Join(" ", writtenBytes.Select(b => b.ToString("X2")))}");
 
-            var originalFileJson = JsonConvert.SerializeObject(file, Formatting.Indented);
             var writtenFileJson = JsonConvert.SerializeObject(writtenFile, Formatting.Indented);
             Assert.AreEqual(originalFileJson, writtenFileJson, false, "Written JSON does not match original JSON");
 
@@ -48,7 +53,7 @@ namespace DatReaderWriter.Tests.Lib {
 
             Assert.AreEqual((int)originalEntry.Size, writer.Offset, "Written size does not match original size");
 
-            dat.Dispose();
+            if (existingDat == null) dat.Dispose();
         }
     }
 }

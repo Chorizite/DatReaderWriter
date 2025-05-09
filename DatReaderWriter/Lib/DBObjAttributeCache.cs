@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 namespace DatReaderWriter.Lib {
     internal static class DBObjAttributeCache {
         private static Dictionary<Type, DBObjTypeAttribute>? _typeCache;
+        private static Dictionary<Type, DBObjTypeAttribute>? _typeFileCache;
         private static Dictionary<Type, DBObjTypeAttribute>? _typeCacheMasks;
         private static Dictionary<Type, DBObjTypeAttribute>? _typeCacheIds;
         private static Dictionary<Type, DBObjTypeAttribute>? _typeCacheRanges;

@@ -10,42 +10,32 @@
 
 using System;
 namespace DatReaderWriter.Enums {
-    public enum SpellIndex : int {
-        Undef = 0x0,
+    public enum MediaType : int {
+        Undef = 0x00000000,
 
-        Resistable = 0x1,
+        Movie = 0x00000001,
 
-        PKSensitive = 0x2,
+        Alpha = 0x00000002,
 
-        Beneficial = 0x4,
+        Animation = 0x00000003,
 
-        SelfTargeted =  0x8,
+        Cursor = 0x00000004,
 
-        Reversed = 0x10,
+        Image = 0x00000005,
 
-        NotIndoor = 0x20,
+        Jump = 0x00000006,
 
-        NotOutdoor = 0x40,
+        Message = 0x00000007,
 
-        NotResearchable = 0x80,
+        Pause = 0x00000008,
 
-        Projectile = 0x100,
+        Sound = 0x00000009,
 
-        CreatureSpell = 0x200,
+        State = 0x0000000A,
 
-        ExcludedFromItemDescriptions = 0x400,
+        Fade = 0x0000000B,
 
-        IgnoresManaConversion = 0x800,
-
-        NonTrackingProjectile = 0x1000,
-
-        FellowshipSpell = 0x2000,
-
-        FastCast = 0x4000,
-
-        IndoorLongRange = 0x8000,
-
-        DamageOverTime = 0x10000,
+        Stretch = 0x0000000C,
 
     };
 }

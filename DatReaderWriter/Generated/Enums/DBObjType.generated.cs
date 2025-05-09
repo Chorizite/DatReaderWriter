@@ -270,9 +270,9 @@ namespace DatReaderWriter.Enums {
         EnvCell,
 
         /// <summary>
-        /// DBObj UILayout - DB_TYPE_UI_LAYOUT in the client.
+        /// DBObj LayoutDesc - DB_TYPE_UI_LAYOUT in the client.
         /// </summary>
-        UILayout,
+        LayoutDesc,
 
         /// <summary>
         /// DBObj StringTable - DB_TYPE_STRING_TABLE in the client.

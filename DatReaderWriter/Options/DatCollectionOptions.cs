@@ -4,21 +4,32 @@ namespace DatReaderWriter.Options {
     /// <summary>
     /// Options for <see cref="DatManager"/>
     /// </summary>
-    public class DatManagerOptions {
+    public class DatCollectionOptions {
         private string? _portalPath;
         private string? _cellPath;
-        private string? _languagePath;
+        private string? _localPath;
         private string? _highResPath;
 
         private IndexCachingStrategy? _portalIndexCachingStrategy;
         private IndexCachingStrategy? _cellIndexCachingStrategy;
-        private IndexCachingStrategy? _languageIndexCachingStrategy;
+        private IndexCachingStrategy? _localIndexCachingStrategy;
         private IndexCachingStrategy? _highresIndexCachingStrategy;
 
         /// <summary>
         /// The directory to read dats from.
         /// </summary>
         public string DatDirectory { get; set; } = @"C:\Turbine\Asheron's Call\";
+
+        /// <summary>
+        /// The access type to use when opening dat files
+        /// </summary>
+        public DatAccessType AccessType = DatAccessType.Read;
+
+        /// <summary>
+        /// Whether or not to cache file entries. This will cache files when using <see cref="DatCollection.TryReadFile{T}(uint, out T)"/>
+        /// and <see cref="DatCollection.Get{T}(uint)"/>.
+        /// </summary>
+        public bool CacheFiles { get; set; } = false;
 
         /// <summary>
         /// The name of the portal dat file. will be joined with <see cref="DatDirectory"/>
@@ -33,7 +44,7 @@ namespace DatReaderWriter.Options {
         /// <summary>
         /// The name of the language dat file. will be joined with <see cref="DatDirectory"/>
         /// </summary>
-        public string LanguageDatFileName { get; set; } = @"client_local_English.dat";
+        public string LocalDatFileName { get; set; } = @"client_local_English.dat";
 
         /// <summary>
         /// The name of the highres dat file. will be joined with <see cref="DatDirectory"/>
@@ -68,9 +79,9 @@ namespace DatReaderWriter.Options {
         /// This overrides the file location index caching strategy for the language dat file loaded
         /// by the manager. If not set, defaults to using <see cref="IndexCachingStrategy"/>
         /// </remarks>
-        public IndexCachingStrategy? LanguageIndexCachingStratgey {
-            get => _languageIndexCachingStrategy ?? IndexCachingStrategy;
-            set => _languageIndexCachingStrategy = value;
+        public IndexCachingStrategy? LocalIndexCachingStratgey {
+            get => _localIndexCachingStrategy ?? IndexCachingStrategy;
+            set => _localIndexCachingStrategy = value;
         }
 
         /// <inheritdoc cref="DatDatabaseOptions.IndexCachingStrategy"/>
@@ -105,12 +116,12 @@ namespace DatReaderWriter.Options {
 
         /// <summary>
         /// The absolute path to the language dat file. By default this uses <see cref="DatDirectory"/> and
-        /// <see cref="LanguageDatFileName"/>, but if set to a non null value you can override the path
+        /// <see cref="LocalDatFileName"/>, but if set to a non null value you can override the path
         /// to this specific dat.
         /// </summary>
-        public string LanguageDatPath {
-            get => _languagePath ?? Path.Combine(DatDirectory, LanguageDatFileName);
-            set => _languagePath = value;
+        public string LocalDatPath {
+            get => _localPath ?? Path.Combine(DatDirectory, LocalDatFileName);
+            set => _localPath = value;
         }
 
         /// <summary>

@@ -2273,25 +2273,48 @@
       <value name="Internal" value="0x1" />
     </enum>
     <enum name="SpellIndex" parent="int">
-        <value name="Undef" value="0x0" />
-        <value name="Resistable" value="0x1" />
-        <value name="PKSensitive" value="0x2" />
-        <value name="Beneficial" value="0x4" />
-        <value name="SelfTargeted" value=" 0x8" />
-        <value name="Reversed" value="0x10" />
-        <value name="NotIndoor" value="0x20" />
-        <value name="NotOutdoor" value="0x40" />
-        <value name="NotResearchable" value="0x80" />
-        <value name="Projectile" value="0x100" />
-        <value name="CreatureSpell" value="0x200" />
-        <value name="ExcludedFromItemDescriptions" value="0x400" />
-        <value name="IgnoresManaConversion" value="0x800" />
-        <value name="NonTrackingProjectile" value="0x1000" />
-        <value name="FellowshipSpell" value="0x2000" />
-        <value name="FastCast" value="0x4000" />
-        <value name="IndoorLongRange" value="0x8000" />
-        <value name="DamageOverTime" value="0x10000" />
-        <value name="FORCE_SpellIndex_32_BIT" value="0x7FFFFFFF" />
+      <value name="Undef" value="0x0" />
+      <value name="Resistable" value="0x1" />
+      <value name="PKSensitive" value="0x2" />
+      <value name="Beneficial" value="0x4" />
+      <value name="SelfTargeted" value=" 0x8" />
+      <value name="Reversed" value="0x10" />
+      <value name="NotIndoor" value="0x20" />
+      <value name="NotOutdoor" value="0x40" />
+      <value name="NotResearchable" value="0x80" />
+      <value name="Projectile" value="0x100" />
+      <value name="CreatureSpell" value="0x200" />
+      <value name="ExcludedFromItemDescriptions" value="0x400" />
+      <value name="IgnoresManaConversion" value="0x800" />
+      <value name="NonTrackingProjectile" value="0x1000" />
+      <value name="FellowshipSpell" value="0x2000" />
+      <value name="FastCast" value="0x4000" />
+      <value name="IndoorLongRange" value="0x8000" />
+      <value name="DamageOverTime" value="0x10000" />
+    </enum>
+    <enum name="IncorporationFlags" parent="uint">
+      <value name="None" value="0x0" />
+      <value name="PassToChildren" value="0x1" />
+      <value name="X" value="0x2" />
+      <value name="Y" value="0x4" />
+      <value name="Width" value="0x8" />
+      <value name="Height" value="0x10" />
+      <value name="ZLevel" value="0x20" />
+    </enum>
+    <enum name="MediaType" parent="int">
+      <value name="Undef" value="0x00000000" />
+      <value name="Movie" value="0x00000001" />
+      <value name="Alpha" value="0x00000002" />
+      <value name="Animation" value="0x00000003" />
+      <value name="Cursor" value="0x00000004" />
+      <value name="Image" value="0x00000005" />
+      <value name="Jump" value="0x00000006" />
+      <value name="Message" value="0x00000007" />
+      <value name="Pause" value="0x00000008" />
+      <value name="Sound" value="0x00000009" />
+      <value name="State" value="0x0000000A" />
+      <value name="Fade" value="0x0000000B" />
+      <value name="Stretch" value="0x0000000C" />
     </enum>
   </enums>
   <types>
@@ -3210,6 +3233,105 @@
       <field name="_numIdToStringMaps" type="CompressedUInt" />
       <vector name="IdToStringMap" length="_numIdToStringMaps" type="Dictionary" genericKey="uint" genericValue="bytestring" />
     </type>
+    <type name="MediaDesc" abstract="true">
+      <field name="_mediaType" type="MediaType" />
+      <field name="Type" type="MediaType" />
+      <typeswitch name="_mediaType">
+        <type name="MediaDescMovie" value="MediaType.Movie">
+          <field name="FileName" type="bytestring" />
+          <field name="StretchToFullScreen" type="bool" size="1" />
+        </type>
+        <type name="MediaDescAlpha" value="MediaType.Alpha">
+          <field name="File" type="uint" />
+        </type>
+        <type name="MediaDescAnimation" value="MediaType.Animation">
+          <field name="Duration" type="float" />
+          <field name="DrawMode" type="uint" />
+          <field type="uint" name="_numValues" />
+          <vector name="Frames" length="_numValues" type="List" genericValue="uint" />
+        </type>
+        <type name="MediaDescCursor" value="MediaType.Cursor">
+          <field name="File" type="uint" />
+          <field name="XHotspot" type="uint" />
+          <field name="YHotspot" type="uint" />
+        </type>
+        <type name="MediaDescImage" value="MediaType.Image">
+          <field name="File" type="uint" />
+          <field name="DrawMode" type="uint" />
+        </type>
+        <type name="MediaDescJump" value="MediaType.Jump">
+          <field name="JumpItemIndex" type="uint" />
+          <field name="Probability" type="float" />
+        </type>
+        <type name="MediaDescMessage" value="MediaType.Message">
+          <field name="Id" type="uint" />
+          <field name="Probability" type="float" />
+        </type>
+        <type name="MediaDescPause" value="MediaType.Pause">
+          <field name="MinDuration" type="float" />
+          <field name="MaxDuration" type="float" />
+        </type>
+        <type name="MediaDescSound" value="MediaType.Sound">
+          <field name="File" type="uint" />
+          <field name="Sound" type="Sound" />
+        </type>
+        <type name="MediaDescState" value="MediaType.State">
+          <field name="StateId" type="uint" />
+          <field name="Probability" type="float" />
+        </type>
+        <type name="MediaDescFade" value="MediaType.Fade">
+          <field name="StartAlpha" type="float" />
+          <field name="EndAlpha" type="float" />
+          <field name="Duration" type="float" />
+        </type>
+      </typeswitch>
+    </type>
+    <type name="StateDesc">
+      <field type="uint" name="StateId" />
+      <field type="bool" name="PassToChildren" size="1" />
+      <field type="IncorporationFlags" name="IncorporationFlags" />
+      <field type="byte" name="_numBuckets" value="0" />
+      <field type="CompressedUInt" name="_numProperties" />
+      <vector name="Properties" length="_numProperties" type="List" genericValue="BaseProperty" />
+      <field type="CompressedUInt" name="_numMedia" />
+      <vector name="Media" length="_numMedia" type="List" genericValue="MediaDesc" />
+    </type>
+    <type name="ElementDesc">
+      <field type="StateDesc" name="StateDesc" />
+      <field type="uint" name="ReadOrder" />
+      <field type="uint" name="ElementId" />
+      <field type="uint" name="Type" />
+      <field type="uint" name="BaseElement" />
+      <field type="uint" name="BaseLayoutId" />
+      <field type="uint" name="DefaultState" />
+      <maskmap name="StateDesc.IncorporationFlags">
+        <mask value="IncorporationFlags.X">
+          <field type="uint" name="X" />
+        </mask>
+        <mask value="IncorporationFlags.Y">
+          <field type="uint" name="Y" />
+        </mask>
+        <mask value="IncorporationFlags.Width">
+          <field type="uint" name="Width" />
+        </mask>
+        <mask value="IncorporationFlags.Height">
+          <field type="uint" name="Height" />
+        </mask>
+        <mask value="IncorporationFlags.ZLevel">
+          <field type="uint" name="ZLevel" />
+        </mask>
+      </maskmap>
+      <field type="uint" name="LeftEdge" />
+      <field type="uint" name="TopEdge" />
+      <field type="uint" name="RightEdge" />
+      <field type="uint" name="BottomEdge" />
+      <field type="byte" name="_statesBucketSize" value="1" />
+      <field type="CompressedUInt" name="_numStates" />
+      <vector name="States" length="_numStates" type="Dictionary" genericKey="uint" genericValue="StateDesc" />
+      <field type="byte" name="_childrenBucketSize" value="1" />
+      <field type="CompressedUInt" name="_numChildren" />
+      <vector name="Children" length="_numChildren" type="Dictionary" genericKey="uint" genericValue="ElementDesc" />
+    </type>
   </types>
   <dats>
     <dat name="portal" text="client_portal.dat" type="DatFileType.Portal">
@@ -3672,7 +3794,12 @@
       </type>
     </dat>
     <dat name="local" text="client_local_English.dat" type="DatFileType.Local">
-      <type name="UILayout" text="DB_TYPE_UI_LAYOUT in the client." parent="DBObj" first="0x21000000" last="0x21FFFFFF" flags="DBObjHeaderFlags.HasId">
+      <type name="LayoutDesc" text="DB_TYPE_UI_LAYOUT in the client." parent="DBObj" first="0x21000000" last="0x21FFFFFF" flags="DBObjHeaderFlags.HasId">
+        <field type="uint" name="Width" />
+        <field type="uint" name="Height" />
+        <field type="byte" name="_elementsBucketSizeIndex" value="1" />
+        <field type="CompressedUInt" name="_numElements" />
+        <vector name="Elements" length="_numElements" type="Dictionary" genericKey="uint" genericValue="ElementDesc" />
       </type>
       <type name="StringTable" text="DB_TYPE_STRING_TABLE in the client." parent="DBObj" first="0x23000000" last="0x24FFFFFF" flags="DBObjHeaderFlags.HasId">
         <field type="uint" name="Language" text="This should always be 1 for English" />
