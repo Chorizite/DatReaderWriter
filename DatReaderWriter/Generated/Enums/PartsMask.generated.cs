@@ -10,6 +10,7 @@
 
 using System;
 namespace DatReaderWriter.Enums {
+    [Flags]
     public enum PartsMask : uint {
         HasSoundInfo = 0x01,
 

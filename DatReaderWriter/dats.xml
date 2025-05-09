@@ -151,7 +151,7 @@
       <value name="UnknownVertexType" value="0" />
       <value name="CSWVertexType" value="1" />
     </enum>
-    <enum name="PartsMask" parent="uint">
+    <enum name="PartsMask" parent="uint" mask="true">
       <value name="HasSoundInfo" value="0x01" />
       <value name="HasSceneInfo" value="0x02" />
       <value name="HasSkyInfo" value="0x10" />
@@ -216,12 +216,12 @@
       <value name="ExactMatch" value="0x0001" />
       <value name="PortalSide" value="0x0002" />
     </enum>
-    <enum name="EnvCellFlags" parent="int">
+    <enum name="EnvCellFlags" parent="int" mask="true">
       <value name="SeenOutside" value="0x00000001" />
       <value name="HasStaticObjs" value="0x00000002" />
       <value name="HasRestrictionObj" value="0x00000008" />
     </enum>
-    <enum name="SetupFlags" parent="uint">
+    <enum name="SetupFlags" parent="uint" mask="true">
       <value name="HasParent" value="0x00000001" />
       <value name="HasDefaultScale" value="0x00000002" />
       <value name="AllowFreeHeading" value="0x00000004" />
@@ -753,7 +753,7 @@
       <value name="Stippled" value="0x40000000" />
       <value name="Perspective" value="0x80000000" />
     </enum>
-    <enum name="MotionDataFlags" parent="byte">
+    <enum name="MotionDataFlags" parent="byte" mask="true">
       <value name="None" value="0x00" />
       <value name="HasVelocity" value="0x01" />
       <value name="HasOmega" value="0x02" />
@@ -2150,7 +2150,7 @@
       <value name="Medium" value="0x00000002" />
       <value name="Low" value="0x00000003" />
     </enum>
-    <enum name="AttackType" parent="int">
+    <enum name="AttackType" parent="int" mask="true">
       <value name="Undef" value="0x00000000" />
       <value name="Punch" value="0x00000001" />
       <value name="Thrust" value="0x00000002" />
@@ -2200,7 +2200,7 @@
       <value name="PropertyName" value="0x00000014" />
       <value name="TriState" value="0x00000015" />
     </enum>
-    <enum name="StringInfoOverrideFlag" parent="byte">
+    <enum name="StringInfoOverrideFlag" parent="byte" mask="true">
       <value name="None" value="0x0" />
       <value name="Literal" value="0x1" />
       <value name="AutoGen" value="0x2" />
@@ -2272,7 +2272,7 @@
       <value name="Global" value="0x0" />
       <value name="Internal" value="0x1" />
     </enum>
-    <enum name="SpellIndex" parent="int">
+    <enum name="SpellIndex" parent="int" mask="true">
       <value name="Undef" value="0x0" />
       <value name="Resistable" value="0x1" />
       <value name="PKSensitive" value="0x2" />
@@ -2292,7 +2292,7 @@
       <value name="IndoorLongRange" value="0x8000" />
       <value name="DamageOverTime" value="0x10000" />
     </enum>
-    <enum name="IncorporationFlags" parent="uint">
+    <enum name="IncorporationFlags" parent="uint" mask="true">
       <value name="None" value="0x0" />
       <value name="PassToChildren" value="0x1" />
       <value name="X" value="0x2" />

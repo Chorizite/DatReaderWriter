@@ -10,6 +10,7 @@
 
 using System;
 namespace DatReaderWriter.Enums {
+    [Flags]
     public enum SpellIndex : int {
         Undef = 0x0,
 

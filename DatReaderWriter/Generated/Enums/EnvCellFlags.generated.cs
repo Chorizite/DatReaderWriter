@@ -10,6 +10,7 @@
 
 using System;
 namespace DatReaderWriter.Enums {
+    [Flags]
     public enum EnvCellFlags : int {
         SeenOutside = 0x00000001,
 

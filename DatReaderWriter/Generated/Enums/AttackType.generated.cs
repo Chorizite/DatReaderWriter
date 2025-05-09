@@ -10,6 +10,7 @@
 
 using System;
 namespace DatReaderWriter.Enums {
+    [Flags]
     public enum AttackType : int {
         Undef = 0x00000000,
 

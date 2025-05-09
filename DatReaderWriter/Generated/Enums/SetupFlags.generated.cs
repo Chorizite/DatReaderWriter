@@ -10,6 +10,7 @@
 
 using System;
 namespace DatReaderWriter.Enums {
+    [Flags]
     public enum SetupFlags : uint {
         HasParent = 0x00000001,
 

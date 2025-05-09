@@ -10,6 +10,7 @@
 
 using System;
 namespace DatReaderWriter.Enums {
+    [Flags]
     public enum IncorporationFlags : uint {
         None = 0x0,
 
