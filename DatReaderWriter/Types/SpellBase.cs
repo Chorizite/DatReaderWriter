@@ -95,11 +95,11 @@ namespace DatReaderWriter.Types {
         /// </summary>
         public double PortalLifetime;
 
-        public uint CasterEffect;
+        public PlayScript CasterEffect;
 
-        public uint TargetEffect;
+        public PlayScript TargetEffect;
 
-        public uint FizzleEffect;
+        public PlayScript FizzleEffect;
 
         public double RecoveryInterval;
 
@@ -107,7 +107,7 @@ namespace DatReaderWriter.Types {
 
         public uint DisplayOrder;
 
-        public uint NonComponentTargetType;
+        public ItemType NonComponentTargetType;
 
         public uint ManaMod;
 
@@ -235,13 +235,13 @@ namespace DatReaderWriter.Types {
                 components[i] = reader.ReadUInt32();
             }
             Components = DecryptComponents(components);
-            CasterEffect = reader.ReadUInt32();
-            TargetEffect = reader.ReadUInt32();
-            FizzleEffect = reader.ReadUInt32();
+            CasterEffect = (PlayScript)reader.ReadUInt32();
+            TargetEffect = (PlayScript)reader.ReadUInt32();
+            FizzleEffect = (PlayScript)reader.ReadUInt32();
             RecoveryInterval = reader.ReadDouble();
             RecoveryAmount = reader.ReadSingle();
             DisplayOrder = reader.ReadUInt32();
-            NonComponentTargetType = reader.ReadUInt32();
+            NonComponentTargetType = (ItemType)reader.ReadUInt32();
             ManaMod = reader.ReadUInt32();
             return true;
         }
@@ -280,13 +280,13 @@ namespace DatReaderWriter.Types {
             for (var i=0; i < 8; i++) {
                 writer.WriteUInt32(encryptedComponents[i]);
             }
-            writer.WriteUInt32(CasterEffect);
-            writer.WriteUInt32(TargetEffect);
-            writer.WriteUInt32(FizzleEffect);
+            writer.WriteUInt32((uint)CasterEffect);
+            writer.WriteUInt32((uint)TargetEffect);
+            writer.WriteUInt32((uint)FizzleEffect);
             writer.WriteDouble(RecoveryInterval);
             writer.WriteSingle(RecoveryAmount);
             writer.WriteUInt32(DisplayOrder);
-            writer.WriteUInt32(NonComponentTargetType);
+            writer.WriteUInt32((uint)NonComponentTargetType);
             writer.WriteUInt32(ManaMod);
             return true;
         }

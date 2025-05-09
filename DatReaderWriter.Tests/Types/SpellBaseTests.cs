@@ -35,18 +35,18 @@ namespace DatReaderWriter.Tests.Types {
                 MetaSpellType = SpellType.Enchantment,
                 MetaSpellId = 0x87654321,
                 RecoveryAmount = 1,
-                CasterEffect = 2,
+                CasterEffect = PlayScript.Launch,
                 DegradeLimit = 1,
                 DegradeModifier = 0.5f,
                 DisplayOrder = 123,
                 Duration = 2.2,
-                FizzleEffect = 4,
+                FizzleEffect = PlayScript.Fizzle,
                 ManaMod = 5, 
-                NonComponentTargetType = 1234,
+                NonComponentTargetType = ItemType.Armor,
                 PortalLifetime = 0,
                 Components = [1, 2, 3, 4, 5, 6, 7, 8],
                 RecoveryInterval = 0.1,
-                TargetEffect = 0x12345678
+                TargetEffect = PlayScript.Explode
             };
 
             var buffer = new byte[5_000_000];
