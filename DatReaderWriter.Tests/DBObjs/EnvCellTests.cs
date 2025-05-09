@@ -124,13 +124,67 @@ namespace DatReaderWriter.Tests.DBObjs {
 
             CollectionAssert.AreEquivalent(new List<ushort>() { 0x101, 0x100, 0x103, 0x104, 0x110, 0x10D, 0x10E, 0x10F, 0x10B, 0x10A, 0x108, 0x105, 0x107, 0x106, 0x109, 0x10C, 0x113, 0x112, 0x114, 0x111 }, envCell1.VisibleCells);
 
+
+            var res2 = dat.TryReadFile<EnvCell>(0x7d64010du, out var envCell2);
+            Assert.IsTrue(res2);
+            Assert.IsNotNull(envCell2);
+            Assert.AreEqual(0x7d64010du, envCell2.Id);
+
+            Assert.AreEqual(EnvCellFlags.SeenOutside | EnvCellFlags.HasStaticObjs, envCell2.Flags);
+            Assert.AreEqual(16, envCell2.Surfaces.Count);
+
+            Assert.AreEqual(0x0372, envCell2.Surfaces.First());
+            Assert.AreEqual(0x071B, envCell2.Surfaces.Last());
+
+            Assert.AreEqual(0x03B2, envCell2.EnvironmentId);
+            Assert.AreEqual(13, envCell2.CellStructure);
+
+            Assert.AreEqual(new Vector3(85.5f, 109.5f, 12f), envCell2.Position.Origin);
+            Assert.AreEqual(new Quaternion(0, 0, -0.707107f, 0.707107f), envCell2.Position.Orientation);
+
+            Assert.AreEqual(2, envCell2.CellPortals.Count);
+
+            Assert.AreEqual(PortalFlags.ExactMatch, envCell2.CellPortals[0].Flags);
+            Assert.AreEqual(13, envCell2.CellPortals[0].PolygonId);
+            Assert.AreEqual(0x105, envCell2.CellPortals[0].OtherCellId);
+            Assert.AreEqual(1, envCell2.CellPortals[0].OtherPortalId);
+
+            Assert.AreEqual(PortalFlags.ExactMatch, envCell2.CellPortals[1].Flags);
+            Assert.AreEqual(12, envCell2.CellPortals[1].PolygonId);
+            Assert.AreEqual(0x109, envCell2.CellPortals[1].OtherCellId);
+            Assert.AreEqual(0, envCell2.CellPortals[1].OtherPortalId);
+
+            Assert.AreEqual(13, envCell2.VisibleCells.Count);
+            Assert.AreEqual(0x100, envCell2.VisibleCells[0]);
+            Assert.AreEqual(0x101, envCell2.VisibleCells[1]);
+            Assert.AreEqual(0x10C, envCell2.VisibleCells.Last());
+
+            Assert.AreEqual(4, envCell2.StaticObjects.Count);
+            Assert.AreEqual(0x0200033Fu, envCell2.StaticObjects[0].Id);
+            Assert.AreEqual(new Vector3(77, 118, 12), envCell2.StaticObjects[0].Frame.Origin);
+            Assert.AreEqual(new Quaternion(0, 0, -0.707107f, 0.707107f), envCell2.StaticObjects[0].Frame.Orientation);
+
+            Assert.AreEqual(0x0200016Du, envCell2.StaticObjects[1].Id);
+            Assert.AreEqual(new Vector3(79.725f, 113.1f, 12), envCell2.StaticObjects[1].Frame.Origin);
+            Assert.AreEqual(new Quaternion(0, 0, -0.707107f, 0.707107f), envCell2.StaticObjects[1].Frame.Orientation);
+
+            Assert.AreEqual(0x0200036Eu, envCell2.StaticObjects[2].Id);
+            Assert.AreEqual(new Vector3(80.5f, 118.4f, 12), envCell2.StaticObjects[2].Frame.Origin);
+            Assert.AreEqual(new Quaternion(0, 0, -0.707107f, 0.707107f), envCell2.StaticObjects[2].Frame.Orientation);
+
+            Assert.AreEqual(0x02000372u, envCell2.StaticObjects[3].Id);
+            Assert.AreEqual(new Vector3(80.675f, 114.325f, 14.375f), envCell2.StaticObjects[3].Frame.Origin);
+            Assert.AreEqual(new Quaternion(0, 0, -0.707107f, 0.707107f), envCell2.StaticObjects[3].Frame.Orientation);
+
             dat.Dispose();
         }
 
         [TestMethod]
         [TestCategory("EOR")]
         public void CanReadEORAndWriteIdentical() {
-            TestHelpers.CanReadAndWriteIdentical<EnvCell>(Path.Combine(EORCommonData.DatDirectory, $"client_cell_1.dat"), 0x00020102);
+            TestHelpers.CanReadAndWriteIdentical<EnvCell>(Path.Combine(EORCommonData.DatDirectory, $"client_cell_1.dat"), 0x00020102u);
+            TestHelpers.CanReadAndWriteIdentical<EnvCell>(Path.Combine(EORCommonData.DatDirectory, $"client_cell_1.dat"), 0x7D64010Du);
+            TestHelpers.CanReadAndWriteIdentical<EnvCell>(Path.Combine(EORCommonData.DatDirectory, $"client_cell_1.dat"), 0x7D7E0111u);
         }
     }
 }
