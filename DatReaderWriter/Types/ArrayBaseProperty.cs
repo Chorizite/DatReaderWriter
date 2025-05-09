@@ -18,16 +18,15 @@ namespace DatReaderWriter.Types {
 
         /// <inheritdoc />
         public override bool Unpack(DatBinReader reader) {
-            if (reader.Database is null) {
-                throw new Exception("reader.Database is null, unable to read MasterProperties and unpack DBProperties.ArrayBaseProperty");
+            if (reader.Database?.DatCollection is null) {
+                throw new Exception("reader.Database.DatCollection is null! Unable to read MasterProperties and unpack StateDesc. Use DatCollection instead of creating a standalone DatDatabase");
+            }
+            if (!reader.Database.DatCollection.TryReadFile<MasterProperty>(0x39000001u, out var masterProperty)) {
+                throw new Exception("Unable to read MasterProperty (0x39000001)");
             }
 
             base.Unpack(reader);
             var _numValues = reader.ReadUInt32();
-
-            if (!reader.Database.TryReadFile<MasterProperty>(0x39000001u, out var masterProperty)) {
-                throw new Exception("Unable to read MasterProperty (0x39000001)");
-            }
 
             for (var i = 0; i < _numValues; i++) {
                 var _peekedValue = reader.ReadUInt32();
@@ -44,8 +43,9 @@ namespace DatReaderWriter.Types {
             writer.WriteUInt32((uint)Value.Count());
 
             foreach (var item in Value) {
+                writer.WriteUInt32((uint)item.PropertyType);
                 item._includeType = _includeType;
-                writer.WriteItem<BaseProperty>(item);
+                item.Pack(writer);
             }
             return true;
         }

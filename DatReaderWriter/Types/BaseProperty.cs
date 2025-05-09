@@ -12,12 +12,21 @@ using DatReaderWriter.DBObjs;
 namespace DatReaderWriter.Types {
     public abstract partial class BaseProperty : IDatObjType {
         internal bool _includeType = true;
+        internal int? _propKey;
+
         public abstract BasePropertyType PropertyType { get; }
 
         /// <inheritdoc />
         public virtual bool Unpack(DatBinReader reader) {
             if (_includeType) {
-                var _propKey = reader.ReadInt32();
+                _propKey = reader.ReadInt32();
+                if (reader.Database?.DatCollection is null) {
+                    throw new Exception("reader.Database.DatCollection is null! Unable to read MasterProperties and unpack StateDesc. Use DatCollection instead of creating a standalone DatDatabase");
+                }
+                if (!reader.Database.DatCollection.TryReadFile<MasterProperty>(0x39000001u, out var masterProperty)) {
+                    throw new Exception("Unable to read MasterProperty (0x39000001)");
+                }
+                var _propLookup = masterProperty.Properties[(uint)_propKey].Type;
             }
             return true;
         }
@@ -25,16 +34,18 @@ namespace DatReaderWriter.Types {
         /// <inheritdoc />
         public virtual bool Pack(DatBinWriter writer) {
             if (_includeType) {
-                if (writer.Database is null) {
-                    throw new Exception("Database is null");
+                if (writer.Database?.DatCollection is null) {
+                    throw new Exception("reader.Database.DatCollection is null! Unable to read MasterProperties and unpack StateDesc. Use DatCollection instead of creating a standalone DatDatabase");
+                }
+                if (!writer.Database.DatCollection.TryReadFile<MasterProperty>(0x39000001u, out var masterProperty)) {
+                    throw new Exception("Unable to read MasterProperty (0x39000001)");
                 }
 
-                if (!writer.Database.TryReadFile<MasterProperty>(0x39000001u, out var masterProperty)) {
-                    throw new Exception("MasterProperty not found (0x39000001)");
-                }
+                var _propLookup = _propKey.HasValue ? (uint)_propKey.Value : masterProperty.Properties.FirstOrDefault((kv) => {
+                    return kv.Value.Type == PropertyType;
+                }).Key;
 
-                var _propLookup = masterProperty.Properties.FirstOrDefault(kv => kv.Value.Type == PropertyType).Key;
-
+                writer.WriteInt32((int)_propLookup);
                 writer.WriteInt32((int)_propLookup);
             }
             return true;

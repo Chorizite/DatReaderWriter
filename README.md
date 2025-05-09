@@ -69,10 +69,11 @@ portalDat.Dispose();
 
 ## Todo
 - BSP trees are broken (reading and writing)
+- DBProperties / BaseProperty seems broken, can't write identical binary
 - DBObjs left to implement:
     - RenderMaterial
     - ActionMap
-    - UILayout
+    - UILayout (writing identical is broken)
 
 ## Contributing
 
