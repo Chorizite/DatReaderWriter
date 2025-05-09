@@ -10,6 +10,7 @@
 
 using System;
 namespace DatReaderWriter.Enums {
+    [Flags]
     public enum MotionDataFlags : byte {
         None = 0x00,
 
