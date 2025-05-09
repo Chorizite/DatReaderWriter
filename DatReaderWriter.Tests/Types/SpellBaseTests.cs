@@ -24,7 +24,7 @@ namespace DatReaderWriter.Tests.Types {
                 School = MagicSchool.ItemEnchantment,
                 Icon = 0x12345678,
                 Category = SpellCategory.StrengthRaising,
-                Bitfield = 0x01,
+                Bitfield = SpellIndex.Resistable,
                 BaseMana = 103,
                 BaseRangeConstant = 1.1f,
                 BaseRangeMod = 0.5f,
