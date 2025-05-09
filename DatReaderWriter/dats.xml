@@ -275,6 +275,50 @@
       <value name="LeftWeapon" value="0x00000008" />
       <value name="LeftUnarmed" value="0x00000009" />
     </enum>
+    <enum name="ItemType" parent="uint" shared="true">
+      <value name="None" value="0x00000000" />
+      <value name="MeleeWeapon" value="0x00000001" />
+      <value name="Armor" value="0x00000002" />
+      <value name="Clothing" value="0x00000004" />
+      <value name="Vestements" value="0x00000006" />
+      <value name="Jewelry" value="0x00000008" />
+      <value name="Creature" value="0x00000010" />
+      <value name="Food" value="0x00000020" />
+      <value name="Money" value="0x00000040" />
+      <value name="Misc" value="0x00000080" />
+      <value name="MissileWeapon" value="0x00000100" />
+      <value name="Weapon" value="0x00000101" />
+      <value name="Container" value="0x00000200" />
+      <value name="LockableMagicTarget" value="0x00000280" />
+      <value name="Useless" value="0x00000400" />
+      <value name="Gem" value="0x00000800" />
+      <value name="SpellComponents" value="0x00001000" />
+      <value name="Writable" value="0x00002000" />
+      <value name="Key" value="0x00004000" />
+      <value name="Caster" value="0x00008000" />
+      <value name="WeaponOrCaster" value="0x00008101" />
+      <value name="RedirectableItemEnchantmentTarget" value="0x00008107" />
+      <value name="Portal" value="0x00010000" />
+      <value name="Lockable" value="0x00020000" />
+      <value name="PromissoryNote" value="0x00040000" />
+      <value name="ManaStone" value="0x00080000" />
+      <value name="ItemEnchantableTarget" value="0x00088B8F" />
+      <value name="Service" value="0x00100000" />
+      <value name="MagicWieldable" value="0x00200000" />
+      <value name="Item" value="0x002DFBEF" />
+      <value name="CraftCookingBase" value="0x00400000" />
+      <value name="VendorGrocer" value="0x00446220" />
+      <value name="CraftAlchemyBase" value="0x00800000" />
+      <value name="CraftFletchingBase" value="0x02000000" />
+      <value name="CraftAlchemyIntermediate" value="0x04000000" />
+      <value name="CraftFletchingIntermediate" value="0x08000000" />
+      <value name="LifeStone" value="0x10000000" />
+      <value name="PortalMagicTarget" value="0x10010000" />
+      <value name="TinkeringTool" value="0x20000000" />
+      <value name="TinkeringMaterial" value="0x40000000" />
+      <value name="VendorShopKeep" value="0x480467A7" />
+      <value name="Gameboard" value="0x80000000" />
+    </enum>
     <enum name="Placement" parent="uint" shared="true">
       <value name="Default" value="0x00000000" />
       <value name="RightHandCombat" value="0x00000001" />
@@ -2739,13 +2783,13 @@
         </case>
       </switch>
       <vector name="RawComponents" length="8" type="uint" text="This should always be a length of 8." />
-      <field name="CasterEffect" type="uint" />
-      <field name="TargetEffect" type="uint" />
-      <field name="FizzleEffect" type="uint" />
+      <field name="CasterEffect" type="PlayScript" />
+      <field name="TargetEffect" type="PlayScript" />
+      <field name="FizzleEffect" type="PlayScript" />
       <field name="RecoveryInterval" type="double" />
       <field name="RecoveryAmount" type="float" />
       <field name="DisplayOrder" type="uint" />
-      <field name="NonComponentTargetType" type="uint" />
+      <field name="NonComponentTargetType" type="ItemType" />
       <field name="ManaMod" type="uint" />
     </type>
     <type name="SpellSet">
