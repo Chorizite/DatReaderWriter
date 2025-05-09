@@ -3597,7 +3597,7 @@
         <vector name="VisibleCells" length="_numVisibleCells" type="List" genericValue="ushort" text="A list of visible cell ids" />
         <maskmap name="Flags">
           <mask value="EnvCellFlags.HasStaticObjs">
-            <field type="ushort" name="_numStabs" />
+            <field type="uint" name="_numStabs" />
             <vector name="StaticObjects" length="_numStabs" type="List" genericValue="Stab" text="A list of static objects" />
           </mask>
           <mask value="EnvCellFlags.HasRestrictionObj">

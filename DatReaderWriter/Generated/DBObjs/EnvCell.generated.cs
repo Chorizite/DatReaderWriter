@@ -85,7 +85,7 @@ namespace DatReaderWriter.DBObjs {
                 VisibleCells.Add(reader.ReadUInt16());
             }
             if (Flags.HasFlag(EnvCellFlags.HasStaticObjs)) {
-                var _numStabs = reader.ReadUInt16();
+                var _numStabs = reader.ReadUInt32();
                 for (var i=0; i < _numStabs; i++) {
                     StaticObjects.Add(reader.ReadItem<Stab>());
                 }
@@ -117,7 +117,7 @@ namespace DatReaderWriter.DBObjs {
                 writer.WriteUInt16(item);
             }
             if (Flags.HasFlag(EnvCellFlags.HasStaticObjs)) {
-                writer.WriteUInt16((ushort)StaticObjects.Count());
+                writer.WriteUInt32((uint)StaticObjects.Count());
                 foreach (var item in StaticObjects) {
                     writer.WriteItem<Stab>(item);
                 }
