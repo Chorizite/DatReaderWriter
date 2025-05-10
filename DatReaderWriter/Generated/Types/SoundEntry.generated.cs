@@ -31,15 +31,12 @@ namespace DatReaderWriter.Types {
 
         public float Volume;
 
-        public int Unknown;
-
         /// <inheritdoc />
         public bool Unpack(DatBinReader reader) {
             Id = reader.ReadUInt32();
             Priority = reader.ReadSingle();
             Probability = reader.ReadSingle();
             Volume = reader.ReadSingle();
-            Unknown = reader.ReadInt32();
             return true;
         }
 
@@ -49,7 +46,6 @@ namespace DatReaderWriter.Types {
             writer.WriteSingle(Priority);
             writer.WriteSingle(Probability);
             writer.WriteSingle(Volume);
-            writer.WriteInt32(Unknown);
             return true;
         }
 
