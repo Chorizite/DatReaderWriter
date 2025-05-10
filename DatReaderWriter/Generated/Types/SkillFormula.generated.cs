@@ -20,41 +20,44 @@ using DatReaderWriter.Lib.IO;
 
 namespace DatReaderWriter.Types {
     /// <summary>
-    /// Formula that dictates how to calculate a skill `(Attribute1 + Attribute2?) / Divisor`.
+    /// Formula that dictates how to calculate a skill `(Attribute1 * Attribute1Multiplier + Attribute2 * Attribute2Multiplier) / Divisor + AdditiveBonus`.
     /// </summary>
     public partial class SkillFormula : IDatObjType {
-        public uint Unknown;
-
         /// <summary>
-        /// True if this formula uses a second attribute for the calculation
+        /// Unused in retail data (W)
         /// </summary>
-        public bool HasSecondAttribute;
+        public int AdditiveBonus;
 
         /// <summary>
-        /// If this is false, dont use this formula just use the base value of the skill
+        /// Was never more than 1 in retail data (X)
         /// </summary>
-        public bool UseFormula;
+        public int Attribute1Multiplier;
 
         /// <summary>
-        /// The divisor used in the formula.
+        /// Was never more than 1 in retail data (Y)
+        /// </summary>
+        public int Attribute2Multiplier;
+
+        /// <summary>
+        /// The divisor used in the formula (Z)
         /// </summary>
         public int Divisor;
 
         /// <summary>
-        /// The first attribute to use
+        /// The first attribute to use.
         /// </summary>
         public AttributeId Attribute1;
 
         /// <summary>
-        /// The second attribute to use. Only valid if HasSecondAttribute is true
+        /// The second attribute to use.
         /// </summary>
         public AttributeId Attribute2;
 
         /// <inheritdoc />
         public bool Unpack(DatBinReader reader) {
-            Unknown = reader.ReadUInt32();
-            HasSecondAttribute = reader.ReadBool(4);
-            UseFormula = reader.ReadBool(4);
+            AdditiveBonus = reader.ReadInt32();
+            Attribute1Multiplier = reader.ReadInt32();
+            Attribute2Multiplier = reader.ReadInt32();
             Divisor = reader.ReadInt32();
             Attribute1 = (AttributeId)reader.ReadUInt32();
             Attribute2 = (AttributeId)reader.ReadUInt32();
@@ -63,9 +66,9 @@ namespace DatReaderWriter.Types {
 
         /// <inheritdoc />
         public bool Pack(DatBinWriter writer) {
-            writer.WriteUInt32(Unknown);
-            writer.WriteBool(HasSecondAttribute, 4);
-            writer.WriteBool(UseFormula, 4);
+            writer.WriteInt32(AdditiveBonus);
+            writer.WriteInt32(Attribute1Multiplier);
+            writer.WriteInt32(Attribute2Multiplier);
             writer.WriteInt32(Divisor);
             writer.WriteUInt32((uint)Attribute1);
             writer.WriteUInt32((uint)Attribute2);

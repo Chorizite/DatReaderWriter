@@ -15,11 +15,11 @@ namespace DatReaderWriter.Tests.Types {
         [TestMethod]
         public void CanSerializeAndDeserialize() {
             var writeObj = new SkillFormula() {
+                Attribute1Multiplier = 1,
+                Attribute2Multiplier = 1,
+                Divisor = 2,
                 Attribute1 = AttributeId.Strength,
                 Attribute2 = AttributeId.Coordination,
-                HasSecondAttribute = true,
-                Divisor = 2,
-                UseFormula = true
             };
 
             var buffer = new byte[5_000_000];
@@ -30,11 +30,11 @@ namespace DatReaderWriter.Tests.Types {
             var reader = new DatBinReader(buffer);
             readObj.Unpack(reader);
 
+            Assert.AreEqual(writeObj.Attribute1Multiplier, readObj.Attribute1Multiplier);
+            Assert.AreEqual(writeObj.Attribute2Multiplier, readObj.Attribute2Multiplier);
+            Assert.AreEqual(writeObj.Divisor, readObj.Divisor);
             Assert.AreEqual(writeObj.Attribute1, readObj.Attribute1);
             Assert.AreEqual(writeObj.Attribute2, readObj.Attribute2);
-            Assert.AreEqual(writeObj.HasSecondAttribute, readObj.HasSecondAttribute);
-            Assert.AreEqual(writeObj.Divisor, readObj.Divisor);
-            Assert.AreEqual(writeObj.UseFormula, readObj.UseFormula);
         }
     }
 }
