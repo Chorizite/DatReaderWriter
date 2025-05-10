@@ -22,12 +22,15 @@ namespace DatReaderWriter.Types {
     public partial class SoundData : IDatObjType {
         public List<SoundEntry> Entries = [];
 
+        public int Unknown;
+
         /// <inheritdoc />
         public bool Unpack(DatBinReader reader) {
             var _numEntries = reader.ReadUInt32();
             for (var i=0; i < _numEntries; i++) {
                 Entries.Add(reader.ReadItem<SoundEntry>());
             }
+            Unknown = reader.ReadInt32();
             return true;
         }
 
@@ -37,6 +40,7 @@ namespace DatReaderWriter.Types {
             foreach (var item in Entries) {
                 writer.WriteItem<SoundEntry>(item);
             }
+            writer.WriteInt32(Unknown);
             return true;
         }
 

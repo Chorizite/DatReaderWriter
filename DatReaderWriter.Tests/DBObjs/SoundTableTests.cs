@@ -87,6 +87,22 @@ namespace DatReaderWriter.Tests.DBObjs {
             Assert.AreEqual(0.7f, readObj.Sounds[Sound.EnchantDown].Entries.First().Priority);
             Assert.AreEqual(1f, readObj.Sounds[Sound.EnchantDown].Entries.First().Probability);
             Assert.AreEqual(0.8f, readObj.Sounds[Sound.EnchantDown].Entries.First().Volume);
+
+
+            var res2 = dat.TryReadFile<SoundTable>(0x200000A8u, out var readObj2);
+            Assert.IsTrue(res2);
+            Assert.IsNotNull(readObj2);
+            Assert.AreEqual(0x200000A8u, readObj2.Id);
+
+            Assert.AreEqual(1, readObj2.Hashes.Count);
+            Assert.AreEqual(32, readObj2.Sounds.Count);
+
+            Assert.IsTrue(readObj2.Sounds.ContainsKey(Sound.Swoosh2));
+            Assert.AreEqual(2, readObj2.Sounds[Sound.Swoosh2].Entries.Count);
+            Assert.AreEqual(0xA000519u, readObj2.Sounds[Sound.Swoosh2].Entries.First().Id);
+            Assert.AreEqual(0xA00051Eu, readObj2.Sounds[Sound.Swoosh2].Entries.Last().Id);
+
+
             dat.Dispose();
         }
 
@@ -96,6 +112,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             TestHelpers.CanReadAndWriteIdentical<SoundTable>(Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat"), 0x20000001u);
             TestHelpers.CanReadAndWriteIdentical<SoundTable>(Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat"), 0x20000002u);
             TestHelpers.CanReadAndWriteIdentical<SoundTable>(Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat"), 0x20000003u);
+            TestHelpers.CanReadAndWriteIdentical<SoundTable>(Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat"), 0x200000A8u);
         }
     }
 }

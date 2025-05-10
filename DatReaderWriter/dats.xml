@@ -3078,11 +3078,11 @@
       <field type="float" name="Priority" />
       <field type="float" name="Probability" />
       <field type="float" name="Volume" />
-      <field type="int" name="Unknown" />
     </type>
     <type name="SoundData">
       <field type="uint" name="_numEntries" />
       <vector name="Entries" length="_numEntries" type="List" genericValue="SoundEntry" />
+      <field type="int" name="Unknown" />
     </type>
     <type name="ScriptAndModData">
       <field type="float" name="Mod" />
