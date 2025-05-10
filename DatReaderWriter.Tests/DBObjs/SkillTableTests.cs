@@ -94,11 +94,11 @@ namespace DatReaderWriter.Tests.DBObjs {
             Assert.AreEqual(1u, skillTable.Skills[SkillId.MeleeDefense].MinLevel);
             Assert.AreEqual(20, skillTable.Skills[SkillId.MeleeDefense].SpecializedCost);
             Assert.AreEqual(10, skillTable.Skills[SkillId.MeleeDefense].TrainedCost);
-            Assert.IsTrue(skillTable.Skills[SkillId.MeleeDefense].Formula.UseFormula);
+            Assert.AreEqual(1, skillTable.Skills[SkillId.MeleeDefense].Formula.Attribute1Multiplier);
+            Assert.AreEqual(1, skillTable.Skills[SkillId.MeleeDefense].Formula.Attribute2Multiplier);
+            Assert.AreEqual(3, skillTable.Skills[SkillId.MeleeDefense].Formula.Divisor);
             Assert.AreEqual(AttributeId.Quickness, skillTable.Skills[SkillId.MeleeDefense].Formula.Attribute1);
             Assert.AreEqual(AttributeId.Coordination, skillTable.Skills[SkillId.MeleeDefense].Formula.Attribute2);
-            Assert.IsTrue(skillTable.Skills[SkillId.MeleeDefense].Formula.HasSecondAttribute);
-            Assert.AreEqual(3, skillTable.Skills[SkillId.MeleeDefense].Formula.Divisor);
 
             Assert.AreEqual("Summoning", skillTable.Skills[SkillId.Summoning].Name);
             Assert.AreEqual("Allows you to summon creatures to attack your foes.", skillTable.Skills[SkillId.Summoning].Description);
@@ -111,11 +111,11 @@ namespace DatReaderWriter.Tests.DBObjs {
             Assert.AreEqual(2u, skillTable.Skills[SkillId.Summoning].MinLevel);
             Assert.AreEqual(12, skillTable.Skills[SkillId.Summoning].SpecializedCost);
             Assert.AreEqual(8, skillTable.Skills[SkillId.Summoning].TrainedCost);
-            Assert.IsTrue(skillTable.Skills[SkillId.Summoning].Formula.UseFormula);
+            Assert.AreEqual(1, skillTable.Skills[SkillId.Summoning].Formula.Attribute1Multiplier);
+            Assert.AreEqual(1, skillTable.Skills[SkillId.Summoning].Formula.Attribute2Multiplier);
+            Assert.AreEqual(3, skillTable.Skills[SkillId.Summoning].Formula.Divisor);
             Assert.AreEqual(AttributeId.Endurance, skillTable.Skills[SkillId.Summoning].Formula.Attribute1);
             Assert.AreEqual(AttributeId.Self, skillTable.Skills[SkillId.Summoning].Formula.Attribute2);
-            Assert.IsTrue(skillTable.Skills[SkillId.Summoning].Formula.HasSecondAttribute);
-            Assert.AreEqual(3, skillTable.Skills[SkillId.Summoning].Formula.Divisor);
 
             dat.Dispose();
         }

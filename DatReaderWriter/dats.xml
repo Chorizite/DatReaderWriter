@@ -2888,13 +2888,13 @@
       <field name="StartTime" type="double" />
       <field name="Hook" type="AnimationHook" />
     </type>
-    <type name="SkillFormula" text="Formula that dictates how to calculate a skill `(Attribute1 + Attribute2?) / Divisor`.">
-      <field name="Unknown" type="uint" />
-      <field name="HasSecondAttribute" type="bool" size="4" text="True if this formula uses a second attribute for the calculation" />
-      <field name="UseFormula" type="bool" size="4" text="If this is false, dont use this formula just use the base value of the skill" />
-      <field name="Divisor" type="int" text="The divisor used in the formula." />
-      <field name="Attribute1" type="AttributeId" text="The first attribute to use" />
-      <field name="Attribute2" type="AttributeId" text="The second attribute to use. Only valid if HasSecondAttribute is true" />
+    <type name="SkillFormula" text="Formula that dictates how to calculate a skill `(Attribute1 * Attribute1Multiplier + Attribute2 * Attribute2Multiplier) / Divisor + AdditiveBonus`.">
+      <field name="AdditiveBonus" type="int" text="Unused in retail data (W)" />
+      <field name="Attribute1Multiplier" type="int" text="Was never more than 1 in retail data (X)" />
+      <field name="Attribute2Multiplier" type="int" text="Was never more than 1 in retail data (Y)" />
+      <field name="Divisor" type="int" text="The divisor used in the formula (Z)" />
+      <field name="Attribute1" type="AttributeId" text="The first attribute to use." />
+      <field name="Attribute2" type="AttributeId" text="The second attribute to use." />
     </type>
     <type name="SkillBase">
       <field name="Description" type="string" />
