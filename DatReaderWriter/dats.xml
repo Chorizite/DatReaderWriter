@@ -115,6 +115,7 @@
       <value value="0x2D" name="LightWeapons" />
       <value value="0x2E" name="FinesseWeapons" />
       <value value="0x2F" name="MissleWeapons" />
+      <value value="0x30" name="Shield" />
       <value value="0x31" name="DualWield" />
       <value value="0x32" name="Recklessness" />
       <value value="0x33" name="SneakAttack" />

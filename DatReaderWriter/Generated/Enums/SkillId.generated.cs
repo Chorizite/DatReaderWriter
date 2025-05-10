@@ -108,6 +108,8 @@ namespace DatReaderWriter.Enums {
 
         MissleWeapons = 0x2F,
 
+        Shield = 0x30,
+
         DualWield = 0x31,
 
         Recklessness = 0x32,
