@@ -106,6 +106,7 @@ portalDat.Dispose();
 ```
 
 ## Todo
+- Support for older dat formats
 - Clean up source gen so the library can be generated in other languages (kaitai struct?)
 - DBObjs left to implement:
     - RenderMaterial
