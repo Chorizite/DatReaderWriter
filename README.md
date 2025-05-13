@@ -88,7 +88,7 @@ We welcome contributions from the community! If you would like to contribute to 
 
 ## Thanks
 
-In no particular order, thanks to ACE team, GDLE team, OptimShi, paradox, and Yonneh. Used lots of projects as a reference for different parts.
+In no particular order, thanks to ACE team, GDLE team, gmriggs, OptimShi, paradox, and Yonneh. Used lots of projects as a reference for different parts.
 
 ## License
 
