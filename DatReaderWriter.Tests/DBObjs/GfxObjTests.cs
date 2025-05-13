@@ -27,7 +27,7 @@ namespace DatReaderWriter.Tests.DBObjs {
 
             var res = dat.TryWriteFile(gfxObj);
 
-            var res2 = dat.TryReadFile<GfxObj>(0x1000001, out var readEnv);
+            var res2 = dat.TryGet<GfxObj>(0x1000001, out var readEnv);
             Assert.IsTrue(res2);
             Assert.IsNotNull(readEnv);
 
@@ -44,7 +44,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             });
 
 
-            var res = dat.TryReadFile<GfxObj>(0x010005E8, out var env);
+            var res = dat.TryGet<GfxObj>(0x010005E8, out var env);
             Assert.IsTrue(res);
             Assert.IsNotNull(env);
 

@@ -25,13 +25,6 @@ namespace DatReaderWriter.DBObjs {
 
         /// <inheritdoc />
         public override bool Unpack(DatBinReader reader) {
-            if (reader.Database is null) {
-                throw new Exception("reader.Database is null, unable to read MasterProperties and unpack DBProperties.");
-            }
-            if (!reader.Database.TryReadFile<MasterProperty>(0x39000001u, out var masterProperty)) {
-                throw new Exception("Unable to read MasterProperty (0x39000001)");
-            }
-
             base.Unpack(reader);
             var _bucketSize = reader.ReadByte();
             var _numProperties = reader.ReadByte();

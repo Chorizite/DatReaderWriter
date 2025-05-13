@@ -45,7 +45,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             res = dat.TryWriteFile(landblock2);
             Assert.IsTrue(res);
 
-            var res2 = dat.TryReadFile<LandBlock>(0x0001FFFF, out var readLandblock1);
+            var res2 = dat.TryGet<LandBlock>(0x0001FFFF, out var readLandblock1);
             Assert.IsTrue(res2);
             Assert.IsNotNull(readLandblock1);
 
@@ -65,7 +65,7 @@ namespace DatReaderWriter.Tests.DBObjs {
                 Assert.AreEqual(expected.Road, readLandblock1.Terrain[i].Road, $"Road failed: {i}");
             }
 
-            res2 = dat.TryReadFile<LandBlock>(0x0002FFFF, out var readLandblock2);
+            res2 = dat.TryGet<LandBlock>(0x0002FFFF, out var readLandblock2);
             Assert.IsTrue(res2);
             Assert.IsNotNull(readLandblock2);
 
@@ -98,7 +98,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             });
 
 
-            var res = dat.TryReadFile<LandBlock>(0x9AB1FFFF, out var landblock1);
+            var res = dat.TryGet<LandBlock>(0x9AB1FFFF, out var landblock1);
             Assert.IsTrue(res);
             Assert.IsNotNull(landblock1);
 

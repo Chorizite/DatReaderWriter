@@ -34,7 +34,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             var res = dat.TryWriteFile(writeAnim);
             Assert.IsTrue(res);
 
-            var res2 = dat.TryReadFile<DataIdMapper>(0x25000014, out var readDidMap);
+            var res2 = dat.TryGet<DataIdMapper>(0x25000014, out var readDidMap);
             Assert.IsTrue(res2);
             Assert.IsNotNull(readDidMap);
 
@@ -72,7 +72,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             });
 
 
-            var res = dat.TryReadFile<DataIdMapper>(0x25000014, out var didMap);
+            var res = dat.TryGet<DataIdMapper>(0x25000014, out var didMap);
             Assert.IsTrue(res);
             Assert.IsNotNull(didMap);
             Assert.AreEqual(0x25000014u, didMap.Id);

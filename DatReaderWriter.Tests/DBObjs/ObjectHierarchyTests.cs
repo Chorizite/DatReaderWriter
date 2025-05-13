@@ -34,7 +34,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             var res = dat.TryWriteFile(writeObj);
             Assert.IsTrue(res);
 
-            var res2 = dat.TryReadFile<ObjectHierarchy>(0xE00000Du, out var readObj);
+            var res2 = dat.TryGet<ObjectHierarchy>(0xE00000Du, out var readObj);
             Assert.IsTrue(res2);
             Assert.IsNotNull(readObj);
 
@@ -61,7 +61,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             });
 
 
-            var res = dat.TryReadFile<ObjectHierarchy>(0xE00000D, out var objHierarchy);
+            var res = dat.TryGet<ObjectHierarchy>(0xE00000D, out var objHierarchy);
             Assert.IsTrue(res);
             Assert.IsNotNull(objHierarchy);
             Assert.AreEqual(0xE00000Du, objHierarchy.Id);

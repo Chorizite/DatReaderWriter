@@ -30,7 +30,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             var res = dat.TryWriteFile(xpTable);
             Assert.IsTrue(res);
 
-            var res2 = dat.TryReadFile<ExperienceTable>(0xE000018, out var readXPTable);
+            var res2 = dat.TryGet<ExperienceTable>(0xE000018, out var readXPTable);
             Assert.IsTrue(res2);
             Assert.IsNotNull(readXPTable);
             Assert.AreEqual(0xE000018u, readXPTable.Id);
@@ -55,7 +55,7 @@ namespace DatReaderWriter.Tests.DBObjs {
                 options.IndexCachingStrategy = IndexCachingStrategy.OnDemand;
             });
 
-            var res = dat.TryReadFile<ExperienceTable>(0xE000018, out var xpTable);
+            var res = dat.TryGet<ExperienceTable>(0xE000018, out var xpTable);
             Assert.IsTrue(res);
             Assert.IsNotNull(xpTable);
 

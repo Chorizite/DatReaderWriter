@@ -43,7 +43,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             var res = dat.TryWriteFile(xpTable);
             Assert.IsTrue(res);
 
-            var res2 = dat.TryReadFile<Setup>(0xE000018, out var setup);
+            var res2 = dat.TryGet<Setup>(0xE000018, out var setup);
             Assert.IsTrue(res2);
             Assert.IsNotNull(setup);
             Assert.AreEqual(0xE000018u, setup.Id);
@@ -80,7 +80,7 @@ namespace DatReaderWriter.Tests.DBObjs {
                 options.IndexCachingStrategy = IndexCachingStrategy.OnDemand;
             });
 
-            var res = dat.TryReadFile<Setup>(0x02000108, out var setup1);
+            var res = dat.TryGet<Setup>(0x02000108, out var setup1);
             Assert.IsTrue(res);
             Assert.IsNotNull(setup1);
 
@@ -121,7 +121,7 @@ namespace DatReaderWriter.Tests.DBObjs {
                 options.IndexCachingStrategy = IndexCachingStrategy.OnDemand;
             });
 
-            var res = dat.TryReadFile<Setup>(0x02000172, out var setup2);
+            var res = dat.TryGet<Setup>(0x02000172, out var setup2);
             Assert.IsTrue(res);
             Assert.IsNotNull(setup2);
 
@@ -144,7 +144,7 @@ namespace DatReaderWriter.Tests.DBObjs {
                 options.IndexCachingStrategy = IndexCachingStrategy.OnDemand;
             });
 
-            var res = dat.TryReadFile<Setup>(0x02000229, out var setup3);
+            var res = dat.TryGet<Setup>(0x02000229, out var setup3);
             Assert.IsTrue(res);
             Assert.IsNotNull(setup3);
 
@@ -175,7 +175,7 @@ namespace DatReaderWriter.Tests.DBObjs {
                 options.IndexCachingStrategy = IndexCachingStrategy.OnDemand;
             });
 
-            var res = dat.TryReadFile<Setup>(0x02000240, out var setup4);
+            var res = dat.TryGet<Setup>(0x02000240, out var setup4);
             Assert.IsTrue(res);
             Assert.IsNotNull(setup4);
 
@@ -205,7 +205,7 @@ namespace DatReaderWriter.Tests.DBObjs {
                 options.IndexCachingStrategy = IndexCachingStrategy.OnDemand;
             });
 
-            var res = dat.TryReadFile<Setup>(0x0200185A, out var setup5);
+            var res = dat.TryGet<Setup>(0x0200185A, out var setup5);
             Assert.IsTrue(res);
             Assert.IsNotNull(setup5);
 

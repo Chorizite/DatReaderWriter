@@ -9,13 +9,13 @@ using Newtonsoft.Json;
 
 namespace DatReaderWriter.Tests.DBObjs {
     [TestClass]
-    public class UILayoutTests {
+    public class LayoutDescTests {
         [TestMethod]
         [TestCategory("EOR")]
         public void CanReadEOR() {
             using var dat = new DatCollection(EORCommonData.DatDirectory);
 
-            var res = dat.TryReadFile<LayoutDesc>(0x21000000u, out var layout);
+            var res = dat.TryGet<LayoutDesc>(0x21000000u, out var layout);
             Assert.IsTrue(res);
             Assert.IsNotNull(layout);
             Assert.AreEqual(0x21000000u, layout.Id);

@@ -40,7 +40,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             var res = dat.TryWriteFile(writeAnim);
             Assert.IsTrue(res);
 
-            var res2 = dat.TryReadFile<Animation>(0x03000001, out var readAnim);
+            var res2 = dat.TryGet<Animation>(0x03000001, out var readAnim);
             Assert.IsTrue(res2);
             Assert.IsNotNull(readAnim);
 
@@ -69,7 +69,7 @@ namespace DatReaderWriter.Tests.DBObjs {
                 options.IndexCachingStrategy = IndexCachingStrategy.Never;
             });
 
-            var res = dat.TryReadFile<Animation>(0x03000514, out var anim);
+            var res = dat.TryGet<Animation>(0x03000514, out var anim);
             Assert.IsTrue(res);
             Assert.IsNotNull(anim);
             Assert.AreEqual(0x03000514u, anim.Id);

@@ -31,7 +31,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             var res = dat.TryWriteFile(writeObj);
             Assert.IsTrue(res);
 
-            var res2 = dat.TryReadFile<PhysicsScriptTable>(0x34000000u, out var readObj);
+            var res2 = dat.TryGet<PhysicsScriptTable>(0x34000000u, out var readObj);
             Assert.IsTrue(res2);
             Assert.IsNotNull(readObj);
 
@@ -54,7 +54,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             });
 
 
-            var res = dat.TryReadFile<PhysicsScriptTable>(0x34000004u, out var readObj);
+            var res = dat.TryGet<PhysicsScriptTable>(0x34000004u, out var readObj);
             Assert.IsTrue(res);
             Assert.IsNotNull(readObj);
             Assert.AreEqual(0x34000004u, readObj.Id);

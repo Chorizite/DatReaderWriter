@@ -48,7 +48,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             res = dat.TryWriteFile(surface2);
             Assert.IsTrue(res);
 
-            var res2 = dat.TryReadFile<Surface>(0x05000001, out var readSurface1);
+            var res2 = dat.TryGet<Surface>(0x05000001, out var readSurface1);
             Assert.IsTrue(res2);
             Assert.IsNotNull(readSurface1);
 
@@ -61,7 +61,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             Assert.AreEqual(0.4f, readSurface1.Translucency);
             Assert.IsNull(readSurface1.ColorValue);
 
-            res2 = dat.TryReadFile<Surface>(0x05000002, out var readSurface2);
+            res2 = dat.TryGet<Surface>(0x05000002, out var readSurface2);
             Assert.IsTrue(res2);
             Assert.IsNotNull(readSurface2);
 
@@ -91,7 +91,7 @@ namespace DatReaderWriter.Tests.DBObjs {
                 options.IndexCachingStrategy = IndexCachingStrategy.OnDemand;
             });
 
-            var res = dat.TryReadFile<Surface>(0x08000DCB, out var surface1);
+            var res = dat.TryGet<Surface>(0x08000DCB, out var surface1);
             Assert.IsTrue(res);
             Assert.IsNotNull(surface1);
 
@@ -104,7 +104,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             Assert.AreEqual(0.800781f, surface1.Diffuse);
             Assert.IsNull(surface1.ColorValue);
 
-            res = dat.TryReadFile<Surface>(0x08000219, out var surface2);
+            res = dat.TryGet<Surface>(0x08000219, out var surface2);
             Assert.IsTrue(res);
             Assert.IsNotNull(surface2);
 

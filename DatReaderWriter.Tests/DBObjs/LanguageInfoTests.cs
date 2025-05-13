@@ -69,7 +69,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             var res = dat.TryWriteFile(writeObj);
             Assert.IsTrue(res);
 
-            var res2 = dat.TryReadFile<LanguageInfo>(0x41000000u, out var readObj);
+            var res2 = dat.TryGet<LanguageInfo>(0x41000000u, out var readObj);
             Assert.IsTrue(res2);
             Assert.IsNotNull(readObj);
 
@@ -125,7 +125,7 @@ namespace DatReaderWriter.Tests.DBObjs {
                 options.IndexCachingStrategy = IndexCachingStrategy.Never;
             });
 
-            var res = dat.TryReadFile<LanguageInfo>(0x41000000u, out var rt1);
+            var res = dat.TryGet<LanguageInfo>(0x41000000u, out var rt1);
             Assert.IsTrue(res);
             Assert.IsNotNull(rt1);
 

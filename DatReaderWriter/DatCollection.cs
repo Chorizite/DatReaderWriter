@@ -156,32 +156,48 @@ namespace DatReaderWriter {
         }
 
         /// <summary>
-        /// Read a dat file
+        /// Try and read a <see cref="IDBObj"/>. This will be cached according to the <see cref="DatCollectionOptions.FileCachingStrategy"/> in use
         /// </summary>
         /// <typeparam name="T">The dat file type</typeparam>
         /// <param name="fileId">The id of the file to get</param>
         /// <param name="value">The unpacked file</param>
         /// <returns></returns>
 #if (NET8_0_OR_GREATER)
-        public bool TryReadFile<T>(uint fileId, [MaybeNullWhen(false)] out T value) where T : IDBObj {
+        public bool TryGet<T>(uint fileId, [MaybeNullWhen(false)] out T value) where T : IDBObj {
 #else
-        public bool TryReadFile<T>(uint fileId, out T value) where T : IDBObj {
+        public bool TryGet<T>(uint fileId, out T value) where T : IDBObj {
 #endif
             switch (MapToDatFileType<T>()) {
                 case DatFileType.Cell:
-                    return Cell.TryReadFile(fileId, out value);
+                    return Cell.TryGet(fileId, out value);
                 case DatFileType.Portal:
-                    var portalRes = Portal.TryReadFile(fileId, out value);
+                    var portalRes = Portal.TryGet(fileId, out value);
                     if (!portalRes) {
-                        portalRes = HighRes.TryReadFile(fileId, out value);
+                        portalRes = HighRes.TryGet(fileId, out value);
                     }
                     return portalRes;
                 case DatFileType.Local:
-                    return Local.TryReadFile(fileId, out value);
+                    return Local.TryGet(fileId, out value);
                 default:
                     value = default!;
                     return false;
             }
+        }
+
+        /// <summary>
+        /// OBSOLETE: This has been replaced by <see cref="TryGet{T}(uint, out T)"/>!
+        /// </summary>
+        /// <typeparam name="T">The dat file type</typeparam>
+        /// <param name="fileId">The id of the file to get</param>
+        /// <param name="value">The unpacked file</param>
+        /// <returns></returns>
+        [Obsolete("This has been renamed to TryGet<T>(uint, out T)!")]
+#if (NET8_0_OR_GREATER)
+        public bool TryReadFile<T>(uint fileId, [MaybeNullWhen(false)] out T value) where T : IDBObj {
+#else
+        public bool TryReadFile<T>(uint fileId, out T value) where T : IDBObj {
+#endif
+            return TryGet<T>(fileId, out value);
         }
 
         /// <summary>

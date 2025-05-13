@@ -39,7 +39,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             var res = dat.TryWriteFile(writeObj);
             Assert.IsTrue(res);
 
-            var res2 = dat.TryReadFile<QualityFilter>(0x0E010000u, out var readObj);
+            var res2 = dat.TryGet<QualityFilter>(0x0E010000u, out var readObj);
             Assert.IsTrue(res2);
             Assert.IsNotNull(readObj);
 
@@ -101,7 +101,7 @@ namespace DatReaderWriter.Tests.DBObjs {
                 options.IndexCachingStrategy = IndexCachingStrategy.Never;
             });
 
-            var res = dat.TryReadFile<QualityFilter>(0x0E010001u, out var rt1);
+            var res = dat.TryGet<QualityFilter>(0x0E010001u, out var rt1);
             Assert.IsTrue(res);
             Assert.IsNotNull(rt1);
             Assert.AreEqual(0x0E010001u, rt1.Id);

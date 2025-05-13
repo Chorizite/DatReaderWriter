@@ -19,7 +19,7 @@ namespace DatReaderWriter.Tests.Lib {
             dat.Tree.TryGetFile(objId, out var originalEntry);
             Assert.IsNotNull(originalEntry);
 
-            var res = dat.TryReadFile<T>(objId, out var file);
+            var res = dat.TryGet<T>(objId, out var file);
             Assert.IsTrue(res);
             Assert.IsNotNull(file);
 
@@ -33,7 +33,7 @@ namespace DatReaderWriter.Tests.Lib {
             var writer = new DatBinWriter(writtenBytes, dat);
             file.Pack(writer);
 
-            var readRes = dat.TryReadFile<T>(objId, out var writtenFile);
+            var readRes = dat.TryGet<T>(objId, out var writtenFile);
             Assert.IsTrue(readRes);
             Assert.IsNotNull(writtenFile);
 

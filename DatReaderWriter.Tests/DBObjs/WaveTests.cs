@@ -30,7 +30,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             var res = dat.TryWriteFile(writeWave);
             Assert.IsTrue(res);
 
-            var res2 = dat.TryReadFile<Wave>(0xA000001, out var readWave);
+            var res2 = dat.TryGet<Wave>(0xA000001, out var readWave);
             Assert.IsTrue(res2);
             Assert.IsNotNull(readWave);
 
@@ -55,7 +55,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             });
 
 
-            var res = dat.TryReadFile<Wave>(0x0A000002, out var wave1);
+            var res = dat.TryGet<Wave>(0x0A000002, out var wave1);
             Assert.IsTrue(res);
             Assert.IsNotNull(wave1);
             Assert.AreEqual(0x0A000002u, wave1.Id);

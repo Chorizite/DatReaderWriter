@@ -33,7 +33,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             var res = dat.TryWriteFile(writeObj);
             Assert.IsTrue(res);
 
-            var res2 = dat.TryReadFile<SoundTable>(0x20000001u, out var readObj);
+            var res2 = dat.TryGet<SoundTable>(0x20000001u, out var readObj);
             Assert.IsTrue(res2);
             Assert.IsNotNull(readObj);
 
@@ -64,7 +64,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             });
 
 
-            var res = dat.TryReadFile<SoundTable>(0x20000001u, out var readObj);
+            var res = dat.TryGet<SoundTable>(0x20000001u, out var readObj);
             Assert.IsTrue(res);
             Assert.IsNotNull(readObj);
             Assert.AreEqual(0x20000001u, readObj.Id);
@@ -89,7 +89,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             Assert.AreEqual(0.8f, readObj.Sounds[Sound.EnchantDown].Entries.First().Volume);
 
 
-            var res2 = dat.TryReadFile<SoundTable>(0x200000A8u, out var readObj2);
+            var res2 = dat.TryGet<SoundTable>(0x200000A8u, out var readObj2);
             Assert.IsTrue(res2);
             Assert.IsNotNull(readObj2);
             Assert.AreEqual(0x200000A8u, readObj2.Id);

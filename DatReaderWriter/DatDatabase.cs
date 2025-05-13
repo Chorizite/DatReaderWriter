@@ -66,7 +66,7 @@ namespace DatReaderWriter {
 
             Tree = new DatBTreeReaderWriter(BlockAllocator);
 
-            if (TryReadFile<Iteration>(0xFFFF0001, out var iteration)) {
+            if (TryGet<Iteration>(0xFFFF0001, out var iteration)) {
                 Iteration = iteration;
 
                 if (BlockAllocator.CanWrite && Iteration.Iterations.Count > 1) {
@@ -144,8 +144,7 @@ namespace DatReaderWriter {
                 return t;
             }
 
-            TryReadFile<T>(fileId, out var value);
-            
+            var value = Get<T>(fileId);
             if (value is not null && !_fileCache.ContainsKey(fileId)) {
                 _fileCache.Add(fileId, value);
             }
@@ -160,21 +159,21 @@ namespace DatReaderWriter {
         /// <param name="fileId"></param>
         /// <returns></returns>
         public T? Get<T>(uint fileId) where T : IDBObj {
-            TryReadFile<T>(fileId, out var value);
+            TryGet<T>(fileId, out var value);
             return value;
         }
 
         /// <summary>
-        /// Read a dat file. This will be cached according to the <see cref="DatCollectionOptions.FileCachingStrategy"/> in use
+        /// Try and read a <see cref="IDBObj"/>. This will be cached according to the <see cref="DatCollectionOptions.FileCachingStrategy"/> in use
         /// </summary>
         /// <typeparam name="T">The dat file type</typeparam>
         /// <param name="fileId">The id of the file to get</param>
         /// <param name="value">The unpacked file</param>
         /// <returns></returns>
 #if (NET8_0_OR_GREATER)
-        public bool TryReadFile<T>(uint fileId, [MaybeNullWhen(false)] out T value) where T : IDBObj {
+        public bool TryGet<T>(uint fileId, [MaybeNullWhen(false)] out T value) where T : IDBObj {
 #else
-        public bool TryReadFile<T>(uint fileId, out T value) where T : IDBObj {
+        public bool TryGet<T>(uint fileId, out T value) where T : IDBObj {
 #endif
             if (Options.FileCachingStrategy == FileCachingStrategy.OnDemand) {
                 if (_fileCache.TryGetValue(fileId, out var cached) && cached is T t) {
@@ -200,6 +199,22 @@ namespace DatReaderWriter {
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// OBSOLETE: This has been replaced by <see cref="TryGet{T}(uint, out T)"/>!
+        /// </summary>
+        /// <typeparam name="T">The dat file type</typeparam>
+        /// <param name="fileId">The id of the file to get</param>
+        /// <param name="value">The unpacked file</param>
+        /// <returns></returns>
+        [Obsolete("This has been renamed to TryGet<T>(uint, out T)!")]
+#if (NET8_0_OR_GREATER)
+        public bool TryReadFile<T>(uint fileId, [MaybeNullWhen(false)] out T value) where T : IDBObj {
+#else
+        public bool TryReadFile<T>(uint fileId, out T value) where T : IDBObj {
+#endif
+            return TryGet<T>(fileId, out value);
         }
 
         /// <summary>

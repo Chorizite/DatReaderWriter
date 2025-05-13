@@ -32,7 +32,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             var res = dat.TryWriteFile(writeAnim);
             Assert.IsTrue(res);
 
-            var res2 = dat.TryReadFile<EnumMapper>(0x22000001, out var readObj);
+            var res2 = dat.TryGet<EnumMapper>(0x22000001, out var readObj);
             Assert.IsTrue(res2);
             Assert.IsNotNull(readObj);
 
@@ -57,7 +57,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             });
 
 
-            var res = dat.TryReadFile<EnumMapper>(0x2200001B, out var obj);
+            var res = dat.TryGet<EnumMapper>(0x2200001B, out var obj);
             Assert.IsTrue(res);
             Assert.IsNotNull(obj);
             Assert.AreEqual(0x2200001Bu, obj.Id);
@@ -67,7 +67,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             Assert.AreEqual(1765, obj.IdToStringMap.Count);
 
 
-            res = dat.TryReadFile<EnumMapper>(0x22000014, out var obj2);
+            res = dat.TryGet<EnumMapper>(0x22000014, out var obj2);
             Assert.IsTrue(res);
             Assert.IsNotNull(obj2);
             Assert.AreEqual(0x22000014u, obj2.Id);
