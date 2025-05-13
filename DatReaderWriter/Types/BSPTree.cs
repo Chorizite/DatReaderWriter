@@ -1,41 +1,25 @@
 using DatReaderWriter.Enums;
 using DatReaderWriter.Lib.IO;
-using System;
-using System.IO;
-///
-/// From ACE
-///
+
 namespace DatReaderWriter.Types {
     /// <summary>
-    /// Physics BSP Tree
+    /// Abstract base class for BSP trees.
     /// </summary>
-    public class PhysicsBSPTree : BSPTree, IDatObjType {
-        /// <inheritdoc />
-        public bool Pack(DatBinWriter writer) {
-            Pack(writer, BSPTreeType.Physics);
-            return true;
-        }
+    public abstract class BSPTree<TNode> : IDatObjType where TNode : BSPNode {
+        /// <summary>
+        /// Root node of the BSP tree.
+        /// </summary>
+        public TNode? Root { get; set; }
 
         /// <inheritdoc />
         public bool Unpack(DatBinReader reader) {
-            Unpack(reader, BSPTreeType.Physics);
+            Root = reader.ReadItem<TNode>();
             return true;
         }
-    }
 
-    /// <summary>
-    /// Drawing BSP Tree
-    /// </summary>
-    public class DrawingBSPTree : BSPTree, IDatObjType {
         /// <inheritdoc />
         public bool Pack(DatBinWriter writer) {
-            Pack(writer, BSPTreeType.Drawing);
-            return true;
-        }
-
-        /// <inheritdoc />
-        public bool Unpack(DatBinReader reader) {
-            Unpack(reader, BSPTreeType.Drawing);
+            Root?.Pack(writer);
             return true;
         }
     }
@@ -43,28 +27,18 @@ namespace DatReaderWriter.Types {
     /// <summary>
     /// Cell BSP Tree
     /// </summary>
-    public class CellBSPTree : BSPTree, IDatObjType {
-        /// <inheritdoc />
-        public bool Pack(DatBinWriter writer) {
-            Pack(writer, BSPTreeType.Cell);
-            return true;
-        }
-
-        /// <inheritdoc />
-        public bool Unpack(DatBinReader reader) {
-            Unpack(reader, BSPTreeType.Cell);
-            return true;
-        }
+    public class CellBSPTree : BSPTree<CellBSPNode> {
     }
 
-    public abstract class BSPTree {
-        public BSPNode RootNode { get; set; } = new BSPNode();
+    /// <summary>
+    /// Physics BSP Tree
+    /// </summary>
+    public class PhysicsBSPTree : BSPTree<PhysicsBSPNode> {
+    }
 
-        public void Unpack(DatBinReader reader, BSPTreeType treeType) {
-            RootNode = BSPNode.ReadNode(reader, treeType);
-        }
-        public void Pack(DatBinWriter writer, BSPTreeType treeType) {
-            RootNode.Pack(writer, treeType);
-        }
+    /// <summary>
+    /// Drawing BSP Tree
+    /// </summary>
+    public class DrawingBSPTree : BSPTree<DrawingBSPNode> {
     }
 }

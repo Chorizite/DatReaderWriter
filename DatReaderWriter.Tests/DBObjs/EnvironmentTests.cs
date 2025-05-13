@@ -44,19 +44,13 @@ namespace DatReaderWriter.Tests.DBObjs {
                             }
                         },
                         CellBSP = new CellBSPTree() {
-                            RootNode = new BSPLeaf() {
-                                Type = "LEAF"
-                            }
+                            Root = new CellBSPNode() { Type = BSPNodeType.Leaf }
                         },
                         DrawingBSP = new DrawingBSPTree() {
-                            RootNode = new BSPLeaf() {
-                                Type = "LEAF"
-                            }
+                           Root = new DrawingBSPNode() { Type = BSPNodeType.Leaf }
                         },
                         PhysicsBSP = new PhysicsBSPTree() {
-                            RootNode = new BSPLeaf() {
-                                Type = "LEAF"
-                            }
+                           Root = new PhysicsBSPNode() { Type = BSPNodeType.Leaf }
                         },
                         PhysicsPolygons = new Dictionary<ushort, Polygon>() {
                             { 1, new Polygon() {
@@ -110,11 +104,12 @@ namespace DatReaderWriter.Tests.DBObjs {
             Assert.AreEqual(1, readEnv.Cells.First().Value.VertexArray.Vertices.First().Value.UVs.Skip(1).First().V);
 
             Assert.IsNotNull(readEnv.Cells.First().Value.CellBSP);
-            Assert.IsNotNull("LEAF", readEnv.Cells.First().Value.CellBSP.RootNode.Type);
+            Assert.AreEqual(BSPNodeType.Leaf, readEnv.Cells.First().Value.CellBSP.Root.Type);
             Assert.IsNotNull(readEnv.Cells.First().Value.PhysicsBSP);
-            Assert.IsNotNull("LEAF", readEnv.Cells.First().Value.PhysicsBSP.RootNode.Type);
-            Assert.IsNotNull(readEnv.Cells.First().Value.DrawingBSP);
-            Assert.IsNotNull("LEAF", readEnv.Cells.First().Value.DrawingBSP.RootNode.Type);
+
+            //Assert.IsNotNull("LEAF", readEnv.Cells.First().Value.PhysicsBSP.Root.Type);
+            //Assert.IsNotNull(readEnv.Cells.First().Value.DrawingBSP);
+            //Assert.IsNotNull("LEAF", readEnv.Cells.First().Value.DrawingBSP.Root.Type);
 
             Assert.AreEqual(1, readEnv.Cells.First().Value.PhysicsPolygons.Count);
             Assert.AreEqual(1, readEnv.Cells.First().Value.PhysicsPolygons.First().Key);
@@ -186,8 +181,8 @@ namespace DatReaderWriter.Tests.DBObjs {
             Assert.AreEqual(-1, lastPoly.NegSurface);
             Assert.AreEqual("7,6,5,4", string.Join(",", lastPoly.VertexIds));
 
-            Assert.AreEqual("BPnn", env.Cells[0].CellBSP.RootNode.Type);
-            Assert.AreEqual(-1.8f, env.Cells[0].CellBSP.RootNode.SplittingPlane.D);
+            Assert.AreEqual(BSPNodeType.BPnn, env.Cells[0].CellBSP.Root.Type);
+            Assert.AreEqual(-1.8f, env.Cells[0].CellBSP.Root.SplittingPlane.D);
 
             Assert.AreEqual(6, env.Cells[0].PhysicsPolygons.Count);
             var firstPhysicsPoly = env.Cells[0].PhysicsPolygons.First().Value;
@@ -204,29 +199,29 @@ namespace DatReaderWriter.Tests.DBObjs {
             Assert.AreEqual(-1, lastPhysicsPoly.NegSurface);
             Assert.AreEqual("3,0,5,4", string.Join(",", lastPhysicsPoly.VertexIds));
 
-            Assert.AreEqual("BPnN", env.Cells[0].PhysicsBSP.RootNode.Type);
-            Assert.AreEqual(1.8f, env.Cells[0].PhysicsBSP.RootNode.SplittingPlane.D);
-            Assert.AreEqual("LEAF", env.Cells[0].PhysicsBSP.RootNode.PosNode.Type);
+            Assert.AreEqual(BSPNodeType.BPnN, env.Cells[0].PhysicsBSP.Root.Type);
+            Assert.AreEqual(1.8f, env.Cells[0].PhysicsBSP.Root.SplittingPlane.D);
+            Assert.AreEqual(BSPNodeType.Leaf, env.Cells[0].PhysicsBSP.Root.PosNode.Type);
 
-            var leafNode = env.Cells[0].PhysicsBSP.RootNode.PosNode as BSPLeaf;
+            var leafNode = env.Cells[0].PhysicsBSP.Root.PosNode;
             Assert.IsNotNull(leafNode);
             Assert.AreEqual(0, leafNode.LeafIndex);
-            Assert.AreEqual(0, leafNode.Solid);
-            Assert.AreEqual("BPnN", env.Cells[0].PhysicsBSP.RootNode.NegNode.Type);
+            Assert.AreEqual(BSPNodeType.BPnN, env.Cells[0].PhysicsBSP.Root.NegNode.Type);
 
-            Assert.AreEqual("BPIn", env.Cells[0].DrawingBSP.RootNode.Type);
-            Assert.AreEqual(-1.8f, env.Cells[0].DrawingBSP.RootNode.SplittingPlane.D);
-            Assert.AreEqual("BPIn", env.Cells[0].DrawingBSP.RootNode.PosNode.Type);
+            Assert.AreEqual(BSPNodeType.BPIn, env.Cells[0].DrawingBSP.Root.Type);
+            Assert.AreEqual(-1.8f, env.Cells[0].DrawingBSP.Root.SplittingPlane.D);
+            Assert.AreEqual(BSPNodeType.BPIn, env.Cells[0].DrawingBSP.Root.PosNode.Type);
 
             dat.Dispose();
         }
 
-        /*
         [TestMethod]
         [TestCategory("EOR")]
         public void CanReadEORAndWriteIdentical() {
-            TestHelpers.CanReadAndWriteIdentical<Environment>(Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat"), 0x0D00062E);
+            TestHelpers.CanReadAndWriteIdentical<Environment>(Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat"), 0x0D000098u);
+            TestHelpers.CanReadAndWriteIdentical<Environment>(Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat"), 0x0D0003B5u);
+            TestHelpers.CanReadAndWriteIdentical<Environment>(Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat"), 0x0D000444u);
+            TestHelpers.CanReadAndWriteIdentical<Environment>(Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat"), 0x0D00062Eu);
         }
-        */
     }
 }

@@ -103,6 +103,8 @@ namespace DatReaderWriter.Tests.DBObjs {
         [TestMethod]
         [TestCategory("EOR")]
         public void CanReadEORAndWriteIdentical() {
+            TestHelpers.CanReadAndWriteIdentical<DataIdMapper>(Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat"), 0x25000000);
+            TestHelpers.CanReadAndWriteIdentical<DataIdMapper>(Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat"), 0x2500000C);
             TestHelpers.CanReadAndWriteIdentical<DataIdMapper>(Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat"), 0x25000014);
         }
     }

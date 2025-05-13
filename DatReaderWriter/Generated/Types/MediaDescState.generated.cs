@@ -23,14 +23,14 @@ namespace DatReaderWriter.Types {
         /// <inheritdoc />
         public override MediaType MediaType => MediaType.State;
 
-        public uint StateId;
+        public UIStateId StateId;
 
         public float Probability;
 
         /// <inheritdoc />
         public override bool Unpack(DatBinReader reader) {
             base.Unpack(reader);
-            StateId = reader.ReadUInt32();
+            StateId = (UIStateId)reader.ReadUInt32();
             Probability = reader.ReadSingle();
             return true;
         }
@@ -38,7 +38,7 @@ namespace DatReaderWriter.Types {
         /// <inheritdoc />
         public override bool Pack(DatBinWriter writer) {
             base.Pack(writer);
-            writer.WriteUInt32(StateId);
+            writer.WriteUInt32((uint)StateId);
             writer.WriteSingle(Probability);
             return true;
         }

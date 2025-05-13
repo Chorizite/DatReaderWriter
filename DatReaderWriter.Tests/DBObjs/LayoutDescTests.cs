@@ -31,7 +31,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             Assert.AreEqual(3u, layout.Elements[0x1000041a].Type, "Type");
             Assert.AreEqual(0u, layout.Elements[0x1000041a].BaseElement, "BaseElement");
             Assert.AreEqual(0u, layout.Elements[0x1000041a].BaseLayoutId, "BaseLayoutId");
-            Assert.AreEqual(StateId.Undef, layout.Elements[0x1000041a].DefaultState, "DefaultState");
+            Assert.AreEqual(UIStateId.Undef, layout.Elements[0x1000041a].DefaultState, "DefaultState");
             Assert.AreEqual((IncorporationFlags)63, layout.Elements[0x1000041a].StateDesc.IncorporationFlags, "Flags");
 
             Assert.AreEqual(7, layout.Elements[0x1000041a].Children.Count);
