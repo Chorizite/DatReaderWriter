@@ -41,7 +41,7 @@ namespace DatReaderWriter.Types {
         /// <summary>
         /// The default state this element is in.
         /// </summary>
-        public StateId DefaultState;
+        public UIStateId DefaultState;
 
         /// <summary>
         /// The X position of this element, relative to the parent.
@@ -76,7 +76,7 @@ namespace DatReaderWriter.Types {
 
         public uint BottomEdge;
 
-        public Dictionary<StateId, StateDesc> States = [];
+        public Dictionary<UIStateId, StateDesc> States = [];
 
         public Dictionary<uint, ElementDesc> Children = [];
 
@@ -88,7 +88,7 @@ namespace DatReaderWriter.Types {
             Type = reader.ReadUInt32();
             BaseElement = reader.ReadUInt32();
             BaseLayoutId = reader.ReadUInt32();
-            DefaultState = (StateId)reader.ReadUInt32();
+            DefaultState = (UIStateId)reader.ReadUInt32();
             if (StateDesc.IncorporationFlags.HasFlag(IncorporationFlags.X)) {
                 X = reader.ReadUInt32();
             }
@@ -111,7 +111,7 @@ namespace DatReaderWriter.Types {
             var _statesBucketSize = reader.ReadByte();
             var _numStates = reader.ReadCompressedUInt();
             for (var i=0; i < _numStates; i++) {
-                var _key = (StateId)reader.ReadUInt32();
+                var _key = (UIStateId)reader.ReadUInt32();
                 var _val = reader.ReadItem<StateDesc>();
                 States.Add(_key, _val);
             }

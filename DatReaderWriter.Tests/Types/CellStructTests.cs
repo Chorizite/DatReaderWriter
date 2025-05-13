@@ -35,19 +35,13 @@ namespace DatReaderWriter.Tests.Types {
                             }
                 },
                 CellBSP = new CellBSPTree() {
-                    RootNode = new BSPLeaf() {
-                        Type = "LEAF"
-                    }
+                    Root = new CellBSPNode() { Type = BSPNodeType.Leaf }
                 },
                 DrawingBSP = new DrawingBSPTree() {
-                    RootNode = new BSPLeaf() {
-                        Type = "LEAF"
-                    }
+                    Root = new DrawingBSPNode() { Type = BSPNodeType.Leaf }
                 },
                 PhysicsBSP = new PhysicsBSPTree() {
-                    RootNode = new BSPLeaf() {
-                        Type = "LEAF"
-                    }
+                    Root = new PhysicsBSPNode() { Type = BSPNodeType.Leaf }
                 },
                 PhysicsPolygons = new Dictionary<ushort, Polygon>() {
                             { 1, new Polygon() {
@@ -95,11 +89,11 @@ namespace DatReaderWriter.Tests.Types {
             Assert.AreEqual(1, readObj.VertexArray.Vertices.First().Value.UVs.Skip(1).First().V);
 
             Assert.IsNotNull(readObj.CellBSP);
-            Assert.IsNotNull("LEAF", readObj.CellBSP.RootNode.Type);
+            Assert.AreEqual(BSPNodeType.Leaf, readObj.CellBSP.Root.Type);
             Assert.IsNotNull(readObj.PhysicsBSP);
-            Assert.IsNotNull("LEAF", readObj.PhysicsBSP.RootNode.Type);
+            Assert.AreEqual(BSPNodeType.Leaf, readObj.PhysicsBSP.Root.Type);
             Assert.IsNotNull(readObj.DrawingBSP);
-            Assert.IsNotNull("LEAF", readObj.DrawingBSP.RootNode.Type);
+            Assert.AreEqual(BSPNodeType.Leaf, readObj.DrawingBSP.Root.Type);
 
             Assert.AreEqual(1, readObj.PhysicsPolygons.Count);
             Assert.AreEqual(1, readObj.PhysicsPolygons.First().Key);

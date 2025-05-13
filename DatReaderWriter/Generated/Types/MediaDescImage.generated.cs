@@ -25,13 +25,13 @@ namespace DatReaderWriter.Types {
 
         public uint File;
 
-        public uint DrawMode;
+        public DrawModeType DrawMode;
 
         /// <inheritdoc />
         public override bool Unpack(DatBinReader reader) {
             base.Unpack(reader);
             File = reader.ReadUInt32();
-            DrawMode = reader.ReadUInt32();
+            DrawMode = (DrawModeType)reader.ReadUInt32();
             return true;
         }
 
@@ -39,7 +39,7 @@ namespace DatReaderWriter.Types {
         public override bool Pack(DatBinWriter writer) {
             base.Pack(writer);
             writer.WriteUInt32(File);
-            writer.WriteUInt32(DrawMode);
+            writer.WriteUInt32((uint)DrawMode);
             return true;
         }
 

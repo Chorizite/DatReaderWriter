@@ -76,21 +76,23 @@ namespace DatReaderWriter.Tests.DBObjs {
             Assert.IsNotNull(env.DrawingBSP);
             Assert.IsNull(env.PhysicsBSP);
 
-            Assert.AreEqual("BPOL", env.DrawingBSP.RootNode.Type);
-            Assert.IsNull(env.DrawingBSP.RootNode.PosNode);
-            Assert.IsNull(env.DrawingBSP.RootNode.NegNode);
-            Assert.AreEqual("0", string.Join(",", env.DrawingBSP.RootNode.InPolys));
-            Assert.AreEqual(0.126001f, env.DrawingBSP.RootNode.Sphere.Radius);
+            Assert.AreEqual(BSPNodeType.BPOL, env.DrawingBSP.Root.Type);
+            Assert.IsNull(env.DrawingBSP.Root.PosNode);
+            Assert.IsNull(env.DrawingBSP.Root.NegNode);
+            Assert.AreEqual("0", string.Join(",", env.DrawingBSP.Root.Polygons));
+            Assert.AreEqual(0.126001f, env.DrawingBSP.Root.BoundingSphere.Radius);
 
             dat.Dispose();
         }
 
-        /*
         [TestMethod]
         [TestCategory("EOR")]
         public void CanReadEORAndWriteIdentical() {
+            TestHelpers.CanReadAndWriteIdentical<GfxObj>(Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat"), 0x01000331);
             TestHelpers.CanReadAndWriteIdentical<GfxObj>(Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat"), 0x010005E8);
+            TestHelpers.CanReadAndWriteIdentical<GfxObj>(Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat"), 0x01001B2A);
+            TestHelpers.CanReadAndWriteIdentical<GfxObj>(Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat"), 0x01004E57);
+            TestHelpers.CanReadAndWriteIdentical<GfxObj>(Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat"), 0x01003E17);
         }
-        */
     }
 }

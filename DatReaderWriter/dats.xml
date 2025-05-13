@@ -2317,7 +2317,7 @@
       <value name="Fade" value="0x0000000B" />
       <value name="Stretch" value="0x0000000C" />
     </enum>
-    <enum name="StateId" parent="uint">
+    <enum name="UIStateId" parent="uint">
       <value name="Undef" value="0x00000000" />
       <value name="Normal" value="0x00000001" />
       <value name="Normal_rollover" value="0x00000002" />
@@ -2427,6 +2427,12 @@
       <value name="LockedUI" value="0x10000063" />
       <value name="UnlockedUI" value="0x10000064" />
     </enum>
+    <enum name="DrawModeType" parent="uint">
+      <value name="Undefined" value="0x0" />
+      <value name="Normal" value="0x1" />
+      <value name="Overlay" value="0x2" />
+      <value name="Alphablend" value="0x3" />
+    </enum>
   </enums>
   <types>
     <type name="DBObj" abstract="true">
@@ -2495,7 +2501,7 @@
       <vector name="Polygons" length="_numPolys" type="Dictionary" genericKey="ushort" genericValue="Polygon" />
       <vector name="Portals" length="_numPortals" type="List" genericValue="ushort" />
       <align type="uint" />
-      <field type="CellBSPTree" name="CellBSP" BSPType="BSPType.Cell" />
+      <field type="CellBSPTree" name="CellBSP" />
       <vector name="PhysicsPolygons" length="_numPhysicsPolys" type="Dictionary" genericKey="ushort" genericValue="Polygon" />
       <field type="PhysicsBSPTree" name="PhysicsBSP" />
       <field type="bool" name="_hasDrawingBSP" value="DrawingBSP != null" />
@@ -3357,7 +3363,7 @@
         </type>
         <type name="MediaDescAnimation" value="MediaType.Animation">
           <field name="Duration" type="float" />
-          <field name="DrawMode" type="uint" />
+          <field name="DrawMode" type="DrawModeType" />
           <field type="uint" name="_numValues" />
           <vector name="Frames" length="_numValues" type="List" genericValue="uint" />
         </type>
@@ -3368,7 +3374,7 @@
         </type>
         <type name="MediaDescImage" value="MediaType.Image">
           <field name="File" type="uint" />
-          <field name="DrawMode" type="uint" />
+          <field name="DrawMode" type="DrawModeType" />
         </type>
         <type name="MediaDescJump" value="MediaType.Jump">
           <field name="JumpItemIndex" type="uint" />
@@ -3387,7 +3393,7 @@
           <field name="Sound" type="Sound" />
         </type>
         <type name="MediaDescState" value="MediaType.State">
-          <field name="StateId" type="uint" />
+          <field name="StateId" type="UIStateId" />
           <field name="Probability" type="float" />
         </type>
         <type name="MediaDescFade" value="MediaType.Fade">
@@ -3398,7 +3404,7 @@
       </typeswitch>
     </type>
     <type name="StateDesc">
-      <field type="uint" name="StateId" />
+      <field type="UIStateId" name="StateId" />
       <field type="bool" name="PassToChildren" size="1" />
       <field type="IncorporationFlags" name="IncorporationFlags" />
       <field type="byte" name="_numBuckets" value="0" />
@@ -3414,7 +3420,7 @@
       <field type="uint" name="Type" />
       <field type="uint" name="BaseElement" text="ElementId that this inherits from, if any. BaseLayoutId contains the parent layout." />
       <field type="uint" name="BaseLayoutId" text="The parent layout for the BaseElement, if any" />
-      <field type="StateId" name="DefaultState" text="The default state this element is in." />
+      <field type="UIStateId" name="DefaultState" text="The default state this element is in." />
       <maskmap name="StateDesc.IncorporationFlags">
         <mask value="IncorporationFlags.X">
           <field type="uint" name="X" text="The X position of this element, relative to the parent." />
@@ -3438,7 +3444,7 @@
       <field type="uint" name="BottomEdge" />
       <field type="byte" name="_statesBucketSize" value="1" />
       <field type="CompressedUInt" name="_numStates" />
-      <vector name="States" length="_numStates" type="Dictionary" genericKey="StateId" genericValue="StateDesc" value="A list of states that can be applied to this element." />
+      <vector name="States" length="_numStates" type="Dictionary" genericKey="UIStateId" genericValue="StateDesc" value="A list of states that can be applied to this element." />
       <field type="byte" name="_childrenBucketSize" value="1" />
       <field type="CompressedUInt" name="_numChildren" />
       <vector name="Children" length="_numChildren" type="Dictionary" genericKey="uint" genericValue="ElementDesc" />

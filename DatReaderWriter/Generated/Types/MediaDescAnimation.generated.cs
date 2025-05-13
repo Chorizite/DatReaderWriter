@@ -25,7 +25,7 @@ namespace DatReaderWriter.Types {
 
         public float Duration;
 
-        public uint DrawMode;
+        public DrawModeType DrawMode;
 
         public List<uint> Frames = [];
 
@@ -33,7 +33,7 @@ namespace DatReaderWriter.Types {
         public override bool Unpack(DatBinReader reader) {
             base.Unpack(reader);
             Duration = reader.ReadSingle();
-            DrawMode = reader.ReadUInt32();
+            DrawMode = (DrawModeType)reader.ReadUInt32();
             var _numValues = reader.ReadUInt32();
             for (var i=0; i < _numValues; i++) {
                 Frames.Add(reader.ReadUInt32());
@@ -45,7 +45,7 @@ namespace DatReaderWriter.Types {
         public override bool Pack(DatBinWriter writer) {
             base.Pack(writer);
             writer.WriteSingle(Duration);
-            writer.WriteUInt32(DrawMode);
+            writer.WriteUInt32((uint)DrawMode);
             writer.WriteUInt32((uint)Frames.Count());
             foreach (var item in Frames) {
                 writer.WriteUInt32(item);

@@ -10,7 +10,7 @@
 
 using System;
 namespace DatReaderWriter.Enums {
-    public enum StateId : uint {
+    public enum UIStateId : uint {
         Undef = 0x00000000,
 
         Normal = 0x00000001,
