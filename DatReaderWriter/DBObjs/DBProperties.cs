@@ -28,19 +28,17 @@ namespace DatReaderWriter.DBObjs {
             if (reader.Database is null) {
                 throw new Exception("reader.Database is null, unable to read MasterProperties and unpack DBProperties.");
             }
+            if (!reader.Database.TryReadFile<MasterProperty>(0x39000001u, out var masterProperty)) {
+                throw new Exception("Unable to read MasterProperty (0x39000001)");
+            }
 
             base.Unpack(reader);
             var _bucketSize = reader.ReadByte();
             var _numProperties = reader.ReadByte();
-            if (!reader.Database.TryReadFile<MasterProperty>(0x39000001u, out var masterProperty)) {
-                throw new Exception("Unable to read MasterProperty (0x39000001)");
-            }
+
             for (var i = 0; i < _numProperties; i++) {
                 var _key = reader.ReadUInt32();
-                var _peekedValue = reader.ReadUInt32();
-                var _peekedPropType = masterProperty.Properties[_peekedValue].Type;
-                reader.Skip(-sizeof(BasePropertyType));
-                var _val = BaseProperty.Unpack(reader, _peekedPropType, true);
+                var _val = BaseProperty.UnpackGeneric(reader);
                 Properties.Add(_key, _val);
             }
             return true;
@@ -53,8 +51,6 @@ namespace DatReaderWriter.DBObjs {
             writer.WriteByte((byte)Properties.Count());
             foreach (var kv in Properties) {
                 writer.WriteUInt32(kv.Key);
-                writer.WriteUInt32(kv.Key);
-                kv.Value._includeType = false;
                 writer.WriteItem<BaseProperty>(kv.Value);
             }
             return true;

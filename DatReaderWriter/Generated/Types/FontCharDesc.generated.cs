@@ -30,11 +30,11 @@ namespace DatReaderWriter.Types {
 
         public byte Height;
 
-        public byte HorizontalOffsetBefore;
+        public sbyte HorizontalOffsetBefore;
 
-        public byte HorizontalOffsetAfter;
+        public sbyte HorizontalOffsetAfter;
 
-        public byte VerticalOffsetBefore;
+        public sbyte VerticalOffsetBefore;
 
         /// <inheritdoc />
         public bool Unpack(DatBinReader reader) {
@@ -43,9 +43,9 @@ namespace DatReaderWriter.Types {
             OffsetY = reader.ReadUInt16();
             Width = reader.ReadByte();
             Height = reader.ReadByte();
-            HorizontalOffsetBefore = reader.ReadByte();
-            HorizontalOffsetAfter = reader.ReadByte();
-            VerticalOffsetBefore = reader.ReadByte();
+            HorizontalOffsetBefore = reader.ReadSByte();
+            HorizontalOffsetAfter = reader.ReadSByte();
+            VerticalOffsetBefore = reader.ReadSByte();
             return true;
         }
 
@@ -56,9 +56,9 @@ namespace DatReaderWriter.Types {
             writer.WriteUInt16(OffsetY);
             writer.WriteByte(Width);
             writer.WriteByte(Height);
-            writer.WriteByte(HorizontalOffsetBefore);
-            writer.WriteByte(HorizontalOffsetAfter);
-            writer.WriteByte(VerticalOffsetBefore);
+            writer.WriteSByte(HorizontalOffsetBefore);
+            writer.WriteSByte(HorizontalOffsetAfter);
+            writer.WriteSByte(VerticalOffsetBefore);
             return true;
         }
 

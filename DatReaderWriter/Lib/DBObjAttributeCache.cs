@@ -105,8 +105,11 @@ namespace DatReaderWriter.Lib {
         }
 
         internal static DBObjType DBObjTypeFromId(DatFileType datType, uint id) {
-            var type = TypeFromId(datType, id);
+            if (id == 0xFFFF0001) {
+                return DBObjType.Iteration;
+            }
 
+            var type = TypeFromId(datType, id);
             if (type is not null && TypeCache.TryGetValue(type, out var attr)) {
                 return attr.DBObjType;
             }

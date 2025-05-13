@@ -85,7 +85,8 @@ namespace DatReaderWriter.Tests.DBObjs {
         [TestMethod]
         [TestCategory("EOR")]
         public void CanReadEORAndWriteIdentical() {
-            TestHelpers.CanReadAndWriteIdentical<MasterProperty>(Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat"), 0x39000001u);
+            var datCollection = new DatCollection(EORCommonData.DatDirectory, DatAccessType.Read);
+            TestHelpers.CanReadAndWriteIdentical<MasterProperty>("", 0x39000001u, datCollection.Portal);
         }
     }
 }

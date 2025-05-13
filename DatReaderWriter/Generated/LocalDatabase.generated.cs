@@ -21,24 +21,5 @@ using DatReaderWriter.DBObjs;
 
 namespace DatReaderWriter {
     public partial class LocalDatabase {
-        private DBObjCollection<LayoutDesc>? _LayoutDescs;
-        private DBObjCollection<StringTable>? _StringTables;
-        private DBObjCollection<LanguageInfo>? _LanguageInfos;
-        
-        /// <summary>
-        /// All LayoutDescs in the database.
-        /// </summary>
-        public DBObjCollection<LayoutDesc> LayoutDescs => _LayoutDescs ??= new DBObjCollection<LayoutDesc>(this);
-        
-        /// <summary>
-        /// All StringTables in the database.
-        /// </summary>
-        public DBObjCollection<StringTable> StringTables => _StringTables ??= new DBObjCollection<StringTable>(this);
-        
-        /// <summary>
-        /// All LanguageInfos in the database.
-        /// </summary>
-        public DBObjCollection<LanguageInfo> LanguageInfos => _LanguageInfos ??= new DBObjCollection<LanguageInfo>(this);
-        
     }
 }

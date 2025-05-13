@@ -1,4 +1,5 @@
-﻿using DatReaderWriter.Enums;
+﻿using DatReaderWriter.DBObjs;
+using DatReaderWriter.Enums;
 using DatReaderWriter.Lib;
 using DatReaderWriter.Lib.IO;
 using DatReaderWriter.Options;
@@ -12,9 +13,7 @@ namespace DatReaderWriter {
     /// Represents a collection of eor .dat files
     /// </summary>
     public class DatCollection : IDisposable {
-        private Dictionary<uint, IDBObj> _cellCache = new();
-        private Dictionary<uint, IDBObj> _portalCache = new();
-        private Dictionary<uint, IDBObj> _localCache = new();
+        private MasterProperty? _masterProperty;
 
         /// <summary>
         /// The options this collection was created with
@@ -64,10 +63,33 @@ namespace DatReaderWriter {
         public DatCollection(DatCollectionOptions options) {
             Options = options;
 
-            Cell = new CellDatabase(options.CellDatPath, options.AccessType);
-            Portal = new PortalDatabase(options.PortalDatPath, options.AccessType);
-            Local = new LocalDatabase(options.LocalDatPath, options.AccessType);
-            HighRes = new PortalDatabase(options.HighResDatPath, options.AccessType);
+            Cell = new CellDatabase((o) => {
+                o.FilePath = options.CellDatPath;
+                o.AccessType = options.AccessType;
+                o.IndexCachingStrategy = options.CellIndexCachingStrategy;
+                o.FileCachingStrategy = options.CellFileCachingStrategy;
+            });
+
+            Portal = new PortalDatabase((o) => {
+                o.FilePath = options.PortalDatPath;
+                o.AccessType = options.AccessType;
+                o.IndexCachingStrategy = options.PortalIndexCachingStrategy;
+                o.FileCachingStrategy = options.PortalFileCachingStrategy;
+            });
+
+            Local = new LocalDatabase((o) => {
+                o.FilePath = options.LocalDatPath;
+                o.AccessType = options.AccessType;
+                o.IndexCachingStrategy = options.LocalIndexCachingStrategy;
+                o.FileCachingStrategy = options.LocalFileCachingStrategy;
+            });
+
+            HighRes = new PortalDatabase((o) => {
+                o.FilePath = options.HighResDatPath;
+                o.AccessType = options.AccessType;
+                o.IndexCachingStrategy = options.HighResIndexCachingStrategy;
+                o.FileCachingStrategy = options.HighResFileCachingStrategy;
+            });
 
             Cell.DatCollection = this;
             Portal.DatCollection = this;
@@ -76,12 +98,33 @@ namespace DatReaderWriter {
         }
 
         /// <summary>
-        /// Clear the file cache, only applicable if <see cref="DatCollectionOptions.CacheFiles"/> is true
+        /// Clear the file cache, only applicable if <see cref="DatCollectionOptions.FileCachingStrategy"/>
+        /// is <see cref="FileCachingStrategy.OnDemand"/>
         /// </summary>
         public void ClearCache() {
-            _cellCache.Clear();
-            _portalCache.Clear();
-            _localCache.Clear();
+            Cell.ClearCache();
+            Portal.ClearCache();
+            Local.ClearCache();
+            HighRes.ClearCache();
+        }
+
+        /// <summary>
+        /// Read a dat file, and caches it regardless of <see cref="DatCollectionOptions.FileCachingStrategy"/>
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="fileId"></param>
+        /// <returns></returns>
+        public T? GetCached<T>(uint fileId) where T : IDBObj {
+            switch (MapToDatFileType<T>()) {
+                case DatFileType.Cell:
+                    return Cell.GetCached<T>(fileId);
+                case DatFileType.Portal:
+                    return Portal.GetCached<T>(fileId) ?? HighRes.GetCached<T>(fileId);
+                case DatFileType.Local:
+                    return Local.GetCached<T>(fileId);
+                default:
+                    return default;
+            }
         }
 
         /// <summary>
@@ -90,9 +133,26 @@ namespace DatReaderWriter {
         /// <typeparam name="T"></typeparam>
         /// <param name="fileId"></param>
         /// <returns></returns>
-        public T? Read<T>(uint fileId) where T : IDBObj {
+        public T? Get<T>(uint fileId) where T : IDBObj {
             TryReadFile<T>(fileId, out var value);
             return value;
+        }
+
+        /// <summary>
+        /// Get an enumerable of all existing ids of a specific type
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        public IEnumerable<uint> GetAllIdsOfType<T>() where T : IDBObj {
+            switch (MapToDatFileType<T>()) {
+                case DatFileType.Cell:
+                    return Cell.GetAllIdsOfType<T>();
+                case DatFileType.Portal:
+                    return Portal.GetAllIdsOfType<T>().Concat(HighRes.GetAllIdsOfType<T>());
+                case DatFileType.Local:
+                    return Local.GetAllIdsOfType<T>();
+                default:
+                    return [];
+            }
         }
 
         /// <summary>
@@ -103,46 +163,21 @@ namespace DatReaderWriter {
         /// <param name="value">The unpacked file</param>
         /// <returns></returns>
 #if (NET8_0_OR_GREATER)
-            public bool TryReadFile<T>(uint fileId, [MaybeNullWhen(false)] out T value) where T : IDBObj {
+        public bool TryReadFile<T>(uint fileId, [MaybeNullWhen(false)] out T value) where T : IDBObj {
 #else
         public bool TryReadFile<T>(uint fileId, out T value) where T : IDBObj {
 #endif
             switch (MapToDatFileType<T>()) {
                 case DatFileType.Cell:
-                    if (Options.CacheFiles && _cellCache.TryGetValue(fileId, out var cached) && cached is T t) {
-                        value = t;
-                        return true;
-                    }
-                    var res = Cell.TryReadFile(fileId, out value);
-                    if (res && Options.CacheFiles) {
-                        _cellCache[fileId] = value!;
-                    }
-                    return res;
+                    return Cell.TryReadFile(fileId, out value);
                 case DatFileType.Portal:
-                    if (Options.CacheFiles && _portalCache.TryGetValue(fileId, out cached) && cached is T t2) {
-                        value = t2;
-                        return true;
+                    var portalRes = Portal.TryReadFile(fileId, out value);
+                    if (!portalRes) {
+                        portalRes = HighRes.TryReadFile(fileId, out value);
                     }
-                    var res2 = Portal.TryReadFile(fileId, out value);
-                    if (!res2) {
-                        res2 = HighRes.TryReadFile(fileId, out value);
-                    }
-
-                    if (res2 && Options.CacheFiles) {
-                        _portalCache[fileId] = value!;
-                    }
-
-                    return res2;
+                    return portalRes;
                 case DatFileType.Local:
-                    if (Options.CacheFiles && _localCache.TryGetValue(fileId, out cached) && cached is T t3) {
-                        value = t3;
-                        return true;
-                    }
-                    var res3 = Local.TryReadFile(fileId, out value);
-                    if (res3 && Options.CacheFiles) {
-                        _localCache[fileId] = value!;
-                    }
-                    return res3;
+                    return Local.TryReadFile(fileId, out value);
                 default:
                     value = default!;
                     return false;
@@ -150,9 +185,8 @@ namespace DatReaderWriter {
         }
 
         /// <summary>
-        /// Get the dat file that stores an id
+        /// Get the DatFileType associated with the specified IDBObj type
         /// </summary>
-        /// <param name="id">The id of the dat file entry</param>
         /// <returns>The DatFileType this entry is stored in</returns>
         public DatFileType MapToDatFileType<T>() where T : IDBObj {
             var typeCacheVal = DBObjAttributeCache.TypeCache.Values.FirstOrDefault(t => t.Type == typeof(T));

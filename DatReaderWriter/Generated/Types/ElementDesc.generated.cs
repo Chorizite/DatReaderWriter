@@ -28,20 +28,44 @@ namespace DatReaderWriter.Types {
 
         public uint Type;
 
+        /// <summary>
+        /// ElementId that this inherits from, if any. BaseLayoutId contains the parent layout.
+        /// </summary>
         public uint BaseElement;
 
+        /// <summary>
+        /// The parent layout for the BaseElement, if any
+        /// </summary>
         public uint BaseLayoutId;
 
-        public uint DefaultState;
+        /// <summary>
+        /// The default state this element is in.
+        /// </summary>
+        public StateId DefaultState;
 
+        /// <summary>
+        /// The X position of this element, relative to the parent.
+        /// </summary>
         public uint X;
 
+        /// <summary>
+        /// The Y position of this element, relative to the parent.
+        /// </summary>
         public uint Y;
 
+        /// <summary>
+        /// The width of this element.
+        /// </summary>
         public uint Width;
 
+        /// <summary>
+        /// The height of this element.
+        /// </summary>
         public uint Height;
 
+        /// <summary>
+        /// Determines draw order, higher is on top
+        /// </summary>
         public uint ZLevel;
 
         public uint LeftEdge;
@@ -52,7 +76,7 @@ namespace DatReaderWriter.Types {
 
         public uint BottomEdge;
 
-        public Dictionary<uint, StateDesc> States = [];
+        public Dictionary<StateId, StateDesc> States = [];
 
         public Dictionary<uint, ElementDesc> Children = [];
 
@@ -64,7 +88,7 @@ namespace DatReaderWriter.Types {
             Type = reader.ReadUInt32();
             BaseElement = reader.ReadUInt32();
             BaseLayoutId = reader.ReadUInt32();
-            DefaultState = reader.ReadUInt32();
+            DefaultState = (StateId)reader.ReadUInt32();
             if (StateDesc.IncorporationFlags.HasFlag(IncorporationFlags.X)) {
                 X = reader.ReadUInt32();
             }
@@ -87,7 +111,7 @@ namespace DatReaderWriter.Types {
             var _statesBucketSize = reader.ReadByte();
             var _numStates = reader.ReadCompressedUInt();
             for (var i=0; i < _numStates; i++) {
-                var _key = reader.ReadUInt32();
+                var _key = (StateId)reader.ReadUInt32();
                 var _val = reader.ReadItem<StateDesc>();
                 States.Add(_key, _val);
             }
@@ -109,7 +133,7 @@ namespace DatReaderWriter.Types {
             writer.WriteUInt32(Type);
             writer.WriteUInt32(BaseElement);
             writer.WriteUInt32(BaseLayoutId);
-            writer.WriteUInt32(DefaultState);
+            writer.WriteUInt32((uint)DefaultState);
             if (StateDesc.IncorporationFlags.HasFlag(IncorporationFlags.X)) {
                 writer.WriteUInt32(X);
             }
@@ -132,7 +156,7 @@ namespace DatReaderWriter.Types {
             writer.WriteByte(1);
             writer.WriteCompressedUInt((uint)States.Count());
             foreach (var kv in States) {
-                writer.WriteUInt32(kv.Key);
+                writer.WriteUInt32((uint)kv.Key);
                 writer.WriteItem<StateDesc>(kv.Value);
             }
             writer.WriteByte(1);

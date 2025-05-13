@@ -15,19 +15,5 @@ namespace DatReaderWriter.Tests {
             using var dat = new CellDatabase(Path.Combine(EORCommonData.DatDirectory, $"client_cell_1.dat"));
             EORCommonData.AssertGoodHeader(dat.Header);
         }
-
-        [TestMethod]
-        [TestCategory("EOR")]
-        public void CanOpenIterateEoRLandBlocks() {
-            using var dat = new CellDatabase(Path.Combine(EORCommonData.DatDirectory, $"client_cell_1.dat"));
-
-            var count = 0;
-            foreach (var landBlock in dat.LandBlocks) {
-                Assert.IsNotNull(landBlock);
-                count++;
-            }
-
-            Assert.AreEqual(65025, count);
-        }
     }
 }

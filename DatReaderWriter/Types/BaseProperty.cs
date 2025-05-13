@@ -11,51 +11,64 @@ using DatReaderWriter.DBObjs;
 
 namespace DatReaderWriter.Types {
     public abstract partial class BaseProperty : IDatObjType {
-        internal bool _includeType = true;
-        internal int? _propKey;
-
         public abstract BasePropertyType PropertyType { get; }
+
+        /// <summary>
+        /// The type key, from MasterProperties (not valid for BaseProperties inside MasterProperties)
+        /// </summary>
+        public uint MasterPropertyId { get; set; }
+
+        /// <summary>
+        /// True if this property should pack its type. This should be set to true
+        /// except for MasterProperties
+        /// </summary>
+        public bool ShouldPackMasterPropertyId { get; set; }
 
         /// <inheritdoc />
         public virtual bool Unpack(DatBinReader reader) {
-            if (_includeType) {
-                _propKey = reader.ReadInt32();
-                if (reader.Database?.DatCollection is null) {
-                    throw new Exception("reader.Database.DatCollection is null! Unable to read MasterProperties and unpack StateDesc. Use DatCollection instead of creating a standalone DatDatabase");
-                }
-                if (!reader.Database.DatCollection.TryReadFile<MasterProperty>(0x39000001u, out var masterProperty)) {
-                    throw new Exception("Unable to read MasterProperty (0x39000001)");
-                }
-                var _propLookup = masterProperty.Properties[(uint)_propKey].Type;
-            }
             return true;
         }
 
         /// <inheritdoc />
         public virtual bool Pack(DatBinWriter writer) {
-            if (_includeType) {
-                if (writer.Database?.DatCollection is null) {
-                    throw new Exception("reader.Database.DatCollection is null! Unable to read MasterProperties and unpack StateDesc. Use DatCollection instead of creating a standalone DatDatabase");
-                }
-                if (!writer.Database.DatCollection.TryReadFile<MasterProperty>(0x39000001u, out var masterProperty)) {
-                    throw new Exception("Unable to read MasterProperty (0x39000001)");
-                }
-
-                var _propLookup = _propKey.HasValue ? (uint)_propKey.Value : masterProperty.Properties.FirstOrDefault((kv) => {
-                    return kv.Value.Type == PropertyType;
-                }).Key;
-
-                writer.WriteInt32((int)_propLookup);
-                writer.WriteInt32((int)_propLookup);
+            if (ShouldPackMasterPropertyId) {
+                writer.WriteUInt32(MasterPropertyId);
             }
             return true;
         }
 
         /// <summary>
+        /// Create a typed instance of this abstract class, used for MasterProperties
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <returns></returns>
+        public static BaseProperty? UnpackGenericMasterProperty(DatBinReader reader, BasePropertyType type) {
+            return UnpackInstanceFromType(reader, type, false, 0);
+        }
+
+        /// <summary>
         /// Create a typed instance of this abstract class
         /// </summary>
-        public static BaseProperty? Unpack(DatBinReader reader, BasePropertyType type, bool includeType = false) {
+        public static BaseProperty? UnpackGeneric(DatBinReader reader) {
+            MasterProperty? masterProperty = null;
+            if (masterProperty is null && reader.Database is not null && reader.Database is PortalDatabase portalDatabase) {
+                masterProperty = portalDatabase.MasterProperty;
+            }
+            masterProperty ??= reader.Database?.DatCollection?.Portal?.MasterProperty;
+
+            if (masterProperty is null) {
+                throw new Exception($"writer.Database.DatCollection is null! Unable to read MasterProperties and pack {typeof(BaseProperty).Name}. Use DatCollection instead of creating a standalone DatDatabase");
+            }
+
+            var key = reader.ReadUInt32();
+            var type = masterProperty.Properties[key].Type;
+            
+            return UnpackInstanceFromType(reader, type, true, key);
+        }
+
+        private static BaseProperty? UnpackInstanceFromType(DatBinReader reader, BasePropertyType type, bool shouldPackType, uint key) {
             BaseProperty? instance = null;
+
             switch (type) {
                 case BasePropertyType.Enum:
                     instance = new EnumBaseProperty();
@@ -99,7 +112,8 @@ namespace DatReaderWriter.Types {
                 default:
                     throw new Exception($"Unsupported BaseProperty type: {type}");
             }
-            instance._includeType = includeType;
+            instance.ShouldPackMasterPropertyId = shouldPackType;
+            instance.MasterPropertyId = key;
             instance.Unpack(reader);
             return instance;
         }

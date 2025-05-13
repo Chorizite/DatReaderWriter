@@ -60,20 +60,5 @@ namespace DatReaderWriter.Tests {
             using var dat = new PortalDatabase(Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat"));
             EORCommonData.AssertGoodHeader(dat.Header);
         }
-
-        [TestMethod]
-        [TestCategory("EOR")]
-        public void CanOpenIterateEoRAnimations() {
-            using var dat = new PortalDatabase(Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat"));
-
-            var count = 0;
-            foreach (var animation in dat.Animations) {
-                Assert.IsNotNull(animation);
-                count++;
-            }
-            Console.WriteLine($"Count: {count}");
-
-            Assert.AreEqual(2066, count);
-        }
     }
 }

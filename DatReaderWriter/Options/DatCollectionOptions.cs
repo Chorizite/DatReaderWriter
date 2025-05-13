@@ -2,7 +2,7 @@
 
 namespace DatReaderWriter.Options {
     /// <summary>
-    /// Options for <see cref="DatManager"/>
+    /// Options for <see cref="DatCollection"/>
     /// </summary>
     public class DatCollectionOptions {
         private string? _portalPath;
@@ -15,6 +15,11 @@ namespace DatReaderWriter.Options {
         private IndexCachingStrategy? _localIndexCachingStrategy;
         private IndexCachingStrategy? _highresIndexCachingStrategy;
 
+        private FileCachingStrategy? _portalFileCachingStrategy;
+        private FileCachingStrategy? _cellFileCachingStrategy;
+        private FileCachingStrategy? _localFileCachingStrategy;
+        private FileCachingStrategy? _highresFileCachingStrategy;
+
         /// <summary>
         /// The directory to read dats from.
         /// </summary>
@@ -24,12 +29,6 @@ namespace DatReaderWriter.Options {
         /// The access type to use when opening dat files
         /// </summary>
         public DatAccessType AccessType = DatAccessType.Read;
-
-        /// <summary>
-        /// Whether or not to cache file entries. This will cache files when using <see cref="DatCollection.TryReadFile{T}(uint, out T)"/>
-        /// and <see cref="DatCollection.Get{T}(uint)"/>.
-        /// </summary>
-        public bool CacheFiles { get; set; } = false;
 
         /// <summary>
         /// The name of the portal dat file. will be joined with <see cref="DatDirectory"/>
@@ -59,7 +58,7 @@ namespace DatReaderWriter.Options {
         /// This overrides the file location index caching strategy for the portal dat file loaded
         /// by the manager. If not set, defaults to using <see cref="IndexCachingStrategy"/>
         /// </remarks>
-        public IndexCachingStrategy? PortalIndexCachingStrategy {
+        public IndexCachingStrategy PortalIndexCachingStrategy {
             get => _portalIndexCachingStrategy ?? IndexCachingStrategy;
             set => _portalIndexCachingStrategy = value;
         }
@@ -69,7 +68,7 @@ namespace DatReaderWriter.Options {
         /// This overrides the file location index caching strategy for the cell dat file loaded
         /// by the manager. If not set, defaults to using <see cref="IndexCachingStrategy"/>
         /// </remarks>
-        public IndexCachingStrategy? CellIndexCachingStrategy {
+        public IndexCachingStrategy CellIndexCachingStrategy {
             get => _cellIndexCachingStrategy ?? IndexCachingStrategy;
             set => _cellIndexCachingStrategy = value;
         }
@@ -79,7 +78,7 @@ namespace DatReaderWriter.Options {
         /// This overrides the file location index caching strategy for the language dat file loaded
         /// by the manager. If not set, defaults to using <see cref="IndexCachingStrategy"/>
         /// </remarks>
-        public IndexCachingStrategy? LocalIndexCachingStratgey {
+        public IndexCachingStrategy LocalIndexCachingStrategy {
             get => _localIndexCachingStrategy ?? IndexCachingStrategy;
             set => _localIndexCachingStrategy = value;
         }
@@ -89,9 +88,52 @@ namespace DatReaderWriter.Options {
         /// This overrides the file location index caching strategy for the highres dat file loaded
         /// by the manager. If not set, defaults to using <see cref="IndexCachingStrategy"/>
         /// </remarks>
-        public IndexCachingStrategy? HighResIndexCachingStrategy {
+        public IndexCachingStrategy HighResIndexCachingStrategy {
             get => _highresIndexCachingStrategy ?? IndexCachingStrategy;
             set => _highresIndexCachingStrategy = value;
+        }
+
+        /// <inheritdoc cref="DatDatabaseOptions.FileCachingStrategy"/>
+        public FileCachingStrategy FileCachingStrategy { get; set; } = FileCachingStrategy.OnDemand;
+
+        /// <inheritdoc cref="DatDatabaseOptions.FileCachingStrategy"/>
+        /// <remarks>
+        /// This overrides the file entry data caching strategy for the portal dat file loaded
+        /// by the manager. If not set, defaults to using <see cref="FileCachingStrategy.Never"/>
+        /// </remarks>
+        public FileCachingStrategy PortalFileCachingStrategy {
+            get => _portalFileCachingStrategy ?? FileCachingStrategy;
+            set => _portalFileCachingStrategy = value;
+        }
+
+        /// <inheritdoc cref="DatDatabaseOptions.FileCachingStrategy"/>
+        /// <remarks>
+        /// This overrides the file entry data index caching strategy for the cell dat file loaded
+        /// by the manager. If not set, defaults to using <see cref="FileCachingStrategy.Never"/>
+        /// </remarks>
+        public FileCachingStrategy CellFileCachingStrategy {
+            get => _cellFileCachingStrategy ?? FileCachingStrategy;
+            set => _cellFileCachingStrategy = value;
+        }
+
+        /// <inheritdoc cref="DatDatabaseOptions.FileCachingStrategy"/>
+        /// <remarks>
+        /// This overrides the file entry data index caching strategy for the language dat file loaded
+        /// by the manager. If not set, defaults to using <see cref="FileCachingStrategy.Never"/>
+        /// </remarks>
+        public FileCachingStrategy LocalFileCachingStrategy {
+            get => _localFileCachingStrategy ?? FileCachingStrategy;
+            set => _localFileCachingStrategy = value;
+        }
+
+        /// <inheritdoc cref="DatDatabaseOptions.FileCachingStrategy"/>
+        /// <remarks>
+        /// This overrides the file location index caching strategy for the highres dat file loaded
+        /// by the manager. If not set, defaults to using <see cref="FileCachingStrategy.Never"/>
+        /// </remarks>
+        public FileCachingStrategy HighResFileCachingStrategy {
+            get => _highresFileCachingStrategy ?? FileCachingStrategy;
+            set => _highresFileCachingStrategy = value;
         }
 
         /// <summary>
