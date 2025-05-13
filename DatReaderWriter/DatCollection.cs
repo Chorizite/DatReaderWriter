@@ -115,7 +115,7 @@ namespace DatReaderWriter {
         /// <param name="fileId"></param>
         /// <returns></returns>
         public T? GetCached<T>(uint fileId) where T : IDBObj {
-            switch (MapToDatFileType<T>()) {
+            switch (TypeToDatFileType<T>()) {
                 case DatFileType.Cell:
                     return Cell.GetCached<T>(fileId);
                 case DatFileType.Portal:
@@ -134,7 +134,7 @@ namespace DatReaderWriter {
         /// <param name="fileId"></param>
         /// <returns></returns>
         public T? Get<T>(uint fileId) where T : IDBObj {
-            TryReadFile<T>(fileId, out var value);
+            TryGet<T>(fileId, out var value);
             return value;
         }
 
@@ -143,7 +143,7 @@ namespace DatReaderWriter {
         /// </summary>
         /// <typeparam name="T"></typeparam>
         public IEnumerable<uint> GetAllIdsOfType<T>() where T : IDBObj {
-            switch (MapToDatFileType<T>()) {
+            switch (TypeToDatFileType<T>()) {
                 case DatFileType.Cell:
                     return Cell.GetAllIdsOfType<T>();
                 case DatFileType.Portal:
@@ -167,7 +167,11 @@ namespace DatReaderWriter {
 #else
         public bool TryGet<T>(uint fileId, out T value) where T : IDBObj {
 #endif
-            switch (MapToDatFileType<T>()) {
+            if (typeof(T) == typeof(Iteration)) {
+                throw new Exception("Iteration is not a valid type to get from a dat file collection since it is used in all dat files. Use a specific dat like datCollection.Portal.Get<Iteration>()");
+            }
+
+            switch (TypeToDatFileType<T>()) {
                 case DatFileType.Cell:
                     return Cell.TryGet(fileId, out value);
                 case DatFileType.Portal:
@@ -200,11 +204,36 @@ namespace DatReaderWriter {
             return TryGet<T>(fileId, out value);
         }
 
+
+
+        /// <summary>
+        /// Try and write a <see cref="IDBObj"/> to the dat.
+        /// </summary>
+        /// <param name="value">The value to write</param>
+        /// <param name="iteration">The iteration to use. If none is passed, it will use the current files iteration if available, otherwise it will use the current dat iteration.</param>
+        public Result<T, string> TryWriteFile<T>(T value, int? iteration = null) where T : IDBObj {
+            if (typeof(T) == typeof(Iteration)) {
+                throw new Exception("Iteration is not a valid type to write to a dat file collection since it is used in all dat files. Use a specific dat like datCollection.Portal.TryWriteFile<Iteration>()");
+            }
+
+            switch (TypeToDatFileType<T>()) {
+                case DatFileType.Cell:
+                    return Cell.TryWriteFile(value, iteration);
+                case DatFileType.Portal:
+                    return Portal.TryWriteFile(value, iteration);
+                case DatFileType.Local:
+                    return Local.TryWriteFile(value, iteration);
+                default:
+                    value = default!;
+                    return "Unable to determine dat file type. Use a specific dat like datCollection.Portal.TryWriteFile<Iteration>()";
+            }
+        }
+
         /// <summary>
         /// Get the DatFileType associated with the specified IDBObj type
         /// </summary>
         /// <returns>The DatFileType this entry is stored in</returns>
-        public DatFileType MapToDatFileType<T>() where T : IDBObj {
+        public DatFileType TypeToDatFileType<T>() where T : IDBObj {
             var typeCacheVal = DBObjAttributeCache.TypeCache.Values.FirstOrDefault(t => t.Type == typeof(T));
             return typeCacheVal?.DatFileType ?? DatFileType.Undefined;
         }
