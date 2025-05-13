@@ -88,7 +88,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             var res = dat.TryWriteFile(environment);
             Assert.IsTrue(res);
 
-            var res2 = dat.TryReadFile<Environment>(0xD000001, out var readEnv);
+            var res2 = dat.TryGet<Environment>(0xD000001, out var readEnv);
             Assert.IsTrue(res2);
             Assert.IsNotNull(readEnv);
 
@@ -160,7 +160,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             });
 
 
-            var res = dat.TryReadFile<Environment>(0x0D00062E, out var env);
+            var res = dat.TryGet<Environment>(0x0D00062E, out var env);
             Assert.IsTrue(res);
             Assert.IsNotNull(env);
 

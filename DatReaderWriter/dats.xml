@@ -2317,6 +2317,116 @@
       <value name="Fade" value="0x0000000B" />
       <value name="Stretch" value="0x0000000C" />
     </enum>
+    <enum name="StateId" parent="uint">
+      <value name="Undef" value="0x00000000" />
+      <value name="Normal" value="0x00000001" />
+      <value name="Normal_rollover" value="0x00000002" />
+      <value name="Normal_pressed" value="0x00000003" />
+      <value name="Normal_focussed" value="0x00000004" />
+      <value name="Normal_activated" value="0x00000005" />
+      <value name="Highlight" value="0x00000006" />
+      <value name="Highlight_rollover" value="0x00000007" />
+      <value name="Highlight_pressed" value="0x00000008" />
+      <value name="Drag_rollover_accept" value="0x00000009" />
+      <value name="Drag_rollover_reject" value="0x0000000A" />
+      <value name="Closed" value="0x0000000B" />
+      <value name="Open" value="0x0000000C" />
+      <value name="Ghosted" value="0x0000000D" />
+      <value name="Unencumbered" value="0x0000000E" />
+      <value name="Encumbered" value="0x0000000F" />
+      <value name="Heavily_encumbered" value="0x00000010" />
+      <value name="Connection_good" value="0x00000011" />
+      <value name="Connection_uncertain" value="0x00000012" />
+      <value name="Connection_bad" value="0x00000013" />
+      <value name="Connection_disconnected" value="0x00000014" />
+      <value name="Csm_highlight" value="0x00000015" />
+      <value name="Csm_normal" value="0x00000016" />
+      <value name="Csm_ghosted" value="0x00000017" />
+      <value name="Dialog_pending_true" value="0x00000018" />
+      <value name="Dialog_pending_false" value="0x00000019" />
+      <value name="Talkfocus_highlight" value="0x10000001" />
+      <value name="MeleeCombat" value="0x10000003" />
+      <value name="MissileCombat" value="0x10000004" />
+      <value name="HideDetail" value="0x10000006" />
+      <value name="ShowDetail" value="0x10000007" />
+      <value name="Abuse_PageOne" value="0x10000008" />
+      <value name="Abuse_PageTwo" value="0x10000009" />
+      <value name="Abuse_PageThree" value="0x1000000A" />
+      <value name="ObjectSelected" value="0x1000000B" />
+      <value name="StackedItemSelected" value="0x1000000C" />
+      <value name="StackedItem" value="0x1000000D" />
+      <value name="UrgentAssistance_PageOne" value="0x1000000E" />
+      <value name="UrgentAssistance_PageTwo" value="0x1000000F" />
+      <value name="UrgentAssistance_PageThree" value="0x10000010" />
+      <value name="StatManagement_Footer_Default" value="0x10000011" />
+      <value name="StatManagement_Footer_Text" value="0x10000012" />
+      <value name="StatManagement_Footer_Meter" value="0x10000013" />
+      <value name="Buffed" value="0x10000014" />
+      <value name="Unselected" value="0x10000016" />
+      <value name="Selected" value="0x10000017" />
+      <value name="Unlocked" value="0x10000018" />
+      <value name="Locked" value="0x10000019" />
+      <value name="Inactive" value="0x1000001A" />
+      <value name="Active" value="0x1000001B" />
+      <value name="ItemSlot_Empty" value="0x1000001C" />
+      <value name="ItemSlot_Filled" value="0x1000001D" />
+      <value name="Aluvian" value="0x10000021" />
+      <value name="Gharundim" value="0x10000022" />
+      <value name="Sho" value="0x10000023" />
+      <value name="Viamont" value="0x10000024" />
+      <value name="Heritage" value="0x10000025" />
+      <value name="Profession" value="0x10000026" />
+      <value name="Skills" value="0x10000027" />
+      <value name="Appearance" value="0x10000028" />
+      <value name="Town" value="0x10000029" />
+      <value name="Summary" value="0x1000002A" />
+      <value name="Custom" value="0x1000002B" />
+      <value name="Bow_hunter" value="0x1000002C" />
+      <value name="Life_caster" value="0x1000002D" />
+      <value name="War_mage" value="0x1000002E" />
+      <value name="Wayfarer" value="0x1000002F" />
+      <value name="Soldier" value="0x10000030" />
+      <value name="Swashbuckler" value="0x10000031" />
+      <value name="Create_normal" value="0x10000032" />
+      <value name="Create_admin" value="0x10000033" />
+      <value name="Holtburg" value="0x10000034" />
+      <value name="Sanamar" value="0x10000035" />
+      <value name="Yaraq" value="0x10000036" />
+      <value name="Shoushi" value="0x10000037" />
+      <value name="Frame1" value="0x10000038" />
+      <value name="Frame2" value="0x10000039" />
+      <value name="Frame3" value="0x1000003A" />
+      <value name="Inprogress" value="0x1000003B" />
+      <value name="Done" value="0x1000003C" />
+      <value name="IntroVideo" value="0x1000003E" />
+      <value name="ItemSlot_DragOver_Normal" value="0x1000003F" />
+      <value name="ItemSlot_DragOver_Accept" value="0x10000040" />
+      <value name="ItemSlot_DragOver_Reject" value="0x10000041" />
+      <value name="JumpMode" value="0x10000042" />
+      <value name="MeleeMode" value="0x10000043" />
+      <value name="MissileMode" value="0x10000044" />
+      <value name="DDDMode" value="0x10000045" />
+      <value name="ItemSlot_DragOver_DropIn" value="0x10000046" />
+      <value name="Maximized" value="0x10000047" />
+      <value name="Minimized" value="0x10000048" />
+      <value name="Uninscribed" value="0x10000050" />
+      <value name="Create_envoy" value="0x10000053" />
+      <value name="Online" value="0x10000054" />
+      <value name="Offline" value="0x10000055" />
+      <value name="IsCharacter" value="0x10000056" />
+      <value name="IsAccount" value="0x10000057" />
+      <value name="Shadow" value="0x10000058" />
+      <value name="Penumbraen" value="0x10000059" />
+      <value name="Gearknight" value="0x1000005A" />
+      <value name="Undead" value="0x1000005B" />
+      <value name="Empyrean" value="0x1000005C" />
+      <value name="Olthoi" value="0x1000005D" />
+      <value name="Olthoiacid" value="0x1000005E" />
+      <value name="Auntumerok" value="0x1000005F" />
+      <value name="Lugian" value="0x10000060" />
+      <value name="LockedUI" value="0x10000063" />
+      <value name="UnlockedUI" value="0x10000064" />
+    </enum>
   </enums>
   <types>
     <type name="DBObj" abstract="true">
@@ -3098,9 +3208,9 @@
       <field type="ushort" name="OffsetY" />
       <field type="byte" name="Width" />
       <field type="byte" name="Height" />
-      <field type="byte" name="HorizontalOffsetBefore" />
-      <field type="byte" name="HorizontalOffsetAfter" />
-      <field type="byte" name="VerticalOffsetBefore" />
+      <field type="sbyte" name="HorizontalOffsetBefore" />
+      <field type="sbyte" name="HorizontalOffsetAfter" />
+      <field type="sbyte" name="VerticalOffsetBefore" />
     </type>
     <type name="StringTableData">
       <field type="ushort" name="_numVarNames" />
@@ -3302,24 +3412,24 @@
       <field type="uint" name="ReadOrder" />
       <field type="uint" name="ElementId" />
       <field type="uint" name="Type" />
-      <field type="uint" name="BaseElement" />
-      <field type="uint" name="BaseLayoutId" />
-      <field type="uint" name="DefaultState" />
+      <field type="uint" name="BaseElement" text="ElementId that this inherits from, if any. BaseLayoutId contains the parent layout." />
+      <field type="uint" name="BaseLayoutId" text="The parent layout for the BaseElement, if any" />
+      <field type="StateId" name="DefaultState" text="The default state this element is in." />
       <maskmap name="StateDesc.IncorporationFlags">
         <mask value="IncorporationFlags.X">
-          <field type="uint" name="X" />
+          <field type="uint" name="X" text="The X position of this element, relative to the parent." />
         </mask>
         <mask value="IncorporationFlags.Y">
-          <field type="uint" name="Y" />
+          <field type="uint" name="Y" text="The Y position of this element, relative to the parent." />
         </mask>
         <mask value="IncorporationFlags.Width">
-          <field type="uint" name="Width" />
+          <field type="uint" name="Width" text="The width of this element." />
         </mask>
         <mask value="IncorporationFlags.Height">
-          <field type="uint" name="Height" />
+          <field type="uint" name="Height" text="The height of this element." />
         </mask>
         <mask value="IncorporationFlags.ZLevel">
-          <field type="uint" name="ZLevel" />
+          <field type="uint" name="ZLevel" text="Determines draw order, higher is on top" />
         </mask>
       </maskmap>
       <field type="uint" name="LeftEdge" />
@@ -3328,7 +3438,7 @@
       <field type="uint" name="BottomEdge" />
       <field type="byte" name="_statesBucketSize" value="1" />
       <field type="CompressedUInt" name="_numStates" />
-      <vector name="States" length="_numStates" type="Dictionary" genericKey="uint" genericValue="StateDesc" />
+      <vector name="States" length="_numStates" type="Dictionary" genericKey="StateId" genericValue="StateDesc" value="A list of states that can be applied to this element." />
       <field type="byte" name="_childrenBucketSize" value="1" />
       <field type="CompressedUInt" name="_numChildren" />
       <vector name="Children" length="_numChildren" type="Dictionary" genericKey="uint" genericValue="ElementDesc" />

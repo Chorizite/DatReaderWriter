@@ -525,6 +525,7 @@ namespace DatReaderWriter.SourceGen {
                 case "long":
                 case "float":
                 case "double":
+                case "sbyte":
                 case "byte":
                     WriteLine($"{type} {child.Name} = 0;");
                     break;
@@ -577,6 +578,8 @@ namespace DatReaderWriter.SourceGen {
                     return "WriteBool";
                 case "byte":
                     return "WriteByte";
+                case "sbyte":
+                    return "WriteSByte";
                 case "ushortstring":
                     return "WriteUShortString";
                 case "rawstring":
@@ -638,6 +641,8 @@ namespace DatReaderWriter.SourceGen {
                     return $"reader.ReadBool({size})";
                 case "byte":
                     return "reader.ReadByte()";
+                case "sbyte":
+                    return "reader.ReadSByte()";
                 case "string":
                     return "reader.ReadString16L()";
                 case "bytestring":

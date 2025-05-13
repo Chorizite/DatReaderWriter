@@ -38,7 +38,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             var res = dat.TryWriteFile(writeObj);
             Assert.IsTrue(res);
 
-            var res2 = dat.TryReadFile<MasterInputMap>(0x14000000u, out var readObj);
+            var res2 = dat.TryGet<MasterInputMap>(0x14000000u, out var readObj);
             Assert.IsTrue(res2);
             Assert.IsNotNull(readObj);
 

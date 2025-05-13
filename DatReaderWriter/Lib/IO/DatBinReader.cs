@@ -92,6 +92,15 @@ namespace DatReaderWriter.Lib.IO {
         }
 
         /// <summary>
+        /// Read a signed byte and advance the buffer position accordingly
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public sbyte ReadSByte() {
+            return (sbyte)ReadBytesInternal(1).ToArray()[0];
+        }
+
+        /// <summary>
         /// Read an bool and advance the buffer position accordingly
         /// </summary>
         /// <returns></returns>

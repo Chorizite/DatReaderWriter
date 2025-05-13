@@ -34,7 +34,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             var res = dat.TryWriteFile(writeSpellTable);
             Assert.IsTrue(res);
 
-            var res2 = dat.TryReadFile<SpellComponentTable>(0x0E00000F, out var readSpellTable);
+            var res2 = dat.TryGet<SpellComponentTable>(0x0E00000F, out var readSpellTable);
             Assert.IsTrue(res2);
             Assert.IsNotNull(readSpellTable);
 
@@ -57,7 +57,7 @@ namespace DatReaderWriter.Tests.DBObjs {
                 options.IndexCachingStrategy = IndexCachingStrategy.Never;
             });
 
-            var res = dat.TryReadFile<SpellComponentTable>(0x0E00000F, out var spellTable);
+            var res = dat.TryGet<SpellComponentTable>(0x0E00000F, out var spellTable);
             Assert.IsTrue(res);
             Assert.IsNotNull(spellTable);
             Assert.AreEqual(0x0E00000Fu, spellTable.Id);

@@ -46,16 +46,16 @@ namespace DatReaderWriter.Types {
 
             var _hasDefaultValue = reader.ReadBool(1);
             if (_hasDefaultValue) {
-                DefaultValue = BaseProperty.Unpack(reader, Type);
+                DefaultValue = BaseProperty.UnpackGenericMasterProperty(reader, Type);
             }
 
             var _hasMaxValue = reader.ReadBool(1);
             if (_hasMaxValue) {
-                MaxValue = BaseProperty.Unpack(reader, Type);
+                MaxValue = BaseProperty.UnpackGenericMasterProperty(reader, Type);
             }
             var _hasMinValue = reader.ReadBool(1);
             if (_hasMinValue) {
-                MinValue = BaseProperty.Unpack(reader, Type);
+                MinValue = BaseProperty.UnpackGenericMasterProperty(reader, Type);
             }
 
             PredictionTimeout = reader.ReadSingle();

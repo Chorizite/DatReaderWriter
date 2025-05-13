@@ -53,7 +53,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             var res = dat.TryWriteFile(envCell1);
             Assert.IsTrue(res);
 
-            var res2 = dat.TryReadFile<EnvCell>(0x00010100, out var readEnvCell1);
+            var res2 = dat.TryGet<EnvCell>(0x00010100, out var readEnvCell1);
             Assert.IsTrue(res2);
             Assert.IsNotNull(readEnvCell1);
 
@@ -94,7 +94,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             });
 
 
-            var res = dat.TryReadFile<EnvCell>(0x00020102, out var envCell1);
+            var res = dat.TryGet<EnvCell>(0x00020102, out var envCell1);
             Assert.IsTrue(res);
             Assert.IsNotNull(envCell1);
             Assert.AreEqual(0x00020102u, envCell1.Id);
@@ -125,7 +125,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             CollectionAssert.AreEquivalent(new List<ushort>() { 0x101, 0x100, 0x103, 0x104, 0x110, 0x10D, 0x10E, 0x10F, 0x10B, 0x10A, 0x108, 0x105, 0x107, 0x106, 0x109, 0x10C, 0x113, 0x112, 0x114, 0x111 }, envCell1.VisibleCells);
 
 
-            var res2 = dat.TryReadFile<EnvCell>(0x7d64010du, out var envCell2);
+            var res2 = dat.TryGet<EnvCell>(0x7d64010du, out var envCell2);
             Assert.IsTrue(res2);
             Assert.IsNotNull(envCell2);
             Assert.AreEqual(0x7d64010du, envCell2.Id);

@@ -14,6 +14,11 @@
         public IndexCachingStrategy IndexCachingStrategy { get; set; } = IndexCachingStrategy.OnDemand;
 
         /// <summary>
+        /// The file location index caching strategy to use.
+        /// </summary>
+        public FileCachingStrategy FileCachingStrategy { get; set; } = FileCachingStrategy.OnDemand;
+
+        /// <summary>
         /// The type of access to use when opening the dat file.
         /// </summary>
         public DatAccessType AccessType { get; set; } = DatAccessType.Read;

@@ -32,7 +32,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             var res = dat.TryWriteFile(writeObj);
             Assert.IsTrue(res);
 
-            var res2 = dat.TryReadFile<ParticleEmitter>(0x32000001, out var readObj);
+            var res2 = dat.TryGet<ParticleEmitter>(0x32000001, out var readObj);
             Assert.IsTrue(res2);
             Assert.IsNotNull(readObj);
 
@@ -56,7 +56,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             });
 
 
-            var res = dat.TryReadFile<ParticleEmitter>(0x320009C4u, out var readObj);
+            var res = dat.TryGet<ParticleEmitter>(0x320009C4u, out var readObj);
             Assert.IsTrue(res);
             Assert.IsNotNull(readObj);
             Assert.AreEqual(0x320009C4u, readObj.Id);

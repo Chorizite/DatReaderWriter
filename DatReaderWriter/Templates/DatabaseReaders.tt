@@ -39,33 +39,16 @@
             using (new IndentHelper(this)) {
                 foreach (var dataType in dbObjs) {
                     if (dataType.FirstId != 0 && dataType.FirstId == dataType.LastId) {
-                        //WriteLine($"private {dataType.Name}>? _{dataType.Name}s;");
+                        WriteSummary("The " + dataType.Name + " DBObj in the database. This will always use the cache.");
+                        WriteLine($"public {dataType.Name}? {dataType.Name} => GetCached<{dataType.Name}>(0x{dataType.FirstId:X8}u);");
+                        WriteLine("");
                     }
                     else {
-                        WriteLine($"private DBObjCollection<{dataType.Name}>? _{dataType.Name}s;");
-                    }
-                }
-            
-                WriteLine("");
-            
-                foreach (var dataType in dbObjs) {
-                    if (dataType.FirstId != 0 && dataType.FirstId == dataType.LastId) {
-                        WriteSummary("The " + dataType.Name + " DBObj in the database.");
-                        WriteLine($"public {dataType.Name}? {dataType.Name} {{");
-                        using (new  IndentHelper(this)) {
-                            WriteLine("get {");
-                            using (new  IndentHelper(this)) {
-                                WriteLine($"TryReadFile<{dataType.Name}>(0x{dataType.FirstId:X8}u, out var dbObj);");
-                                WriteLine("return dbObj;");
-                            }
-                            WriteLine("}");
-                        }
-                        WriteLine("}");
-                    }
-                    else {
+                        /*
                         WriteSummary("All " + dataType.Name + "s in the database.");
                         WriteLine($"public DBObjCollection<{dataType.Name}> {dataType.Name}s => _{dataType.Name}s ??= new DBObjCollection<{dataType.Name}>(this);");
                         WriteLine("");
+                        */
                     }
                 }
             }

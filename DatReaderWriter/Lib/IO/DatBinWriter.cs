@@ -74,6 +74,14 @@ namespace DatReaderWriter.Lib.IO {
         }
 
         /// <summary>
+        /// Write a signed byte and advance the buffer position accordingly
+        /// </summary>
+        /// <param name="value"></param>
+        public void WriteSByte(sbyte value) {
+            GetSpanAndAdvanceOffset(1)[0] = (byte)value;
+        }
+
+        /// <summary>
         /// Write the specified number of bytes and advance the buffer position accordingly
         /// </summary>
         public void WriteBytes(byte[] buffer, int numBytes) {

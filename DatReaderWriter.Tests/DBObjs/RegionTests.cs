@@ -23,7 +23,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             });
 
 
-            var res = dat.TryReadFile<Region>(0x13000000, out var region);
+            var res = dat.TryGet<Region>(0x13000000, out var region);
             Assert.IsTrue(res);
             Assert.IsNotNull(region);
             Assert.AreEqual(0x13000000u, region.Id);

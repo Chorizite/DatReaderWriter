@@ -24,7 +24,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             foreach (var f in dat.Tree) {
                 if (f.Id >= 0x17000000 && f.Id <= 0x17FFFFFF) {
                     Console.WriteLine($"{f.Id:X8}  (bytes: {f.Size})");
-                    var materialInstance = dat.TryReadFile<MaterialModifier>(f.Id, out var mm);
+                    var materialInstance = dat.TryGet<MaterialModifier>(f.Id, out var mm);
                     Console.WriteLine($"MaterialModifier: 0x{mm.Id:X8}");
                     foreach (var prop in mm.MaterialProperties) {
                         Console.WriteLine($"\t Prop:");
@@ -40,7 +40,7 @@ namespace DatReaderWriter.Tests.DBObjs {
 
             return;
 
-            var res = dat.TryReadFile<Animation>(0x03000514, out var anim);
+            var res = dat.TryGet<Animation>(0x03000514, out var anim);
             Assert.IsTrue(res);
             Assert.IsNotNull(anim);
             Assert.AreEqual(0x03000514u, anim.Id);

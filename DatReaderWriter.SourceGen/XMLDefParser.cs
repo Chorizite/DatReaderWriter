@@ -13,6 +13,7 @@ namespace DatReaderWriter.SourceGen {
 
         public static Dictionary<string, string> PrimitiveTypeLookup = new Dictionary<string, string>() {
             { "byte", "System.Byte" },
+            { "sbyte", "System.SByte" },
             { "short", "System.Int16" },
             { "ushort", "System.UInt16" },
             { "int", "System.Int32" },

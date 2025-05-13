@@ -31,7 +31,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             var res = dat.TryWriteFile(writeObj);
             Assert.IsTrue(res);
 
-            var res2 = dat.TryReadFile<TabooTable>(0x0E00001Eu, out var readObj);
+            var res2 = dat.TryGet<TabooTable>(0x0E00001Eu, out var readObj);
             Assert.IsTrue(res2);
             Assert.IsNotNull(readObj);
 
@@ -53,7 +53,7 @@ namespace DatReaderWriter.Tests.DBObjs {
                 options.IndexCachingStrategy = IndexCachingStrategy.Never;
             });
 
-            var res = dat.TryReadFile<TabooTable>(0x0E00001Eu, out var rt1);
+            var res = dat.TryGet<TabooTable>(0x0E00001Eu, out var rt1);
             Assert.IsTrue(res);
             Assert.IsNotNull(rt1);
             Assert.AreEqual(0x0E00001Eu, rt1.Id);

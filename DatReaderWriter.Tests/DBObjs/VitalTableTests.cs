@@ -35,7 +35,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             var res = dat.TryWriteFile(writeAnim);
             Assert.IsTrue(res);
 
-            var res2 = dat.TryReadFile<VitalTable>(0xE000003, out var readVitalTable);
+            var res2 = dat.TryGet<VitalTable>(0xE000003, out var readVitalTable);
             Assert.IsTrue(res2);
             Assert.IsNotNull(readVitalTable);
 
@@ -58,7 +58,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             });
 
 
-            var res = dat.TryReadFile<VitalTable>(0xE000003, out var vitalTable);
+            var res = dat.TryGet<VitalTable>(0xE000003, out var vitalTable);
             Assert.IsTrue(res);
             Assert.IsNotNull(vitalTable);
             Assert.AreEqual(0xE000003u, vitalTable.Id);

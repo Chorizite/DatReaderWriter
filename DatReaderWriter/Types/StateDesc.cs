@@ -17,19 +17,12 @@ namespace DatReaderWriter.Types {
 
         public IncorporationFlags IncorporationFlags;
 
-        public List<BaseProperty> Properties = [];
+        public Dictionary<uint, BaseProperty> Properties = [];
 
         public List<MediaDesc> Media = [];
 
         /// <inheritdoc />
         public bool Unpack(DatBinReader reader) {
-            if (reader.Database?.DatCollection is null) {
-                throw new Exception("reader.Database.DatCollection is null! Unable to read MasterProperties and unpack StateDesc. Use DatCollection instead of creating a standalone DatDatabase");
-            }
-            if (!reader.Database.DatCollection.TryReadFile<MasterProperty>(0x39000001u, out var masterProperty)) {
-                throw new Exception("Unable to read MasterProperty (0x39000001)");
-            }
-
             StateId = reader.ReadUInt32();
             PassToChildren = reader.ReadBool(1);
             IncorporationFlags = (IncorporationFlags)reader.ReadUInt32();
@@ -37,10 +30,10 @@ namespace DatReaderWriter.Types {
             var _numProperties = reader.ReadCompressedUInt();
 
             for (var i = 0; i < _numProperties; i++) {
-                var _peekedValue = reader.ReadUInt32();
-                var _peekedPropType = masterProperty.Properties[_peekedValue].Type;
-                Properties.Add(BaseProperty.Unpack(reader, _peekedPropType, true));
+                var key = reader.ReadUInt32();
+                Properties.Add(key, BaseProperty.UnpackGeneric(reader));
             }
+
             var _numMedia = reader.ReadCompressedUInt();
             for (var i = 0; i < _numMedia; i++) {
                 var _peekedValue = (MediaType)reader.ReadInt32();
@@ -58,7 +51,8 @@ namespace DatReaderWriter.Types {
             writer.WriteByte(0);
             writer.WriteCompressedUInt((uint)Properties.Count());
             foreach (var item in Properties) {
-                writer.WriteItem<BaseProperty>(item);
+                writer.WriteUInt32(item.Key);
+                writer.WriteItem<BaseProperty>(item.Value);
             }
             writer.WriteCompressedUInt((uint)Media.Count());
             foreach (var item in Media) {

@@ -16,6 +16,20 @@ namespace DatReaderWriter {
     /// </summary>
     public partial class PortalDatabase : DatDatabase {
         /// <summary>
+        /// The master property in portal database. This is used for property lookups. Although technically
+        /// there can be multiple master properties, in practice there is only ever one. This will always
+        /// return the first one. This file will always be cached.
+        /// </summary>
+        public MasterProperty? MasterProperty => GetCached<MasterProperty>(0x39000001u);
+
+        /// <summary>
+        /// The Region in portal database. Although technically
+        /// there can be multiple regions, in practice there is only ever one (for now?). This will always
+        /// return the first one. This file will always be cached.
+        /// </summary>
+        public Region? Region => GetCached<Region>(0x13000000u);
+
+        /// <summary>
         /// Open a <see cref="PortalDatabase"/> (client_portal.dat)
         /// </summary>
         /// <param name="options">An action that lets you configure the options</param>

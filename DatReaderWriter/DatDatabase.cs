@@ -6,17 +6,17 @@ using DatReaderWriter.Lib.IO;
 using DatReaderWriter.Lib.IO.BlockAllocators;
 using DatReaderWriter.Lib.IO.DatBTree;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Linq.Expressions;
 
 namespace DatReaderWriter {
     /// <summary>
     /// Provides read access to a dat database
     /// </summary>
     public partial class DatDatabase : IDisposable {
+        private Dictionary<uint, IDBObj> _fileCache = [];
+
         /// <summary>
         /// Block allocator
         /// </summary>
@@ -66,7 +66,7 @@ namespace DatReaderWriter {
 
             Tree = new DatBTreeReaderWriter(BlockAllocator);
 
-            if (TryReadFile<Iteration>(0xFFFF0001, out var iteration)) {
+            if (TryGet<Iteration>(0xFFFF0001, out var iteration)) {
                 Iteration = iteration;
 
                 if (BlockAllocator.CanWrite && Iteration.Iterations.Count > 1) {
@@ -81,6 +81,29 @@ namespace DatReaderWriter {
         }
 
         /// <summary>
+        /// Clear the file cache, only applicable if <see cref="DatCollectionOptions.FileCachingStrategy"/>
+        /// is <see cref="FileCachingStrategy.OnDemand"/>
+        /// </summary>
+        public void ClearCache() {
+            _fileCache.Clear();
+        }
+
+        /// <summary>
+        /// Get an enumerable of all existing ids of a specific type
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        public IEnumerable<uint> GetAllIdsOfType<T>() where T : IDBObj {
+            if (DBObjAttributeCache.TypeCache.TryGetValue(typeof(T), out var typeAttr)) {
+                if (typeAttr.IsSingular) {
+                    return [ typeAttr.FirstId ];
+                }
+                return Tree.GetFilesInRange(typeAttr.FirstId, typeAttr.LastId).Select(f => f.Id);
+            }
+
+            return Enumerable.Empty<uint>();
+        }
+
+        /// <summary>
         /// Get the type of a DBObj based on its id.
         /// </summary>
         /// <param name="id"></param>
@@ -90,7 +113,7 @@ namespace DatReaderWriter {
         }
 
         /// <summary>
-        /// Get the raw bytes of a file entry
+        /// Get the raw bytes of a file entry, this is never cached.
         /// </summary>
         /// <param name="fileId">The id of the file to get</param>
         /// <param name="bytes">The raw bytes</param>
@@ -111,17 +134,54 @@ namespace DatReaderWriter {
         }
 
         /// <summary>
-        /// Read a dat file
+        /// Read a dat file, and caches it regardless of <see cref="DatCollectionOptions.FileCachingStrategy"/>
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="fileId"></param>
+        /// <returns></returns>
+        public T? GetCached<T>(uint fileId) where T : IDBObj {
+            if (_fileCache.TryGetValue(fileId, out var cached) && cached is T t) {
+                return t;
+            }
+
+            var value = Get<T>(fileId);
+            if (value is not null && !_fileCache.ContainsKey(fileId)) {
+                _fileCache.Add(fileId, value);
+            }
+            
+            return value;
+        }
+
+        /// <summary>
+        /// Read a dat file, returns null if the file is not found
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="fileId"></param>
+        /// <returns></returns>
+        public T? Get<T>(uint fileId) where T : IDBObj {
+            TryGet<T>(fileId, out var value);
+            return value;
+        }
+
+        /// <summary>
+        /// Try and read a <see cref="IDBObj"/>. This will be cached according to the <see cref="DatCollectionOptions.FileCachingStrategy"/> in use
         /// </summary>
         /// <typeparam name="T">The dat file type</typeparam>
         /// <param name="fileId">The id of the file to get</param>
         /// <param name="value">The unpacked file</param>
         /// <returns></returns>
 #if (NET8_0_OR_GREATER)
-            public bool TryReadFile<T>(uint fileId, [MaybeNullWhen(false)] out T value) where T : IDBObj {
+        public bool TryGet<T>(uint fileId, [MaybeNullWhen(false)] out T value) where T : IDBObj {
 #else
-        public bool TryReadFile<T>(uint fileId, out T value) where T : IDBObj {
+        public bool TryGet<T>(uint fileId, out T value) where T : IDBObj {
 #endif
+            if (Options.FileCachingStrategy == FileCachingStrategy.OnDemand) {
+                if (_fileCache.TryGetValue(fileId, out var cached) && cached is T t) {
+                    value = t;
+                    return true;
+                }
+            }
+
             if (!TryGetFileBytes(fileId, out var bytes)) {
                 value = default!;
                 return false;
@@ -134,7 +194,27 @@ namespace DatReaderWriter {
                 return false;
             }
 
+            if (Options.FileCachingStrategy == FileCachingStrategy.OnDemand) {
+                _fileCache.Add(fileId, value);
+            }
+
             return true;
+        }
+
+        /// <summary>
+        /// OBSOLETE: This has been replaced by <see cref="TryGet{T}(uint, out T)"/>!
+        /// </summary>
+        /// <typeparam name="T">The dat file type</typeparam>
+        /// <param name="fileId">The id of the file to get</param>
+        /// <param name="value">The unpacked file</param>
+        /// <returns></returns>
+        [Obsolete("This has been renamed to TryGet<T>(uint, out T)!")]
+#if (NET8_0_OR_GREATER)
+        public bool TryReadFile<T>(uint fileId, [MaybeNullWhen(false)] out T value) where T : IDBObj {
+#else
+        public bool TryReadFile<T>(uint fileId, out T value) where T : IDBObj {
+#endif
+            return TryGet<T>(fileId, out value);
         }
 
         /// <summary>
@@ -152,7 +232,8 @@ namespace DatReaderWriter {
                 startingBlockId = existingFile.Offset;
             }
 
-            // TODO: fix this static 5mb buffer...
+            // TODO: fix this static 5mb buffer...?
+            // we dont know how big the file will be, so we need to make sure we have enough space
             var buffer = BaseBlockAllocator.SharedBytes.Rent(1024 * 1024 * 5);
             var writer = new DatBinWriter(buffer, this);
 
@@ -181,11 +262,16 @@ namespace DatReaderWriter {
 
             BaseBlockAllocator.SharedBytes.Return(buffer);
 
+            if (_fileCache.ContainsKey(value.Id)) {
+                _fileCache[value.Id] = value;
+            }
+
             return value;
         }
 
         /// <inheritdoc/>
         public void Dispose() {
+            ClearCache();
             Dispose(true);
             GC.SuppressFinalize(this);
         }

@@ -67,7 +67,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             res = dat.TryWriteFile(landblock2);
             Assert.IsTrue(res);
 
-            var res2 = dat.TryReadFile<LandBlockInfo>(0x0001FFFE, out var readLandblock1);
+            var res2 = dat.TryGet<LandBlockInfo>(0x0001FFFE, out var readLandblock1);
             Assert.IsTrue(res2);
             Assert.IsNotNull(readLandblock1);
 
@@ -95,7 +95,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             Assert.AreEqual(1u, readLandblock1.RestrictionTable[1]);
             Assert.AreEqual(2u, readLandblock1.RestrictionTable[2]);
 
-            res2 = dat.TryReadFile<LandBlockInfo>(0x0002FFFE, out var readLandblock2);
+            res2 = dat.TryGet<LandBlockInfo>(0x0002FFFE, out var readLandblock2);
             Assert.IsTrue(res2);
             Assert.IsNotNull(readLandblock2);
 
@@ -118,7 +118,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             });
 
 
-            var res = dat.TryReadFile<LandBlockInfo>(0x1455FFFE, out var landblock1);
+            var res = dat.TryGet<LandBlockInfo>(0x1455FFFE, out var landblock1);
             Assert.IsTrue(res);
             Assert.IsNotNull(landblock1);
 
@@ -139,7 +139,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             Assert.AreEqual(0, landblock1.RestrictionTable.Count);
 
 
-            res = dat.TryReadFile<LandBlockInfo>(0x5262FFFE, out var landblock2);
+            res = dat.TryGet<LandBlockInfo>(0x5262FFFE, out var landblock2);
             Assert.IsTrue(res);
             Assert.IsNotNull(landblock2);
             Assert.AreEqual(74u, landblock2.NumCells);

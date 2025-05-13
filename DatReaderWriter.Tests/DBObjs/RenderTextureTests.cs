@@ -34,7 +34,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             var res = dat.TryWriteFile(writeObj);
             Assert.IsTrue(res);
 
-            var res2 = dat.TryReadFile<RenderTexture>(0x15000000u, out var readObj);
+            var res2 = dat.TryGet<RenderTexture>(0x15000000u, out var readObj);
             Assert.IsTrue(res2);
             Assert.IsNotNull(readObj);
 
@@ -58,7 +58,7 @@ namespace DatReaderWriter.Tests.DBObjs {
                 options.IndexCachingStrategy = IndexCachingStrategy.Never;
             });
 
-            var res = dat.TryReadFile<RenderTexture>(0x15000000u, out var rt1);
+            var res = dat.TryGet<RenderTexture>(0x15000000u, out var rt1);
             Assert.IsTrue(res);
             Assert.IsNotNull(rt1);
             Assert.AreEqual(0x15000000u, rt1.Id);
@@ -68,7 +68,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             Assert.AreEqual(1, rt1.SourceLevels.Count);
             Assert.AreEqual(0x06004B91u, rt1.SourceLevels[0]);
 
-            var res2 = dat.TryReadFile<RenderTexture>(0x15000001u, out var rt2);
+            var res2 = dat.TryGet<RenderTexture>(0x15000001u, out var rt2);
             Assert.IsTrue(res2);
             Assert.IsNotNull(rt2);
             Assert.AreEqual(0x15000001u, rt2.Id);

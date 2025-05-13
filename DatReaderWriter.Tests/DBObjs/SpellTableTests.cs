@@ -41,7 +41,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             var res = dat.TryWriteFile(writeSpellTable);
             Assert.IsTrue(res);
 
-            var res2 = dat.TryReadFile<SpellTable>(0x0E00000E, out var readSpellTable);
+            var res2 = dat.TryGet<SpellTable>(0x0E00000E, out var readSpellTable);
             Assert.IsTrue(res2);
             Assert.IsNotNull(readSpellTable);
 
@@ -64,7 +64,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             });
 
 
-            var res = dat.TryReadFile<SpellTable>(0x0E00000E, out var spellTable);
+            var res = dat.TryGet<SpellTable>(0x0E00000E, out var spellTable);
             Assert.IsTrue(res);
             Assert.IsNotNull(spellTable);
             Assert.AreEqual(0x0E00000Eu, spellTable.Id);
