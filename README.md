@@ -22,6 +22,7 @@ DatReaderWriter is an open-source library for reading and writing .dat files use
 - Full Dat BTree seeking / insertion / removal / range queries
 - Built-in caching options
 - net8.0;netstandard2.0;net48 nuget packages
+- *Most* DBObj file formats are in the dats.xml, which could be potentially used to generate readerwriters in other languages
 
 ## Basic Usage
 
@@ -105,6 +106,7 @@ portalDat.Dispose();
 ```
 
 ## Todo
+- Clean up source gen so the library can be generated in other languages (kaitai struct?)
 - DBObjs left to implement:
     - RenderMaterial
     - ActionMap
