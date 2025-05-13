@@ -1,3 +1,4 @@
+
 # DatReaderWriter
 
 DatReaderWriter is an open-source library for reading and writing .dat files used by the game Asheron's Call. This tool allows players and developers to access and modify game data files for various purposes, such as creating mods or analyzing game content.
@@ -7,6 +8,7 @@ DatReaderWriter is an open-source library for reading and writing .dat files use
 - [Features](#features)
 - [Installation](#installation)
 - [Basic Usage](#basic-usage)
+	- [Getting Started](#getting-started)
     - [Update spell names and descriptions](#update-spell-names-and-descriptions)
     - [Rewrite all MotionTables to be 100x speed](#rewrite-all-motiontables-to-be-100x-speed)
 - [Todo](#todo)
@@ -16,12 +18,47 @@ DatReaderWriter is an open-source library for reading and writing .dat files use
 
 ## Features
 
-- Read/Write AC .dat files (Including creating new dats)
+- Read/Write AC end-of-retail .dat files (Including creating new dats!)
 - Full Dat BTree seeking / insertion / removal / range queries
+- Built-in caching options
+- net8.0;netstandard2.0;net48 nuget packages
 
 ## Basic Usage
 
-See Tests for full usage.  
+- Install `Chorizite.DatReaderWriter` package from nuget.org
+- See Tests for further usage.  
+
+### Getting Started
+```cs
+// Open a set of dat file for reading. This will open all the eor dat files as a single collection.
+// (client_portal.dat, client_cell_1.dat, client_local_English.dat, and client_highres.dat)
+var datPath = @"C:\Turbing\Asheron's Call\";
+var dats= new DatCollection(EORCommonData.DatDirectory, DatAccessType.ReadWrite);
+
+// read files
+LayoutDesc? layoutDesc = dats.Get<LayoutDesc>(0x21000000u);
+
+// check iteration of portal dat
+Console.WriteLine($"Portal Iteration: {dats.Portal.Iteration.CurrentIteration}");
+
+// get ids of all Animations
+IEnumerable<uint> allAnimationIds = dats.GetAllIdsOfType<Animation>();
+
+// determine type from a file id
+var type = dats.Local.TypeFromId(0x21000000u);
+Assert.AreEqual(DBObjType.LayoutDesc, type);
+
+// write a file with a new iteration
+StringTable? stringTable = dats.Get<StringTable>(0x23000001u) ?? throw new Exception("StringTable not found");
+stringTable.StringTableData.Add(0x1234u, new StringTableData() {
+    Strings = ["foo", "bar"]
+});
+var newIteration = dats.Local.Iteration.CurrentIteration + 1;
+if (!dats.TryWriteFile(stringTable, newIteration)) throw new Exception($"Failed to write StringTable");
+
+// Dispose dat collection to flush any changes and close the files
+dats.Dispose();
+```
 
 ### Update spell names and descriptions
 ```cs

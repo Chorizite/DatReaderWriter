@@ -42,11 +42,11 @@ namespace DatReaderWriter.Tests.DBObjs {
         [TestMethod]
         [TestCategory("EOR")]
         public void CanReadEORAndWriteIdentical() {
-            using var datCollection = new DatCollection(EORCommonData.DatDirectory);
-            TestHelpers.CanReadAndWriteIdentical<LayoutDesc>("", 0x21000000u, datCollection.Local);
-            TestHelpers.CanReadAndWriteIdentical<LayoutDesc>("", 0x21000001u, datCollection.Local);
-            TestHelpers.CanReadAndWriteIdentical<LayoutDesc>("", 0x21000028u, datCollection.Local);
-            TestHelpers.CanReadAndWriteIdentical<LayoutDesc>("", 0x21000075u, datCollection.Local);
+            using var dats = new DatCollection(EORCommonData.DatDirectory);
+            TestHelpers.CanReadAndWriteIdentical<LayoutDesc>("", 0x21000000u, dats.Local);
+            TestHelpers.CanReadAndWriteIdentical<LayoutDesc>("", 0x21000001u, dats.Local);
+            TestHelpers.CanReadAndWriteIdentical<LayoutDesc>("", 0x21000028u, dats.Local);
+            TestHelpers.CanReadAndWriteIdentical<LayoutDesc>("", 0x21000075u, dats.Local);
         }
     }
 }
