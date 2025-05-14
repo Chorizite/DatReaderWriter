@@ -90,6 +90,15 @@ namespace DatReaderWriter.Tests.DBObjs {
         [TestMethod]
         [TestCategory("EOR")]
         public void CanReadEORAndWriteIdentical() {
+            var dats = new DatCollection(EORCommonData.DatDirectory);
+            var allFiles = dats.Portal.Tree.GetFilesInRange(0x16000000, 0x16FFFFFF);
+
+            foreach (var file in allFiles) {
+                dats.Portal.TryGetFileBytes(file.Id, out var bytes);
+                Console.WriteLine($"0x{file.Id:X8}  {file.Size}");
+                Console.WriteLine(string.Join(" ", bytes.Select(b => $"{b:X2}")));
+            }
+
             TestHelpers.CanReadAndWriteIdentical<Animation>(Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat"), 0x03000DD8);
             TestHelpers.CanReadAndWriteIdentical<Animation>(Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat"), 0x03000514);
             TestHelpers.CanReadAndWriteIdentical<Animation>(Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat"), 0x03000968);
