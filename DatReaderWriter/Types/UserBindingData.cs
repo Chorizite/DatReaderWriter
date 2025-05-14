@@ -1,14 +1,4 @@
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//
-//                                                            //
-//                          WARNING                           //
-//                                                            //
-//           DO NOT MAKE LOCAL CHANGES TO THIS FILE           //
-//               EDIT THE .tt TEMPLATE INSTEAD                //
-//                                                            //
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//
-
-
-using System;
+﻿using System;
 using System.Numerics;
 using System.IO;
 using System.Linq;
@@ -22,12 +12,7 @@ namespace DatReaderWriter.Types {
     /// <summary>
     /// User binding value used in ActionMap
     /// </summary>
-    public partial class UserBindingValue : IDatObjType {
-        public uint Unknown;
-
-        /// <summary>
-        /// This can be looked up in the 0x2200002B enum dat entry
-        /// </summary>
+    public partial class UserBindingData : IDatObjType {
         public uint ActionClass;
 
         /// <summary>
@@ -42,7 +27,6 @@ namespace DatReaderWriter.Types {
 
         /// <inheritdoc />
         public bool Unpack(DatBinReader reader) {
-            Unknown = reader.ReadUInt32();
             ActionClass = reader.ReadUInt32();
             ActionName = reader.ReadUInt32();
             ActionDescription = reader.ReadUInt32();
@@ -51,7 +35,6 @@ namespace DatReaderWriter.Types {
 
         /// <inheritdoc />
         public bool Pack(DatBinWriter writer) {
-            writer.WriteUInt32(Unknown);
             writer.WriteUInt32(ActionClass);
             writer.WriteUInt32(ActionName);
             writer.WriteUInt32(ActionDescription);

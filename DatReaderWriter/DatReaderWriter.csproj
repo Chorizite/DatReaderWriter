@@ -1,105 +1,124 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <LangVersion>12.0</LangVersion>
-    <TargetFrameworks>net8.0;netstandard2.0;net48</TargetFrameworks>
-    <Nullable>enable</Nullable>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DebugType>pdbonly</DebugType>
-    <DebugSymbols>true</DebugSymbols>
-    <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <IsTrimmable>True</IsTrimmable>
-    <IsPackable>True</IsPackable>
-    <Platforms>AnyCPU</Platforms>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFrameworks>net8.0;netstandard2.0;net48</TargetFrameworks>
+		<OutputType>Library</OutputType>
+		<LangVersion>12</LangVersion>
+		<DebugType>pdbonly</DebugType>
+		<DebugSymbols>true</DebugSymbols>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<IsPackable>True</IsPackable>
+		<OutputPath>..\bin\</OutputPath>
+		<NoWarn>1591</NoWarn>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
 
-  <PropertyGroup>
-    <Title>DatReaderWriter</Title>
-    <Product>DatReaderWriter</Product>
-    <PackageId>DatReaderWriter</PackageId>
-    <Authors>ACClientLib</Authors>
-    <Company>ACClientLib</Company>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Description>DatReaderWriter is an open-source library for reading and writing .dat files used by the game Asheron's Call.</Description>
-    <RepositoryUrl>https://github.com/ACClientLib/DatReaderWriter/</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <GenerateAssemblyFileVersionAttribute>true</GenerateAssemblyFileVersionAttribute>
-    <GenerateAssemblyInformationalVersionAttribute>true</GenerateAssemblyInformationalVersionAttribute>
-    <GenerateAssemblyVersionAttribute>true</GenerateAssemblyVersionAttribute>
-    <UpdateAssemblyInfo>false</UpdateAssemblyInfo>
-  </PropertyGroup>
-  
-  <ItemGroup>
-    <None Include="../README.md">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-  </ItemGroup>
+	<PropertyGroup>
+		<Title>Chorizite.DatReaderWriter</Title>
+		<Product>Chorizite.DatReaderWriter</Product>
+		<PackageId>Chorizite.DatReaderWriter</PackageId>
+		<Authors>Chorizite</Authors>
+		<Company>Chorizite</Company>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<Description>DatReaderWriter is an open-source library for reading and writing .dat files used by the game Asheron's Call.</Description>
+		<RepositoryUrl>https://github.com/Chorizite/DatReaderWriter/</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<GenerateAssemblyFileVersionAttribute>true</GenerateAssemblyFileVersionAttribute>
+		<GenerateAssemblyInformationalVersionAttribute>true</GenerateAssemblyInformationalVersionAttribute>
+		<GenerateAssemblyVersionAttribute>true</GenerateAssemblyVersionAttribute>
+		<UpdateAssemblyInfo>false</UpdateAssemblyInfo>
+		<UseProjectNamespaceForGitVersionInformation>true</UseProjectNamespaceForGitVersionInformation>
+		<PackageOutputPath>.\..\bin\</PackageOutputPath>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="GitVersion.MsBuild" Version="5.11.1">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="System.IO.Pipelines" Version="8.0.0" />
-  </ItemGroup>
+	<Target Name="VSGitVersion" BeforeTargets="GenerateNuspec">
+		<Exec Command="$(NuGetPackageRoot)\gitversion.msbuild\6.3.0\tools\net8.0\gitversion.exe /output json /showvariable SemVer" ConsoleToMSBuild="true">
+			<Output TaskParameter="ConsoleOutput" PropertyName="PackageVersion" />
+		</Exec>
+		<Exec Command="$(NuGetPackageRoot)\gitversion.msbuild\6.3.0\tools\net8.0\gitversion.exe /output json /showvariable Major" ConsoleToMSBuild="true">
+			<Output TaskParameter="ConsoleOutput" PropertyName="AssemblyVersion" />
+		</Exec>
+		<Message Text="Set PackageVersion to $(PackageVersion)" Importance="high" />
+		<Message Text="Delete $(NuGetPackageRoot)$(PackageId)\$(PackageVersion)" Importance="high" />
+		<RemoveDir Directories="$(NuGetPackageRoot)$(PackageId)\$(PackageVersion)" />
+	</Target>
 
-  <ItemGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net48')) Or $([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'netstandard2.0'))">
-    <PackageReference Include="System.Buffers" Version="4.5.1" />
-    <PackageReference Include="System.Memory" Version="4.5.5" />
-  </ItemGroup>
+	<Target Name="PreparePackageReleaseNotesFromFile" BeforeTargets="GenerateNuspec" Condition="Exists('../release-notes.md')">
+		<ReadLinesFromFile File="../release-notes.md">
+			<Output TaskParameter="Lines" ItemName="ReleaseNoteLines" />
+		</ReadLinesFromFile>
 
-  <ItemGroup>
-    <None Update="Templates\DBObjs.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>DBObjs.cs</LastGenOutput>
-    </None>
-    <None Update="Templates\Enums.tt">
-      <LastGenOutput>Enums.cs</LastGenOutput>
-      <Generator>TextTemplatingFileGenerator</Generator>
-    </None>
-    <None Update="Templates\Types.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>Types.cs</LastGenOutput>
-    </None>
-    <None Update="Templates\DatabaseReaders.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>DatabaseReaders.cs</LastGenOutput>
-    </None>
-  </ItemGroup>
+		<PropertyGroup>
+			<PackageReleaseNotes>@(ReleaseNoteLines, '%0a')</PackageReleaseNotes>
+		</PropertyGroup>
+	</Target>
 
-  <ItemGroup>
-    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Include="../README.md">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Include="Templates\DBObjs.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>DBObjs.tt</DependentUpon>
-    </None>
-    <Compile Update="Templates\DatabaseReaders.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>DatabaseReaders.tt</DependentUpon>
-    </Compile>
-    <Compile Update="Templates\DBObjs.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>DBObjs.tt</DependentUpon>
-    </Compile>
-    <Compile Update="Templates\Enums.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Enums.tt</DependentUpon>
-    </Compile>
-    <Compile Update="Templates\Types.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Types.tt</DependentUpon>
-    </Compile>
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="GitVersion.MsBuild" Version="6.3.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="System.IO.Pipelines" Version="9.0.5" />
+	</ItemGroup>
+
+	<ItemGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net48')) Or $([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'netstandard2.0'))">
+		<PackageReference Include="System.Buffers" Version="4.6.1" />
+		<PackageReference Include="System.Memory" Version="4.6.3" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="Templates\DBObjs.tt">
+			<Generator>TextTemplatingFileGenerator</Generator>
+			<LastGenOutput>DBObjs.cs</LastGenOutput>
+		</None>
+		<None Update="Templates\Enums.tt">
+			<LastGenOutput>Enums.cs</LastGenOutput>
+			<Generator>TextTemplatingFileGenerator</Generator>
+		</None>
+		<None Update="Templates\Types.tt">
+			<Generator>TextTemplatingFileGenerator</Generator>
+			<LastGenOutput>Types.cs</LastGenOutput>
+		</None>
+		<None Update="Templates\DatabaseReaders.tt">
+			<Generator>TextTemplatingFileGenerator</Generator>
+			<LastGenOutput>DatabaseReaders.cs</LastGenOutput>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="Templates\DBObjs.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>DBObjs.tt</DependentUpon>
+		</None>
+		<Compile Update="Templates\DatabaseReaders.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>DatabaseReaders.tt</DependentUpon>
+		</Compile>
+		<Compile Update="Templates\DBObjs.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>DBObjs.tt</DependentUpon>
+		</Compile>
+		<Compile Update="Templates\Enums.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Enums.tt</DependentUpon>
+		</Compile>
+		<Compile Update="Templates\Types.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Types.tt</DependentUpon>
+		</Compile>
+	</ItemGroup>
 </Project>

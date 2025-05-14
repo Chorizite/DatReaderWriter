@@ -12,12 +12,11 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D58A96C1-8D2F-46EC-BB8C-4937EE7DF71E}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
-		.github\workflows\beta-release.yml = .github\workflows\beta-release.yml
-		.github\workflows\ci.yml = .github\workflows\ci.yml
+		.github\workflows\build.yml = .github\workflows\build.yml
 		GitVersion.yml = GitVersion.yml
 		LICENSE.txt = LICENSE.txt
+		.github\workflows\make-release.yml = .github\workflows\make-release.yml
 		README.md = README.md
-		.github\workflows\test-report.yml = .github\workflows\test-report.yml
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatReaderWriter.SourceGen", "DatReaderWriter.SourceGen\DatReaderWriter.SourceGen.csproj", "{DD4D1499-0612-4699-A927-B0CF51BDFDF5}"
