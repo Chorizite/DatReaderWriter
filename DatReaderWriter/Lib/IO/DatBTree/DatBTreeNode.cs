@@ -28,14 +28,14 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
         /// <remarks>
         /// Except on leaf nodes, Branches.Count must always be equal to Files.Count + 1.
         /// </remarks>
-        public List<int> Branches { get; set; } = [];
+        public List<int> Branches { get; set; } = new(62);
 
         /// <summary>
         /// A list of file ids (keys) directly contained in this node.
         /// Except for root nodes, this must be between <see cref="DatBTreeReaderWriter.MinItems"/>
         /// and <see cref="DatBTreeReaderWriter.MaxItems"/> in length.
         /// </summary>
-        public List<DatBTreeFile> Files { get; set; } = [];
+        public List<DatBTreeFile> Files { get; set; } = new(61);
 
         /// <summary>
         /// Wether this is a leaf node. Leaf nodes have no branches, only files.
@@ -75,7 +75,6 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
 
             for (entryCountSpan[0] = 0; entryCountSpan[0] < entryCountSpan[1]; entryCountSpan[0]++) {
                 var file = new DatBTreeFile {
-                    Parent = this
                 };
                 file.Unpack(reader);
                 Files.Add(file);

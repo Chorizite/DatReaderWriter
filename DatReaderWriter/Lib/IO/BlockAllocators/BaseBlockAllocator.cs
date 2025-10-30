@@ -119,7 +119,7 @@ namespace DatReaderWriter.Lib.IO.BlockAllocators {
         }
 
         /// <inheritdoc/>
-        public int ReserveBlock() {
+        public virtual int ReserveBlock() {
             if (Header.FreeBlockCount > 0) {
                 var freeBlockOffset = Header.FirstFreeBlock;
                 Header.FirstFreeBlock += Header.BlockSize;

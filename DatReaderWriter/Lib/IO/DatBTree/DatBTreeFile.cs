@@ -8,7 +8,7 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
     /// A dat file entry. This points to where dat files are stored in the dat,
     /// as well as some other meta data.
     /// </summary>
-    public class DatBTreeFile : IPackable, IUnpackable {
+    public struct DatBTreeFile : IPackable, IUnpackable {
         /// <summary>
         /// The size of this struct
         /// </summary>
@@ -17,7 +17,7 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
         /// <summary>
         /// Some kind of flags?
         /// </summary>
-        public uint Flags { get; set; } = 0x20000;
+        public uint Flags { get; set; }
 
         /// <summary>
         /// The id of the file this entry points to. These are dat file ids like
@@ -46,13 +46,12 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
         /// </summary>
         public int Iteration { get; set; }
 
-        /// <summary>
-        /// The parent node of this file entry
-        /// </summary>
-        public DatBTreeNode? Parent { get; internal set; }
-
         /// <inheritdoc/>
         public int GetSize() => SIZE;
+
+        public DatBTreeFile() {
+            Flags = 0x20000;
+        }
 
         /// <inheritdoc/>
         public bool Unpack(DatBinReader reader) {
