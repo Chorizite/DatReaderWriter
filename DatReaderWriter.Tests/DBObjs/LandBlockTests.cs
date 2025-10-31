@@ -35,7 +35,7 @@ namespace DatReaderWriter.Tests.DBObjs {
                 Terrain = Enumerable.Range(0, 81).Select(v => new TerrainInfo() {
                     Road = (byte)(v > 60 ? 0 : 1),
                     Type = v > 40 ? TerrainTextureType.ObsidianPlain : TerrainTextureType.MudRichDirt,
-                    Scenery = (ushort)(v > 10 ? 5 : 20)
+                    Scenery = (byte)(v > 10 ? 5 : 20)
                 }).ToArray()
             };
 
@@ -76,7 +76,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             var expected2 = Enumerable.Range(0, 81).Select(v => new TerrainInfo() {
                 Road = (byte)(v > 60 ? 0 : 1),
                 Type = v > 40 ? TerrainTextureType.ObsidianPlain : TerrainTextureType.MudRichDirt,
-                Scenery = (ushort)(v > 10 ? 5 : 20)
+                Scenery = (byte)(v > 10 ? 5 : 20)
             }).ToArray();
             for (var i = 0; i < expected2.Length; i++) {
                 var expected = expected2[i];

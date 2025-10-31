@@ -127,7 +127,7 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
                 }
             }
 
-            file = null;
+            file = default;
             return false;
         }
 
@@ -293,17 +293,11 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
         public DatBTreeFile? Insert(DatBTreeFile file) {
             // check if file already exists
             if (TryGetFile(file.Id, out var foundFile)) {
-                file.Parent = foundFile.Parent;
-
-                if (foundFile.Parent is not null) {
-                    var idx = foundFile.Parent.Files.IndexOf(foundFile);
-                    foundFile.Parent.Files[idx] = file;
-                    WriteNode(foundFile.Parent);
+                // Find the parent node and update the file in place
+                if (TryFindParentAndUpdate(Root, file, out var replacedFile)) {
+                    return replacedFile;
                 }
-                else {
-                    throw new Exception($"Could not find existing parent?");
-                }
-                return foundFile;
+                throw new Exception($"Could not find existing file in tree structure");
             }
 
             // if root is null, create a new root node and add the file there
@@ -320,14 +314,41 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
                 var newRoot = new DatBTreeNode(BlockAllocator.ReserveBlock());
                 SetNewRoot(newRoot);
 
-                // add old root to new root
                 newRoot.Branches.Add(oldRoot.Offset);
                 SplitChild(newRoot, oldRoot);
             }
 
             InsertNonFull(Root, file);
-
             return null;
+        }
+
+        private bool TryFindParentAndUpdate(DatBTreeNode? node, DatBTreeFile file, out DatBTreeFile replacedFile) {
+            if (node is null) {
+                replacedFile = default;
+                return false;
+            }
+
+            var idx = node.Files.FindIndex(f => f.Id == file.Id);
+            if (idx >= 0) {
+                replacedFile = node.Files[idx];
+                node.Files[idx] = file;
+                WriteNode(node);
+                return true;
+            }
+
+            // Search children
+            if (!node.IsLeaf) {
+                foreach (var branchOffset in node.Branches) {
+                    if (TryGetNode(branchOffset, out var child)) {
+                        if (TryFindParentAndUpdate(child, file, out replacedFile)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            replacedFile = default;
+            return false;
         }
 
         private void InsertNonFull(DatBTreeNode node, DatBTreeFile file) {
@@ -377,7 +398,7 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
         public bool TryDelete(uint fileId, out DatBTreeFile fileEntry) {
 #endif
             if (Root is null) {
-                fileEntry = null;
+                fileEntry = default;
                 return false;
             }
 

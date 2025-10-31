@@ -15,7 +15,7 @@ namespace DatReaderWriter {
     /// Provides read access to a dat database
     /// </summary>
     public partial class DatDatabase : IDisposable {
-        private Dictionary<uint, IDBObj> _fileCache = [];
+        public Dictionary<uint, IDBObj> _fileCache = [];
 
         /// <summary>
         /// Block allocator
@@ -134,6 +134,22 @@ namespace DatReaderWriter {
         }
 
         /// <summary>
+        /// Get the raw bytes of a file entry, this is never cached.
+        /// </summary>
+        /// <param name="fileId">The id of the file to get</param>
+        /// <param name="bytes">The raw bytes</param>
+        /// <returns>True if the file was found, false otherwise</returns>
+        public bool TryGetFileBytes(uint fileId, ref byte[] bytes, out int bytesRead) {
+            if (Tree.TryGetFile(fileId, out var fileEntry)) {
+                bytesRead = (int)fileEntry.Size;
+                BlockAllocator.ReadBlock(bytes, fileEntry.Offset);
+                return true;
+            }
+            bytesRead = 0;
+            return false;
+        }
+
+        /// <summary>
         /// Read a dat file, and caches it regardless of <see cref="DatCollectionOptions.FileCachingStrategy"/>
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -228,8 +244,13 @@ namespace DatReaderWriter {
             }
 
             int startingBlockId = 0;
+            uint existingFlags = 0x20000;
+            int existingIteration = 0;
+
             if (Tree.TryGetFile(value.Id, out var existingFile)) {
                 startingBlockId = existingFile.Offset;
+                existingFlags = existingFile.Flags;
+                existingIteration = existingFile.Iteration;
             }
 
             // TODO: fix this static 5mb buffer...?
@@ -240,9 +261,9 @@ namespace DatReaderWriter {
             value.Pack(writer);
             startingBlockId = Tree.BlockAllocator.WriteBlock(buffer, writer.Offset, startingBlockId);
 
-            var newIteration = iteration.HasValue ? iteration.Value : (existingFile?.Iteration ?? 0);
-            var newEntry = new DatBTreeFile() {
-                Flags = existingFile?.Flags ?? 0u,
+            var newIteration = iteration ?? existingIteration;
+            var newEntry = new DatBTreeFile {
+                Flags = existingFlags,
                 Id = value.Id,
                 Size = (uint)writer.Offset,
                 Offset = startingBlockId,
@@ -267,6 +288,47 @@ namespace DatReaderWriter {
             }
 
             return value;
+        }
+
+        /// <summary>
+        /// Try and write a <see cref="IDBObj"/> to the dat.
+        /// </summary>
+        /// <param name="id">The id of the file to write</param>
+        /// <param name="buffer">The value to write</param>
+        /// <param name="bytesToWrite">The number of bytes to write from the buffer.</param>
+        /// <param name="iteration">The iteration to use.</param>
+        public Result<bool, string> TryWriteFileBytes(uint id, byte[] buffer, int bytesToWrite, int iteration) {
+            if (!BlockAllocator.CanWrite) {
+                return "Block allocator was opened as read only.";
+            }
+
+            int startingBlockId = 0;
+            if (Tree.TryGetFile(id, out var existingFile)) {
+                startingBlockId = existingFile.Offset;
+            }
+
+            startingBlockId = Tree.BlockAllocator.WriteBlock(buffer, bytesToWrite, startingBlockId);
+
+            var newEntry = new DatBTreeFile() {
+                Flags = existingFile.Flags,
+                Id = id,
+                Size = (uint)bytesToWrite,
+                Offset = startingBlockId,
+                Date = DateTime.UtcNow,
+                Iteration = iteration
+            };
+            var oldEntry = Tree.Insert(newEntry);
+
+            // update dat iteration if needed
+            if (iteration > Iteration.CurrentIteration) {
+                Iteration.CurrentIteration = iteration;
+                var iterationUpdateRes = TryWriteFile(Iteration);
+                if (!iterationUpdateRes) {
+                    return iterationUpdateRes.Error ?? "Failed to update dat iteration.";
+                }
+            }
+
+            return true;
         }
 
         /// <inheritdoc/>

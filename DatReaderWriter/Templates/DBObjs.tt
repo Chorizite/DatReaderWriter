@@ -10,7 +10,7 @@
     SetupMessageParser(this.Host.ResolvePath("../dats.xml"));
     foreach (var kv in this.XMLDefParser.ACDBObjs) {
         if (kv.Value.Children.Count == 0) continue;
-        if (kv.Key == "DBProperties" || kv.Key == "MasterProperty") {
+        if (kv.Key == "DBProperties" || kv.Key == "MasterProperty" || kv.Key == "LandBlock") {
             continue;
         }
 

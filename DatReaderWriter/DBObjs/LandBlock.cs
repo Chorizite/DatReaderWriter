@@ -1,14 +1,4 @@
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//
-//                                                            //
-//                          WARNING                           //
-//                                                            //
-//           DO NOT MAKE LOCAL CHANGES TO THIS FILE           //
-//               EDIT THE .tt TEMPLATE INSTEAD                //
-//                                                            //
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//
-
-
-using System;
+﻿using System;
 using System.Numerics;
 using System.IO;
 using System.Linq;
@@ -27,28 +17,29 @@ namespace DatReaderWriter.DBObjs {
     public partial class LandBlock : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;
-
         /// <inheritdoc />
         public override DBObjType DBObjType => DBObjType.LandBlock;
 
         public bool HasObjects;
-
-        public TerrainInfo[] Terrain = [];
-
-        public byte[] Height = [];
+        public TerrainInfo[] Terrain = new TerrainInfo[81];
+        public byte[] Height = new byte[81];
 
         /// <inheritdoc />
         public override bool Unpack(DatBinReader reader) {
             base.Unpack(reader);
+
             HasObjects = reader.ReadBool();
-            Terrain = new TerrainInfo[81];
-            for (var i=0; i < 81; i++) {
-                Terrain[i] = reader.ReadItem<TerrainInfo>();
+
+            // Read raw ushorts and convert to TerrainInfo
+            for (int i = 0; i < 81; i++) {
+                ushort raw = reader.ReadUInt16();
+                Terrain[i] = raw; // implicit conversion
             }
-            Height = new byte[81];
-            for (var i=0; i < 81; i++) {
+
+            for (int i = 0; i < 81; i++) {
                 Height[i] = reader.ReadByte();
             }
+
             reader.Align(4);
             return true;
         }
@@ -56,17 +47,20 @@ namespace DatReaderWriter.DBObjs {
         /// <inheritdoc />
         public override bool Pack(DatBinWriter writer) {
             base.Pack(writer);
+
             writer.WriteBool(HasObjects);
-            for (var i=0; i < Terrain.Count(); i++) {
-                writer.WriteItem<TerrainInfo>(Terrain[i]);
+
+            // Write backing ushort values
+            for (int i = 0; i < 81; i++) {
+                writer.WriteUInt16(Terrain[i]); // implicit conversion
             }
-            for (var i=0; i < Height.Count(); i++) {
+
+            for (int i = 0; i < 81; i++) {
                 writer.WriteByte(Height[i]);
             }
+
             writer.Align(4);
             return true;
         }
-
     }
-
 }

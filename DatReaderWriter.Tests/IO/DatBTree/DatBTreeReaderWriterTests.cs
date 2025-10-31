@@ -85,7 +85,6 @@ namespace DatReaderWriter.Tests.IO.DatBTree {
 
             // Assert
             Assert.IsFalse(result);
-            Assert.IsNull(retrievedFile);
         }
 
         [TestMethod]
@@ -112,7 +111,6 @@ namespace DatReaderWriter.Tests.IO.DatBTree {
 
             // Assert
             Assert.IsFalse(deleteResult);
-            Assert.IsNull(deletedFile);
         }
 
         [TestMethod]
@@ -450,7 +448,6 @@ namespace DatReaderWriter.Tests.IO.DatBTree {
             var result = tree.TryGetFile(fileId, out var file);
 
             Assert.IsFalse(result);
-            Assert.IsNull(file);
         }
 
         [TestMethod]
@@ -466,7 +463,6 @@ namespace DatReaderWriter.Tests.IO.DatBTree {
             var result = tree.TryGetFile(fileId, out var file);
 
             Assert.IsFalse(result);
-            Assert.IsNull(file);
         }
 
         [TestMethod]

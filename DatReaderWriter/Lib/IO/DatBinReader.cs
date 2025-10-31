@@ -3,6 +3,8 @@ using System.Buffers.Binary;
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace DatReaderWriter.Lib.IO {
@@ -12,6 +14,7 @@ namespace DatReaderWriter.Lib.IO {
     /// </summary>
     public class DatBinReader {
         private readonly ReadOnlyMemory<byte> _data;
+        private static readonly Encoding Windows1252 = Encoding.GetEncoding(1252);
         private int _offset;
 
         /// <summary>
@@ -48,6 +51,7 @@ namespace DatReaderWriter.Lib.IO {
         /// Align the underlying buffer position
         /// </summary>
         /// <param name="v"></param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Align(int v) {
             var alignDelta = _offset % v;
 
@@ -60,6 +64,7 @@ namespace DatReaderWriter.Lib.IO {
         /// Advance the buffer position without reading any data
         /// </summary>
         /// <param name="numBytes">The number of bytes to skip</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Skip(int numBytes) {
             _offset += numBytes;
         }
@@ -69,6 +74,7 @@ namespace DatReaderWriter.Lib.IO {
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T ReadItem<T>(params object[] p) where T : IUnpackable {
             var item = (T)Activator.CreateInstance(typeof(T), p ?? []);
             item.Unpack(this);
@@ -80,6 +86,7 @@ namespace DatReaderWriter.Lib.IO {
         /// </summary>
         /// <param name="count">The number of bytes to read</param>
         /// <returns>The bytes that were read</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public byte[] ReadBytes(int count) {
             return ReadBytesInternal(count).ToArray();
         }
@@ -87,8 +94,9 @@ namespace DatReaderWriter.Lib.IO {
         /// <summary>
         /// Read a byte and advance the buffer position accordingly
         /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public byte ReadByte() {
-            return ReadBytesInternal(1).ToArray()[0];
+            return ReadBytesInternal(1)[0];
         }
 
         /// <summary>
@@ -96,14 +104,16 @@ namespace DatReaderWriter.Lib.IO {
         /// </summary>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public sbyte ReadSByte() {
-            return (sbyte)ReadBytesInternal(1).ToArray()[0];
+            return (sbyte)ReadBytesInternal(1)[0];
         }
 
         /// <summary>
         /// Read an bool and advance the buffer position accordingly
         /// </summary>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool ReadBool(int size = 4) {
             switch (size) {
                 case 8:
@@ -123,8 +133,10 @@ namespace DatReaderWriter.Lib.IO {
         /// Read an int64 and advance the buffer position accordingly
         /// </summary>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public long ReadInt64() {
-            return BinaryPrimitives.ReadInt64LittleEndian(ReadBytesInternal(8));
+            var span = ReadBytesInternal(8);
+            return Unsafe.ReadUnaligned<long>(ref MemoryMarshal.GetReference(span));
         }
 
 
@@ -132,30 +144,37 @@ namespace DatReaderWriter.Lib.IO {
         /// Read an uint64 and advance the buffer position accordingly
         /// </summary>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ulong ReadUInt64() {
-            return BinaryPrimitives.ReadUInt64LittleEndian(ReadBytesInternal(8));
+            var span = ReadBytesInternal(8);
+            return Unsafe.ReadUnaligned<ulong>(ref MemoryMarshal.GetReference(span));
         }
 
         /// <summary>
         /// Read an int32 and advance the buffer position accordingly
         /// </summary>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int ReadInt32() {
-            return BinaryPrimitives.ReadInt32LittleEndian(ReadBytesInternal(4));
+            var span = ReadBytesInternal(4);
+            return Unsafe.ReadUnaligned<int>(ref MemoryMarshal.GetReference(span));
         }
 
         /// <summary>
         /// Read an uint32 and advance the buffer position accordingly
         /// </summary>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public uint ReadUInt32() {
-            return BinaryPrimitives.ReadUInt32LittleEndian(ReadBytesInternal(4));
+            var span = ReadBytesInternal(4);
+            return Unsafe.ReadUnaligned<uint>(ref MemoryMarshal.GetReference(span));
         }
 
         /// <summary>
         /// Read an int16 and advance the buffer position accordingly
         /// </summary>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public short ReadInt16() {
             return BinaryPrimitives.ReadInt16LittleEndian(ReadBytesInternal(2));
         }
@@ -165,6 +184,7 @@ namespace DatReaderWriter.Lib.IO {
         /// Read an uint16 and advance the buffer position accordingly
         /// </summary>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ushort ReadUInt16() {
             return BinaryPrimitives.ReadUInt16LittleEndian(ReadBytesInternal(2));
         }
@@ -173,6 +193,7 @@ namespace DatReaderWriter.Lib.IO {
         /// Read a float (single) and advance the buffer position accordingly
         /// </summary>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public float ReadSingle() {
 #if NETSTANDARD2_0 || NETFRAMEWORK
             return BitConverter.ToSingle(ReadBytesInternal(4).ToArray(), 0);
@@ -185,6 +206,7 @@ namespace DatReaderWriter.Lib.IO {
         /// Read a double and advance the buffer position accordingly
         /// </summary>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public double ReadDouble() {
 #if NETSTANDARD2_0 || NETFRAMEWORK
             return BitConverter.ToDouble(ReadBytesInternal(8).ToArray(), 0);
@@ -197,6 +219,7 @@ namespace DatReaderWriter.Lib.IO {
         /// Read a <see cref="Vector3"/> and advance the buffer position accordingly
         /// </summary>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Vector3 ReadVector3() {
             var x = ReadSingle();
             var y = ReadSingle();
@@ -208,6 +231,7 @@ namespace DatReaderWriter.Lib.IO {
         /// Read a <see cref="Quaternion"/> and advance the buffer position accordingly
         /// </summary>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Quaternion ReadQuaternion() {
             var w = ReadSingle();
             var x = ReadSingle();
@@ -225,6 +249,7 @@ namespace DatReaderWriter.Lib.IO {
         /// If both (0x80) and (0x40) are set, it's 4 bytes.
         /// </summary>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public uint ReadCompressedUInt() {
             var b0 = ReadByte();
             if ((b0 & 0x80) == 0)
@@ -242,6 +267,7 @@ namespace DatReaderWriter.Lib.IO {
         /// Read a <see cref="Plane"/> and advance the buffer position accordingly.
         /// </summary>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Plane ReadPlane() {
             var normal = ReadVector3();
             var distance = ReadSingle();
@@ -252,6 +278,7 @@ namespace DatReaderWriter.Lib.IO {
         /// From ACE: First reads a UInt16. If the MSB is set, it will be masked with 0x3FFF, shifted left 2 bytes, and then OR'd with the next UInt16. The sum is then added to knownType.
         /// </summary>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public uint ReadDataIdOfKnownType(uint knownType) {
             var value = ReadUInt16();
 
@@ -265,6 +292,7 @@ namespace DatReaderWriter.Lib.IO {
             return knownType + value;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string ReadString16L(int sizeOfLength = 2, bool align = true) {
             int stringlength;
             switch (sizeOfLength) {
@@ -282,6 +310,7 @@ namespace DatReaderWriter.Lib.IO {
             return Encoding.Default.GetString(thestring);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string ReadString16LByte() {
             return ReadString16L(1, false);
         }
@@ -291,6 +320,7 @@ namespace DatReaderWriter.Lib.IO {
         /// The string is stored as a length-prefixed sequence of bytes where each byte has been bit-rotated.
         /// </summary>
         /// <returns>The deobfuscated string</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string ReadObfuscatedString() {
 #if NET8_0_OR_GREATER
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
@@ -307,9 +337,10 @@ namespace DatReaderWriter.Lib.IO {
             }
 
             // Convert bytes to string using Windows-1252 encoding
-            return Encoding.GetEncoding(1252).GetString(obfuscatedBytes);
+            return Windows1252.GetString(obfuscatedBytes);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private int ReadVariableLengthInt() {
             int result = 0;
             int shift = 0;
@@ -331,19 +362,21 @@ namespace DatReaderWriter.Lib.IO {
         /// </summary>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string ReadString() {
 #if NET8_0_OR_GREATER
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 #endif
             var length = ReadVariableLengthInt();
             var bytes = ReadBytes(length);
-            return Encoding.GetEncoding(1252).GetString(bytes);
+            return Windows1252.GetString(bytes);
         }
 
         /// <summary>
         /// Reads a <see cref="Guid"/> from the current stream.
         /// </summary>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Guid ReadGuid() {
             return new Guid(ReadBytes(16));
         }
@@ -352,6 +385,7 @@ namespace DatReaderWriter.Lib.IO {
         /// Reads a string from the current stream. The string is prefixed with the compressed uint length.,
         /// </summary>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string ReadStringCompressed() {
 #if NET8_0_OR_GREATER
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
@@ -359,13 +393,14 @@ namespace DatReaderWriter.Lib.IO {
             var length = ReadCompressedUInt();
             if (length == 0) return string.Empty;
             var bytes = ReadBytes((int)length);
-            return Encoding.GetEncoding(1252).GetString(bytes);
+            return Windows1252.GetString(bytes);
         }
 
         /// <summary>
         /// Reads a PStringBase[ushort] from the current stream
         /// </summary>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string ReadUShortString() {
             var length = ReadCompressedUInt();
             var str = new StringBuilder();

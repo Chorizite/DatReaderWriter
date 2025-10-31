@@ -5,6 +5,7 @@ using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.MemoryMappedFiles;
+using System.Runtime.CompilerServices;
 
 namespace DatReaderWriter.Lib.IO.BlockAllocators {
     /// <summary>
@@ -39,8 +40,9 @@ namespace DatReaderWriter.Lib.IO.BlockAllocators {
         }
 
         /// <inheritdoc/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override void WriteBytes(byte[] buffer, int byteOffset, int numBytes) {
-            fixed (byte* bufferPtr = &buffer[0]) {
+            fixed (byte* bufferPtr = buffer) {
                 Buffer.MemoryCopy(bufferPtr, _viewPtr + byteOffset, numBytes, numBytes);
             }
         }
@@ -49,36 +51,37 @@ namespace DatReaderWriter.Lib.IO.BlockAllocators {
         public override int WriteBlock(byte[] buffer, int numBytes, int startingBlock = 0) {
             startingBlock = startingBlock > 0 ? startingBlock : ReserveBlock();
 
-            var currentBlockBuffer = stackalloc byte[4];
-            var currentBlockSpan = new Span<int>(currentBlockBuffer, 1);
-            BinaryPrimitives.WriteInt32LittleEndian(new Span<byte>(currentBlockBuffer, 4), startingBlock);
+            int currentBlock = startingBlock;
+            int bufferIndex = 0;
+            int blockDataSize = Header.BlockSize - 4;
 
-            var bufferIndex = 0;
             while (bufferIndex < numBytes) {
+                int size = Math.Min(blockDataSize, numBytes - bufferIndex);
+
                 fixed (byte* dataPtr = &buffer[bufferIndex]) {
-                    var size = Math.Min(Header.BlockSize - 4, numBytes - bufferIndex);
-                    Buffer.MemoryCopy(dataPtr, _viewPtr + currentBlockSpan[0] + 4, size, size);
-
-                    bufferIndex += size;
-
-                    var oldOffset = currentBlockSpan[0];
-                    if (bufferIndex < numBytes) {
-                        Buffer.MemoryCopy(_viewPtr + currentBlockSpan[0], currentBlockBuffer, 4, 4);
-                        var nextBlock = BinaryPrimitives.ReadInt32LittleEndian(new Span<byte>(currentBlockBuffer, 4));
-                        if (nextBlock <= 0) {
-                            currentBlockSpan[0] = ReserveBlock();
-                        }
-                        else {
-                            currentBlockSpan[0] = nextBlock;
-                        }
-                    }
-                    else {
-                        currentBlockSpan[0] = 0;
-                    }
-
-                    // write pointer to next block, 0 if none
-                    Buffer.MemoryCopy(currentBlockBuffer, _viewPtr + oldOffset, 4, 4);
+                    // Write data to current block (skip first 4 bytes for next pointer)
+                    Buffer.MemoryCopy(dataPtr, _viewPtr + currentBlock + 4, size, size);
                 }
+
+                bufferIndex += size;
+
+                // Determine next block
+                int nextBlock;
+                if (bufferIndex < numBytes) {
+                    // Read existing next block pointer
+                    nextBlock = *(int*)(_viewPtr + currentBlock);
+
+                    if (nextBlock <= 0) {
+                        nextBlock = ReserveBlock();
+                    }
+                }
+                else {
+                    nextBlock = 0; // End of chain
+                }
+
+                // Write next block pointer
+                *(int*)(_viewPtr + currentBlock) = nextBlock;
+                currentBlock = nextBlock;
             }
 
             WriteHeader();
@@ -87,41 +90,45 @@ namespace DatReaderWriter.Lib.IO.BlockAllocators {
         }
 
         /// <inheritdoc/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override void ReadBytes(byte[] buffer, int bufferOffset, int byteOffset, int numBytes) {
-            new ReadOnlySpan<byte>(_viewPtr + byteOffset, numBytes).CopyTo(buffer.AsSpan().Slice(bufferOffset, numBytes));
+            fixed (byte* bufferPtr = &buffer[bufferOffset]) {
+                Buffer.MemoryCopy(_viewPtr + byteOffset, bufferPtr, numBytes, numBytes);
+            }
         }
 
         /// <inheritdoc/>
         public override void ReadBlock(byte[] buffer, int startingBlock) {
-            var nextBlockBuffer = stackalloc byte[4];
-            Span<int> bufferStatsSpan = [0, 0];
+            int bufferOffset = 0;
+            int blockDataSize = Header.BlockSize - 4;
+            int bufferLength = buffer.Length;
 
-            while (startingBlock != 0 && bufferStatsSpan[0] < buffer.Length) {
-                bufferStatsSpan[1] = Math.Min(Header.BlockSize - 4, buffer.Length - bufferStatsSpan[0]);
-                fixed (byte* dataPtr = &buffer[bufferStatsSpan[0]]) {
-                    Buffer.MemoryCopy(_viewPtr + startingBlock + 4, dataPtr, bufferStatsSpan[1], bufferStatsSpan[1]);
+            fixed (byte* bufferPtr = buffer) {
+                while (startingBlock != 0 && bufferOffset < bufferLength) {
+                    int bytesToRead = Math.Min(blockDataSize, bufferLength - bufferOffset);
+
+                    // Copy data from block (skip first 4 bytes)
+                    Buffer.MemoryCopy(_viewPtr + startingBlock + 4, bufferPtr + bufferOffset, bytesToRead, bytesToRead);
+
+                    bufferOffset += bytesToRead;
+
+                    if (bufferOffset >= bufferLength) {
+                        return;
+                    }
+
+                    // Read next block pointer directly
+                    startingBlock = *(int*)(_viewPtr + startingBlock);
                 }
-
-                if (bufferStatsSpan[0] + bufferStatsSpan[1] >= buffer.Length) {
-                    return;
-                }
-
-                Buffer.MemoryCopy(_viewPtr + startingBlock, nextBlockBuffer, 4, 4);
-                startingBlock = BinaryPrimitives.ReadInt32LittleEndian(new ReadOnlySpan<byte>(nextBlockBuffer, 4));
-
-                bufferStatsSpan[0] += bufferStatsSpan[1];
             }
         }
 
-
         /// <inheritdoc/>
         public override bool TryGetBlockOffsets(int startingBlock, out List<int> fileBlocks) {
-            fileBlocks = [];
-            var nextBlockBuffer = stackalloc byte[4];
+            fileBlocks = new List<int>();
 
             while (startingBlock != 0) {
-                Buffer.MemoryCopy(_viewPtr + startingBlock, nextBlockBuffer, 4, 4);
-                startingBlock = BinaryPrimitives.ReadInt32LittleEndian(new ReadOnlySpan<byte>(nextBlockBuffer, 4));
+                fileBlocks.Add(startingBlock);
+                startingBlock = *(int*)(_viewPtr + startingBlock);
             }
 
             return true;
@@ -141,13 +148,14 @@ namespace DatReaderWriter.Lib.IO.BlockAllocators {
             UpdateViewPtr(out _mappedFile, out _view, out _viewPtr);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void DestroyMappedFile() {
             if (_view is not null) {
                 if (CanWrite) {
                     _view.Flush();
                 }
                 _view.SafeMemoryMappedViewHandle.ReleasePointer();
-                _viewPtr = (byte*)0;
+                _viewPtr = null;
                 _view.Dispose();
                 _view = null;
             }
@@ -165,7 +173,7 @@ namespace DatReaderWriter.Lib.IO.BlockAllocators {
                 view = mappedFile.CreateViewAccessor(0, _datStream.Length, MemoryMappedFileAccess.Read);
             }
 
-            viewPtr = (byte*)0;
+            viewPtr = null;
             view.SafeMemoryMappedViewHandle.AcquirePointer(ref viewPtr);
         }
 
