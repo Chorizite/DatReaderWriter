@@ -24,7 +24,7 @@ namespace DatReaderWriter.Tests.DBObjs {
                 Height = Enumerable.Range(0, 81).Select(v => (byte)v).ToArray(),
                 Terrain = Enumerable.Range(0, 81).Select(v => new TerrainInfo() {
                     Road = 1,
-                    Type = (byte)TerrainTextureType.LushGrass,
+                    Type = TerrainTextureType.LushGrass,
                     Scenery = 15
                 }).ToArray()
             };
@@ -34,7 +34,7 @@ namespace DatReaderWriter.Tests.DBObjs {
                 Height = Enumerable.Range(0, 81).Select(v => (byte)0xAB).ToArray(),
                 Terrain = Enumerable.Range(0, 81).Select(v => new TerrainInfo() {
                     Road = (byte)(v > 60 ? 0 : 1),
-                    Type = v > 40 ? (byte)TerrainTextureType.ObsidianPlain : (byte)TerrainTextureType.MudRichDirt,
+                    Type = v > 40 ? TerrainTextureType.ObsidianPlain : TerrainTextureType.MudRichDirt,
                     Scenery = (byte)(v > 10 ? 5 : 20)
                 }).ToArray()
             };
@@ -55,7 +55,7 @@ namespace DatReaderWriter.Tests.DBObjs {
 
             var expected1 = Enumerable.Range(0, 81).Select(v => new TerrainInfo() {
                 Road = 1,
-                Type = (byte)TerrainTextureType.LushGrass,
+                Type = TerrainTextureType.LushGrass,
                 Scenery = 15
             }).ToArray();
             for (var i = 0; i < expected1.Length; i++) {
@@ -75,7 +75,7 @@ namespace DatReaderWriter.Tests.DBObjs {
 
             var expected2 = Enumerable.Range(0, 81).Select(v => new TerrainInfo() {
                 Road = (byte)(v > 60 ? 0 : 1),
-                Type = v > 40 ? (byte)TerrainTextureType.ObsidianPlain : (byte)TerrainTextureType.MudRichDirt,
+                Type = v > 40 ? TerrainTextureType.ObsidianPlain : TerrainTextureType.MudRichDirt,
                 Scenery = (byte)(v > 10 ? 5 : 20)
             }).ToArray();
             for (var i = 0; i < expected2.Length; i++) {
@@ -107,15 +107,15 @@ namespace DatReaderWriter.Tests.DBObjs {
             Assert.AreEqual(81, landblock1.Terrain.Length);
 
             Assert.AreEqual((byte)0, landblock1.Terrain[0].Road);
-            Assert.AreEqual((byte)TerrainTextureType.SedimentaryRock, landblock1.Terrain[0].Type);
+            Assert.AreEqual(TerrainTextureType.SedimentaryRock, landblock1.Terrain[0].Type);
             Assert.AreEqual((ushort)9, landblock1.Terrain[0].Scenery);
 
             Assert.AreEqual((byte)0, landblock1.Terrain[1].Road);
-            Assert.AreEqual((byte)TerrainTextureType.PatchyGrassland, landblock1.Terrain[1].Type);
+            Assert.AreEqual(TerrainTextureType.PatchyGrassland, landblock1.Terrain[1].Type);
             Assert.AreEqual((ushort)13, landblock1.Terrain[1].Scenery);
 
             Assert.AreEqual((byte)0, landblock1.Terrain[80].Road);
-            Assert.AreEqual((byte)TerrainTextureType.SedimentaryRock, landblock1.Terrain[80].Type);
+            Assert.AreEqual(TerrainTextureType.SedimentaryRock, landblock1.Terrain[80].Type);
             Assert.AreEqual((ushort)11, landblock1.Terrain[80].Scenery);
 
             Assert.AreEqual((ushort)120, landblock1.Height[0]);

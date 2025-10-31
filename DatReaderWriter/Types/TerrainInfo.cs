@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DatReaderWriter.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,9 +25,9 @@ namespace DatReaderWriter.Types {
         }
 
         // Bits 2-6: Type
-        public byte Type {
-            get => (byte)((_value & 0x7C) >> 2);
-            set => _value = (ushort)((_value & ~0x7C) | ((value & 0x1F) << 2));
+        public TerrainTextureType Type {
+            get => (TerrainTextureType)((_value & 0x7C) >> 2);
+            set => _value = (ushort)((_value & ~0x7C) | (((byte)value & 0x1F) << 2));
         }
 
         // Bits 11-15: Scenery

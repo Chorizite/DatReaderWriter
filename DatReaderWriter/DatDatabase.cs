@@ -253,6 +253,8 @@ namespace DatReaderWriter {
                 existingIteration = existingFile.Iteration;
             }
 
+            // TODO: fix this static 5mb buffer...?
+            // we dont know how big the file will be, so we need to make sure we have enough space
             var buffer = BaseBlockAllocator.SharedBytes.Rent(1024 * 1024 * 5);
             var writer = new DatBinWriter(buffer, this);
 
@@ -260,7 +262,7 @@ namespace DatReaderWriter {
             startingBlockId = Tree.BlockAllocator.WriteBlock(buffer, writer.Offset, startingBlockId);
 
             var newIteration = iteration ?? existingIteration;
-            var newEntry = new DatBTreeFile {  // struct initialization
+            var newEntry = new DatBTreeFile {
                 Flags = existingFlags,
                 Id = value.Id,
                 Size = (uint)writer.Offset,
