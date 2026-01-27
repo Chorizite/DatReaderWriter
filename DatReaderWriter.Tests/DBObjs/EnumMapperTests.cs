@@ -21,7 +21,6 @@ namespace DatReaderWriter.Tests.DBObjs {
 
             var writeAnim = new EnumMapper() {
                 Id = 0x22000001,
-                NumberingType = NumberingType.Sequential,
                 BaseEnumMap = 0x12345678,
                 IdToStringMap = new Dictionary<uint, string>() {
                     { 1, "test" },
@@ -38,7 +37,6 @@ namespace DatReaderWriter.Tests.DBObjs {
 
             Assert.AreEqual(0x22000001u, readObj.Id);
 
-            Assert.AreEqual(NumberingType.Sequential, readObj.NumberingType);
             Assert.AreEqual(0x12345678u, readObj.BaseEnumMap);
             Assert.AreEqual(2, readObj.IdToStringMap.Count);
             Assert.AreEqual("test", readObj.IdToStringMap[1]);
@@ -62,7 +60,6 @@ namespace DatReaderWriter.Tests.DBObjs {
             Assert.IsNotNull(obj);
             Assert.AreEqual(0x2200001Bu, obj.Id);
 
-            Assert.AreEqual((NumberingType)7, obj.NumberingType);
             Assert.AreEqual(0x22000027u, obj.BaseEnumMap);
             Assert.AreEqual(1765, obj.IdToStringMap.Count);
 
@@ -73,7 +70,6 @@ namespace DatReaderWriter.Tests.DBObjs {
             Assert.AreEqual(0x22000014u, obj2.Id);
 
             Assert.AreEqual(3, obj2.IdToStringMap.Count);
-            Assert.AreEqual(NumberingType.Undefined, obj2.NumberingType);
             Assert.AreEqual("Invalid", obj2.IdToStringMap[0]);
             Assert.AreEqual("All", obj2.IdToStringMap[1]);
             Assert.AreEqual("Default", obj2.IdToStringMap[2]);

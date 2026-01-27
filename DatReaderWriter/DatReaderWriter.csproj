@@ -63,6 +63,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="DotNet.Standard.Common" Version="2.0.1" />
 		<PackageReference Include="GitVersion.MsBuild" Version="6.3.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; buildtransitive</IncludeAssets>
@@ -76,49 +77,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Update="Templates\DBObjs.tt">
-			<Generator>TextTemplatingFileGenerator</Generator>
-			<LastGenOutput>DBObjs.cs</LastGenOutput>
-		</None>
-		<None Update="Templates\Enums.tt">
-			<LastGenOutput>Enums.cs</LastGenOutput>
-			<Generator>TextTemplatingFileGenerator</Generator>
-		</None>
-		<None Update="Templates\Types.tt">
-			<Generator>TextTemplatingFileGenerator</Generator>
-			<LastGenOutput>Types.cs</LastGenOutput>
-		</None>
-		<None Update="Templates\DatabaseReaders.tt">
-			<Generator>TextTemplatingFileGenerator</Generator>
-			<LastGenOutput>DatabaseReaders.cs</LastGenOutput>
-		</None>
+		<ProjectReference Include="..\DatReaderWriter.SourceGenerator\DatReaderWriter.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Include="Templates\DBObjs.cs">
-			<DesignTime>True</DesignTime>
-			<AutoGen>True</AutoGen>
-			<DependentUpon>DBObjs.tt</DependentUpon>
-		</None>
-		<Compile Update="Templates\DatabaseReaders.cs">
-			<DesignTime>True</DesignTime>
-			<AutoGen>True</AutoGen>
-			<DependentUpon>DatabaseReaders.tt</DependentUpon>
-		</Compile>
-		<Compile Update="Templates\DBObjs.cs">
-			<DesignTime>True</DesignTime>
-			<AutoGen>True</AutoGen>
-			<DependentUpon>DBObjs.tt</DependentUpon>
-		</Compile>
-		<Compile Update="Templates\Enums.cs">
-			<DesignTime>True</DesignTime>
-			<AutoGen>True</AutoGen>
-			<DependentUpon>Enums.tt</DependentUpon>
-		</Compile>
-		<Compile Update="Templates\Types.cs">
-			<DesignTime>True</DesignTime>
-			<AutoGen>True</AutoGen>
-			<DependentUpon>Types.tt</DependentUpon>
-		</Compile>
+		<AdditionalFiles Include="dats.xml" />
 	</ItemGroup>
 </Project>

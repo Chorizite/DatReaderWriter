@@ -19,7 +19,8 @@ namespace DatReaderWriter.Tests.Lib {
     }
 
     internal static class EORCommonData {
-        internal const string DatDirectory = @"C:\Turbine\Asheron's Call\";
+        // get from environment variable EOR_DAT_DIR or default to acclient install
+        internal static string DatDirectory = Environment.GetEnvironmentVariable("EOR_DAT_DIR") ?? @"/media/trevis/projects/ac/dats/EoR";
 
         internal const string PortalName = @"portal";
         internal const string CellName = @"cell_1";
