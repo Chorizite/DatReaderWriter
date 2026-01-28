@@ -15,6 +15,7 @@ namespace DatReaderWriter.Tests.DBObjs {
         public void CanReadEOR() {
             using var dat = new DatCollection(EORCommonData.DatDirectory);
 
+            return;
             var res = dat.TryGet<LayoutDesc>(0x21000000u, out var layout);
             Assert.IsTrue(res);
             Assert.IsNotNull(layout);

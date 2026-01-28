@@ -1,0 +1,117 @@
+using System;
+using System.Linq;
+using DatReaderWriter.SourceGenerator.Models;
+
+namespace DatReaderWriter.SourceGenerator {
+    public static class TypeGeneratorHelper {
+        public static string SimplifyType(string type) {
+            return type switch {
+                "ObjectId" or "PackedDWORD" or "LandcellId" or "DataId" => "uint",
+                "WString" or "bytestring" or "obfuscatedstring" or "rawstring" or "compressedstring" or "ushortstring" => "string",
+                "CompressedUInt" => "uint",
+                "DataIdOfKnownType" => "uint",
+                "guid" => "Guid",
+                _ => type
+            };
+        }
+
+        public static string GetTypeDeclaration(ACDataMember member, XMLDefParser parser) {
+            var simplifiedType = SimplifyType(member.MemberType);
+            if (parser.ACTemplatedTypes.ContainsKey(member.MemberType)) {
+                simplifiedType = parser.ACTemplatedTypes[member.MemberType].ParentType;
+            }
+
+            if (!string.IsNullOrWhiteSpace(member.GenericKey) && !string.IsNullOrWhiteSpace(member.GenericValue))
+                return $"{simplifiedType}<{SimplifyType(member.GenericKey)}, {SimplifyType(member.GenericValue)}>";
+            if (!string.IsNullOrWhiteSpace(member.GenericType))
+                return $"{simplifiedType}<{SimplifyType(member.GenericType)}>";
+            return simplifiedType;
+        }
+
+        public static string GetTypeDeclaration(ACDataType member) {
+            foreach (var child in member.Children) {
+                if (child is ACVector) {
+                    var memberTypes = child.Children.Where(c => c is ACDataMember)
+                        .Select(c => SimplifyType((c as ACDataMember).MemberType)
+                        );
+                    return member.Name + "<" + string.Join(", ", memberTypes) + ">";
+                }
+            }
+
+            return member.Name;
+        }
+
+        public static string GetTypeDeclaration(ACVector vector) {
+            if (!string.IsNullOrEmpty(vector.GenericKey)) {
+                return
+                    $"{SimplifyType(vector.Type)}<{SimplifyType(vector.GenericKey)}, {SimplifyType(vector.GenericValue)}>";
+            }
+            else if (!string.IsNullOrEmpty(vector.GenericValue)) {
+                return $"{SimplifyType(vector.Type)}<{SimplifyType(vector.GenericValue)}>";
+            }
+            else {
+                return $"{SimplifyType(vector.Type)}[]";
+            }
+        }
+
+        public static string GetBinaryReaderForType(string type, string? size = null) {
+            return type switch {
+                "WORD" or "SpellId" or "ushort" => "reader.ReadUInt16()",
+                "short" => "reader.ReadInt16()",
+                "DWORD" or "ObjectId" or "LandcellId" or "uint" => "reader.ReadUInt32()",
+                "int" => "reader.ReadInt32()",
+                "ulong" => "reader.ReadUInt64()",
+                "long" => "reader.ReadInt64()",
+                "float" => "reader.ReadSingle()",
+                "double" => "reader.ReadDouble()",
+                "bool" => $"reader.ReadBool({size})",
+                "byte" => "reader.ReadByte()",
+                "sbyte" => "reader.ReadSByte()",
+                "string" => "reader.ReadString16L()",
+                "bytestring" => "reader.ReadString16LByte()",
+                "compressedstring" => "reader.ReadStringCompressed()",
+                "WString" => "reader.ReadString32L()",
+                "PackedWORD" => "reader.ReadPackedWORD()",
+                "Vector3" => "reader.ReadVector3()",
+                "Quaternion" => "reader.ReadQuaternion()",
+                "DataID" or "DataId" or "PackedDWORD" => "reader.ReadPackedDWORD()",
+                "CompressedUInt" => "reader.ReadCompressedUInt()",
+                "DataIdOfKnownType" => $"reader.ReadDataIdOfKnownType({size})",
+                "obfuscatedstring" => "reader.ReadObfuscatedString()",
+                "rawstring" => "reader.ReadString()",
+                "ushortstring" => "reader.ReadUShortString()",
+                "guid" => "reader.ReadGuid()",
+                _ => $"reader.ReadItem<{type}>()"
+            };
+        }
+
+        public static string GetBinaryWriterForType(string type) {
+            return type switch {
+                "WORD" or "SpellId" or "ushort" => "WriteUInt16",
+                "short" => "WriteInt16",
+                "DWORD" or "ObjectId" or "LandcellId" or "uint" => "WriteUInt32",
+                "int" => "WriteInt32",
+                "ulong" => "WriteUInt64",
+                "long" => "WriteInt64",
+                "float" => "WriteSingle",
+                "double" => "WriteDouble",
+                "bool" => "WriteBool",
+                "byte" => "WriteByte",
+                "sbyte" => "WriteSByte",
+                "ushortstring" => "WriteUShortString",
+                "rawstring" => "WriteString",
+                "string" => "WriteString16L",
+                "compressedstring" => "WriteStringCompressed",
+                "bytestring" => "WriteString16LByte",
+                "WString" => "WriteString32L",
+                "Vector3" => "WriteVector3",
+                "Quaternion" => "WriteQuaternion",
+                "CompressedUInt" => "WriteCompressedUInt",
+                "DataIdOfKnownType" => "WriteDataIdOfKnownType",
+                "obfuscatedstring" => "WriteObfuscatedString",
+                "guid" => "WriteGuid",
+                _ => $"WriteItem<{type}>"
+            };
+        }
+    }
+}

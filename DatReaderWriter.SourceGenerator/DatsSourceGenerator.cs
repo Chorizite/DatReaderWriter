@@ -7,25 +7,20 @@ using System.Linq;
 using System.Text;
 using System.Xml.Linq;
 
-namespace DatReaderWriter.SourceGenerator
-{
+namespace DatReaderWriter.SourceGenerator {
     [Generator]
-    public class DatsSourceGenerator : IIncrementalGenerator
-    {
-        public void Initialize(IncrementalGeneratorInitializationContext context)
-        {
+    public class DatsSourceGenerator : IIncrementalGenerator {
+        public void Initialize(IncrementalGeneratorInitializationContext context) {
             var datsXmlFiles = context.AdditionalTextsProvider
                 .Where(file => Path.GetFileName(file.Path).Equals("dats.xml", StringComparison.OrdinalIgnoreCase));
 
-            var datsXmlContents = datsXmlFiles.Select((text, cancellationToken) =>
-            {
+            var datsXmlContents = datsXmlFiles.Select((text, cancellationToken) => {
                 var content = text.GetText(cancellationToken)?.ToString();
                 return content;
             });
 
             // We only care if dats.xml changes.
-            context.RegisterSourceOutput(datsXmlContents, (spc, content) =>
-            {
+            context.RegisterSourceOutput(datsXmlContents, (spc, content) => {
                 spc.ReportDiagnostic(Diagnostic.Create(
                     new DiagnosticDescriptor(
                         "DRW000",
@@ -39,8 +34,7 @@ namespace DatReaderWriter.SourceGenerator
 
                 if (string.IsNullOrEmpty(content)) return;
 
-                try
-                {
+                try {
                     var doc = XDocument.Parse(content);
                     var parser = new XMLDefParser(doc);
 
@@ -48,9 +42,9 @@ namespace DatReaderWriter.SourceGenerator
                     new TypesGenerator(parser).Generate(spc, parser);
                     new DBObjsGenerator(parser).Generate(spc, parser);
                     new DatabaseReadersGenerator(parser).Generate(spc, parser);
+                    new HashTableGenerator(parser).Generate(spc, parser);
                 }
-                catch (Exception e)
-                {
+                catch (Exception e) {
                     spc.ReportDiagnostic(Diagnostic.Create(
                         new DiagnosticDescriptor(
                             "DRW001",

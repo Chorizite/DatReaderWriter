@@ -23,13 +23,16 @@ namespace DatReaderWriter.SourceGenerator.Models {
         public bool IsAbstract { get; set; } = false;
         public List<ACDataType> SubTypes { get; set; } = new List<ACDataType>();
         public bool IsAbstractImplementation { get; set; } = false;
+        public string GenericKey { get; set; }
+        public string GenericValue { get; set; }
+        public bool IsAutoGrow { get; set; }
 
         public ACDataType(ACBaseModel parent, XElement element) : base(parent, element) {
-
         }
 
         public string GetParameterType() {
-            var el = Element.XPathSelectElements("./field").FirstOrDefault(e => e.Attribute("name")?.Value == TypeSwitch);
+            var el = Element.XPathSelectElements("./field")
+                .FirstOrDefault(e => e.Attribute("name")?.Value == TypeSwitch);
 
             return el.Attribute("type").Value;
         }
@@ -59,7 +62,10 @@ namespace DatReaderWriter.SourceGenerator.Models {
                 Size = size,
                 HasDataCategory = hasDataCategory,
                 IsAbstract = isAbstract,
-                TypeSwitch = element.XPathSelectElement("./typeswitch")?.Attribute("name")?.Value ?? ""
+                TypeSwitch = element.XPathSelectElement("./typeswitch")?.Attribute("name")?.Value ?? "",
+                GenericKey = (string)element.Attribute("genericKey"),
+                GenericValue = (string)element.Attribute("genericValue"),
+                IsAutoGrow = ((string)element.Attribute("isAutoGrow"))?.ToLower() == "true",
             };
 
             var subTypeNodes = element.XPathSelectElements("./typeswitch/type");
