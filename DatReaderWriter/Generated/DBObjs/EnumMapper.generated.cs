@@ -18,6 +18,7 @@ namespace DatReaderWriter.DBObjs {
     /// <summary>
     /// DB_TYPE_ENUM_MAPPER in the client.
     /// </summary>
+    [DBObjType(typeof(EnumMapper), DatFileType.Portal, DBObjType.EnumMapper, DBObjHeaderFlags.HasId, 0x22000000, 0x22FFFFFF, 0x00000000)]
     public partial class EnumMapper : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;
@@ -27,19 +28,13 @@ namespace DatReaderWriter.DBObjs {
 
         public uint BaseEnumMap;
 
-        public Dictionary<uint, string> IdToStringMap = [];
+        public AutoGrowHashTable<uint, PStringBase<byte>> IdToStringMap = [];
 
         /// <inheritdoc />
         public override bool Unpack(DatBinReader reader) {
             base.Unpack(reader);
             BaseEnumMap = reader.ReadUInt32();
-            var _bucketSize = reader.ReadByte();
-            var _numElements = reader.ReadCompressedUInt();
-            for (var i=0; i < _numElements; i++) {
-                var _key = reader.ReadUInt32();
-                var _val = reader.ReadString16LByte();
-                IdToStringMap.Add(_key, _val);
-            }
+            IdToStringMap = reader.ReadItem<AutoGrowHashTable<uint, PStringBase<byte>>>();
             return true;
         }
 
@@ -47,12 +42,7 @@ namespace DatReaderWriter.DBObjs {
         public override bool Pack(DatBinWriter writer) {
             base.Pack(writer);
             writer.WriteUInt32(BaseEnumMap);
-            writer.WriteByte(5);
-            writer.WriteCompressedUInt((uint)IdToStringMap.Count());
-            foreach (var kv in IdToStringMap) {
-                writer.WriteUInt32(kv.Key);
-                writer.WriteString16LByte(kv.Value);
-            }
+            writer.WriteItem<AutoGrowHashTable<uint, PStringBase<byte>>>(IdToStringMap);
             return true;
         }
     }

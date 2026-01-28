@@ -22,7 +22,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             var writeAnim = new EnumMapper() {
                 Id = 0x22000001,
                 BaseEnumMap = 0x12345678,
-                IdToStringMap = new Dictionary<uint, string>() {
+                IdToStringMap = new() {
                     { 1, "test" },
                     { 2, "test 2" }
                 }

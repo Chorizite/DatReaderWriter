@@ -368,16 +368,16 @@ namespace DatReaderWriter {
         public Task<EnumMapper?> GetEnumMapperAsync(uint id, CancellationToken ct = default) => GetAsync<EnumMapper>(id, ct);
         #endif
         /// <summary>
-        /// Get a &lt;see cref=&quot;DataIdMapper&quot;/&gt; entirely from the portal.dat
+        /// Get a &lt;see cref=&quot;EnumIDMap&quot;/&gt; entirely from the portal.dat
         /// </summary>
-        public DataIdMapper? GetDataIdMapper(uint id) => Get<DataIdMapper>(id);
+        public EnumIDMap? GetEnumIDMap(uint id) => Get<EnumIDMap>(id);
         /// <summary>
-        /// Get a &lt;see cref=&quot;DataIdMapper&quot;/&gt; entirely from the portal.dat asynchronously
+        /// Get a &lt;see cref=&quot;EnumIDMap&quot;/&gt; entirely from the portal.dat asynchronously
         /// </summary>
         #if (NET8_0_OR_GREATER)
-        public ValueTask<DataIdMapper?> GetDataIdMapperAsync(uint id, CancellationToken ct = default) => GetAsync<DataIdMapper>(id, ct);
+        public ValueTask<EnumIDMap?> GetEnumIDMapAsync(uint id, CancellationToken ct = default) => GetAsync<EnumIDMap>(id, ct);
         #else
-        public Task<DataIdMapper?> GetDataIdMapperAsync(uint id, CancellationToken ct = default) => GetAsync<DataIdMapper>(id, ct);
+        public Task<EnumIDMap?> GetEnumIDMapAsync(uint id, CancellationToken ct = default) => GetAsync<EnumIDMap>(id, ct);
         #endif
         /// <summary>
         /// Get a &lt;see cref=&quot;ActionMap&quot;/&gt; entirely from the portal.dat

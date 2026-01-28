@@ -31,14 +31,14 @@ namespace DatReaderWriter.SourceGenerator.Models {
 
         public static ACVector FromXElement(ACBaseModel parent, XElement element) {
             return new ACVector(parent, element) {
-                Name = (string)element.Attribute("name"),
-                Type = (string)element.Attribute("type"),
-                Length = (string)element.Attribute("length"),
-                LengthMod = (string)element.Attribute("lengthmod"),
-                Text = (string)element.Attribute("text"),
-                Skip = (string)element.Attribute("skip"),
-                GenericKey = (string)element.Attribute("genericKey"),
-                GenericValue = (string)element.Attribute("genericValue")
+                Name = (string)element.Attribute("name") ?? "",
+                Type = (string)element.Attribute("type") ?? "",
+                Length = (string)element.Attribute("length") ?? "",
+                LengthMod = (string)element.Attribute("lengthmod") ?? "",
+                Text = (string)element.Attribute("text") ?? "",
+                Skip = (string)element.Attribute("skip") ?? "",
+                GenericKey = (string)element.Attribute("genericKey") ?? "",
+                GenericValue = (string)element.Attribute("genericValue") ?? ""
             };
         }
     }

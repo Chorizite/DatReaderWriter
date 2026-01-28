@@ -16,9 +16,10 @@ namespace DatReaderWriter.SourceGenerator.Models {
         }
 
         public static ACPrimitive FromXElement(ACBaseModel parent, XElement element) {
+            ushort.TryParse((string)element.Attribute("size"), out var s);
             return new ACPrimitive(parent, element) {
-                Name = (string)element.Attribute("name"),
-                Size = Convert.ToUInt16((string)element.Attribute("size")),
+                Name = (string)element.Attribute("name") ?? "",
+                Size = s,
             };
         }
     }

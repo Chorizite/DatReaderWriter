@@ -19,9 +19,9 @@ namespace DatReaderWriter.SourceGenerator.Models {
 
         public static ACDat FromXElement(XElement element) {
             return new ACDat(element) {
-                Name = element.Attribute("name").Value,
-                Text = element.Attribute("text").Value,
-                Type = element.Attribute("type").Value,
+                Name = element.Attribute("name")?.Value ?? "",
+                Text = element.Attribute("text")?.Value ?? "",
+                Type = element.Attribute("type")?.Value ?? "",
             };
         }
     }

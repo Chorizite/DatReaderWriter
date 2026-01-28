@@ -18,6 +18,7 @@ namespace DatReaderWriter.DBObjs {
     /// <summary>
     /// DB_TYPE_DEGRADEINFO in the client.
     /// </summary>
+    [DBObjType(typeof(GfxObjDegradeInfo), DatFileType.Portal, DBObjType.GfxObjDegradeInfo, DBObjHeaderFlags.HasId, 0x11000000, 0x1100FFFF, 0x00000000)]
     public partial class GfxObjDegradeInfo : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;

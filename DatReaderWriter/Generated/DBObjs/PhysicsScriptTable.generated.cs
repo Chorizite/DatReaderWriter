@@ -18,6 +18,7 @@ namespace DatReaderWriter.DBObjs {
     /// <summary>
     /// DB_TYPE_PHYSICS_SCRIPT_TABLE in the client.
     /// </summary>
+    [DBObjType(typeof(PhysicsScriptTable), DatFileType.Portal, DBObjType.PhysicsScriptTable, DBObjHeaderFlags.HasId, 0x34000000, 0x3400FFFF, 0x00000000)]
     public partial class PhysicsScriptTable : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;

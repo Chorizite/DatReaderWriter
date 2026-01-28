@@ -211,6 +211,7 @@ namespace DatReaderWriter {
                     "Iteration is not a valid type to get from a dat file collection since it is used in all dat files. Use a specific dat like datCollection.Portal.Get<Iteration>()");
             }
 
+            Console.WriteLine($"Determining dat file type for {typeof(T).Name} is {TypeToDatFileType<T>()}");
             switch (TypeToDatFileType<T>()) {
                 case DatFileType.Cell:
                     return Cell.TryGet(fileId, out value);
@@ -228,6 +229,15 @@ namespace DatReaderWriter {
                     return false;
             }
         }
+        
+        /// <summary>
+        /// Try and read a <see cref="IDBObj"/> asynchronously. This will be cached according to the <see cref="DatCollectionOptions.FileCachingStrategy"/> in use
+        /// </summary>
+        /// <param name="fileId"></param>
+        /// <param name="ct"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
 #if (NET8_0_OR_GREATER)
         public async ValueTask<(bool Success, T? Value)> TryGetAsync<T>(uint fileId, CancellationToken ct = default)
             where T : IDBObj {

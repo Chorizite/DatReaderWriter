@@ -18,6 +18,7 @@ namespace DatReaderWriter.DBObjs {
     /// <summary>
     /// DB_TYPE_SKILL_TABLE_0 in the client.
     /// </summary>
+    [DBObjType(typeof(SkillTable), DatFileType.Portal, DBObjType.SkillTable, DBObjHeaderFlags.HasId, 0x0E000004, 0x0E000004, 0x00000000)]
     public partial class SkillTable : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;

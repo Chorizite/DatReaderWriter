@@ -18,6 +18,7 @@ namespace DatReaderWriter.DBObjs {
     /// <summary>
     /// DB_TYPE_NAME_FILTER_TABLE in the client.
     /// </summary>
+    [DBObjType(typeof(NameFilterTable), DatFileType.Portal, DBObjType.NameFilterTable, DBObjHeaderFlags.HasId, 0x0E000020, 0x0E000020, 0x00000000)]
     public partial class NameFilterTable : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;

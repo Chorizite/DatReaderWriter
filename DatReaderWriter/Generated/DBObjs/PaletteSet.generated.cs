@@ -18,6 +18,7 @@ namespace DatReaderWriter.DBObjs {
     /// <summary>
     /// DB_TYPE_PAL_SET in the client.
     /// </summary>
+    [DBObjType(typeof(PaletteSet), DatFileType.Portal, DBObjType.PaletteSet, DBObjHeaderFlags.HasId, 0x0F000000, 0x0F00FFFF, 0x00000000)]
     public partial class PaletteSet : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;

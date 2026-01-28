@@ -316,7 +316,7 @@ namespace DatReaderWriter.Lib.IO {
 
         /// <summary>
         ///  Write a string from the current stream. The string is prefixed with the length,
-        //     encoded as an integer seven bits at a time.
+        ///     encoded as an integer seven bits at a time.
         /// </summary>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>

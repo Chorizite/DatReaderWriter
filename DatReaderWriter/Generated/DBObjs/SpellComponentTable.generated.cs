@@ -18,6 +18,7 @@ namespace DatReaderWriter.DBObjs {
     /// <summary>
     /// DB_TYPE_SPELLCOMPONENT_TABLE_0 in the client.
     /// </summary>
+    [DBObjType(typeof(SpellComponentTable), DatFileType.Portal, DBObjType.SpellComponentTable, DBObjHeaderFlags.HasId, 0x0E00000F, 0x0E00000F, 0x00000000)]
     public partial class SpellComponentTable : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;

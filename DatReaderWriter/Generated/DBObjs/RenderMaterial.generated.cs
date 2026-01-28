@@ -18,6 +18,7 @@ namespace DatReaderWriter.DBObjs {
     /// <summary>
     /// DB_TYPE_RENDERMATERIAL in the client
     /// </summary>
+    [DBObjType(typeof(RenderMaterial), DatFileType.Portal, DBObjType.RenderMaterial, DBObjHeaderFlags.HasId, 0x16000000, 0x16FFFFFF, 0x00000000)]
     public partial class RenderMaterial : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;

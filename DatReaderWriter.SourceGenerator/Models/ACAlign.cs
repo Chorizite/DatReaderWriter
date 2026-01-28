@@ -18,7 +18,7 @@ namespace DatReaderWriter.SourceGenerator.Models {
             var type = (string)element.Attribute("type");
 
             return new ACAlign(parent, element) {
-                Type = type
+                Type = type ?? ""
             };
         }
     }

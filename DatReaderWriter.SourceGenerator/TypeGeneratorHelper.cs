@@ -41,13 +41,22 @@ namespace DatReaderWriter.SourceGenerator {
             return member.Name;
         }
 
-        public static string GetTypeDeclaration(ACVector vector) {
+        public static string GetTypeDeclaration(ACVector vector, XMLDefParser parser) {
             if (!string.IsNullOrEmpty(vector.GenericKey)) {
                 return
                     $"{SimplifyType(vector.Type)}<{SimplifyType(vector.GenericKey)}, {SimplifyType(vector.GenericValue)}>";
             }
             else if (!string.IsNullOrEmpty(vector.GenericValue)) {
                 return $"{SimplifyType(vector.Type)}<{SimplifyType(vector.GenericValue)}>";
+            }
+            else if (vector.Children.Any(c => c is ACDataMember m && string.IsNullOrEmpty(m.Name)) ||
+                     vector.Children.Any(c => c is ACVector v && string.IsNullOrEmpty(v.Name))) {
+                var types = vector.Children.Select(c => {
+                    if (c is ACDataMember m) return GetTypeDeclaration(m, parser);
+                    if (c is ACVector v) return GetTypeDeclaration(v, parser);
+                    return "object";
+                });
+                return $"{SimplifyType(vector.Type)}<{string.Join(", ", types)}>";
             }
             else {
                 return $"{SimplifyType(vector.Type)}[]";

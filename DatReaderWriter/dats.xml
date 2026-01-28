@@ -3472,73 +3472,118 @@
     </types>
     <dats>
         <dat name="portal" text="client_portal.dat" type="DatFileType.Portal">
-            <type name="GfxObj" text="GfxObj / DB_TYPE_GFXOBJ in the client." parent="DBObj" first="0x1000000"
-                  last="0x100FFFF" flags="DBObjHeaderFlags.HasId">
-                <field type="GfxObjFlags" name="Flags"/>
-                <field type="CompressedUInt" name="_numSurfaces"/>
-                <vector name="Surfaces" length="_numSurfaces" type="List" genericValue="uint"
-                        text="The list of surfaces"/>
-                <field type="VertexArray" name="VertexArray"/>
+            <type name="GfxObj"
+                  text="DB_TYPE_GFXOBJ in the client. Main visual geometry object (mesh + surfaces + physics)"
+                  parent="DBObj" first="0x01000000" last="0x0100FFFF" flags="DBObjHeaderFlags.HasId">
+
+                <field type="GfxObjFlags" name="Flags"
+                       text="Bitfield controlling which optional data is present (physics, drawing, degrade, etc.)"/>
+
+                <field type="CompressedUInt" name="_numSurfaces" text="Number of CSurface pointers that follow"/>
+                <vector name="Surfaces" length="_numSurfaces" type="List"
+                        text="Array of surface (material/texture) IDs used by this mesh">
+                    <vector type="QualifiedDataId" genericValue="Surface"/>
+                </vector>
+
+                <field type="VertexArray" name="VertexArray" text="All vertices + UVs + normals used by this object"/>
+
+                <!-- Physics (optional) -->
                 <maskmap name="Flags">
-                    <mask value="GfxObjFlags.HasPhysics">
-                        <field type="CompressedUInt" name="_numPhysicsPolys"/>
+                    <mask value="GfxObjFlags.HasPhysics" text="Physics / collision data follows">
+                        <field type="CompressedUInt" name="_numPhysicsPolys" text="Number of physics polygons"/>
                         <vector name="PhysicsPolygons" length="_numPhysicsPolys" type="Dictionary" genericKey="ushort"
-                                genericValue="Polygon"/>
-                        <field type="PhysicsBSPTree" name="PhysicsBSP"/>
+                                genericValue="Polygon"
+                                text="Collision polygons (usually simplified/low-poly version)"/>
+                        <field type="PhysicsBSPTree" name="PhysicsBSP"
+                               text="BSP tree used for collision raycasts &amp; movement"/>
                     </mask>
                 </maskmap>
-                <field type="Vector3" name="SortCenter"/>
+
+                <field type="Vector3" name="SortCenter"
+                       text="Approximate center point used for depth sorting / transparency ordering"/>
+
+                <!-- Rendering / drawing (optional) -->
                 <maskmap name="Flags">
-                    <mask value="GfxObjFlags.HasDrawing">
-                        <field type="CompressedUInt" name="_numPolys"/>
+                    <mask value="GfxObjFlags.HasDrawing" text="Rendering polygons + BSP follow">
+                        <field type="CompressedUInt" name="_numPolys" text="Number of render polygons"/>
                         <vector name="Polygons" length="_numPolys" type="Dictionary" genericKey="ushort"
-                                genericValue="Polygon"/>
-                        <field type="DrawingBSPTree" name="DrawingBSP"/>
+                                genericValue="Polygon"
+                                text="Actual render polygons (can be higher detail than physics polys)"/>
+                        <field type="DrawingBSPTree" name="DrawingBSP"
+                               text="BSP tree used for rendering (portal culling, etc.)"/>
                     </mask>
-                    <mask value="GfxObjFlags.HasDIDDegrade">
-                        <field type="uint" name="DIDDegrade"/>
+
+                    <mask value="GfxObjFlags.HasDIDDegrade" text="Lower-detail / LOD version exists">
+                        <field type="uint" name="DIDDegrade"
+                               text="DataID of a simpler GfxObj to use at long distance / low quality"/>
                     </mask>
                 </maskmap>
+
             </type>
             <type name="Setup" text="DB_TYPE_SETUP in the client." parent="DBObj" first="0x2000000" last="0x200FFFF"
                   flags="DBObjHeaderFlags.HasId">
-                <field type="SetupFlags" name="Flags"/>
-                <field type="uint" name="NumParts" hidden="true"/>
-                <vector name="Parts" length="NumParts" type="List" genericValue="uint"/>
-                <maskmap name="Flags">
+
+                <field type="SetupFlags" name="Flags"
+                       text="Bitfield controlling optional data presence (parent indices, default scales, etc.)"/>
+                
+                <field type="uint" name="_numParts" 
+                       text="Number of GfxObj parts in this setup"/>
+                <vector name="Parts" length="_numParts" type="List" text="Array of part GfxObj ids">
+                    <vector type="QualifiedDataId" genericValue="GfxObj"/>
+                </vector>
+
+                <maskmap name="Flags" text="Conditional arrays controlled by SetupFlags bits">
                     <mask value="SetupFlags.HasParent">
-                        <vector name="ParentIndex" length="NumParts" type="List" genericValue="uint"/>
+                        <vector name="ParentIndex" length="NumParts" type="List" genericValue="uint"
+                                text="For each part: index of its parent part (hierarchical skeleton)"/>
                     </mask>
                     <mask value="SetupFlags.HasDefaultScale">
-                        <vector name="DefaultScale" length="NumParts" type="List" genericValue="Vector3"/>
+                        <vector name="DefaultScale" length="NumParts" type="List" genericValue="Vector3"
+                                text="Per-part default scale factors (usually Vector3(1,1,1))"/>
                     </mask>
                 </maskmap>
-                <field type="int" name="_numHoldingLocations"/>
+
+                <field type="int" name="_numHoldingLocations" text="Count of holding / attachment locations"/>
                 <vector name="HoldingLocations" length="_numHoldingLocations" type="Dictionary"
-                        genericKey="ParentLocation" genericValue="LocationType"/>
-                <field type="int" name="_numConnectionPoints"/>
+                        genericKey="ParentLocation" genericValue="LocationType"
+                        text="Dictionary of weapon / clothing / spell attachment points (LocationType → data)"/>
+
+                <field type="int" name="_numConnectionPoints" text="Count of connection / linkage points"/>
                 <vector name="ConnectionPoints" length="_numConnectionPoints" type="Dictionary"
-                        genericKey="ParentLocation" genericValue="LocationType"/>
-                <field type="int" name="_numPlacements"/>
+                        genericKey="ParentLocation" genericValue="LocationType"
+                        text="Dictionary of connection points used for linking objects (hooks, missile launchers, etc.)"/>
+
+                <field type="int" name="_numPlacements" text="Count of placement / animation frame hooks"/>
                 <vector name="PlacementFrames" length="_numPlacements" type="Dictionary" genericKey="Placement"
-                        genericValue="AnimationFrame"/>
-                <field type="uint" name="_numCylSpheres"/>
-                <vector name="CylSpheres" length="_numCylSpheres" type="List" genericValue="CylSphere"/>
-                <field type="uint" name="_numSpheres"/>
-                <vector name="Spheres" length="_numSpheres" type="List" genericValue="Sphere"/>
-                <field type="float" name="Height"/>
-                <field type="float" name="Radius"/>
-                <field type="float" name="StepUpHeight"/>
-                <field type="float" name="StepDownHeight"/>
-                <field type="Sphere" name="SortingSphere"/>
-                <field type="Sphere" name="SelectionSphere"/>
-                <field type="int" name="_numLights"/>
-                <vector name="Lights" length="_numLights" type="Dictionary" genericKey="int" genericValue="LightInfo"/>
-                <field type="uint" name="DefaultAnimation"/>
-                <field type="uint" name="DefaultScript"/>
-                <field type="uint" name="DefaultMotionTable"/>
-                <field type="uint" name="DefaultSoundTable"/>
-                <field type="uint" name="DefaultScriptTable"/>
+                        genericValue="AnimationFrame"
+                        text="Dictionary of named animation placement frames (used for hooks, effects, etc.)"/>
+
+                <field type="uint" name="_numCylSpheres" text="Number of cylinder + sphere collision primitives"/>
+                <vector name="CylSpheres" length="_numCylSpheres" type="List" genericValue="CylSphere"
+                        text="Array of cylinder + sphere collision volumes"/>
+
+                <field type="uint" name="_numSpheres" text="Number of simple sphere collision primitives"/>
+                <vector name="Spheres" length="_numSpheres" type="List" genericValue="Sphere"
+                        text="Array of simple bounding spheres for collision"/>
+
+                <field type="float" name="Height" text="Approximate visual / physics height of the object"/>
+                <field type="float" name="Radius" text="Approximate radius / width of the object"/>
+                <field type="float" name="StepUpHeight" text="Maximum step height this object can climb"/>
+                <field type="float" name="StepDownHeight" text="Maximum step-down distance without falling"/>
+
+                <field type="Sphere" name="SortingSphere" text="Sphere used for depth sorting / rendering order"/>
+                <field type="Sphere" name="SelectionSphere" text="Sphere used for mouse selection / picking"/>
+
+                <field type="int" name="_numLights" text="Number of light sources attached to this model"/>
+                <vector name="Lights" length="_numLights" type="Dictionary" genericKey="int" genericValue="LightInfo"
+                        text="Dictionary of dynamic light sources attached to this setup"/>
+
+                <field type="uint" name="DefaultAnimation" text="Default animation ID (usually 0xFFFFFFFF = none)"/>
+                <field type="uint" name="DefaultScript" text="Default script ID (usually 0xFFFFFFFF = none)"/>
+                <field type="uint" name="DefaultMotionTable" text="Default motion table (animation state machine) ID"/>
+                <field type="uint" name="DefaultSoundTable" text="Default sound table ID"/>
+                <field type="uint" name="DefaultScriptTable"
+                       text="Default script table ID (usually physics / behavior scripts)"/>
             </type>
             <type name="Animation" text="DB_TYPE_ANIM in the client." parent="DBObj" first="0x3000000" last="0x300FFFF"
                   flags="DBObjHeaderFlags.HasId">
@@ -3762,19 +3807,12 @@
             <type name="EnumMapper" text="DB_TYPE_ENUM_MAPPER in the client." parent="DBObj" first="0x22000000"
                   last="0x22FFFFFF" flags="DBObjHeaderFlags.HasId">
                 <field name="BaseEnumMap" type="uint"/>
-                <field name="_bucketSize" type="byte" value="5" />
-                <field name="_numElements" type="CompressedUInt"/>
-                <vector name="IdToStringMap" length="_numElements" type="Dictionary" genericKey="uint" genericValue="PStringBase"/>
+                <vector name="IdToStringMap" type="AutoGrowHashTable">
+                    <field type="uint"/>
+                    <vector type="PStringBase" genericValue="byte"/>
+                </vector>
             </type>
-            <type name="EnumMapper" text="DB_TYPE_ENUM_MAPPER in the client." parent="DBObj" first="0x22000000"
-                  last="0x22FFFFFF" flags="DBObjHeaderFlags.HasId">
-                <field name="BaseEnumMap" type="uint"/>
-                <field name="IdToStringMap" type="AutoGrowHashTable">
-                    <generickey type="uint" />
-                    <genericvalue type="PStringBase" genericValue="byte" />
-                </field>
-            </type>
-            <type name="DataIdMapper" text="DB_TYPE_DID_MAPPER in the client." parent="DBObj" first="0x25000000"
+            <type name="EnumIDMap" text="DB_TYPE_DID_MAPPER in the client." parent="DBObj" first="0x25000000"
                   last="0x25FFFFFF" flags="DBObjHeaderFlags.HasId">
                 <field name="ClientIDNumberingType" type="NumberingType"/>
                 <field name="_numClientEnumToIDs" type="CompressedUInt"/>

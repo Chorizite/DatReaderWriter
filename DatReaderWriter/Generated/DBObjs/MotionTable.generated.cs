@@ -18,6 +18,7 @@ namespace DatReaderWriter.DBObjs {
     /// <summary>
     /// DB_TYPE_MTABLE in the client.
     /// </summary>
+    [DBObjType(typeof(MotionTable), DatFileType.Portal, DBObjType.MotionTable, DBObjHeaderFlags.HasId, 0x09000000, 0x0900FFFF, 0x00000000)]
     public partial class MotionTable : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;

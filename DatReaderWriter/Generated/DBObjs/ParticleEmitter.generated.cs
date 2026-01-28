@@ -18,6 +18,7 @@ namespace DatReaderWriter.DBObjs {
     /// <summary>
     /// DB_TYPE_PARTICLE_EMITTER in the client.
     /// </summary>
+    [DBObjType(typeof(ParticleEmitter), DatFileType.Portal, DBObjType.ParticleEmitter, DBObjHeaderFlags.HasId, 0x32000000, 0x3200FFFF, 0x00000000)]
     public partial class ParticleEmitter : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;

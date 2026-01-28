@@ -18,6 +18,7 @@ namespace DatReaderWriter.DBObjs {
     /// <summary>
     /// Stores static spawns, buildings. DB_TYPE_LBI in the client.
     /// </summary>
+    [DBObjType(typeof(LandBlockInfo), DatFileType.Cell, DBObjType.LandBlockInfo, DBObjHeaderFlags.HasId, 0x00000000, 0x00000000, 0x0000FFFE)]
     public partial class LandBlockInfo : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;

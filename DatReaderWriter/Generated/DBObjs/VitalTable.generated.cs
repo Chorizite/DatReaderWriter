@@ -18,6 +18,7 @@ namespace DatReaderWriter.DBObjs {
     /// <summary>
     /// DB_TYPE_ATTRIBUTE_2ND_TABLE_0 in the client.
     /// </summary>
+    [DBObjType(typeof(VitalTable), DatFileType.Portal, DBObjType.VitalTable, DBObjHeaderFlags.HasId, 0x0E000003, 0x0E000003, 0x00000000)]
     public partial class VitalTable : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;

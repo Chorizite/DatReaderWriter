@@ -18,6 +18,7 @@ namespace DatReaderWriter.DBObjs {
     /// <summary>
     /// DB_TYPE_CLOTHING in the client.
     /// </summary>
+    [DBObjType(typeof(Clothing), DatFileType.Portal, DBObjType.Clothing, DBObjHeaderFlags.HasId, 0x10000000, 0x1000FFFF, 0x00000000)]
     public partial class Clothing : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;

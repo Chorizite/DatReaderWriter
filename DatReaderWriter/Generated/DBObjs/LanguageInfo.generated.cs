@@ -18,6 +18,7 @@ namespace DatReaderWriter.DBObjs {
     /// <summary>
     /// DB_TYPE_STRING_STATE in the client.
     /// </summary>
+    [DBObjType(typeof(LanguageInfo), DatFileType.Local, DBObjType.LanguageInfo, DBObjHeaderFlags.None, 0x41000000, 0x41FFFFFF, 0x00000000)]
     public partial class LanguageInfo : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.None;

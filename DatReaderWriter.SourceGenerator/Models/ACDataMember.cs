@@ -19,16 +19,16 @@ namespace DatReaderWriter.SourceGenerator.Models {
 
         public List<ACSubMember> SubMembers { get; set; } = new List<ACSubMember>();
 
-        public bool IsLength => Parent.AllChildren.Any(c => c is ACVector v && (v.Length.Split(' ').First() == Name || v.Length.Split(' ').First() == LengthOf));
+        public bool IsLength => Parent.AllChildren.Any(c => c is ACVector v && !string.IsNullOrEmpty(v.Length) && (v.Length.Split(' ').First() == Name || (!string.IsNullOrEmpty(LengthOf) && v.Length.Split(' ').First() == LengthOf)));
         public ACVector? LengthFor {
             get {
                 if (!string.IsNullOrEmpty(LengthOf)) {
-                    var res = Parent.AllChildren.FirstOrDefault(c => c is ACVector v && v.Length.Split(' ').First() == LengthOf) as ACVector;
+                    var res = Parent.AllChildren.FirstOrDefault(c => c is ACVector v && !string.IsNullOrEmpty(v.Length) && v.Length.Split(' ').First() == LengthOf) as ACVector;
                     if (res is not null) {
                         return res;
                     }
                 }
-                return Parent.AllChildren.FirstOrDefault(c => c is ACVector v && v.Length.Split(' ').First() == Name) as ACVector;
+                return Parent.AllChildren.FirstOrDefault(c => c is ACVector v && !string.IsNullOrEmpty(v.Length) && v.Length.Split(' ').First() == Name) as ACVector;
             }
         }
 
@@ -49,16 +49,16 @@ namespace DatReaderWriter.SourceGenerator.Models {
             var lengthof = (string)element.Attribute("lengthof");
 
             var dataMember = new ACDataMember(parent, element) {
-                Name = name,
-                Text = text,
-                MemberType = memberType,
-                GenericKey = genericKey,
-                GenericType = genericType,
-                GenericValue = genericValue,
-                Value = value,
-                Size = size,
-                KnownType = knownType,
-                LengthOf = lengthof
+                Name = name ?? "",
+                Text = text ?? "",
+                MemberType = memberType ?? "",
+                GenericKey = genericKey ?? "",
+                GenericType = genericType ?? "",
+                GenericValue = genericValue ?? "",
+                Value = value ?? "",
+                Size = size ?? "",
+                KnownType = knownType ?? "",
+                LengthOf = lengthof ?? ""
             };
 
             var subMemberNodes = element.XPathSelectElements("./subfield");

@@ -27,9 +27,9 @@ namespace DatReaderWriter.SourceGenerator.Models {
             var xor = (string)element.Attribute("xor");
 
             var maskMap = new ACMaskMap(parent, element) {
-                Name = name,
-                Text = text,
-                XOR = xor
+                Name = name ?? "",
+                Text = text ?? "",
+                XOR = xor ?? ""
             };
 
             var maskNodes = element.XPathSelectElements("./mask");

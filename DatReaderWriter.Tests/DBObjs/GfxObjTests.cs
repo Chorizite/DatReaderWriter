@@ -4,6 +4,7 @@ using DatReaderWriter.Options;
 using DatReaderWriter.Enums;
 using DatReaderWriter.DBObjs;
 using DatReaderWriter.Types;
+using Newtonsoft.Json;
 using System.Numerics;
 
 namespace DatReaderWriter.Tests.DBObjs {
@@ -38,11 +39,7 @@ namespace DatReaderWriter.Tests.DBObjs {
         [TestMethod]
         [TestCategory("EOR")]
         public void CanReadEORGfxObjs() {
-            using var dat = new DatDatabase(options => {
-                options.FilePath = Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat");
-                options.IndexCachingStrategy = IndexCachingStrategy.OnDemand;
-            });
-
+            using var dat = new DatCollection(EORCommonData.DatDirectory);
 
             var res = dat.TryGet<GfxObj>(0x010005E8, out var env);
             Assert.IsTrue(res);
@@ -51,6 +48,12 @@ namespace DatReaderWriter.Tests.DBObjs {
             Assert.AreEqual(0u, env.DataCategory);
             Assert.AreEqual(1, env.Surfaces.Count);
             Assert.AreEqual(0x080001B8u, env.Surfaces.First());
+            
+            var surface = env.Surfaces.First().Get(dat);
+            Assert.IsNotNull(surface);
+            Console.WriteLine(JsonConvert.SerializeObject(surface));
+            Assert.AreEqual(SurfaceType.Base1Image, surface.Type);
+            Assert.AreEqual(0x05000FA0u, surface.OrigTextureId);
 
             Assert.AreEqual(4, env.VertexArray.Vertices.Count);
             Assert.AreEqual(VertexType.CSWVertexType, env.VertexArray.VertexType);

@@ -18,6 +18,7 @@ namespace DatReaderWriter.DBObjs {
     /// <summary>
     /// DB_TYPE_BADDATA in the client.
     /// </summary>
+    [DBObjType(typeof(BadDataTable), DatFileType.Portal, DBObjType.BadDataTable, DBObjHeaderFlags.HasId, 0x0E00001A, 0x0E00001A, 0x00000000)]
     public partial class BadDataTable : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;

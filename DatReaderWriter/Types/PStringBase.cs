@@ -12,7 +12,7 @@ namespace DatReaderWriter.Types {
     /// A base class for packed strings with elements of type TValue.
     /// </summary>
     /// <typeparam name="TValue"></typeparam>
-    public class PStringBase<TValue> : IUnpackable, IPackable where TValue : unmanaged {
+    public class PStringBase<TValue> : IUnpackable, IPackable, IEquatable<string> where TValue : unmanaged {
         /// <summary>
         /// The string value.
         /// </summary>
@@ -59,6 +59,37 @@ namespace DatReaderWriter.Types {
             }
 
             return true;
+        }
+
+        public bool Equals(string other)
+        {
+            return Value == other;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is null) {
+                return false;
+            }
+
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+            
+            if (obj is string str) {
+                return Equals(str);
+            }
+
+            if (obj.GetType() != GetType()) {
+                return false;
+            }
+
+            return Equals((PStringBase<TValue>)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return (Value != null ? Value.GetHashCode() : 0);
         }
     }
 }

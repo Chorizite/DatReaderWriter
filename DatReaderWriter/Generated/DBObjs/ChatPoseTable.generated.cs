@@ -18,6 +18,7 @@ namespace DatReaderWriter.DBObjs {
     /// <summary>
     /// DB_TYPE_CHAT_POSE_TABLE in the client.
     /// </summary>
+    [DBObjType(typeof(ChatPoseTable), DatFileType.Portal, DBObjType.ChatPoseTable, DBObjHeaderFlags.HasId, 0x0E000007, 0x0E000007, 0x00000000)]
     public partial class ChatPoseTable : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;

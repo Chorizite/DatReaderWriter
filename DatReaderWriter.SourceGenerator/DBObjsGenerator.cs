@@ -34,6 +34,8 @@ namespace DatReaderWriter.SourceGenerator {
                 using (writer.IndentScope()) {
                     WriteSummary(writer, dbObj.Text);
                     var baseType = string.IsNullOrEmpty(dbObj.BaseType) ? "IDatObjType" : dbObj.BaseType;
+                    var datType = (dbObj.Parent as ACDat).Type;
+                    writer.WriteLine($"[DBObjType(typeof({dbObj.Name}), {datType}, DBObjType.{dbObj.Name}, {dbObj.DBObjHeaderFlags}, 0x{dbObj.FirstId:X8}, 0x{dbObj.LastId:X8}, 0x{dbObj.MaskId:X8})]");
                     writer.WriteLine($"public partial class {dbObj.Name} : {baseType} {{");
 
                     using (writer.IndentScope()) {

@@ -18,6 +18,7 @@ namespace DatReaderWriter.DBObjs {
     /// <summary>
     /// DB_TYPE_SCENE in the client.
     /// </summary>
+    [DBObjType(typeof(Scene), DatFileType.Portal, DBObjType.Scene, DBObjHeaderFlags.HasId, 0x12000000, 0x1200FFFF, 0x00000000)]
     public partial class Scene : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;

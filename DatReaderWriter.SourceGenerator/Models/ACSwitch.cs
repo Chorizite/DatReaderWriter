@@ -21,7 +21,7 @@ namespace DatReaderWriter.SourceGenerator.Models {
             var cases = new List<ACSwitchCase>();
             
             var acs = new ACSwitch(parent, element) {
-                Name = name
+                Name = name ?? ""
             };
 
             var nodes = element.XPathSelectElements("./case");

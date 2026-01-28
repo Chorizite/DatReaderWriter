@@ -18,6 +18,7 @@ namespace DatReaderWriter.DBObjs {
     /// <summary>
     /// DB_TYPE_CONTRACT_TABLE_0 in the client.
     /// </summary>
+    [DBObjType(typeof(ContractTable), DatFileType.Portal, DBObjType.ContractTable, DBObjHeaderFlags.HasId, 0x0E00001D, 0x0E00001D, 0x00000000)]
     public partial class ContractTable : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;

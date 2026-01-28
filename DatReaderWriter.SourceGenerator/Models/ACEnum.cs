@@ -19,9 +19,9 @@ namespace DatReaderWriter.SourceGenerator.Models {
         }
 
         public ACEnum(ACBaseModel parent, XElement element) : base(parent, element) {
-			Name = element.Attribute("name")?.Value;
-            Text = element.Attribute("text")?.Value;
-            ParentType = element.Attribute("parent")?.Value;
+			Name = element.Attribute("name")?.Value ?? "";
+            Text = element.Attribute("text")?.Value ?? "";
+            ParentType = element.Attribute("parent")?.Value ?? "";
             Values = element.XPathSelectElements("./*[self::value or self::mask]").Select(
 					e => new ACEnumValue(this, e)
 				).ToList();

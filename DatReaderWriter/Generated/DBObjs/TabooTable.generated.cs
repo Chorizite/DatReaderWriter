@@ -18,6 +18,7 @@ namespace DatReaderWriter.DBObjs {
     /// <summary>
     /// DB_TYPE_TABOO_TABLE in the client.
     /// </summary>
+    [DBObjType(typeof(TabooTable), DatFileType.Portal, DBObjType.TabooTable, DBObjHeaderFlags.HasId, 0x0E00001E, 0x0E00001E, 0x00000000)]
     public partial class TabooTable : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;

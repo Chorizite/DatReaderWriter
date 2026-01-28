@@ -27,12 +27,12 @@ namespace DatReaderWriter.SourceGenerator.Models {
             var mask = (string)element.Attribute("mask");
 
             return new ACSubMember(parent, element) {
-                Name = (name),
-                Text = text,
-                Type = type,
-                Value = value,
-                Shift = shift,
-                Mask = mask
+                Name = (name) ?? "",
+                Text = text ?? "",
+                Type = type ?? "",
+                Value = value ?? "",
+                Shift = shift ?? "",
+                Mask = mask ?? ""
             };
         }
     }

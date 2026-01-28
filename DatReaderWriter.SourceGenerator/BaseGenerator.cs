@@ -87,11 +87,14 @@ namespace DatReaderWriter.SourceGenerator {
         }
 
         public void WriteClassVectorProperty(SourceWriter writer, ACVector vector) {
-            if (vector.Children.Count > 1)
+            bool areGenericArgs = vector.Children.Any(c => c is ACDataMember m && string.IsNullOrEmpty(m.Name)) ||
+                                  vector.Children.Any(c => c is ACVector v && string.IsNullOrEmpty(v.Name));
+
+            if (vector.Children.Count > 1 && !areGenericArgs)
                 WriteVectorItemClassDefinition(writer, vector);
 
             WriteSummary(writer, vector.Text);
-            writer.WriteLine($"public {TypeGeneratorHelper.GetTypeDeclaration(vector)} {vector.Name} = [];");
+            writer.WriteLine($"public {TypeGeneratorHelper.GetTypeDeclaration(vector, XMLDefParser)} {vector.Name} = [];");
             writer.WriteLine("");
         }
 
@@ -224,17 +227,20 @@ namespace DatReaderWriter.SourceGenerator {
             writer.WriteLine("}");
         }
 
-        // Wait, GenerateReaderSwitch inside `GenerateReaderContents` copy paste has a bug. 
-        // original used `model.Parent`. I passed `acswitch`. So I need to use `acswitch.Parent` inside the method.
-        // Also the original code inside switch had `if (model.Parent.GetType() != typeof(ACDataType) && model.Parent.GetType() != typeof(ACDBObj))`
-        // I should fix that variable name `model` -> `acswitch`.
-
         private void GenerateReaderVector(SourceWriter writer, ACVector vector, int depth) {
             if (vector.Parent is ACVector) {
                 WriteLocalVectorDefinition(writer, vector);
             }
 
-            if (string.IsNullOrEmpty(vector.GenericKey) && string.IsNullOrEmpty(vector.GenericValue)) {
+            bool areGenericArgs = vector.Children.Any(c => c is ACDataMember m && string.IsNullOrEmpty(m.Name)) ||
+                                  vector.Children.Any(c => c is ACVector v && string.IsNullOrEmpty(v.Name));
+
+            if (areGenericArgs && string.IsNullOrEmpty(vector.Length) && string.IsNullOrEmpty(vector.LengthMod) && string.IsNullOrEmpty(vector.Skip)) {
+                 writer.WriteLine($"{vector.Name} = reader.ReadItem<{TypeGeneratorHelper.GetTypeDeclaration(vector, XMLDefParser)}>();");
+                 return;
+            }
+
+            if (string.IsNullOrEmpty(vector.GenericKey) && string.IsNullOrEmpty(vector.GenericValue) && vector.Children.Count == 0) {
                 if (!string.IsNullOrEmpty(vector.LengthMod)) {
                     writer.WriteLine(
                         $"{vector.Name} = new {TypeGeneratorHelper.SimplifyType(vector.Type)}[{vector.Length} + {vector.LengthMod}];");
@@ -261,11 +267,64 @@ namespace DatReaderWriter.SourceGenerator {
             }
 
             using (writer.IndentScope()) {
-                foreach (var vmember in vector.Children) {
-                    GenerateReaderContents(writer, vmember, depth + 1);
-                }
+                if (areGenericArgs) {
+                    if (vector.Children.Count == 1) {
+                        var valModel = vector.Children[0];
+                        string valRead = "";
+                        if (valModel is ACDataMember valDm) {
+                            if (XMLDefParser.ACEnums.ContainsKey(valDm.MemberType)) {
+                                 valRead = $"({valDm.MemberType}){TypeGeneratorHelper.GetBinaryReaderForType(XMLDefParser.ACEnums[valDm.MemberType].ParentType)}";
+                            }
+                            else {
+                                valRead = TypeGeneratorHelper.GetBinaryReaderForType(valDm.MemberType, valDm.Size);
+                            }
+                        }
+                        else if (valModel is ACVector v) {
+                            valRead = $"reader.ReadItem<{TypeGeneratorHelper.GetTypeDeclaration(v, XMLDefParser)}>()";
+                        }
+                        writer.WriteLine($"{vector.Name}.Add({valRead});");
+                    }
+                    else if (vector.Children.Count == 2) {
+                        var keyModel = vector.Children[0];
+                        var valModel = vector.Children[1];
+                        
+                        string keyRead = "";
+                        if (keyModel is ACDataMember keyDm) {
+                            if (XMLDefParser.ACEnums.ContainsKey(keyDm.MemberType)) {
+                                keyRead = $"({keyDm.MemberType}){TypeGeneratorHelper.GetBinaryReaderForType(XMLDefParser.ACEnums[keyDm.MemberType].ParentType)}";
+                            }
+                            else {
+                                keyRead = TypeGeneratorHelper.GetBinaryReaderForType(keyDm.MemberType, keyDm.Size);
+                            }
+                        }
+                        else if (keyModel is ACVector v) {
+                            keyRead = $"reader.ReadItem<{TypeGeneratorHelper.GetTypeDeclaration(v, XMLDefParser)}>()";
+                        }
 
-                WriteVectorPusher(writer, vector, indexVar);
+                        string valRead = "";
+                        if (valModel is ACDataMember valDm) {
+                            if (XMLDefParser.ACEnums.ContainsKey(valDm.MemberType)) {
+                                valRead = $"({valDm.MemberType}){TypeGeneratorHelper.GetBinaryReaderForType(XMLDefParser.ACEnums[valDm.MemberType].ParentType)}";
+                            }
+                            else {
+                                valRead = TypeGeneratorHelper.GetBinaryReaderForType(valDm.MemberType, valDm.Size);
+                            }
+                        }
+                        else if (valModel is ACVector v) {
+                            valRead = $"reader.ReadItem<{TypeGeneratorHelper.GetTypeDeclaration(v, XMLDefParser)}>()";
+                        }
+                        
+                        writer.WriteLine($"var _key = {keyRead};");
+                        writer.WriteLine($"var _val = {valRead};");
+                        writer.WriteLine($"{vector.Name}.Add(_key, _val);");
+                    }
+                }
+                else {
+                    foreach (var vmember in vector.Children) {
+                        GenerateReaderContents(writer, vmember, depth + 1);
+                    }
+                    WriteVectorPusher(writer, vector, indexVar);
+                }
             }
 
             writer.WriteLine("}");
@@ -329,7 +388,7 @@ namespace DatReaderWriter.SourceGenerator {
         }
 
         public void WriteLocalVectorDefinition(SourceWriter writer, ACVector vector) {
-            writer.WriteLine($"var {vector.Name} = new {TypeGeneratorHelper.GetTypeDeclaration(vector)}();");
+            writer.WriteLine($"var {vector.Name} = new {TypeGeneratorHelper.GetTypeDeclaration(vector, XMLDefParser)}();");
         }
 
         public void GenerateMemberReader(SourceWriter writer, ACDataMember member) {
@@ -788,7 +847,15 @@ namespace DatReaderWriter.SourceGenerator {
         }
 
         private void GenerateWriterVector(SourceWriter writer, ACVector vector, int depth, string pre) {
-            if (string.IsNullOrEmpty(vector.GenericKey) && string.IsNullOrEmpty(vector.GenericValue)) {
+            bool areGenericArgs = vector.Children.Any(c => c is ACDataMember m && string.IsNullOrEmpty(m.Name)) ||
+                                  vector.Children.Any(c => c is ACVector v && string.IsNullOrEmpty(v.Name));
+
+            if (areGenericArgs && string.IsNullOrEmpty(vector.Length) && string.IsNullOrEmpty(vector.LengthMod) && string.IsNullOrEmpty(vector.Skip)) {
+                 writer.WriteLine($"writer.WriteItem<{TypeGeneratorHelper.GetTypeDeclaration(vector, XMLDefParser)}>({vector.Name});");
+                 return;
+            }
+
+            if (string.IsNullOrEmpty(vector.GenericKey) && string.IsNullOrEmpty(vector.GenericValue) && !areGenericArgs) {
                 var indexVar =
                     new string[] { "i", "x", "y", "z", "q", "p", "t", "r", "f", "g", "h", "k", "u", "v" }[depth];
                 if (!string.IsNullOrEmpty(vector.Skip)) {
@@ -807,10 +874,22 @@ namespace DatReaderWriter.SourceGenerator {
 
                 writer.WriteLine("}");
             }
-            else if (string.IsNullOrEmpty(vector.GenericKey)) {
+            else if (string.IsNullOrEmpty(vector.GenericKey) && (!areGenericArgs || vector.Children.Count == 1)) {
                 writer.WriteLine($"foreach (var item in {vector.Name}) {{");
                 using (writer.IndentScope()) {
-                    if (XMLDefParser.ACEnums.ContainsKey(vector.GenericValue)) {
+                    if (areGenericArgs) {
+                         var valModel = vector.Children[0];
+                         if (valModel is ACDataMember valDm) {
+                            if (XMLDefParser.ACEnums.ContainsKey(valDm.MemberType)) {
+                                writer.WriteLine($"writer.{TypeGeneratorHelper.GetBinaryWriterForType(XMLDefParser.ACEnums[valDm.MemberType].ParentType)}(({XMLDefParser.ACEnums[valDm.MemberType].ParentType})item);");
+                            } else {
+                                writer.WriteLine($"writer.{TypeGeneratorHelper.GetBinaryWriterForType(valDm.MemberType)}(item);");
+                            }
+                         } else if (valModel is ACVector v) {
+                             writer.WriteLine($"writer.WriteItem<{TypeGeneratorHelper.GetTypeDeclaration(v, XMLDefParser)}>(item);");
+                         }
+                    }
+                    else if (XMLDefParser.ACEnums.ContainsKey(vector.GenericValue)) {
                         writer.WriteLine(
                             $"writer.{TypeGeneratorHelper.GetBinaryWriterForType(XMLDefParser.ACEnums[vector.GenericValue].ParentType)}(({XMLDefParser.ACEnums[vector.GenericValue].ParentType})item);");
                     }
@@ -825,22 +904,48 @@ namespace DatReaderWriter.SourceGenerator {
             else {
                 writer.WriteLine($"foreach (var kv in {vector.Name}) {{");
                 using (writer.IndentScope()) {
-                    if (XMLDefParser.ACEnums.ContainsKey(vector.GenericKey)) {
-                        writer.WriteLine(
-                            $"writer.{TypeGeneratorHelper.GetBinaryWriterForType(XMLDefParser.ACEnums[vector.GenericKey].ParentType)}(({XMLDefParser.ACEnums[vector.GenericKey].ParentType})kv.Key);");
+                    if (areGenericArgs) {
+                        var keyModel = vector.Children[0];
+                        var valModel = vector.Children[1];
+                        
+                         if (keyModel is ACDataMember keyDm) {
+                            if (XMLDefParser.ACEnums.ContainsKey(keyDm.MemberType)) {
+                                writer.WriteLine($"writer.{TypeGeneratorHelper.GetBinaryWriterForType(XMLDefParser.ACEnums[keyDm.MemberType].ParentType)}(({XMLDefParser.ACEnums[keyDm.MemberType].ParentType})kv.Key);");
+                            } else {
+                                writer.WriteLine($"writer.{TypeGeneratorHelper.GetBinaryWriterForType(keyDm.MemberType)}(kv.Key);");
+                            }
+                         } else if (keyModel is ACVector v) {
+                             writer.WriteLine($"writer.WriteItem<{TypeGeneratorHelper.GetTypeDeclaration(v, XMLDefParser)}>(kv.Key);");
+                         }
+                         
+                         if (valModel is ACDataMember valDm) {
+                            if (XMLDefParser.ACEnums.ContainsKey(valDm.MemberType)) {
+                                writer.WriteLine($"writer.{TypeGeneratorHelper.GetBinaryWriterForType(XMLDefParser.ACEnums[valDm.MemberType].ParentType)}(({XMLDefParser.ACEnums[valDm.MemberType].ParentType})kv.Value);");
+                            } else {
+                                writer.WriteLine($"writer.{TypeGeneratorHelper.GetBinaryWriterForType(valDm.MemberType)}(kv.Value);");
+                            }
+                         } else if (valModel is ACVector v) {
+                             writer.WriteLine($"writer.WriteItem<{TypeGeneratorHelper.GetTypeDeclaration(v, XMLDefParser)}>(kv.Value);");
+                         }
                     }
                     else {
-                        writer.WriteLine(
-                            $"writer.{TypeGeneratorHelper.GetBinaryWriterForType(vector.GenericKey)}(kv.Key);");
-                    }
+                        if (XMLDefParser.ACEnums.ContainsKey(vector.GenericKey)) {
+                            writer.WriteLine(
+                                $"writer.{TypeGeneratorHelper.GetBinaryWriterForType(XMLDefParser.ACEnums[vector.GenericKey].ParentType)}(({XMLDefParser.ACEnums[vector.GenericKey].ParentType})kv.Key);");
+                        }
+                        else {
+                            writer.WriteLine(
+                                $"writer.{TypeGeneratorHelper.GetBinaryWriterForType(vector.GenericKey)}(kv.Key);");
+                        }
 
-                    if (XMLDefParser.ACEnums.ContainsKey(vector.GenericValue)) {
-                        writer.WriteLine(
-                            $"writer.{TypeGeneratorHelper.GetBinaryWriterForType(XMLDefParser.ACEnums[vector.GenericValue].ParentType)}(({XMLDefParser.ACEnums[vector.GenericValue].ParentType})kv.Value);");
-                    }
-                    else {
-                        writer.WriteLine(
-                            $"writer.{TypeGeneratorHelper.GetBinaryWriterForType(vector.GenericValue)}(kv.Value);");
+                        if (XMLDefParser.ACEnums.ContainsKey(vector.GenericValue)) {
+                            writer.WriteLine(
+                                $"writer.{TypeGeneratorHelper.GetBinaryWriterForType(XMLDefParser.ACEnums[vector.GenericValue].ParentType)}(({XMLDefParser.ACEnums[vector.GenericValue].ParentType})kv.Value);");
+                        }
+                        else {
+                            writer.WriteLine(
+                                $"writer.{TypeGeneratorHelper.GetBinaryWriterForType(vector.GenericValue)}(kv.Value);");
+                        }
                     }
                 }
 

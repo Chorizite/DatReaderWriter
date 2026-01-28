@@ -18,6 +18,7 @@ namespace DatReaderWriter.DBObjs {
     /// <summary>
     /// DB_TYPE_KEYMAP in the client.
     /// </summary>
+    [DBObjType(typeof(MasterInputMap), DatFileType.Portal, DBObjType.MasterInputMap, DBObjHeaderFlags.HasId, 0x14000000, 0x1400FFFF, 0x00000000)]
     public partial class MasterInputMap : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;

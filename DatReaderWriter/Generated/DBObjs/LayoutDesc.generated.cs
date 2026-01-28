@@ -18,6 +18,7 @@ namespace DatReaderWriter.DBObjs {
     /// <summary>
     /// DB_TYPE_UI_LAYOUT in the client.
     /// </summary>
+    [DBObjType(typeof(LayoutDesc), DatFileType.Local, DBObjType.LayoutDesc, DBObjHeaderFlags.HasId, 0x21000000, 0x21FFFFFF, 0x00000000)]
     public partial class LayoutDesc : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;

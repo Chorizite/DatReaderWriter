@@ -18,6 +18,7 @@ namespace DatReaderWriter.DBObjs {
     /// <summary>
     /// DB_TYPE_CELL in the client.
     /// </summary>
+    [DBObjType(typeof(EnvCell), DatFileType.Cell, DBObjType.EnvCell, DBObjHeaderFlags.HasId, 0x00000000, 0x00000000, 0x00000000)]
     public partial class EnvCell : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;

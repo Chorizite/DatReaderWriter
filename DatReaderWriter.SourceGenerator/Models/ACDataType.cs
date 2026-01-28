@@ -51,20 +51,20 @@ namespace DatReaderWriter.SourceGenerator.Models {
             var isAbstract = ((string)element.Attribute("abstract"))?.ToLower() == "true";
 
             var type = new ACDataType(parent, element) {
-                Name = name,
-                Primitive = primitive,
-                ParentType = parentType,
-                BaseType = baseType,
-                Param = param,
-                Text = text,
-                Value = value,
+                Name = name ?? "",
+                Primitive = primitive ?? "",
+                ParentType = parentType ?? "",
+                BaseType = baseType ?? "",
+                Param = param ?? "",
+                Text = text ?? "",
+                Value = value ?? "",
                 IsTemplated = !string.IsNullOrWhiteSpace(templated),
-                Size = size,
+                Size = size ?? "",
                 HasDataCategory = hasDataCategory,
                 IsAbstract = isAbstract,
                 TypeSwitch = element.XPathSelectElement("./typeswitch")?.Attribute("name")?.Value ?? "",
-                GenericKey = (string)element.Attribute("genericKey"),
-                GenericValue = (string)element.Attribute("genericValue"),
+                GenericKey = (string)element.Attribute("genericKey") ?? "",
+                GenericValue = (string)element.Attribute("genericValue") ?? "",
                 IsAutoGrow = ((string)element.Attribute("isAutoGrow"))?.ToLower() == "true",
             };
 

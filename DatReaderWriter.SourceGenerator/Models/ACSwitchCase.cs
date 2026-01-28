@@ -14,8 +14,8 @@ namespace DatReaderWriter.SourceGenerator.Models {
             var text = (string)element.Attribute("text");
 
             return new ACSwitchCase(parent, element) {
-                Value = value,
-                Text = text
+                Value = value ?? "",
+                Text = text ?? ""
             };
         }
     }

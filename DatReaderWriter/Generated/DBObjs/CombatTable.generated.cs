@@ -18,6 +18,7 @@ namespace DatReaderWriter.DBObjs {
     /// <summary>
     /// DB_TYPE_COMBAT_TABLE_0 in the client.
     /// </summary>
+    [DBObjType(typeof(CombatTable), DatFileType.Portal, DBObjType.CombatTable, DBObjHeaderFlags.HasId, 0x30000000, 0x3000FFFF, 0x00000000)]
     public partial class CombatTable : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;

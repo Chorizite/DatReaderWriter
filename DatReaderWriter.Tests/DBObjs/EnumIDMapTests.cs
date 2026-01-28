@@ -8,7 +8,7 @@ using System.Numerics;
 
 namespace DatReaderWriter.Tests.DBObjs {
     [TestClass]
-    public class DataIdMapperTests {
+    public class EnumIDMapTests {
         [TestMethod]
         public void CanInsertAndReadDataIdMappers() {
             var datFilePath = Path.GetTempFileName();
@@ -19,7 +19,7 @@ namespace DatReaderWriter.Tests.DBObjs {
 
             dat.BlockAllocator.InitNew(DatFileType.Portal, 0);
 
-            var writeAnim = new DataIdMapper() {
+            var writeAnim = new EnumIDMap() {
                 Id = 0x25000014,
                 ClientIDNumberingType = NumberingType.Sequential,
                 ClientNameNumberingType = NumberingType.Sequential,
@@ -34,7 +34,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             var res = dat.TryWriteFile(writeAnim);
             Assert.IsTrue(res);
 
-            var res2 = dat.TryGet<DataIdMapper>(0x25000014, out var readDidMap);
+            var res2 = dat.TryGet<EnumIDMap>(0x25000014, out var readDidMap);
             Assert.IsTrue(res2);
             Assert.IsNotNull(readDidMap);
 
@@ -72,7 +72,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             });
 
 
-            var res = dat.TryGet<DataIdMapper>(0x25000014, out var didMap);
+            var res = dat.TryGet<EnumIDMap>(0x25000014, out var didMap);
             Assert.IsTrue(res);
             Assert.IsNotNull(didMap);
             Assert.AreEqual(0x25000014u, didMap.Id);
@@ -103,9 +103,9 @@ namespace DatReaderWriter.Tests.DBObjs {
         [TestMethod]
         [TestCategory("EOR")]
         public void CanReadEORAndWriteIdentical() {
-            TestHelpers.CanReadAndWriteIdentical<DataIdMapper>(Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat"), 0x25000000);
-            TestHelpers.CanReadAndWriteIdentical<DataIdMapper>(Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat"), 0x2500000C);
-            TestHelpers.CanReadAndWriteIdentical<DataIdMapper>(Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat"), 0x25000014);
+            TestHelpers.CanReadAndWriteIdentical<EnumIDMap>(Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat"), 0x25000000);
+            TestHelpers.CanReadAndWriteIdentical<EnumIDMap>(Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat"), 0x2500000C);
+            TestHelpers.CanReadAndWriteIdentical<EnumIDMap>(Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat"), 0x25000014);
         }
     }
 }

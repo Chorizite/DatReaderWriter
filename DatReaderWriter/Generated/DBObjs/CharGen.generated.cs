@@ -18,6 +18,7 @@ namespace DatReaderWriter.DBObjs {
     /// <summary>
     /// DB_TYPE_CHAR_GEN_0 in the client.
     /// </summary>
+    [DBObjType(typeof(CharGen), DatFileType.Portal, DBObjType.CharGen, DBObjHeaderFlags.HasId, 0x0E000002, 0x0E000002, 0x00000000)]
     public partial class CharGen : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;

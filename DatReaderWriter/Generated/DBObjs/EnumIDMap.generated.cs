@@ -16,15 +16,15 @@ using DatReaderWriter.Types;
 
 namespace DatReaderWriter.DBObjs {
     /// <summary>
-    /// DB_TYPE_DUAL_DID_MAPPER in the client.
+    /// DB_TYPE_DID_MAPPER in the client.
     /// </summary>
-    [DBObjType(typeof(DualDataIdMapper), DatFileType.Portal, DBObjType.DualDataIdMapper, DBObjHeaderFlags.HasId, 0x27000000, 0x27FFFFFF, 0x00000000)]
-    public partial class DualDataIdMapper : DBObj {
+    [DBObjType(typeof(EnumIDMap), DatFileType.Portal, DBObjType.EnumIDMap, DBObjHeaderFlags.HasId, 0x25000000, 0x25FFFFFF, 0x00000000)]
+    public partial class EnumIDMap : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;
 
         /// <inheritdoc />
-        public override DBObjType DBObjType => DBObjType.DualDataIdMapper;
+        public override DBObjType DBObjType => DBObjType.EnumIDMap;
 
         public NumberingType ClientIDNumberingType;
 

@@ -18,6 +18,7 @@ namespace DatReaderWriter.DBObjs {
     /// <summary>
     /// DB_TYPE_STABLE in the client.
     /// </summary>
+    [DBObjType(typeof(SoundTable), DatFileType.Portal, DBObjType.SoundTable, DBObjHeaderFlags.HasId, 0x20000000, 0x2000FFFF, 0x00000000)]
     public partial class SoundTable : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;

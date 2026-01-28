@@ -18,6 +18,7 @@ namespace DatReaderWriter.DBObjs {
     /// <summary>
     /// DB_TYPE_SURFACETEXTURE in the client.
     /// </summary>
+    [DBObjType(typeof(SurfaceTexture), DatFileType.Portal, DBObjType.SurfaceTexture, DBObjHeaderFlags.HasId | DBObjHeaderFlags.HasDataCategory, 0x05000000, 0x05FFFFFF, 0x00000000)]
     public partial class SurfaceTexture : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId | DBObjHeaderFlags.HasDataCategory;

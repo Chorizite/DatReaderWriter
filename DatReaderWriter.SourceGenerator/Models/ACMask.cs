@@ -15,7 +15,7 @@ namespace DatReaderWriter.SourceGenerator.Models {
             var value = (string)element.Attribute("value");
 
             var acmask = new ACMask(parent, element) {
-                Value = value
+                Value = value ?? ""
             };
 
             var elseNode = element.XPathSelectElement("./else");

@@ -18,6 +18,7 @@ namespace DatReaderWriter.DBObjs {
     /// <summary>
     /// DB_TYPE_RENDERTEXTURE in the client.
     /// </summary>
+    [DBObjType(typeof(RenderTexture), DatFileType.Portal, DBObjType.RenderTexture, DBObjHeaderFlags.HasId | DBObjHeaderFlags.HasDataCategory, 0x15000000, 0x15FFFFFF, 0x00000000)]
     public partial class RenderTexture : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId | DBObjHeaderFlags.HasDataCategory;

@@ -18,6 +18,7 @@ namespace DatReaderWriter.DBObjs {
     /// <summary>
     /// DB_TYPE_FONT in the client.
     /// </summary>
+    [DBObjType(typeof(Font), DatFileType.Portal, DBObjType.Font, DBObjHeaderFlags.HasId, 0x40000000, 0x40000FFF, 0x00000000)]
     public partial class Font : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;

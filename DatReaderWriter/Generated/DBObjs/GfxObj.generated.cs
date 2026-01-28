@@ -16,8 +16,9 @@ using DatReaderWriter.Types;
 
 namespace DatReaderWriter.DBObjs {
     /// <summary>
-    /// GfxObj / DB_TYPE_GFXOBJ in the client.
+    /// DB_TYPE_GFXOBJ in the client. Main visual geometry object (mesh + surfaces + physics)
     /// </summary>
+    [DBObjType(typeof(GfxObj), DatFileType.Portal, DBObjType.GfxObj, DBObjHeaderFlags.HasId, 0x01000000, 0x0100FFFF, 0x00000000)]
     public partial class GfxObj : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;
@@ -25,25 +26,49 @@ namespace DatReaderWriter.DBObjs {
         /// <inheritdoc />
         public override DBObjType DBObjType => DBObjType.GfxObj;
 
+        /// <summary>
+        /// Bitfield controlling which optional data is present (physics, drawing, degrade, etc.)
+        /// </summary>
         public GfxObjFlags Flags;
 
         /// <summary>
-        /// The list of surfaces
+        /// Array of surface (material/texture) IDs used by this mesh
         /// </summary>
-        public List<uint> Surfaces = [];
+        public List<QualifiedDataId<Surface>> Surfaces = [];
 
+        /// <summary>
+        /// All vertices + UVs + normals used by this object
+        /// </summary>
         public VertexArray VertexArray;
 
+        /// <summary>
+        /// Collision polygons (usually simplified/low-poly version)
+        /// </summary>
         public Dictionary<ushort, Polygon> PhysicsPolygons = [];
 
+        /// <summary>
+        /// BSP tree used for collision raycasts &amp; movement
+        /// </summary>
         public PhysicsBSPTree PhysicsBSP;
 
+        /// <summary>
+        /// Approximate center point used for depth sorting / transparency ordering
+        /// </summary>
         public Vector3 SortCenter;
 
+        /// <summary>
+        /// Actual render polygons (can be higher detail than physics polys)
+        /// </summary>
         public Dictionary<ushort, Polygon> Polygons = [];
 
+        /// <summary>
+        /// BSP tree used for rendering (portal culling, etc.)
+        /// </summary>
         public DrawingBSPTree DrawingBSP;
 
+        /// <summary>
+        /// DataID of a simpler GfxObj to use at long distance / low quality
+        /// </summary>
         public uint DIDDegrade;
 
         /// <inheritdoc />
@@ -52,7 +77,7 @@ namespace DatReaderWriter.DBObjs {
             Flags = (GfxObjFlags)reader.ReadUInt32();
             var _numSurfaces = reader.ReadCompressedUInt();
             for (var i=0; i < _numSurfaces; i++) {
-                Surfaces.Add(reader.ReadUInt32());
+                Surfaces.Add(reader.ReadItem<QualifiedDataId<Surface>>());
             }
             VertexArray = reader.ReadItem<VertexArray>();
             if (Flags.HasFlag(GfxObjFlags.HasPhysics)) {
@@ -86,7 +111,7 @@ namespace DatReaderWriter.DBObjs {
             writer.WriteUInt32((uint)Flags);
             writer.WriteCompressedUInt((uint)Surfaces.Count());
             foreach (var item in Surfaces) {
-                writer.WriteUInt32(item);
+                writer.WriteItem<QualifiedDataId<Surface>>(item);
             }
             writer.WriteItem<VertexArray>(VertexArray);
             if (Flags.HasFlag(GfxObjFlags.HasPhysics)) {

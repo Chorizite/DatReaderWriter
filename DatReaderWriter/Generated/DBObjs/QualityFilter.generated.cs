@@ -18,6 +18,7 @@ namespace DatReaderWriter.DBObjs {
     /// <summary>
     /// DB_TYPE_QUALITY_FILTER_0 in the client.
     /// </summary>
+    [DBObjType(typeof(QualityFilter), DatFileType.Portal, DBObjType.QualityFilter, DBObjHeaderFlags.HasId, 0x0E010000, 0x0E01FFFF, 0x00000000)]
     public partial class QualityFilter : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;

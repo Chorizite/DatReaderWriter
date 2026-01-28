@@ -18,6 +18,7 @@ namespace DatReaderWriter.DBObjs {
     /// <summary>
     /// DB_TYPE_STRING_TABLE in the client.
     /// </summary>
+    [DBObjType(typeof(StringTable), DatFileType.Local, DBObjType.StringTable, DBObjHeaderFlags.HasId, 0x23000000, 0x24FFFFFF, 0x00000000)]
     public partial class StringTable : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;

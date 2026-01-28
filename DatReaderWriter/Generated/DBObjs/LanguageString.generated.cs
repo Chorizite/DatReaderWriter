@@ -18,6 +18,7 @@ namespace DatReaderWriter.DBObjs {
     /// <summary>
     /// DB_TYPE_STRING in the client.
     /// </summary>
+    [DBObjType(typeof(LanguageString), DatFileType.Portal, DBObjType.LanguageString, DBObjHeaderFlags.HasId, 0x31000000, 0x3100FFFF, 0x00000000)]
     public partial class LanguageString : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;

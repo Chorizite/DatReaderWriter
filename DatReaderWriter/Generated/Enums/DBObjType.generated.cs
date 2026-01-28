@@ -19,7 +19,7 @@ namespace DatReaderWriter.Enums {
         Iteration,
 
         /// <summary>
-        /// DBObj GfxObj - GfxObj / DB_TYPE_GFXOBJ in the client.
+        /// DBObj GfxObj - DB_TYPE_GFXOBJ in the client. Main visual geometry object (mesh + surfaces + physics)
         /// </summary>
         GfxObj,
 
@@ -154,9 +154,9 @@ namespace DatReaderWriter.Enums {
         EnumMapper,
 
         /// <summary>
-        /// DBObj DataIdMapper - DB_TYPE_DID_MAPPER in the client.
+        /// DBObj EnumIDMap - DB_TYPE_DID_MAPPER in the client.
         /// </summary>
-        DataIdMapper,
+        EnumIDMap,
 
         /// <summary>
         /// DBObj ActionMap - DB_TYPE_ACTIONMAP in the client.

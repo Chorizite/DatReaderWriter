@@ -18,6 +18,7 @@ namespace DatReaderWriter.DBObjs {
     /// <summary>
     /// DB_TYPE_OBJECT_HIERARCHY in the client.
     /// </summary>
+    [DBObjType(typeof(ObjectHierarchy), DatFileType.Portal, DBObjType.ObjectHierarchy, DBObjHeaderFlags.HasId, 0x0E00000D, 0x0E00000D, 0x00000000)]
     public partial class ObjectHierarchy : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;
