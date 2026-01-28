@@ -3469,14 +3469,6 @@
             <vector name="Children" length="_numChildren" type="Dictionary" genericKey="uint"
                     genericValue="ElementDesc"/>
         </type>
-        <type name="AutoGrowHashTable" genericKey="TKey" genericValue="TValue" isAutoGrow="true">
-            <field name="_bucketSize" type="byte" />
-            <field name="_numElements" type="CompressedUInt"/>
-        </type>
-        <type name="PStringBase" genericValue="byte">
-            <field name="_bucketSize" type="byte" />
-            <field name="Value" type="string"/>
-        </type>
     </types>
     <dats>
         <dat name="portal" text="client_portal.dat" type="DatFileType.Portal">
@@ -3772,7 +3764,15 @@
                 <field name="BaseEnumMap" type="uint"/>
                 <field name="_bucketSize" type="byte" value="5" />
                 <field name="_numElements" type="CompressedUInt"/>
-                <vector name="IdToStringMap" length="_numElements" type="Dictionary" genericKey="uint" genericValue="bytestring"/>
+                <vector name="IdToStringMap" length="_numElements" type="Dictionary" genericKey="uint" genericValue="PStringBase"/>
+            </type>
+            <type name="EnumMapper" text="DB_TYPE_ENUM_MAPPER in the client." parent="DBObj" first="0x22000000"
+                  last="0x22FFFFFF" flags="DBObjHeaderFlags.HasId">
+                <field name="BaseEnumMap" type="uint"/>
+                <field name="IdToStringMap" type="AutoGrowHashTable">
+                    <generickey type="uint" />
+                    <genericvalue type="PStringBase" genericValue="byte" />
+                </field>
             </type>
             <type name="DataIdMapper" text="DB_TYPE_DID_MAPPER in the client." parent="DBObj" first="0x25000000"
                   last="0x25FFFFFF" flags="DBObjHeaderFlags.HasId">

@@ -19,8 +19,7 @@ namespace DatReaderWriter.SourceGenerator {
                 "BaseProperty",
                 "ArrayBaseProperty",
                 "StructBaseProperty",
-                "TerrainInfo",
-                "T4Template" // Added T4Template to the ignore list as per instruction
+                "TerrainInfo"
             };
 
             foreach (var kv in parser.ACDataTypes) {
@@ -28,8 +27,8 @@ namespace DatReaderWriter.SourceGenerator {
                     continue;
                 }
 
-                // We only care about types that are NOT hash tables
-                if (!string.IsNullOrEmpty(kv.Value.GenericKey)) {
+                // We only care about types that are NOT generics
+                if (!string.IsNullOrEmpty(kv.Value.GenericKey) || !string.IsNullOrEmpty(kv.Value.GenericValue)) {
                     continue;
                 }
 

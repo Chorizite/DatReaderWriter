@@ -48,9 +48,9 @@ namespace DatReaderWriter.Lib {
         /// <param name="numEntries">The number of entries in the hash table</param>
         /// <param name="isAutoGrow">If this is an auto-growing hash table.</param>
         /// <returns>The index of the calculated bucket size in the <see cref="BucketSizes"/> table</returns>
-        public static int GetBucketSizeIndex(int numEntries, bool isAutoGrow = false) {
+        public static byte GetBucketSizeIndex(int numEntries, bool isAutoGrow = false) {
             var bucketSize = GetBucketSize(numEntries, isAutoGrow);
-            return Array.IndexOf(BucketSizes, bucketSize);
+            return (byte)Array.IndexOf(BucketSizes, bucketSize);
         }
     }
 
