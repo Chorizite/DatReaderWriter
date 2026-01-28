@@ -8,6 +8,8 @@ using System.Xml.Linq;
 using System.Diagnostics;
 using System.Collections;
 using DatReaderWriter.Lib.IO.BlockAllocators;
+using System.Threading;
+using System.Threading.Tasks;
 
 /*
  *  Heavily based on https://github.com/rsdcastro/btree-dotnet/ and https://github.com/msambol/dsa/blob/master/trees/b_tree.py
@@ -73,6 +75,24 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
             return success;
         }
 
+#if (NET8_0_OR_GREATER)
+        private async ValueTask<(bool Success, DatBTreeNode? Node)> TryGetNodeAsync(int blockOffset,
+            CancellationToken ct = default) {
+#else
+        private async Task<(bool Success, DatBTreeNode? Node)> TryGetNodeAsync(int blockOffset, CancellationToken ct =
+ default) {
+#endif
+            var buffer = BaseBlockAllocator.SharedBytes.Rent(DatBTreeNode.SIZE);
+
+            await BlockAllocator.ReadBlockAsync(buffer, blockOffset, ct);
+            var result = new DatBTreeNode(blockOffset);
+            var success = result.Unpack(new DatBinReader(buffer));
+
+            BaseBlockAllocator.SharedBytes.Return(buffer);
+
+            return (success, result);
+        }
+
         /// <summary>
         /// Write a node back to the dat
         /// </summary>
@@ -82,6 +102,14 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
             var writer = new DatBinWriter(buffer);
             node.Pack(writer);
             node.Offset = BlockAllocator.WriteBlock(buffer, DatBTreeNode.SIZE, node.Offset);
+            BaseBlockAllocator.SharedBytes.Return(buffer);
+        }
+
+        private async ValueTask WriteNodeAsync(DatBTreeNode node, CancellationToken ct = default) {
+            var buffer = BaseBlockAllocator.SharedBytes.Rent(DatBTreeNode.SIZE);
+            var writer = new DatBinWriter(buffer);
+            node.Pack(writer);
+            node.Offset = await BlockAllocator.WriteBlockAsync(buffer, DatBTreeNode.SIZE, node.Offset, ct);
             BaseBlockAllocator.SharedBytes.Return(buffer);
         }
 
@@ -131,9 +159,69 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
             return false;
         }
 
+#if (NET8_0_OR_GREATER)
+        private async ValueTask<(bool Success, DatBTreeFile File)> TryGetFileInternalAsync(uint fileId,
+            int startingBlock, CancellationToken ct = default) {
+#else
+        private async Task<(bool Success, DatBTreeFile File)> TryGetFileInternalAsync(uint fileId, int startingBlock, CancellationToken ct
+ = default) {
+#endif
+            // 0 and 0xCDCDCDCD are invalid node offsets
+            while (startingBlock != 0 && startingBlock != unchecked((int)0xCDCDCDCD)) {
+                var (success, node) = await TryGetNodeAsync(startingBlock, ct);
+                if (success && node is not null) {
+                    var left = 0;
+                    var right = node.Files.Count - 1;
+                    var i = 0;
+
+                    // binary search on keys
+                    while (left <= right) {
+                        i = (left + right) / 2;
+                        var currentFile = node.Files[i];
+
+                        if (fileId == currentFile.Id) {
+                            return (true, currentFile);
+                        }
+                        else if (fileId < currentFile.Id)
+                            right = i - 1;
+                        else
+                            left = i + 1;
+                    }
+
+                    // leaf is end of the line, so no result was found
+                    if (node.IsLeaf) {
+                        break;
+                    }
+
+                    if (fileId > node.Files[i].Id)
+                        i++;
+
+                    startingBlock = node.Branches[i];
+                }
+                else {
+                    break;
+                }
+            }
+
+            return (false, default);
+        }
+
         private void SetNewRoot(DatBTreeNode rootBlock) {
             Root = rootBlock;
             WriteNode(rootBlock);
+            BlockAllocator.SetRootBlock(rootBlock.Offset);
+        }
+
+        private async ValueTask SetNewRootAsync(DatBTreeNode rootBlock, CancellationToken ct = default) {
+            Root = rootBlock;
+            await WriteNodeAsync(rootBlock, ct);
+            // BlockAllocator.SetRootBlock modifies the header, usually synchronous/fast.
+            // But if we want to be fully async, BlockAllocator logic might need async header write?
+            // Currently BlockAllocator.SetRootBlock is sync.
+            // Header is small and usually cached/memory mapped IO is fast.
+            // We can keep it sync or add SetRootBlockAsync to Allocator interface?
+            // Allocator interface doesn't have Async SetRootBlock.
+            // Keeping it sync for now as it's just a header update.
             BlockAllocator.SetRootBlock(rootBlock.Offset);
         }
 
@@ -166,6 +254,33 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
             WriteNode(newNode);
             WriteNode(child);
             WriteNode(parent);
+        }
+
+        private async ValueTask SplitChildAsync(DatBTreeNode parent, DatBTreeNode child,
+            CancellationToken ct = default) {
+            var newNode = new DatBTreeNode(BlockAllocator.ReserveBlock());
+            // ReserveBlock is sync, but we fixed it to be thread safe.
+
+            var childIdx = parent.Branches.FindIndex(f => f == child.Offset);
+
+            // Insert the middle entry from the full child into the parent
+            parent.Files.Insert(childIdx, child.Files[Degree - 1]);
+            parent.Branches.Insert(childIdx + 1, newNode.Offset);
+
+            // Transfer second half of files from child to new node
+            newNode.Files.AddRange(child.Files.Skip(Degree).Take(Degree - 1));
+            child.Files.RemoveRange(Degree - 1, Degree);
+
+            // If not a leaf, also split the branches
+            if (!child.IsLeaf) {
+                newNode.Branches.AddRange(child.Branches.GetRange(Degree, child.Branches.Count - Degree));
+                child.Branches.RemoveRange(Degree, child.Branches.Count - Degree);
+            }
+
+            // Write nodes back
+            await WriteNodeAsync(newNode, ct);
+            await WriteNodeAsync(child, ct);
+            await WriteNodeAsync(parent, ct);
         }
 
         private IEnumerable<DatBTreeFile> GetFilesRecursive(DatBTreeNode? node) {
@@ -257,6 +372,7 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
                         }
                     }
                 }
+
                 i++;
             }
         }
@@ -273,6 +389,22 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
         public bool TryGetFile(uint fileId, out DatBTreeFile file) {
 #endif
             return TryGetFileInternal(fileId, BlockAllocator.Header.RootBlock, out file);
+        }
+
+        /// <summary>
+        /// Try and get a file in the tree with the specified id asynchronously
+        /// </summary>
+        /// <param name="fileId">The file id to search for</param>
+        /// <param name="ct">Cancellation token</param>
+        /// <returns>A ValueTask containing success status and the file if found</returns>
+#if (NET8_0_OR_GREATER)
+        public async ValueTask<(bool Success, DatBTreeFile File)> TryGetFileAsync(uint fileId,
+            CancellationToken ct = default) {
+#else
+        public async Task<(bool Success, DatBTreeFile File)> TryGetFileAsync(uint fileId, CancellationToken ct =
+ default) {
+#endif
+            return await TryGetFileInternalAsync(fileId, BlockAllocator.Header.RootBlock, ct);
         }
 
         /// <summary>
@@ -297,6 +429,7 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
                 if (TryFindParentAndUpdate(Root, file, out var replacedFile)) {
                     return replacedFile;
                 }
+
                 throw new Exception($"Could not find existing file in tree structure");
             }
 
@@ -319,6 +452,52 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
             }
 
             InsertNonFull(Root, file);
+            return null;
+        }
+
+        /// <summary>
+        /// Inserts a <see cref="DatBTreeFile"/> into this tree asynchronously, replacing a
+        /// a file if one is already there.
+        /// </summary>
+        /// <param name="file">The file to add</param>
+        /// <param name="ct">Cancellation token</param>
+        /// <returns>The file that was replaced, if any</returns>
+#if (NET8_0_OR_GREATER)
+        public async ValueTask<DatBTreeFile?> InsertAsync(DatBTreeFile file, CancellationToken ct = default) {
+#else
+        public async Task<DatBTreeFile?> InsertAsync(DatBTreeFile file, CancellationToken ct = default) {
+#endif
+            // check if file already exists
+            var (found, _) = await TryGetFileAsync(file.Id, ct);
+            if (found) {
+                // Find the parent node and update the file in place
+                var (success, replacedFile) = await TryFindParentAndUpdateAsync(Root, file, ct);
+                if (success) {
+                    return replacedFile;
+                }
+
+                throw new Exception($"Could not find existing file in tree structure");
+            }
+
+            // if root is null, create a new root node and add the file there
+            if (Root is null) {
+                var rootBlock = new DatBTreeNode(BlockAllocator.ReserveBlock());
+                rootBlock.Files.Add(file);
+                await SetNewRootAsync(rootBlock, ct);
+                return null;
+            }
+
+            // check if root node is full, if so create a new root node before insertion
+            if (Root.Files.Count == MaxItems) {
+                var oldRoot = Root;
+                var newRoot = new DatBTreeNode(BlockAllocator.ReserveBlock());
+                await SetNewRootAsync(newRoot, ct);
+
+                newRoot.Branches.Add(oldRoot.Offset);
+                await SplitChildAsync(newRoot, oldRoot, ct);
+            }
+
+            await InsertNonFullAsync(Root, file, ct);
             return null;
         }
 
@@ -349,6 +528,41 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
 
             replacedFile = default;
             return false;
+        }
+
+#if (NET8_0_OR_GREATER)
+        private async ValueTask<(bool Success, DatBTreeFile ReplacedFile)> TryFindParentAndUpdateAsync(
+            DatBTreeNode? node, DatBTreeFile file, CancellationToken ct = default) {
+#else
+        private async Task<(bool Success, DatBTreeFile ReplacedFile)> TryFindParentAndUpdateAsync(DatBTreeNode? node, DatBTreeFile file, CancellationToken ct
+ = default) {
+#endif
+            if (node is null) {
+                return (false, default);
+            }
+
+            var idx = node.Files.FindIndex(f => f.Id == file.Id);
+            if (idx >= 0) {
+                var replaced = node.Files[idx];
+                node.Files[idx] = file;
+                await WriteNodeAsync(node, ct);
+                return (true, replaced);
+            }
+
+            // Search children
+            if (!node.IsLeaf) {
+                foreach (var branchOffset in node.Branches) {
+                    var (success, child) = await TryGetNodeAsync(branchOffset, ct);
+                    if (success && child is not null) {
+                        var (found, replaced) = await TryFindParentAndUpdateAsync(child, file, ct);
+                        if (found) {
+                            return (true, replaced);
+                        }
+                    }
+                }
+            }
+
+            return (false, default);
         }
 
         private void InsertNonFull(DatBTreeNode node, DatBTreeFile file) {
@@ -384,6 +598,44 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
 
             // Recursively insert into the appropriate child
             InsertNonFull(child, file);
+        }
+
+        private async ValueTask
+            InsertNonFullAsync(DatBTreeNode node, DatBTreeFile file, CancellationToken ct = default) {
+            int positionToInsert = node.Files.TakeWhile(entry => file.Id.CompareTo(entry.Id) >= 0).Count();
+
+            if (node.IsLeaf) {
+                // Directly insert into the leaf node at the calculated position.
+                node.Files.Insert(positionToInsert, file);
+                await WriteNodeAsync(node, ct);
+                return;
+            }
+
+            // Ensure the child at positionToInsert is loaded
+            var (success, child) = await TryGetNodeAsync(node.Branches[positionToInsert], ct);
+            if (!success || child is null) {
+                throw new Exception("Could not look up child node during insertion!");
+            }
+
+            // Check if the child node is full
+            if (child.Files.Count == MaxItems) {
+                // Split the child node
+                await SplitChildAsync(node, child, ct);
+
+                // After splitting, if the file's ID is greater than the middle key
+                // (which was moved up to the parent), adjust positionToInsert to the right child.
+                if (file.Id.CompareTo(node.Files[positionToInsert].Id) > 0) {
+                    positionToInsert++;
+                    // Reload child if it points to the newly created right child
+                    (success, child) = await TryGetNodeAsync(node.Branches[positionToInsert], ct);
+                    if (!success || child is null) {
+                        throw new Exception("Could not look up child node after split!");
+                    }
+                }
+            }
+
+            // Recursively insert into the appropriate child
+            await InsertNonFullAsync(child, file, ct);
         }
 
         /// <summary>
@@ -462,6 +714,7 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
                         return;
                     }
                 }
+
                 if (subtreeIndexInNode < parentNode.Branches.Count - 1) {
                     if (!TryGetNode(parentNode.Branches[rightIndex], out rightSibling)) {
                         Debug.Assert(false, "Unable to lookup rightSibling node!");
@@ -635,6 +888,7 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
             if (!TryGetNode(node.Branches.First(), out var predecessor)) {
                 throw new Exception($"Failed to look up predecessor");
             }
+
             return DeletePredecessor(predecessor);
         }
 
@@ -655,11 +909,13 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
 
         private void WriteTree(StringBuilder str, DatBTreeNode node, int depth) {
             var tabs = new string('\t', depth);
-            str.AppendLine($"{tabs}\tNode: {node.Offset:X8} (Leaf: {node.IsLeaf}, Root: {node.Offset == Root?.Offset})");
+            str.AppendLine(
+                $"{tabs}\tNode: {node.Offset:X8} (Leaf: {node.IsLeaf}, Root: {node.Offset == Root?.Offset})");
             str.AppendLine($"{tabs}\t\tFiles:");
             foreach (var file in node.Files) {
                 str.AppendLine($"{tabs}\t\t\t{file.Id:X8}");
             }
+
             str.AppendLine($"{tabs}\t\tChildren:");
             if (node.Branches.Count == 0) {
                 str.AppendLine($"{tabs}\t\t\tNone!");
@@ -685,7 +941,6 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
         /// <inheritdoc/>
         protected virtual void Dispose(bool disposing) {
             if (disposing) {
-
             }
         }
     }

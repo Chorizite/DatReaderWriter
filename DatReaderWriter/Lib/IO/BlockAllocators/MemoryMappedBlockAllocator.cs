@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.MemoryMappedFiles;
 using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace DatReaderWriter.Lib.IO.BlockAllocators {
     /// <summary>
@@ -13,6 +15,7 @@ namespace DatReaderWriter.Lib.IO.BlockAllocators {
     /// </summary>
     unsafe public class MemoryMappedBlockAllocator : BaseBlockAllocator {
         private readonly FileStream _datStream;
+        private readonly SemaphoreSlim _mmLock = new(1, 1);
         private MemoryMappedFile _mappedFile;
         private MemoryMappedViewAccessor _view;
         private byte* _viewPtr;
@@ -23,7 +26,8 @@ namespace DatReaderWriter.Lib.IO.BlockAllocators {
         /// <param name="options">The options to use</param>
         public MemoryMappedBlockAllocator(DatDatabaseOptions options) : base(options) {
             if (CanWrite) {
-                _datStream = File.Open(options.FilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+                _datStream = File.Open(options.FilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite,
+                    FileShare.ReadWrite);
 
                 // make sure we at least have room for a header, this is a new dat
                 if (_datStream.Length < DatHeader.SIZE) {
@@ -40,95 +44,177 @@ namespace DatReaderWriter.Lib.IO.BlockAllocators {
         }
 
         /// <inheritdoc/>
+        public override int ReserveBlock() {
+            _mmLock.Wait();
+            try {
+                return base.ReserveBlock();
+            }
+            finally {
+                _mmLock.Release();
+            }
+        }
+
+        /// <inheritdoc/>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override void WriteBytes(byte[] buffer, int byteOffset, int numBytes) {
+            _mmLock.Wait();
+            try {
+                WriteBytesInternal(buffer, byteOffset, numBytes);
+            }
+            finally {
+                _mmLock.Release();
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void WriteBytesInternal(byte[] buffer, int byteOffset, int numBytes) {
+            // Ensure view is valid if Expand ruined it? No, Expand updates _viewPtr.
+            // But we must ensure no one Expands while we write.
             fixed (byte* bufferPtr = buffer) {
                 Buffer.MemoryCopy(bufferPtr, _viewPtr + byteOffset, numBytes, numBytes);
             }
         }
 
         /// <inheritdoc/>
+        protected override void WriteHeader() {
+            var headerBuffer = SharedBytes.Rent(DatHeader.SIZE);
+            Header.WriteEmptyTransaction();
+            Header.Pack(new DatBinWriter(headerBuffer));
+            WriteBytesInternal(headerBuffer, 0, DatHeader.SIZE);
+            SharedBytes.Return(headerBuffer);
+        }
+
+        /// <inheritdoc/>
         public override int WriteBlock(byte[] buffer, int numBytes, int startingBlock = 0) {
-            startingBlock = startingBlock > 0 ? startingBlock : ReserveBlock();
+            // startingBlock = startingBlock > 0 ? startingBlock : ReserveBlockCore(); // Moved inside lock
 
             int currentBlock = startingBlock;
             int bufferIndex = 0;
             int blockDataSize = Header.BlockSize - 4;
 
-            while (bufferIndex < numBytes) {
-                int size = Math.Min(blockDataSize, numBytes - bufferIndex);
-
-                fixed (byte* dataPtr = &buffer[bufferIndex]) {
-                    // Write data to current block (skip first 4 bytes for next pointer)
-                    Buffer.MemoryCopy(dataPtr, _viewPtr + currentBlock + 4, size, size);
+            _mmLock.Wait();
+            try {
+                if (startingBlock <= 0) {
+                    startingBlock = ReserveBlockCore();
+                    currentBlock = startingBlock;
                 }
 
-                bufferIndex += size;
+                while (bufferIndex < numBytes) {
+                    int size = Math.Min(blockDataSize, numBytes - bufferIndex);
 
-                // Determine next block
-                int nextBlock;
-                if (bufferIndex < numBytes) {
-                    // Read existing next block pointer
-                    nextBlock = *(int*)(_viewPtr + currentBlock);
-
-                    if (nextBlock <= 0) {
-                        nextBlock = ReserveBlock();
+                    fixed (byte* dataPtr = &buffer[bufferIndex]) {
+                        // Write data to current block (skip first 4 bytes for next pointer)
+                        Buffer.MemoryCopy(dataPtr, _viewPtr + currentBlock + 4, size, size);
                     }
-                }
-                else {
-                    nextBlock = 0; // End of chain
+
+                    bufferIndex += size;
+
+                    // Determine next block
+                    int nextBlock;
+                    if (bufferIndex < numBytes) {
+                        // Read existing next block pointer
+                        nextBlock = *(int*)(_viewPtr + currentBlock);
+
+                        if (nextBlock <= 0) {
+                            nextBlock = ReserveBlockCore();
+                        }
+                    }
+                    else {
+                        nextBlock = 0;
+                    }
+
+                    // Write next block pointer
+                    *(int*)(_viewPtr + currentBlock) = nextBlock;
+                    currentBlock = nextBlock;
                 }
 
-                // Write next block pointer
-                *(int*)(_viewPtr + currentBlock) = nextBlock;
-                currentBlock = nextBlock;
+                WriteHeader();
             }
-
-            WriteHeader();
+            finally {
+                _mmLock.Release();
+            }
 
             return startingBlock;
         }
 
         /// <inheritdoc/>
+        public override ValueTask<int> WriteBlockAsync(byte[] buffer, int numBytes, int startingBlock = 0,
+            CancellationToken ct = default) {
+            // Memory mapped I/O is synchronous (memory copy).
+            return new ValueTask<int>(WriteBlock(buffer, numBytes, startingBlock));
+        }
+
+        /// <inheritdoc/>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override void ReadBytes(byte[] buffer, int bufferOffset, int byteOffset, int numBytes) {
-            fixed (byte* bufferPtr = &buffer[bufferOffset]) {
-                Buffer.MemoryCopy(_viewPtr + byteOffset, bufferPtr, numBytes, numBytes);
+            _mmLock.Wait();
+            try {
+                fixed (byte* bufferPtr = &buffer[bufferOffset]) {
+                    Buffer.MemoryCopy(_viewPtr + byteOffset, bufferPtr, numBytes, numBytes);
+                }
+            }
+            finally {
+                _mmLock.Release();
             }
         }
 
+        /// <inheritdoc/>
         /// <inheritdoc/>
         public override void ReadBlock(byte[] buffer, int startingBlock) {
             int bufferOffset = 0;
             int blockDataSize = Header.BlockSize - 4;
             int bufferLength = buffer.Length;
 
-            fixed (byte* bufferPtr = buffer) {
-                while (startingBlock != 0 && bufferOffset < bufferLength) {
-                    int bytesToRead = Math.Min(blockDataSize, bufferLength - bufferOffset);
+            _mmLock.Wait();
+            try {
+                fixed (byte* bufferPtr = buffer) {
+                    while (startingBlock != 0 && bufferOffset < bufferLength) {
+                        int bytesToRead = Math.Min(blockDataSize, bufferLength - bufferOffset);
 
-                    // Copy data from block (skip first 4 bytes)
-                    Buffer.MemoryCopy(_viewPtr + startingBlock + 4, bufferPtr + bufferOffset, bytesToRead, bytesToRead);
+                        // Copy data from block (skip first 4 bytes)
+                        Buffer.MemoryCopy(_viewPtr + startingBlock + 4, bufferPtr + bufferOffset, bytesToRead,
+                            bytesToRead);
 
-                    bufferOffset += bytesToRead;
+                        bufferOffset += bytesToRead;
 
-                    if (bufferOffset >= bufferLength) {
-                        return;
+                        if (bufferOffset >= bufferLength) {
+                            return;
+                        }
+
+                        // Read next block pointer directly
+                        startingBlock = *(int*)(_viewPtr + startingBlock);
                     }
-
-                    // Read next block pointer directly
-                    startingBlock = *(int*)(_viewPtr + startingBlock);
                 }
             }
+            finally {
+                _mmLock.Release();
+            }
+        }
+
+        /// <inheritdoc/>
+        public override ValueTask ReadBlockAsync(byte[] buffer, int startingBlock, CancellationToken ct = default) {
+            // Sync implementation
+            ReadBlock(buffer, startingBlock);
+#if NET5_0_OR_GREATER
+            return ValueTask.CompletedTask;
+#else
+            return new ValueTask(Task.CompletedTask);
+#endif
         }
 
         /// <inheritdoc/>
         public override bool TryGetBlockOffsets(int startingBlock, out List<int> fileBlocks) {
             fileBlocks = new List<int>();
 
-            while (startingBlock != 0) {
-                fileBlocks.Add(startingBlock);
-                startingBlock = *(int*)(_viewPtr + startingBlock);
+            _mmLock.Wait();
+            try {
+                while (startingBlock != 0) {
+                    fileBlocks.Add(startingBlock);
+                    startingBlock = *(int*)(_viewPtr + startingBlock);
+                }
+            }
+            finally {
+                _mmLock.Release();
             }
 
             return true;
@@ -137,7 +223,8 @@ namespace DatReaderWriter.Lib.IO.BlockAllocators {
         /// <inheritdoc/>
         protected override void Expand(int newSizeInBytes) {
             if (newSizeInBytes <= _datStream.Length) {
-                throw new Exception($"Tried to shrink the database with Expand({newSizeInBytes:N0} bytes) when dat file is already {_datStream.Length:N0} bytes. Can't shrink a database without rewriting!");
+                throw new Exception(
+                    $"Tried to shrink the database with Expand({newSizeInBytes:N0} bytes) when dat file is already {_datStream.Length:N0} bytes. Can't shrink a database without rewriting!");
             }
 
             _datStream.SetLength(newSizeInBytes);
@@ -154,6 +241,7 @@ namespace DatReaderWriter.Lib.IO.BlockAllocators {
                 if (CanWrite) {
                     _view.Flush();
                 }
+
                 _view.SafeMemoryMappedViewHandle.ReleasePointer();
                 _viewPtr = null;
                 _view.Dispose();
@@ -163,13 +251,16 @@ namespace DatReaderWriter.Lib.IO.BlockAllocators {
             _mappedFile?.Dispose();
         }
 
-        private void UpdateViewPtr(out MemoryMappedFile mappedFile, out MemoryMappedViewAccessor view, out byte* viewPtr) {
+        private void UpdateViewPtr(out MemoryMappedFile mappedFile, out MemoryMappedViewAccessor view,
+            out byte* viewPtr) {
             if (CanWrite) {
-                mappedFile = MemoryMappedFile.CreateFromFile(_datStream, null, 0, MemoryMappedFileAccess.ReadWrite, HandleInheritability.None, true);
+                mappedFile = MemoryMappedFile.CreateFromFile(_datStream, null, 0, MemoryMappedFileAccess.ReadWrite,
+                    HandleInheritability.None, true);
                 view = mappedFile.CreateViewAccessor(0, _datStream.Length, MemoryMappedFileAccess.ReadWrite);
             }
             else {
-                mappedFile = MemoryMappedFile.CreateFromFile(_datStream, null, 0, MemoryMappedFileAccess.Read, HandleInheritability.None, true);
+                mappedFile = MemoryMappedFile.CreateFromFile(_datStream, null, 0, MemoryMappedFileAccess.Read,
+                    HandleInheritability.None, true);
                 view = mappedFile.CreateViewAccessor(0, _datStream.Length, MemoryMappedFileAccess.Read);
             }
 
@@ -194,7 +285,9 @@ namespace DatReaderWriter.Lib.IO.BlockAllocators {
                     }
                     catch { }
                 }
+
                 _datStream.Dispose();
+                _mmLock.Dispose();
             }
         }
     }

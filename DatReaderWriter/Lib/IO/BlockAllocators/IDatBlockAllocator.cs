@@ -2,6 +2,8 @@
 using DatReaderWriter.Lib.IO;
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace DatReaderWriter.Lib.IO.BlockAllocators {
     /// <summary>
@@ -66,6 +68,18 @@ namespace DatReaderWriter.Lib.IO.BlockAllocators {
         int WriteBlock(byte[] buffer, int numBytes, int startingBlock = 0);
 
         /// <summary>
+        /// Asynchronously write a buffers contents to unused block space, optionally
+        /// providing a starting block.
+        /// </summary>
+        /// <param name="buffer">The buffer to write</param>
+        /// <param name="numBytes">The number of bytes to write</param>
+        /// <param name="startingBlock">The starting block to use, or -1 to find an empty block</param>
+        /// <param name="ct">Cancellation token</param>
+        /// <returns>The offset of the newly written starting block</returns>
+        ValueTask<int> WriteBlockAsync(byte[] buffer, int numBytes, int startingBlock = 0,
+            CancellationToken ct = default);
+
+        /// <summary>
         /// Fills a buffer with contiguous data from a dat file.
         /// </summary>
         /// <param name="buffer">The buffer to read into</param>
@@ -108,5 +122,13 @@ namespace DatReaderWriter.Lib.IO.BlockAllocators {
         /// </summary>
         /// <param name="offset">The offset in the dat of the new root node</param>
         void SetRootBlock(int offset);
+
+        /// <summary>
+        /// Asynchronously read a block's data into a buffer
+        /// </summary>
+        /// <param name="buffer">The buffer to read into</param>
+        /// <param name="startingBlock">The starting block offset</param>
+        /// <param name="ct">Cancellation token</param>
+        ValueTask ReadBlockAsync(byte[] buffer, int startingBlock, CancellationToken ct = default);
     }
 }

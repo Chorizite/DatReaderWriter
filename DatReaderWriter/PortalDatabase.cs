@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DatReaderWriter {
@@ -30,15 +31,49 @@ namespace DatReaderWriter {
         public Region? Region => GetCached<Region>(0x13000000u);
 
         /// <summary>
+        /// Get an <see cref="ActionMap"/> by id
+        /// </summary>
+        public ActionMap? GetActionMap(uint id) => Get<ActionMap>(id);
+
+        /// <summary>
+        /// Get an <see cref="ActionMap"/> by id asynchronously
+        /// </summary>
+#if (NET8_0_OR_GREATER)
+        public ValueTask<ActionMap?> GetActionMapAsync(uint id, CancellationToken ct = default) =>
+            GetAsync<ActionMap>(id, ct);
+#else
+        public Task<ActionMap?> GetActionMapAsync(uint id, CancellationToken ct =
+ default) => GetAsync<ActionMap>(id, ct);
+#endif
+
+        /// <summary>
+        /// Get an <see cref="DBProperties"/> by id
+        /// </summary>
+        public DBProperties? GetDBProperties(uint id) => Get<DBProperties>(id);
+
+        /// <summary>
+        /// Get an <see cref="DBProperties"/> by id asynchronously
+        /// </summary>
+#if (NET8_0_OR_GREATER)
+        public ValueTask<DBProperties?> GetDBPropertiesAsync(uint id, CancellationToken ct = default) =>
+            GetAsync<DBProperties>(id, ct);
+#else
+        public Task<DBProperties?> GetDBPropertiesAsync(uint id, CancellationToken ct =
+ default) => GetAsync<DBProperties>(id, ct);
+#endif
+
+        /// <summary>
         /// Open a <see cref="PortalDatabase"/> (client_portal.dat)
         /// </summary>
         /// <param name="options">An action that lets you configure the options</param>
         /// <param name="blockAllocator"></param>
-        public PortalDatabase(Action<DatDatabaseOptions> options, IDatBlockAllocator? blockAllocator = null) : base(options, blockAllocator) {
+        public PortalDatabase(Action<DatDatabaseOptions> options, IDatBlockAllocator? blockAllocator = null) : base(
+            options, blockAllocator) {
             if (BlockAllocator.HasHeaderData && Header.Type != DatFileType.Portal) {
                 BlockAllocator.Dispose();
                 Tree.Dispose();
-                throw new ArgumentException($"Tried to open {Options.FilePath} as a portal database, but it's type is {Header.Type}");
+                throw new ArgumentException(
+                    $"Tried to open {Options.FilePath} as a portal database, but it's type is {Header.Type}");
             }
         }
 
@@ -51,7 +86,6 @@ namespace DatReaderWriter {
             options.FilePath = datFilePath;
             options.AccessType = accessType;
         }) {
-
         }
     }
 }

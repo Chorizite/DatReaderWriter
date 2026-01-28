@@ -7,6 +7,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace DatReaderWriter {
     /// <summary>
@@ -49,11 +51,8 @@ namespace DatReaderWriter {
         /// </summary>
         /// <param name="datDirectory"></param>
         /// <param name="datAccessType"></param>
-        public DatCollection(string datDirectory, DatAccessType datAccessType = DatAccessType.Read) : this(new DatCollectionOptions() {
-            DatDirectory = datDirectory,
-            AccessType = datAccessType
-        }) {
-
+        public DatCollection(string datDirectory, DatAccessType datAccessType = DatAccessType.Read) : this(
+            new DatCollectionOptions() { DatDirectory = datDirectory, AccessType = datAccessType }) {
         }
 
         /// <summary>
@@ -128,6 +127,30 @@ namespace DatReaderWriter {
         }
 
         /// <summary>
+        /// Read a dat file asynchronously, and caches it regardless of <see cref="DatCollectionOptions.FileCachingStrategy"/>
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="fileId"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+#if (NET8_0_OR_GREATER)
+        public async ValueTask<T?> GetCachedAsync<T>(uint fileId, CancellationToken ct = default) where T : IDBObj {
+#else
+        public async Task<T?> GetCachedAsync<T>(uint fileId, CancellationToken ct = default) where T : IDBObj {
+#endif
+            switch (TypeToDatFileType<T>()) {
+                case DatFileType.Cell:
+                    return await Cell.GetCachedAsync<T>(fileId, ct);
+                case DatFileType.Portal:
+                    return await Portal.GetCachedAsync<T>(fileId, ct) ?? await HighRes.GetCachedAsync<T>(fileId, ct);
+                case DatFileType.Local:
+                    return await Local.GetCachedAsync<T>(fileId, ct);
+                default:
+                    return default;
+            }
+        }
+
+        /// <summary>
         /// Read a dat file, returns null if the file is not found
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -136,6 +159,22 @@ namespace DatReaderWriter {
         public T? Get<T>(uint fileId) where T : IDBObj {
             TryGet<T>(fileId, out var value);
             return value;
+        }
+
+        /// <summary>
+        /// Read a dat file asynchronously, returns null if the file is not found
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="fileId"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+#if (NET8_0_OR_GREATER)
+        public async ValueTask<T?> GetAsync<T>(uint fileId, CancellationToken ct = default) where T : IDBObj {
+#else
+        public async Task<T?> GetAsync<T>(uint fileId, CancellationToken ct = default) where T : IDBObj {
+#endif
+            var (success, value) = await TryGetAsync<T>(fileId, ct);
+            return success ? value : default;
         }
 
         /// <summary>
@@ -168,7 +207,8 @@ namespace DatReaderWriter {
         public bool TryGet<T>(uint fileId, out T value) where T : IDBObj {
 #endif
             if (typeof(T) == typeof(Iteration)) {
-                throw new Exception("Iteration is not a valid type to get from a dat file collection since it is used in all dat files. Use a specific dat like datCollection.Portal.Get<Iteration>()");
+                throw new Exception(
+                    "Iteration is not a valid type to get from a dat file collection since it is used in all dat files. Use a specific dat like datCollection.Portal.Get<Iteration>()");
             }
 
             switch (TypeToDatFileType<T>()) {
@@ -179,6 +219,7 @@ namespace DatReaderWriter {
                     if (!portalRes) {
                         portalRes = HighRes.TryGet(fileId, out value);
                     }
+
                     return portalRes;
                 case DatFileType.Local:
                     return Local.TryGet(fileId, out value);
@@ -187,23 +228,36 @@ namespace DatReaderWriter {
                     return false;
             }
         }
-
-        /// <summary>
-        /// OBSOLETE: This has been replaced by <see cref="TryGet{T}(uint, out T)"/>!
-        /// </summary>
-        /// <typeparam name="T">The dat file type</typeparam>
-        /// <param name="fileId">The id of the file to get</param>
-        /// <param name="value">The unpacked file</param>
-        /// <returns></returns>
-        [Obsolete("This has been renamed to TryGet<T>(uint, out T)!")]
 #if (NET8_0_OR_GREATER)
-        public bool TryReadFile<T>(uint fileId, [MaybeNullWhen(false)] out T value) where T : IDBObj {
+        public async ValueTask<(bool Success, T? Value)> TryGetAsync<T>(uint fileId, CancellationToken ct = default)
+            where T : IDBObj {
 #else
-        public bool TryReadFile<T>(uint fileId, out T value) where T : IDBObj {
+        public async Task<(bool Success, T? Value)> TryGetAsync<T>(uint fileId, CancellationToken ct =
+ default) where T : IDBObj {
 #endif
-            return TryGet<T>(fileId, out value);
+            if (typeof(T) == typeof(Iteration)) {
+                throw new Exception(
+                    "Iteration is not a valid type to get from a dat file collection since it is used in all dat files. Use a specific dat like datCollection.Portal.Get<Iteration>()");
+            }
+
+            switch (TypeToDatFileType<T>()) {
+                case DatFileType.Cell:
+                    return await Cell.TryGetAsync<T>(fileId, ct);
+                case DatFileType.Portal:
+                    var portalRes = await Portal.TryGetAsync<T>(fileId, ct);
+                    if (!portalRes.Success) {
+                        portalRes = await HighRes.TryGetAsync<T>(fileId, ct);
+                    }
+
+                    return portalRes;
+                case DatFileType.Local:
+                    return await Local.TryGetAsync<T>(fileId, ct);
+                default:
+                    return (false, default);
+            }
         }
 
+        // Removed obsolete TryReadFile
 
 
         /// <summary>
@@ -213,7 +267,8 @@ namespace DatReaderWriter {
         /// <param name="iteration">The iteration to use. If none is passed, it will use the current files iteration if available, otherwise it will use the current dat iteration.</param>
         public Result<T, string> TryWriteFile<T>(T value, int? iteration = null) where T : IDBObj {
             if (typeof(T) == typeof(Iteration)) {
-                throw new Exception("Iteration is not a valid type to write to a dat file collection since it is used in all dat files. Use a specific dat like datCollection.Portal.TryWriteFile<Iteration>()");
+                throw new Exception(
+                    "Iteration is not a valid type to write to a dat file collection since it is used in all dat files. Use a specific dat like datCollection.Portal.TryWriteFile<Iteration>()");
             }
 
             switch (TypeToDatFileType<T>()) {
@@ -225,7 +280,39 @@ namespace DatReaderWriter {
                     return Local.TryWriteFile(value, iteration);
                 default:
                     value = default!;
-                    return "Unable to determine dat file type. Use a specific dat like datCollection.Portal.TryWriteFile<Iteration>()";
+                    return
+                        "Unable to determine dat file type. Use a specific dat like datCollection.Portal.TryWriteFile<Iteration>()";
+            }
+        }
+
+        /// <summary>
+        /// Try and write a <see cref="IDBObj"/> to the dat asynchronously.
+        /// </summary>
+        /// <param name="value">The value to write</param>
+        /// <param name="iteration">The iteration to use. If none is passed, it will use the current files iteration if available, otherwise it will use the current dat iteration.</param>
+        /// <param name="ct">Cancellation token</param>
+#if (NET8_0_OR_GREATER)
+        public async ValueTask<Result<T, string>> TryWriteFileAsync<T>(T value, int? iteration = null,
+            CancellationToken ct = default) where T : IDBObj {
+#else
+        public async Task<Result<T, string>> TryWriteFileAsync<T>(T value, int? iteration = null, CancellationToken ct =
+ default) where T : IDBObj {
+#endif
+            if (typeof(T) == typeof(Iteration)) {
+                throw new Exception(
+                    "Iteration is not a valid type to write to a dat file collection since it is used in all dat files. Use a specific dat like datCollection.Portal.TryWriteFile<Iteration>()");
+            }
+
+            switch (TypeToDatFileType<T>()) {
+                case DatFileType.Cell:
+                    return await Cell.TryWriteFileAsync(value, iteration, ct);
+                case DatFileType.Portal:
+                    return await Portal.TryWriteFileAsync(value, iteration, ct);
+                case DatFileType.Local:
+                    return await Local.TryWriteFileAsync(value, iteration, ct);
+                default:
+                    return
+                        "Unable to determine dat file type. Use a specific dat like datCollection.Portal.TryWriteFile<Iteration>()";
             }
         }
 
@@ -234,8 +321,11 @@ namespace DatReaderWriter {
         /// </summary>
         /// <returns>The DatFileType this entry is stored in</returns>
         public DatFileType TypeToDatFileType<T>() where T : IDBObj {
-            var typeCacheVal = DBObjAttributeCache.TypeCache.Values.FirstOrDefault(t => t.Type == typeof(T));
-            return typeCacheVal?.DatFileType ?? DatFileType.Undefined;
+            if (DBObjAttributeCache.TypeCache.TryGetValue(typeof(T), out var attr)) {
+                return attr.DatFileType;
+            }
+
+            return DatFileType.Undefined;
         }
 
         /// <summary>
