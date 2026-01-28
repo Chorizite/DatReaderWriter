@@ -18,26 +18,6 @@ namespace DatReaderWriter {
     /// </summary>
     public partial class CellDatabase : DatDatabase {
         /// <summary>
-        /// Get a <see cref="LandBlock"/> entirely from the cell.dat
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public LandBlock? GetLandBlock(uint id) => Get<LandBlock>(id);
-
-        /// <summary>
-        /// Get a <see cref="LandBlock"/> entirely from the cell.dat asynchronously
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
-#if (NET8_0_OR_GREATER)
-        public ValueTask<LandBlock?> GetLandBlockAsync(uint id, CancellationToken ct = default) =>
-            GetAsync<LandBlock>(id, ct);
-#else
-        public Task<LandBlock?> GetLandBlockAsync(uint id, CancellationToken ct =
- default) => GetAsync<LandBlock>(id, ct);
-#endif
-        /// <summary>
         /// Open a <see cref="CellDatabase"/>.
         /// </summary>
         /// <param name="options">An action that lets you configure the options</param>

@@ -30,37 +30,6 @@ namespace DatReaderWriter {
         /// </summary>
         public Region? Region => GetCached<Region>(0x13000000u);
 
-        /// <summary>
-        /// Get an <see cref="ActionMap"/> by id
-        /// </summary>
-        public ActionMap? GetActionMap(uint id) => Get<ActionMap>(id);
-
-        /// <summary>
-        /// Get an <see cref="ActionMap"/> by id asynchronously
-        /// </summary>
-#if (NET8_0_OR_GREATER)
-        public ValueTask<ActionMap?> GetActionMapAsync(uint id, CancellationToken ct = default) =>
-            GetAsync<ActionMap>(id, ct);
-#else
-        public Task<ActionMap?> GetActionMapAsync(uint id, CancellationToken ct =
- default) => GetAsync<ActionMap>(id, ct);
-#endif
-
-        /// <summary>
-        /// Get an <see cref="DBProperties"/> by id
-        /// </summary>
-        public DBProperties? GetDBProperties(uint id) => Get<DBProperties>(id);
-
-        /// <summary>
-        /// Get an <see cref="DBProperties"/> by id asynchronously
-        /// </summary>
-#if (NET8_0_OR_GREATER)
-        public ValueTask<DBProperties?> GetDBPropertiesAsync(uint id, CancellationToken ct = default) =>
-            GetAsync<DBProperties>(id, ct);
-#else
-        public Task<DBProperties?> GetDBPropertiesAsync(uint id, CancellationToken ct =
- default) => GetAsync<DBProperties>(id, ct);
-#endif
 
         /// <summary>
         /// Open a <see cref="PortalDatabase"/> (client_portal.dat)
