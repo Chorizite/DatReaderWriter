@@ -1,4 +1,3 @@
-
 # DatReaderWriter
 
 DatReaderWriter is an open-source library for reading and writing .dat files used by the game Asheron's Call. This tool allows players and developers to access and modify game data files for various purposes, such as creating mods or analyzing game content.
@@ -7,119 +6,136 @@ DatReaderWriter is an open-source library for reading and writing .dat files use
 
 - [Features](#features)
 - [Installation](#installation)
+- [Core Concepts](#core-concepts)
 - [Basic Usage](#basic-usage)
 	- [Getting Started](#getting-started)
     - [Update spell names and descriptions](#update-spell-names-and-descriptions)
     - [Rewrite all MotionTables to be 100x speed](#rewrite-all-motiontables-to-be-100x-speed)
-- [Todo](#todo)
 - [Contributing](#contributing)
 - [Thanks](#thanks)
 - [License](#license)
 
 ## Features
 
-- Read/Write AC end-of-retail .dat files (Including creating new dats!)
-- Full Dat BTree seeking / insertion / removal / range queries
-- Built-in caching options
-- net8.0;netstandard2.0;net48 nuget packages
-- *Most* DBObj file formats are in the dats.xml, which could be potentially used to generate readerwriters in other languages
+- **Read/Write Support**: Full support for reading and writing AC end-of-retail .dat files (`client_portal.dat`, `client_cell_1.dat`, `client_local_English.dat`, `client_highres.dat`).
+- **Data Structures**: Full BTree seeking, insertion, removal, and range queries.
+- **Caching**: Built-in caching options (`OnDemand`, `None`, etc.) to optimize performance.
+- **Async API**: Full async support for IO operations.
+- **Cross-Platform**: Targets `net8.0`, `netstandard2.0`, and `net48`.
+
+## Installation
+
+Install the `Chorizite.DatReaderWriter` package from NuGet:
+
+```bash
+dotnet add package Chorizite.DatReaderWriter
+```
+
+## Core Concepts
+
+### DatCollection
+The `DatCollection` class is the main entry point if you want to work with the standard set of AC dat files. It manages `Portal`, `Cell`, `Local`, and `HighRes` databases together, allowing for cross-reference lookups (though explicit database access is recommended for specific types).
+
+### Individual Databases
+You can also open individual dat files using `PortalDatabase`, `CellDatabase`, etc. This gives you more granular control and is often preferred when you know exactly which file you are modifying.
 
 ## Basic Usage
 
-- Install `Chorizite.DatReaderWriter` package from nuget.org
-- See Tests for further usage.  
-
 ### Getting Started
+
 ```cs
+using DatReaderWriter;
+using DatReaderWriter.Enums;
+using DatReaderWriter.Options;
+using DatReaderWriter.DBObjs;
+
 // Open a set of dat file for reading. This will open all the eor dat files as a single collection.
-// (client_portal.dat, client_cell_1.dat, client_local_English.dat, and client_highres.dat)
 var datPath = @"C:\Turbing\Asheron's Call\";
-var dats= new DatCollection(EORCommonData.DatDirectory, DatAccessType.ReadWrite);
+using var dats = new DatCollection(datPath, DatAccessType.Read);
 
-// read files
-LayoutDesc? layoutDesc = dats.Get<LayoutDesc>(0x21000000u);
+// Read a file explicitly from the Portal database
+// We use the specific database (Portal) here for clarity and reliability
+Region? region = dats.Portal.Get<Region>(0x13000000u);
 
-// check iteration of portal dat
+if (region != null) {
+    Console.WriteLine($"Region Name: {region.RegionName}");
+}
+
+// Check iteration of portal dat
 Console.WriteLine($"Portal Iteration: {dats.Portal.Iteration.CurrentIteration}");
 
-// get ids of all Animations
-IEnumerable<uint> allAnimationIds = dats.GetAllIdsOfType<Animation>();
-
-// determine type from a file id
-var type = dats.Local.TypeFromId(0x21000000u);
-Assert.AreEqual(DBObjType.LayoutDesc, type);
-
-// write a file with a new iteration
-StringTable? stringTable = dats.Get<StringTable>(0x23000001u) ?? throw new Exception("StringTable not found");
-stringTable.StringTableData.Add(0x1234u, new StringTableData() {
-    Strings = ["foo", "bar"]
-});
-var newIteration = dats.Local.Iteration.CurrentIteration + 1;
-if (!dats.TryWriteFile(stringTable, newIteration)) throw new Exception($"Failed to write StringTable");
-
-// Dispose dat collection to flush any changes and close the files
-dats.Dispose();
+// Determine type from a file id (using the specific database)
+var type = dats.Portal.TypeFromId(0x13000000u);
+// Returns DBObjType.Region
 ```
 
 ### Update spell names and descriptions
+
 ```cs
-var portalDat = new PortalDatabase(Path.Combine(config.clientDir, "client_portal.dat"), DatAccessType.ReadWrite);
+var portalPath = Path.Combine(datPath, "client_portal.dat");
+using var portalDat = new PortalDatabase(portalPath, DatAccessType.ReadWrite);
+
+// Access the SpellTable directly via the property on PortalDatabase
 var spellTable = portalDat.SpellTable ?? throw new Exception("Failed to read spell table");
 
-// update spell name / description (no need to worry about updating Components with newly
-// encrypted values, they will be transparently decrypted/encrypted during (un)packing).
-spellTable.Spells[1].Name = "Strength Other I (updated)";
-spellTable.Spells[1].Description = "Increases the target's Strength by 10 points. (updated)";
+// Update spell name / description
+// (Changes are in memory until validly written back)
+if (spellTable.Spells.ContainsKey(1)) {
+    spellTable.Spells[1].Name = "Strength Other I (updated)";
+    spellTable.Spells[1].Description = "Increases the target's Strength by 10 points. (updated)";
 
-//write the updated spell table
-if (!portalDat.TryWriteFile(spellTable)) {
-    throw new Exception("Failed to write spell table");
+    // Write the updated spell table back to the dat
+    if (!portalDat.TryWriteFile(spellTable)) {
+        throw new Exception("Failed to write spell table");
+    }
 }
-
-// close dat
-portalDat.Dispose();
 ```
 
 ### Rewrite all MotionTables to be 100x speed
+
 ```cs  
-var portalDat = new PortalDatabase(Path.Combine(config.clientDir, "client_portal.dat"), DatAccessType.ReadWrite);
+using DatReaderWriter.DBObjs;
 
-// loop through all motion tables and update framerates
-foreach (var mTable in portalDat.MotionTables) {
-    // build a list of all animations
-    var anims = new List<AnimData>();
-    anims.AddRange(mTable.Cycles.Values.SelectMany(c => c.Anims));
-    anims.AddRange(mTable.Modifiers.Values.SelectMany(c => c.Anims));
-    anims.AddRange(mTable.Links.Values.SelectMany(v => v.MotionData.Values.SelectMany(c => c.Anims)));
+// ... (dats initialized as above)
+var portalPath = Path.Combine(datPath, "client_portal.dat");
+using var portalDat = new PortalDatabase(portalPath, DatAccessType.ReadWrite);
 
-    // update all animation framerates
-    foreach (var anim in anims) {
-        anim.Framerate *= 100f;
+// Get all MotionTable IDs
+// (This scans the database for files matching the MotionTable type ID range)
+var motionTableIds = portalDat.GetAllIdsOfType<MotionTable>();
+
+foreach (var id in motionTableIds) {
+    // Read the file
+    if (portalDat.TryGet<MotionTable>(id, out var mTable)) {
+        // Update framerates in cycles
+        foreach (var cycle in mTable.Cycles.Values) {
+            foreach (var anim in cycle.Anims) {
+                anim.Framerate *= 100f;
+            }
+        }
+        
+        // Update framerates in modifiers
+        foreach (var modifier in mTable.Modifiers.Values) {
+            foreach (var anim in modifier.Anims) {
+                anim.Framerate *= 100f;
+            }
+        }
+
+        // Write the updated MotionTable back
+        portalDat.TryWriteFile(mTable);
     }
-
-    // write MotionTable back to the dat
-    portalDat.TryWriteFile(mTable);
 }
-
-// close dat
-portalDat.Dispose();
 ```
-
-## Todo
-- Support for older dat formats
-- Clean up source gen so the library can be generated in other languages (kaitai struct?)
-- DBObjs left to implement:
-    - RenderMaterial
 
 ## Contributing
 
 We welcome contributions from the community! If you would like to contribute to DatReaderWriter, please follow these steps:
 
 1. Fork the repository.
-2. Create a new branch (git checkout -b feature-branch).
+2. Create a new branch (`git checkout -b feature-branch`).
 3. Make your changes.
-4. Commit your changes (git commit -am 'Add some feature').
-5. Push to the branch (git push origin feature-branch).
+4. Commit your changes (`git commit -am 'Add some feature'`).
+5. Push to the branch (`git push origin feature-branch`).
 6. Create a new Pull Request.
 
 ## Thanks

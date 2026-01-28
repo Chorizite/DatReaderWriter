@@ -3473,6 +3473,10 @@
             <field name="_bucketSize" type="byte" />
             <field name="_numElements" type="CompressedUInt"/>
         </type>
+        <type name="PStringBase" genericValue="byte">
+            <field name="_bucketSize" type="byte" />
+            <field name="Value" type="string"/>
+        </type>
     </types>
     <dats>
         <dat name="portal" text="client_portal.dat" type="DatFileType.Portal">
