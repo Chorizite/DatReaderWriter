@@ -80,6 +80,33 @@
 		<ProjectReference Include="..\DatReaderWriter.SourceGenerator\DatReaderWriter.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
 	</ItemGroup>
 
+	<PropertyGroup>
+		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+		<CompilerGeneratedFilesOutputPath>$(BaseIntermediateOutputPath)GeneratedFiles</CompilerGeneratedFilesOutputPath>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Remove="Generated\**\*.cs" />
+	</ItemGroup>
+
+	<Target Name="OrganizeGeneratedFiles" AfterTargets="CoreCompile">
+		<PropertyGroup>
+			<GenSourceDir>$(CompilerGeneratedFilesOutputPath)\DatReaderWriter.SourceGenerator\DatReaderWriter.SourceGenerator.DatsSourceGenerator</GenSourceDir>
+		</PropertyGroup>
+
+		<ItemGroup>
+			<TypesFiles Include="$(GenSourceDir)\Types\*.cs" />
+			<DBObjsFiles Include="$(GenSourceDir)\DBObjs\*.cs" />
+			<EnumsFiles Include="$(GenSourceDir)\Enums\*.cs" />
+			<ReadersFiles Include="$(GenSourceDir)\DatabaseReaders\*.cs" />
+		</ItemGroup>
+
+		<Copy SourceFiles="@(TypesFiles)" DestinationFolder="Generated\Types" SkipUnchangedFiles="true" />
+		<Copy SourceFiles="@(DBObjsFiles)" DestinationFolder="Generated\DBObjs" SkipUnchangedFiles="true" />
+		<Copy SourceFiles="@(EnumsFiles)" DestinationFolder="Generated\Enums" SkipUnchangedFiles="true" />
+		<Copy SourceFiles="@(ReadersFiles)" DestinationFolder="Generated\DatabaseReaders" SkipUnchangedFiles="true" />
+	</Target>
+
 	<ItemGroup>
 		<AdditionalFiles Include="dats.xml" />
 	</ItemGroup>
