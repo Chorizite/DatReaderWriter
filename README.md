@@ -11,6 +11,7 @@ DatReaderWriter is an open-source library for reading and writing .dat files use
 	- [Getting Started](#getting-started)
     - [Update spell names and descriptions](#update-spell-names-and-descriptions)
     - [Rewrite all MotionTables to be 100x speed](#rewrite-all-motiontables-to-be-100x-speed)
+- [Known Issues](#known-issues)
 - [Contributing](#contributing)
 - [Thanks](#thanks)
 - [License](#license)
@@ -57,6 +58,9 @@ using var dats = new DatCollection(datPath, DatAccessType.Read);
 // We use the specific database (Portal) here for clarity and reliability
 Region? region = dats.Portal.Get<Region>(0x13000000u);
 
+// this works as well, directly from the collection
+region = dats.Get<Region>(0x13000000u);
+
 if (region != null) {
     Console.WriteLine($"Region Name: {region.RegionName}");
 }
@@ -67,6 +71,13 @@ Console.WriteLine($"Portal Iteration: {dats.Portal.Iteration.CurrentIteration}")
 // Determine type from a file id (using the specific database)
 var type = dats.Portal.TypeFromId(0x13000000u);
 // Returns DBObjType.Region
+
+// Some types will include QualifiedDataIds<TDBObj> that reference other files
+// You can call QualifiedDataId.Get(datCollection) to get the actual file object
+if (!dat.TryGet<GfxObj>(0x010005E8, out var gfxObj)) {
+    throw new Exception($"Failed to read GfxObj: 0x010005E8");
+}
+var surface = gfxObj.Surfaces.First().Get(dat);
 ```
 
 ### Update spell names and descriptions
@@ -126,6 +137,10 @@ foreach (var id in motionTableIds) {
     }
 }
 ```
+
+## Known Issues
+- RenderMaterial files are not yet supported.
+- LayoutDesc files are supported, but the structure will need to be cleaned up in future versions.
 
 ## Contributing
 
