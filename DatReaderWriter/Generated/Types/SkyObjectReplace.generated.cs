@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using DatReaderWriter.Enums;
+using DatReaderWriter.DBObjs;
 using DatReaderWriter.Lib;
 using DatReaderWriter.Lib.Attributes;
 using DatReaderWriter.Lib.IO;
@@ -16,7 +17,7 @@ namespace DatReaderWriter.Types {
     public partial class SkyObjectReplace : IDatObjType {
         public uint ObjectIndex;
 
-        public uint GFXObjId;
+        public QualifiedDataId<GfxObj> GfxObjId = new();
 
         public float Rotate;
 
@@ -29,7 +30,7 @@ namespace DatReaderWriter.Types {
         /// <inheritdoc />
         public bool Unpack(DatBinReader reader) {
             ObjectIndex = reader.ReadUInt32();
-            GFXObjId = reader.ReadUInt32();
+            GfxObjId = reader.ReadItem<QualifiedDataId<GfxObj>>();
             Rotate = reader.ReadSingle();
             Transparent = reader.ReadSingle();
             Luminosity = reader.ReadSingle();
@@ -40,7 +41,7 @@ namespace DatReaderWriter.Types {
         /// <inheritdoc />
         public bool Pack(DatBinWriter writer) {
             writer.WriteUInt32(ObjectIndex);
-            writer.WriteUInt32(GFXObjId);
+            writer.WriteItem<QualifiedDataId<GfxObj>>(GfxObjId);
             writer.WriteSingle(Rotate);
             writer.WriteSingle(Transparent);
             writer.WriteSingle(Luminosity);

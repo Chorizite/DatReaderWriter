@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using DatReaderWriter.Enums;
+using DatReaderWriter.DBObjs;
 using DatReaderWriter.Lib;
 using DatReaderWriter.Lib.Attributes;
 using DatReaderWriter.Lib.IO;
@@ -19,17 +20,17 @@ namespace DatReaderWriter.Types {
     public partial class HeritageGroupCG : IDatObjType {
         public string Name;
 
-        public uint IconId;
+        public QualifiedDataId<RenderSurface> IconId = new();
 
         /// <summary>
         /// Basic character model
         /// </summary>
-        public uint SetupId;
+        public QualifiedDataId<Setup> SetupId = new();
 
         /// <summary>
         /// This is the background environment used during character creation
         /// </summary>
-        public uint EnvironmentSetupId;
+        public QualifiedDataId<Setup> EnvironmentSetupId = new();
 
         /// <summary>
         /// Starting attribute credits
@@ -49,16 +50,14 @@ namespace DatReaderWriter.Types {
 
         public List<TemplateCG> Templates = [];
 
-        public byte UnknownByte;
-
-        public Dictionary<int, SexCG> Genders = [];
+        public HashTable<int, SexCG> Genders = [];
 
         /// <inheritdoc />
         public bool Unpack(DatBinReader reader) {
             Name = reader.ReadString();
-            IconId = reader.ReadUInt32();
-            SetupId = reader.ReadUInt32();
-            EnvironmentSetupId = reader.ReadUInt32();
+            IconId = reader.ReadItem<QualifiedDataId<RenderSurface>>();
+            SetupId = reader.ReadItem<QualifiedDataId<Setup>>();
+            EnvironmentSetupId = reader.ReadItem<QualifiedDataId<Setup>>();
             AttributeCredits = reader.ReadUInt32();
             SkillCredits = reader.ReadUInt32();
             var _numPrimaryStartAreas = reader.ReadCompressedUInt();
@@ -77,22 +76,16 @@ namespace DatReaderWriter.Types {
             for (var i=0; i < _numTemplates; i++) {
                 Templates.Add(reader.ReadItem<TemplateCG>());
             }
-            UnknownByte = reader.ReadByte();
-            var _numGenders = reader.ReadCompressedUInt();
-            for (var i=0; i < _numGenders; i++) {
-                var _key = reader.ReadInt32();
-                var _val = reader.ReadItem<SexCG>();
-                Genders.Add(_key, _val);
-            }
+            Genders = reader.ReadItem<HashTable<int, SexCG>>();
             return true;
         }
 
         /// <inheritdoc />
         public bool Pack(DatBinWriter writer) {
             writer.WriteString(Name);
-            writer.WriteUInt32(IconId);
-            writer.WriteUInt32(SetupId);
-            writer.WriteUInt32(EnvironmentSetupId);
+            writer.WriteItem<QualifiedDataId<RenderSurface>>(IconId);
+            writer.WriteItem<QualifiedDataId<Setup>>(SetupId);
+            writer.WriteItem<QualifiedDataId<Setup>>(EnvironmentSetupId);
             writer.WriteUInt32(AttributeCredits);
             writer.WriteUInt32(SkillCredits);
             writer.WriteCompressedUInt((uint)PrimaryStartAreas.Count());
@@ -111,12 +104,7 @@ namespace DatReaderWriter.Types {
             foreach (var item in Templates) {
                 writer.WriteItem<TemplateCG>(item);
             }
-            writer.WriteByte(UnknownByte);
-            writer.WriteCompressedUInt((uint)Genders.Count());
-            foreach (var kv in Genders) {
-                writer.WriteInt32(kv.Key);
-                writer.WriteItem<SexCG>(kv.Value);
-            }
+            writer.WriteItem<HashTable<int, SexCG>>(Genders);
             return true;
         }
 

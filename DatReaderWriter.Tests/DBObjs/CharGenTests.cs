@@ -39,16 +39,14 @@ namespace DatReaderWriter.Tests.DBObjs {
         [TestMethod]
         [TestCategory("EOR")]
         public void CanReadEORCharGenTable() {
-            using var dat = new DatDatabase(options => {
-                options.FilePath = Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat");
-                options.IndexCachingStrategy = IndexCachingStrategy.Never;
-            });
+            using var dat = new DatCollection(EORCommonData.DatDirectory);
 
 
             var res = dat.TryGet<CharGen>(0xE000002, out var chargen);
             Assert.IsTrue(res);
             Assert.IsNotNull(chargen);
             Assert.AreEqual(0xE000002u, chargen.Id);
+            
 
             Assert.AreEqual(5, chargen.StartingAreas.Count);
             Assert.AreEqual("Holtburg", chargen.StartingAreas[0].Name);

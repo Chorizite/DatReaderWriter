@@ -30,20 +30,14 @@ namespace DatReaderWriter.DBObjs {
 
         public uint Height;
 
-        public Dictionary<uint, ElementDesc> Elements = [];
+        public HashTable<uint, ElementDesc> Elements = [];
 
         /// <inheritdoc />
         public override bool Unpack(DatBinReader reader) {
             base.Unpack(reader);
             Width = reader.ReadUInt32();
             Height = reader.ReadUInt32();
-            var _elementsBucketSizeIndex = reader.ReadByte();
-            var _numElements = reader.ReadCompressedUInt();
-            for (var i=0; i < _numElements; i++) {
-                var _key = reader.ReadUInt32();
-                var _val = reader.ReadItem<ElementDesc>();
-                Elements.Add(_key, _val);
-            }
+            Elements = reader.ReadItem<HashTable<uint, ElementDesc>>();
             return true;
         }
 
@@ -52,12 +46,7 @@ namespace DatReaderWriter.DBObjs {
             base.Pack(writer);
             writer.WriteUInt32(Width);
             writer.WriteUInt32(Height);
-            writer.WriteByte(1);
-            writer.WriteCompressedUInt((uint)Elements.Count());
-            foreach (var kv in Elements) {
-                writer.WriteUInt32(kv.Key);
-                writer.WriteItem<ElementDesc>(kv.Value);
-            }
+            writer.WriteItem<HashTable<uint, ElementDesc>>(Elements);
             return true;
         }
     }

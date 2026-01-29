@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using DatReaderWriter.Enums;
+using DatReaderWriter.DBObjs;
 using DatReaderWriter.Lib;
 using DatReaderWriter.Lib.Attributes;
 using DatReaderWriter.Lib.IO;
@@ -19,13 +20,13 @@ namespace DatReaderWriter.Types {
 
         public ushort PartIndex;
 
-        public uint PartId;
+        public PackedQualifiedDataId<GfxObj> PartId = new();
 
         /// <inheritdoc />
         public override bool Unpack(DatBinReader reader) {
             base.Unpack(reader);
             PartIndex = reader.ReadUInt16();
-            PartId = reader.ReadDataIdOfKnownType(0x01000000);
+            PartId = reader.ReadItem<PackedQualifiedDataId<GfxObj>>();
             return true;
         }
 
@@ -33,7 +34,7 @@ namespace DatReaderWriter.Types {
         public override bool Pack(DatBinWriter writer) {
             base.Pack(writer);
             writer.WriteUInt16(PartIndex);
-            writer.WriteDataIdOfKnownType(PartId, 0x01000000);
+            writer.WriteItem<PackedQualifiedDataId<GfxObj>>(PartId);
             return true;
         }
 

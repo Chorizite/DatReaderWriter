@@ -8,26 +8,27 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using DatReaderWriter.Enums;
+using DatReaderWriter.DBObjs;
 using DatReaderWriter.Lib;
 using DatReaderWriter.Lib.Attributes;
 using DatReaderWriter.Lib.IO;
 
 namespace DatReaderWriter.Types {
     public partial class FaceStripCG : IDatObjType {
-        public uint IconId;
+        public QualifiedDataId<RenderSurface> IconId = new();
 
         public ObjDesc ObjDesc;
 
         /// <inheritdoc />
         public bool Unpack(DatBinReader reader) {
-            IconId = reader.ReadUInt32();
+            IconId = reader.ReadItem<QualifiedDataId<RenderSurface>>();
             ObjDesc = reader.ReadItem<ObjDesc>();
             return true;
         }
 
         /// <inheritdoc />
         public bool Pack(DatBinWriter writer) {
-            writer.WriteUInt32(IconId);
+            writer.WriteItem<QualifiedDataId<RenderSurface>>(IconId);
             writer.WriteItem<ObjDesc>(ObjDesc);
             return true;
         }

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using DatReaderWriter.Lib.IO;
 using DatReaderWriter.Types;
 
 namespace DatReaderWriter.Lib {
@@ -63,7 +62,6 @@ namespace DatReaderWriter.Lib {
                 if (key is StringBase strKey) {
                     return (ulong)strKey.GetHashCode();
                 }
-                
                 return sizeof(TKey) switch {
                     1 => *(byte*)&key,
                     2 => *(ushort*)&key,
@@ -72,56 +70,6 @@ namespace DatReaderWriter.Lib {
                     _ => throw new System.NotSupportedException(
                         $"Key type size {sizeof(TKey)} not supported for modulus operation")
                 };
-            }
-        }
-    }
-
-    public static class DatReaderWriterExtensions {
-        public static T ReadGeneric<T>(this DatBinReader reader) {
-            var type = typeof(T);
-            if (type == typeof(uint)) return (T)(object)reader.ReadUInt32();
-            if (type == typeof(int)) return (T)(object)reader.ReadInt32();
-            if (type == typeof(ulong)) return (T)(object)reader.ReadUInt64();
-            if (type == typeof(long)) return (T)(object)reader.ReadInt64();
-            if (type == typeof(ushort)) return (T)(object)reader.ReadUInt16();
-            if (type == typeof(short)) return (T)(object)reader.ReadInt16();
-            if (type == typeof(byte)) return (T)(object)reader.ReadByte();
-            if (type == typeof(sbyte)) return (T)(object)reader.ReadSByte();
-            if (type == typeof(bool)) return (T)(object)reader.ReadBool();
-            if (type == typeof(float)) return (T)(object)reader.ReadSingle();
-            if (type == typeof(double)) return (T)(object)reader.ReadDouble();
-            if (type == typeof(string)) return (T)(object)reader.ReadString16L();
-            if (type == typeof(Guid)) return (T)(object)reader.ReadGuid();
-
-            if (typeof(IUnpackable).IsAssignableFrom(type)) {
-                var item = (IUnpackable)Activator.CreateInstance(type);
-                item.Unpack(reader);
-                return (T)item;
-            }
-
-            throw new NotSupportedException($"Type {type.Name} is not supported by ReadGeneric.");
-        }
-
-        public static void WriteGeneric<T>(this DatBinWriter writer, T value) {
-            var type = typeof(T);
-            if (type == typeof(uint)) writer.WriteUInt32((uint)(object)value);
-            else if (type == typeof(int)) writer.WriteInt32((int)(object)value);
-            else if (type == typeof(ulong)) writer.WriteUInt64((ulong)(object)value);
-            else if (type == typeof(long)) writer.WriteInt64((long)(object)value);
-            else if (type == typeof(ushort)) writer.WriteUInt16((ushort)(object)value);
-            else if (type == typeof(short)) writer.WriteInt16((short)(object)value);
-            else if (type == typeof(byte)) writer.WriteByte((byte)(object)value);
-            else if (type == typeof(sbyte)) writer.WriteSByte((sbyte)(object)value);
-            else if (type == typeof(bool)) writer.WriteBool((bool)(object)value);
-            else if (type == typeof(float)) writer.WriteSingle((float)(object)value);
-            else if (type == typeof(double)) writer.WriteDouble((double)(object)value);
-            else if (type == typeof(string)) writer.WriteString16L((string)(object)value);
-            else if (type == typeof(Guid)) writer.WriteGuid((Guid)(object)value);
-            else if (value is IPackable packable) {
-                packable.Pack(writer);
-            }
-            else {
-                throw new NotSupportedException($"Type {type.Name} is not supported by WriteGeneric.");
             }
         }
     }

@@ -8,13 +8,14 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using DatReaderWriter.Enums;
+using DatReaderWriter.DBObjs;
 using DatReaderWriter.Lib;
 using DatReaderWriter.Lib.Attributes;
 using DatReaderWriter.Lib.IO;
 
 namespace DatReaderWriter.Types {
     public partial class TerrainTex : IDatObjType {
-        public uint TexGID;
+        public QualifiedDataId<SurfaceTexture> TextureId = new();
 
         public uint TexTiling;
 
@@ -32,11 +33,11 @@ namespace DatReaderWriter.Types {
 
         public uint DetailTexTiling;
 
-        public uint DetailTexGID;
+        public QualifiedDataId<SurfaceTexture> DetailTextureId = new();
 
         /// <inheritdoc />
         public bool Unpack(DatBinReader reader) {
-            TexGID = reader.ReadUInt32();
+            TextureId = reader.ReadItem<QualifiedDataId<SurfaceTexture>>();
             TexTiling = reader.ReadUInt32();
             MaxVertBright = reader.ReadUInt32();
             MinVertBright = reader.ReadUInt32();
@@ -45,13 +46,13 @@ namespace DatReaderWriter.Types {
             MaxVertHue = reader.ReadUInt32();
             MinVertHue = reader.ReadUInt32();
             DetailTexTiling = reader.ReadUInt32();
-            DetailTexGID = reader.ReadUInt32();
+            DetailTextureId = reader.ReadItem<QualifiedDataId<SurfaceTexture>>();
             return true;
         }
 
         /// <inheritdoc />
         public bool Pack(DatBinWriter writer) {
-            writer.WriteUInt32(TexGID);
+            writer.WriteItem<QualifiedDataId<SurfaceTexture>>(TextureId);
             writer.WriteUInt32(TexTiling);
             writer.WriteUInt32(MaxVertBright);
             writer.WriteUInt32(MinVertBright);
@@ -60,7 +61,7 @@ namespace DatReaderWriter.Types {
             writer.WriteUInt32(MaxVertHue);
             writer.WriteUInt32(MinVertHue);
             writer.WriteUInt32(DetailTexTiling);
-            writer.WriteUInt32(DetailTexGID);
+            writer.WriteItem<QualifiedDataId<SurfaceTexture>>(DetailTextureId);
             return true;
         }
 

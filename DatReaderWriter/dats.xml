@@ -2613,7 +2613,7 @@
             <field name="Direction" type="AnimationHookDir"/>
             <typeswitch name="_hookType">
                 <type name="SoundHook" value="AnimationHookType.Sound">
-                    <field name="Id" type="uint"/>
+                    <vector name="Id" type="QualifiedDataId" genericValue="Wave"/>
                 </type>
                 <type name="SoundTableHook" value="AnimationHookType.SoundTable">
                     <field name="SoundType" type="Sound"/>
@@ -2623,7 +2623,7 @@
                 </type>
                 <type name="ReplaceObjectHook" value="AnimationHookType.ReplaceObject">
                     <field name="PartIndex" type="ushort"/>
-                    <field name="PartId" type="DataIdOfKnownType" knownType="0x01000000"/>
+                    <vector name="PartId" type="PackedQualifiedDataId" genericValue="GfxObj" />
                 </type>
                 <type name="EtherealHook" value="AnimationHookType.Ethereal">
                     <field name="Ethereal" type="bool"/>
@@ -2661,7 +2661,7 @@
                     <field name="Time" type="float"/>
                 </type>
                 <type name="CreateParticleHook" value="AnimationHookType.CreateParticle">
-                    <field name="EmitterInfoId" type="uint"/>
+                    <vector name="EmitterInfoId" type="QualifiedDataId" genericValue="ParticleEmitter"/>
                     <field name="PartIndex" type="uint"/>
                     <field name="Offset" type="Frame"/>
                     <field name="EmitterId" type="uint"/>
@@ -2688,7 +2688,7 @@
                     <field name="Time" type="float"/>
                 </type>
                 <type name="SoundTweakedHook" value="AnimationHookType.SoundTweaked">
-                    <field name="SoundID" type="uint"/>
+                    <vector name="SoundId" type="QualifiedDataId" genericValue="Wave"/>
                     <field name="Priority" type="float"/>
                     <field name="Probability" type="float"/>
                     <field name="Volume" type="float"/>
@@ -2741,7 +2741,7 @@
             <field name="Height" type="float"/>
         </type>
         <type name="AnimData">
-            <field name="AnimId" type="uint"/>
+            <vector name="AnimId" type="QualifiedDataId" genericValue="Animation"/>
             <field name="LowFrame" type="int"/>
             <field name="HighFrame" type="int"/>
             <field name="Framerate" type="float"/>
@@ -2782,7 +2782,7 @@
             <field name="ZeroYear" type="uint"/>
             <field name="DayLength" type="float"/>
             <field name="DaysPerYear" type="uint"/>
-            <field name="YearSpec" type="string"/>
+            <vector name="YearSpec" type="AC1LegacyPStringBase" genericValue="byte"/>
             <align type="uint"/>
             <field name="_numTimesOfDay" type="uint"/>
             <vector name="TimesOfDay" length="_numTimesOfDay" type="List" genericValue="TimeOfDay"/>
@@ -2794,12 +2794,12 @@
         <type name="TimeOfDay">
             <field name="Start" type="float"/>
             <field name="IsNight" type="bool" size="4"/>
-            <field name="Name" type="string"/>
+            <vector name="Name" type="AC1LegacyPStringBase" genericValue="byte"/>
             <align type="uint"/>
         </type>
         <type name="Season">
             <field name="Start" type="uint"/>
-            <field name="Name" type="string"/>
+            <vector name="Name" type="AC1LegacyPStringBase" genericValue="byte"/>
             <align type="uint"/>
         </type>
         <type name="SkyDesc">
@@ -2810,7 +2810,7 @@
         </type>
         <type name="DayGroup">
             <field name="ChanceOfOccur" type="float"/>
-            <field name="DayName" type="string"/>
+            <vector name="DayName" type="AC1LegacyPStringBase" genericValue="byte"/>
             <align type="uint"/>
             <field name="_numSkyObjects" type="uint"/>
             <vector name="SkyObjects" length="_numSkyObjects" type="List" genericValue="SkyObject"/>
@@ -2824,8 +2824,8 @@
             <field name="EndAngle" type="float"/>
             <field name="TexVelocityX" type="float"/>
             <field name="TexVelocityY" type="float"/>
-            <field name="DefaultGFXObjectId" type="uint"/>
-            <field name="DefaultPESObjectId" type="uint"/>
+            <vector name="DefaultGfxObjectId" type="QualifiedDataId" genericValue="GfxObj"/>
+            <vector name="DefaultPesObjectId" type="QualifiedDataId" genericValue="PhysicsScript"/>
             <field name="Properties" type="uint"/>
         </type>
         <type name="SkyTimeOfDay">
@@ -2845,7 +2845,7 @@
         </type>
         <type name="SkyObjectReplace">
             <field name="ObjectIndex" type="uint"/>
-            <field name="GFXObjId" type="uint"/>
+            <vector name="GfxObjId" type="QualifiedDataId" genericValue="GfxObj"/>
             <field name="Rotate" type="float"/>
             <field name="Transparent" type="float"/>
             <field name="Luminosity" type="float"/>
@@ -2861,7 +2861,7 @@
             <vector name="AmbientSounds" length="_numAmbientSounds" type="List" genericValue="AmbientSoundDesc"/>
         </type>
         <type name="AmbientSoundDesc">
-            <field name="SType" type="uint"/>
+            <field name="SType" type="Sound"/>
             <field name="Volume" type="float"/>
             <field name="BaseChance" type="float"/>
             <field name="MinRate" type="float"/>
@@ -2874,7 +2874,9 @@
         <type name="SceneType">
             <field name="StbIndex" type="uint"/>
             <field name="_numScenes" type="uint"/>
-            <vector name="Scenes" length="_numScenes" type="List" genericValue="uint"/>
+            <vector name="Scenes" length="_numScenes" type="List">
+                <vector type="QualifiedDataId" genericValue="Scene"/>
+            </vector>
         </type>
         <type name="TerrainDesc">
             <field name="_numTerrainTypes" type="uint"/>
@@ -2905,18 +2907,18 @@
         </type>
         <type name="TerrainAlphaMap">
             <field name="TCode" type="uint"/>
-            <field name="TexGID" type="uint"/>
+            <vector name="TextureId" type="QualifiedDataId" genericValue="SurfaceTexture"/>
         </type>
         <type name="RoadAlphaMap">
             <field name="RCode" type="uint"/>
-            <field name="TexGID" type="uint"/>
+            <vector name="TextureId" type="QualifiedDataId" genericValue="SurfaceTexture"/>
         </type>
         <type name="TMTerrainDesc">
             <field name="TerrainType" type="TerrainTextureType"/>
             <field name="TerrainTex" type="TerrainTex"/>
         </type>
         <type name="TerrainTex">
-            <field name="TexGID" type="uint"/>
+            <vector name="TextureId" type="QualifiedDataId" genericValue="SurfaceTexture"/>
             <field name="TexTiling" type="uint"/>
             <field name="MaxVertBright" type="uint"/>
             <field name="MinVertBright" type="uint"/>
@@ -2925,7 +2927,7 @@
             <field name="MaxVertHue" type="uint"/>
             <field name="MinVertHue" type="uint"/>
             <field name="DetailTexTiling" type="uint"/>
-            <field name="DetailTexGID" type="uint"/>
+            <vector name="DetailTextureId" type="QualifiedDataId" genericValue="SurfaceTexture"/>
         </type>
         <type name="RegionMisc">
             <field name="Version" type="uint"/>
@@ -2954,7 +2956,7 @@
             <field name="Description" type="obfuscatedstring" text="The description of the spell"/>
             <align size="4"/>
             <field name="School" type="MagicSchool" text="The magic school the spell belongs to"/>
-            <field name="Icon" type="uint" text="The data id of the spell icon"/>
+            <vector name="Icon" type="QualifiedDataId" genericValue="RenderSurface"/>
             <field name="Category" type="SpellCategory" text="Spell category"/>
             <field name="Bitfield" type="SpellIndex"/>
             <field name="BaseMana" type="uint"/>
@@ -3000,7 +3002,7 @@
             <field name="Name" type="obfuscatedstring"/>
             <align size="4"/>
             <field name="Category" type="uint"/>
-            <field name="Icon" type="uint"/>
+            <vector name="Icon" type="QualifiedDataId" genericValue="RenderSurface"/>
             <field name="Type" type="ComponentType"/>
             <field name="Gesture" type="uint"/>
             <field name="Time" type="float"/>
@@ -3029,24 +3031,24 @@
         </type>
         <type name="CloObjectEffect">
             <field name="Index" type="uint"/>
-            <field name="ModelId" type="uint"/>
+            <vector name="ModelId" type="QualifiedDataId" genericValue="GfxObj"/>
             <field name="_numCloTextureEffects" type="uint"/>
             <vector name="CloTextureEffects" length="_numCloTextureEffects" type="List"
                     genericValue="CloTextureEffect"/>
         </type>
         <type name="CloTextureEffect">
-            <field name="OldTexture" type="uint"/>
-            <field name="NewTexture" type="uint"/>
+            <vector name="OldTexture" type="QualifiedDataId" genericValue="SurfaceTexture"/>
+            <vector name="NewTexture" type="QualifiedDataId" genericValue="SurfaceTexture"/>
         </type>
         <type name="CloSubPalEffect">
-            <field name="Icon" type="uint"/>
+            <vector name="Icon" type="QualifiedDataId" genericValue="RenderSurface"/>
             <field name="_numCloSubPalettes" type="uint"/>
             <vector name="CloSubPalettes" length="_numCloSubPalettes" type="List" genericValue="CloSubPalette"/>
         </type>
         <type name="CloSubPalette">
             <field name="_numRanges" type="uint"/>
             <vector name="Ranges" length="_numRanges" type="List" genericValue="CloSubPaletteRange"/>
-            <field name="PaletteSet" type="uint"/>
+            <vector name="PaletteSet" type="QualifiedDataId" genericValue="PalSet"/>
         </type>
         <type name="CloSubPaletteRange">
             <field name="Offset" type="uint"/>
@@ -3077,7 +3079,7 @@
         <type name="SkillBase">
             <field name="Description" type="string"/>
             <field name="Name" type="string"/>
-            <field name="IconId" type="uint"/>
+            <vector name="IconId" type="QualifiedDataId" genericValue="RenderSurface"/>
             <field name="TrainedCost" type="int"/>
             <field name="SpecializedCost" type="int"/>
             <field name="Category" type="SkillCategory"/>
@@ -3098,38 +3100,38 @@
             <field name="Frame" type="Frame"/>
         </type>
         <type name="SubPalette">
-            <field name="SubId" type="DataIdOfKnownType" knownType="0x04000000"/>
+            <vector name="SubId" type="PackedQualifiedDataId" genericValue="Palette"/>
             <field name="Offset" type="byte"/>
             <field name="NumColors" type="byte"/>
         </type>
         <type name="TextureMapChange">
             <field name="PartIndex" type="byte"/>
-            <field name="OldTexture" type="DataIdOfKnownType" knownType="0x05000000"/>
-            <field name="NewTexture" type="DataIdOfKnownType" knownType="0x05000000"/>
+            <vector name="OldTexture" type="PackedQualifiedDataId" genericValue="SurfaceTexture"/>
+            <vector name="NewTexture" type="PackedQualifiedDataId" genericValue="SurfaceTexture"/>
         </type>
         <type name="AnimationPartChange">
             <field name="PartIndex" type="byte"/>
-            <field name="PartId" type="DataIdOfKnownType" knownType="0x01000000"/>
+            <vector name="PartId" type="PackedQualifiedDataId" genericValue="GfxObj"/>
         </type>
         <type name="HairStyleCG">
-            <field name="IconId" type="uint"/>
+            <vector name="IconId" type="QualifiedDataId" genericValue="RenderSurface"/>
             <field name="Bald" type="bool" size="1"/>
             <field name="AlternateSetup" type="uint"/>
             <field name="ObjDesc" type="ObjDesc"/>
         </type>
         <type name="EyeStripCG">
-            <field name="IconId" type="uint"/>
+            <vector name="IconId" type="QualifiedDataId" genericValue="RenderSurface"/>
             <field name="BaldIconId" type="uint"/>
             <field name="ObjDesc" type="ObjDesc"/>
             <field name="BaldObjDesc" type="ObjDesc"/>
         </type>
         <type name="FaceStripCG">
-            <field name="IconId" type="uint"/>
+            <vector name="IconId" type="QualifiedDataId" genericValue="RenderSurface"/>
             <field name="ObjDesc" type="ObjDesc"/>
         </type>
         <type name="GearCG">
             <field name="Name" type="rawstring"/>
-            <field name="ClothingTable" type="uint"/>
+            <vector name="ClothingTable" type="QualifiedDataId" genericValue="ClothingTable"/>
             <field name="WeenieDefault" type="uint"/>
         </type>
         <type name="ObjDesc">
@@ -3139,7 +3141,7 @@
             <field name="_numTextureMapChanges" type="byte"/>
             <field name="_numAnimPartChanges" type="byte"/>
             <if condition="_numSubPalettes > 0" writeCondition="SubPalettes != null &amp;&amp; SubPalettes.Count() > 0">
-                <field name="PaletteId" type="DataIdOfKnownType" knownType="0x04000000"/>
+                <vector name="PaletteId" type="PackedQualifiedDataId" genericValue="Palette"/>
             </if>
             <vector name="SubPalettes" length="_numSubPalettes" type="List" genericValue="SubPalette"/>
             <vector name="TextureChanges" length="_numTextureMapChanges" type="List" genericValue="TextureMapChange"/>
@@ -3149,14 +3151,14 @@
         <type name="SexCG">
             <field name="Name" type="rawstring"/>
             <field name="Scale" type="uint"/>
-            <field name="SetupId" type="uint"/>
-            <field name="SoundTable" type="uint"/>
-            <field name="IconId" type="uint"/>
-            <field name="BasePalette" type="uint"/>
-            <field name="SkinPalSet" type="uint"/>
-            <field name="PhysicsTable" type="uint"/>
-            <field name="MotionTable" type="uint"/>
-            <field name="CombatTable" type="uint"/>
+            <vector name="SetupId" type="QualifiedDataId" genericValue="Setup"/>
+            <vector name="SoundTable" type="QualifiedDataId" genericValue="SoundTable"/>
+            <vector name="IconId" type="QualifiedDataId" genericValue="RenderSurface"/>
+            <vector name="BasePalette" type="QualifiedDataId" genericValue="Palette"/>
+            <vector name="SkinPalSet" type="QualifiedDataId" genericValue="PalSet"/>
+            <vector name="PhysicsTable" type="QualifiedDataId" genericValue="PhysicsScriptTable"/>
+            <vector name="MotionTable" type="QualifiedDataId" genericValue="MotionTable"/>
+            <vector name="CombatTable" type="QualifiedDataId" genericValue="CombatTable"/>
             <field name="BaseObjDesc" type="ObjDesc"/>
             <field name="_numHairColors" type="CompressedUInt"/>
             <vector name="HairColors" length="_numHairColors" type="List" genericValue="uint"/>
@@ -3188,7 +3190,7 @@
         </type>
         <type name="TemplateCG">
             <field name="Name" type="rawstring"/>
-            <field name="IconId" type="uint"/>
+            <vector name="IconId" type="QualifiedDataId" genericValue="RenderSurface"/>
             <field name="Title" type="uint"/>
             <field name="Strength" type="int"/>
             <field name="Endurance" type="int"/>
@@ -3203,10 +3205,9 @@
         </type>
         <type name="HeritageGroupCG" text="Information about a heritage group, used during character creation">
             <field name="Name" type="rawstring"/>
-            <field name="IconId" type="uint"/>
-            <field name="SetupId" type="uint" text="Basic character model"/>
-            <field name="EnvironmentSetupId" type="uint"
-                   text="This is the background environment used during character creation"/>
+            <vector name="IconId" type="QualifiedDataId" genericValue="RenderSurface"/>
+            <vector name="SetupId" type="QualifiedDataId" genericValue="Setup" text="Basic character model"/>
+            <vector name="EnvironmentSetupId" type="QualifiedDataId" genericValue="Setup" text="This is the background environment used during character creation"/>
             <field name="AttributeCredits" type="uint" text="Starting attribute credits"/>
             <field name="SkillCredits" type="uint" text="Starting skill credits"/>
             <field name="_numPrimaryStartAreas" type="CompressedUInt"/>
@@ -3217,9 +3218,10 @@
             <vector name="Skills" length="_numSkills" type="List" genericValue="SkillCG"/>
             <field name="_numTemplates" type="CompressedUInt"/>
             <vector name="Templates" length="_numTemplates" type="List" genericValue="TemplateCG"/>
-            <field name="UnknownByte" type="byte"/>
-            <field name="_numGenders" type="CompressedUInt"/>
-            <vector name="Genders" length="_numGenders" type="Dictionary" genericKey="int" genericValue="SexCG"/>
+            <vector name="Genders" type="HashTable">
+                <field type="int"/>
+                <field type="SexCG"/>
+            </vector>
         </type>
         <type name="NameFilterLanguageData">
             <field name="MaximumSameCharactersInARow" type="uint"/>
@@ -3242,7 +3244,7 @@
             <align type="uint"/>
         </type>
         <type name="GfxObjInfo">
-            <field type="uint" name="Id" text="Id of a GfxObj"/>
+            <vector name="Id" type="QualifiedDataId" genericValue="GfxObj"/>
             <field type="uint" name="DegradeMode"/>
             <field type="float" name="MinDist"/>
             <field type="float" name="IdealDist"/>
@@ -3254,7 +3256,7 @@
             <field type="float" name="Volume"/>
         </type>
         <type name="SoundEntry">
-            <field type="uint" name="Id" text="A 0x0A sound entry"/>
+            <vector name="Id" type="QualifiedDataId" genericValue="Wave"/>
             <field type="float" name="Priority"/>
             <field type="float" name="Probability"/>
             <field type="float" name="Volume"/>
@@ -3266,7 +3268,7 @@
         </type>
         <type name="ScriptAndModData">
             <field type="float" name="Mod"/>
-            <field type="uint" name="ScriptId"/>
+            <vector name="ScriptId" type="QualifiedDataId" genericValue="PhysicsScript"/>
         </type>
         <type name="PhysicsScriptTableData">
             <field type="uint" name="_numScripts"/>
@@ -3330,7 +3332,7 @@
             <field type="Position" name="LocationQuestArea"/>
         </type>
         <type name="TabooTableEntry">
-            <field type="uint" name="Unknown1"/>
+            <field type="uint" name="Key"/>
             <field type="ushort" name="Unknown2"/>
             <field type="uint" name="_numBannedPatterns"/>
             <vector name="BannedPatterns" length="_numBannedPatterns" type="List" genericValue="rawstring"/>
@@ -3355,7 +3357,7 @@
         <type name="StringInfo">
             <field type="byte" name="Token"/>
             <field type="uint" name="StringId" text="This is the hashed string value, which is the key in TableId"/>
-            <field type="uint" name="TableId" text="The StringTable (0x23) used to look up the StringId in"/>
+            <vector name="TableId" type="QualifiedDataId" genericValue="StringTable"/>
             <field type="StringInfoOverrideFlag" name="Override"/>
             <field type="byte" name="English"/>
             <field type="byte" name="Comment"/>
@@ -3411,10 +3413,10 @@
         <type name="EnumMapperData">
             <field name="BaseEnumMap" type="uint"/>
             <field name="Unknown" type="uint"/>
-            <field name="_bucketSize" type="byte" value="5"/>
-            <field name="_numIdToStringMaps" type="CompressedUInt"/>
-            <vector name="IdToStringMap" length="_numIdToStringMaps" type="Dictionary" genericKey="uint"
-                    genericValue="bytestring"/>
+            <vector name="IdToStringMap" type="AutoGrowHashTable">
+                <field type="uint"/>
+                <vector type="PStringBase" genericValue="byte"/>
+            </vector>
         </type>
         <type name="MediaDesc" abstract="true">
             <field name="_mediaType" type="MediaType"/>
@@ -3523,7 +3525,7 @@
         <dat name="portal" text="client_portal.dat" type="DatFileType.Portal">
             <type name="GfxObj"
                   text="DB_TYPE_GFXOBJ in the client. Main visual geometry object (mesh + surfaces + physics)"
-                  parent="DBObj" first="0x01000000" last="0x0100FFFF" flags="DBObjHeaderFlags.HasId">
+                  parent="DBObj" first="0x01000000" last="0x0100FFFF" mask="0x01000000" flags="DBObjHeaderFlags.HasId">
 
                 <field type="GfxObjFlags" name="Flags"
                        text="Bitfield controlling which optional data is present (physics, drawing, degrade, etc.)"/>
@@ -3640,7 +3642,7 @@
             </type>
             <type name="Animation"
                   text="DB_TYPE_ANIM in the client. Defines a complete animation (position + part transforms + hooks)"
-                  parent="DBObj" first="0x3000000" last="0x300FFFF"
+                  parent="DBObj" first="0x3000000" last="0x300FFFF" mask="0x3000000"
                   flags="DBObjHeaderFlags.HasId">
                 <field type="AnimationFlags" name="Flags"
                        text="Bit flags controlling which data is present (mainly whether position keyframes exist)"/>
@@ -3660,7 +3662,7 @@
                         text="Per-frame array of per-part transforms + animation hooks"/>
             </type>
             <type name="Palette" text="DB_TYPE_PALETTE in the client. Defines a color lookup table"
-                  parent="DBObj" first="0x4000000" last="0x400FFFF"
+                  parent="DBObj" first="0x4000000" last="0x400FFFF" mask="0x4000000"
                   flags="DBObjHeaderFlags.HasId">
                 <field type="int" name="_numColors"
                        text="Number of colors stored in this palette (usually 256 or 2048)"/>
@@ -3668,7 +3670,7 @@
                         text="Array of 32-bit ARGB colors (0xAARRGGBB)."/>
             </type>
             <type name="SurfaceTexture" text="DB_TYPE_SURFACETEXTURE in the client." parent="DBObj" first="0x5000000"
-                  last="0x5FFFFFF" flags="DBObjHeaderFlags.HasId | DBObjHeaderFlags.HasDataCategory">
+                  last="0x5FFFFFF" mask="0x5000000" flags="DBObjHeaderFlags.HasId | DBObjHeaderFlags.HasDataCategory">
                 <field type="TextureType" name="Type"
                        text="This seems to always be TextureType.Texture2D in the dats."/>
                 <field type="int" name="_numtextures"/>
@@ -3677,7 +3679,7 @@
                 </vector>
             </type>
             <type name="RenderSurface" text="This holds raw texture data. DB_TYPE_RENDERSURFACE in the client."
-                  parent="DBObj" first="0x6000000" last="0x7FFFFFF"
+                  parent="DBObj" first="0x6000000" last="0x7FFFFFF" mask="0x6000000"
                   flags="DBObjHeaderFlags.HasId | DBObjHeaderFlags.HasDataCategory">
                 <field type="int" name="Width" text="The width of the SurfaceTexture"/>
                 <field type="int" name="Height" text="The height of the SurfaceTexture"/>
@@ -3692,7 +3694,7 @@
                 </switch>
             </type>
             <type name="Surface" text="DB_TYPE_SURFACE in the client. Main surface/material descriptor" parent="DBObj"
-                  first="0x8000000" last="0x800FFFF"
+                  first="0x8000000" last="0x800FFFF" mask="0x8000000"
                   flags="DBObjHeaderFlags.None">
                 <field type="SurfaceType" name="Type" text="Bitfield controlling surface behavior"/>
                 <maskmap name="Type">
@@ -3715,6 +3717,7 @@
                   parent="DBObj"
                   first="0x9000000"
                   last="0x900FFFF"
+                  mask="0x9000000"
                   flags="DBObjHeaderFlags.HasId">
 
                 <field name="DefaultStyle" type="MotionCommand"
@@ -3754,6 +3757,7 @@
                   parent="DBObj"
                   first="0xA000000"
                   last="0xA00FFFF"
+                  mask="0xA000000"
                   flags="DBObjHeaderFlags.HasId">
                 <field name="_headerSize" type="int" text="Size of the header in bytes"/>
                 <field name="_dataSize" type="int" text="Size of the raw audio data in bytes"/>
@@ -3762,7 +3766,7 @@
             </type>
             <type name="Environment"
                   text="DB_TYPE_ENVIRONMENT in the client. Represents an environment / landblock containing multiple cells"
-                  parent="DBObj" first="0xD000000"
+                  parent="DBObj" first="0xD000000" mask="0xD000000"
                   last="0xD00FFFF" flags="DBObjHeaderFlags.HasId">
                 <field type="uint" name="_cellCount" text="Number of cells contained in this landblock"/>
                 <vector name="Cells" length="_cellCount" type="Dictionary" genericKey="uint" genericValue="CellStruct"
@@ -3978,39 +3982,68 @@
                   last="0x3100FFFF" flags="DBObjHeaderFlags.HasId">
                 <vector name="Value" type="PStringBase" genericValue="byte"/>
             </type>
-            <type name="ParticleEmitter" text="DB_TYPE_PARTICLE_EMITTER in the client." parent="DBObj"
-                  first="0x32000000" last="0x3200FFFF" flags="DBObjHeaderFlags.HasId">
+            <type name="ParticleEmitter"
+                  text="DB_TYPE_PARTICLE_EMITTER in the client. Defines parameters for a particle emitter system (how, when, and what particles are spawned)."
+                  parent="DBObj"
+                  first="0x32000000" last="0x3200FFFF"
+                  flags="DBObjHeaderFlags.HasId">
                 <field name="Unknown" type="uint"/>
                 <field name="EmitterType" type="EmitterType"/>
                 <field name="ParticleType" type="ParticleType"/>
-                <field name="GfxObjId" type="uint"/>
-                <field name="HwGfxObjId" type="uint"/>
-                <field name="Birthrate" type="double"/>
-                <field name="MaxParticles" type="int"/>
-                <field name="InitialParticles" type="int"/>
-                <field name="TotalParticles" type="int"/>
-                <field name="TotalSeconds" type="double"/>
-                <field name="Lifespan" type="double"/>
-                <field name="LifespanRand" type="double"/>
-                <field name="OffsetDir" type="Vector3"/>
-                <field name="MinOffset" type="float"/>
-                <field name="MaxOffset" type="float"/>
-                <field name="A" type="Vector3"/>
-                <field name="MinA" type="float"/>
-                <field name="MaxA" type="float"/>
-                <field name="B" type="Vector3"/>
-                <field name="MinB" type="float"/>
-                <field name="MaxB" type="float"/>
-                <field name="C" type="Vector3"/>
-                <field name="MinC" type="float"/>
-                <field name="MaxC" type="float"/>
-                <field name="StartScale" type="float"/>
-                <field name="FinalScale" type="float"/>
-                <field name="ScaleRand" type="float"/>
-                <field name="StartTrans" type="float"/>
-                <field name="FinalTrans" type="float"/>
-                <field name="TransRand" type="float"/>
-                <field name="IsParentLocal" type="bool"/>
+                <vector name="GfxObjId" type="QualifiedDataId" genericValue="GfxObj"/>
+                <vector name="HwGfxObjId" type="QualifiedDataId" genericValue="GfxObj"/>
+                <field name="Birthrate" type="double"
+                       text="Average time (seconds) between particle spawns in continuous mode. Lower = faster emission."/>
+                <field name="MaxParticles" type="int"
+                       text="Maximum number of live particles this emitter is allowed to have at once (memory/performance cap)."/>
+                <field name="InitialParticles" type="int"
+                       text="Number of particles to emit immediately when the emitter is created/activated."/>
+                <field name="TotalParticles" type="int"
+                       text="Total number of particles to emit over the emitter's lifetime (0 = unlimited). Used in burst/finite modes."/>
+                <field name="TotalSeconds" type="double"
+                       text="Total duration (seconds) this emitter should run before stopping (0 = infinite)."/>
+                <field name="Lifespan" type="double"
+                       text="Base lifetime (seconds) of each emitted particle."/>
+                <field name="LifespanRand" type="double"
+                       text="Random variation (±) added to Lifespan (final lifespan = Lifespan + rand(-LifespanRand, +LifespanRand))."/>
+                <field name="OffsetDir" type="Vector3"
+                       text="Preferred / primary direction vector used to generate random spawn offsets (often normalized)."/>
+                <field name="MinOffset" type="float"
+                       text="Minimum distance from emitter origin along the offset direction (or in cone/sphere)."/>
+                <field name="MaxOffset" type="float"
+                       text="Maximum distance from emitter origin (defines spawn radius/cone size)."/>
+                <field name="A" type="Vector3"
+                       text="Base direction/velocity vector A — often initial velocity or primary motion direction."/>
+                <field name="MinA" type="float"
+                       text="Minimum magnitude multiplier for vector A."/>
+                <field name="MaxA" type="float"
+                       text="Maximum magnitude multiplier for vector A (final = A × random[MinA..MaxA])."/>
+                <field name="B" type="Vector3"
+                       text="Secondary direction/velocity vector B (used for spread, turbulence, or secondary motion)."/>
+                <field name="MinB" type="float"
+                       text="Minimum magnitude multiplier for vector B."/>
+                <field name="MaxB" type="float"
+                       text="Maximum magnitude multiplier for vector B."/>
+                <field name="C" type="Vector3"
+                       text="Tertiary direction/velocity vector C (often used for conical spread, randomness, or wind-like force)."/>
+                <field name="MinC" type="float"
+                       text="Minimum magnitude multiplier for vector C."/>
+                <field name="MaxC" type="float"
+                       text="Maximum magnitude multiplier for vector C."/>
+                <field name="StartScale" type="float"
+                       text="Initial scale/size of the particle at birth."/>
+                <field name="FinalScale" type="float"
+                       text="Final scale/size the particle interpolates toward at end of life."/>
+                <field name="ScaleRand" type="float"
+                       text="Random variation (±) applied to both StartScale and FinalScale."/>
+                <field name="StartTrans" type="float"
+                       text="Initial transparency/opacity (0 = fully transparent, 1 = fully opaque)."/>
+                <field name="FinalTrans" type="float"
+                       text="Final transparency the particle fades toward (often 0 for fade-out)."/>
+                <field name="TransRand" type="float"
+                       text="Random variation (±) applied to StartTrans and FinalTrans."/>
+                <field name="IsParentLocal" type="bool"
+                       text="If true, particle positions/offsets are in the parent's local space rather than world space (follows parent rotation/movement)."/>
             </type>
             <type name="PhysicsScript" text="DB_TYPE_PHYSICS_SCRIPT in the client." parent="DBObj" first="0x33000000"
                   last="0x3300FFFF" flags="DBObjHeaderFlags.HasId">
@@ -4046,19 +4079,21 @@
                   last="0x7FFFFFFF" flags="DBObjHeaderFlags.HasId">
                 <field name="_bucketSize" type="byte" value="1"/>
                 <field name="_numProperties" type="byte"/>
-                <vector name="Properties" length="_numProperties" type="Dictionary" genericKey="uint"
-                        genericValue="BaseProperty"/>
+                <vector name="Properties" type="AutoGrowHashTable">
+                    <field type="uint"/>
+                    <field type="BaseProperty"/>
+                </vector>
             </type>
             <type name="CharGen" text="DB_TYPE_CHAR_GEN_0 in the client." parent="DBObj" first="0xE000002"
                   last="0xE000002" flags="DBObjHeaderFlags.HasId">
-                <field name="Unknown" type="uint"/>
+                <vector name="DataId" type="QualifiedDataId" genericValue="CharGen" text="This is a self-reference"/>
                 <field name="_numStarterAreas" type="CompressedUInt"/>
                 <vector name="StartingAreas" length="_numStarterAreas" type="List" genericValue="StartingArea"
                         text="A list of starting areas available during character creation"/>
-                <field name="UnknownByte" type="byte"/>
-                <field name="_numHeritageGroups" type="CompressedUInt"/>
-                <vector name="HeritageGroups" length="_numHeritageGroups" type="Dictionary" genericKey="uint"
-                        genericValue="HeritageGroupCG"/>
+                <vector name="HeritageGroups" type="HashTable">
+                    <field type="uint"/>
+                    <field type="HeritageGroupCG"/>
+                </vector>
             </type>
             <type name="VitalTable" text="DB_TYPE_ATTRIBUTE_2ND_TABLE_0 in the client." parent="DBObj" first="0xE000003"
                   last="0xE000003" flags="DBObjHeaderFlags.HasId">
@@ -4068,27 +4103,28 @@
             </type>
             <type name="SkillTable" text="DB_TYPE_SKILL_TABLE_0 in the client." parent="DBObj" first="0xE000004"
                   last="0xE000004" flags="DBObjHeaderFlags.HasId">
-                <field name="_numSkills" type="ushort"/>
-                <field name="_numSkillBuckets" type="ushort" value="32"/>
-                <vector name="Skills" length="_numSkills" type="Dictionary" genericKey="SkillId"
-                        genericValue="SkillBase"/>
+                <vector name="Skills" type="PackableHashTable">
+                    <field type="SkillId"/>
+                    <field type="SkillBase"/>
+                </vector>
             </type>
             <type name="SpellTable" text="DB_TYPE_SPELL_TABLE_0 in the client." parent="DBObj" first="0xE00000E"
                   last="0xE00000E" flags="DBObjHeaderFlags.HasId">
-                <field name="_numSpells" type="ushort"/>
-                <field name="_numSpellBuckets" type="ushort" value="8192"/>
-                <vector name="Spells" length="_numSpells" type="Dictionary" genericKey="uint" genericValue="SpellBase"/>
-                <field name="_numSpellSets" type="ushort"/>
-                <field name="_numSpellSetBuckets" type="ushort" value="256"/>
-                <vector name="SpellsSets" length="_numSpellSets" type="Dictionary" genericKey="EquipmentSet"
-                        genericValue="SpellSet"/>
+                <vector name="Spells" type="PackableHashTable">
+                    <field type="uint"/>
+                    <field type="SpellBase"/>
+                </vector>
+                <vector name="SpellsSets" type="PHashTable">
+                    <field type="EquipmentSet"/>
+                    <field type="SpellSet"/>
+                </vector>
             </type>
             <type name="SpellComponentTable" text="DB_TYPE_SPELLCOMPONENT_TABLE_0 in the client." parent="DBObj"
                   first="0xE00000F" last="0xE00000F" flags="DBObjHeaderFlags.HasId">
-                <field name="_numComponents" type="ushort"/>
-                <field name="_numComponentsBuckets" type="ushort" value="256"/>
-                <vector name="Components" length="_numComponents" type="Dictionary" genericKey="uint"
-                        genericValue="SpellComponentBase"/>
+                <vector name="Components" type="PackableHashTable">
+                    <field type="uint"/>
+                    <field type="SpellComponentBase"/>
+                </vector>
             </type>
             <type name="ExperienceTable"
                   text="Holds the experience required for different attributes/vitals/skill/levels, as well as the amount of skill credits obtained for each level. DB_TYPE_XP_TABLE_0 in the client."
@@ -4143,10 +4179,10 @@
             </type>
             <type name="ContractTable" text="DB_TYPE_CONTRACT_TABLE_0 in the client." parent="DBObj" first="0xE00001D"
                   last="0xE00001D" flags="DBObjHeaderFlags.HasId">
-                <field type="ushort" name="_numContracts"/>
-                <field type="ushort" name="_numBuckets" value="4096"/>
-                <vector name="Contracts" length="_numContracts" type="Dictionary" genericKey="uint"
-                        genericValue="Contract"/>
+                <vector name="Contracts" type="PackableHashTable">
+                    <field type="uint"/>
+                    <field type="Contract"/>
+                </vector>
             </type>
         </dat>
         <dat name="cell" text="client_cell_1.dat" type="DatFileType.Cell">
@@ -4208,18 +4244,18 @@
                   last="0x21FFFFFF" flags="DBObjHeaderFlags.HasId">
                 <field type="uint" name="Width"/>
                 <field type="uint" name="Height"/>
-                <field type="byte" name="_elementsBucketSizeIndex" value="1"/>
-                <field type="CompressedUInt" name="_numElements"/>
-                <vector name="Elements" length="_numElements" type="Dictionary" genericKey="uint"
-                        genericValue="ElementDesc"/>
+                <vector name="Elements" type="HashTable">
+                    <field type="uint"/>
+                    <field type="ElementDesc"/>
+                </vector>
             </type>
             <type name="StringTable" text="DB_TYPE_STRING_TABLE in the client." parent="DBObj" first="0x23000000"
                   last="0x24FFFFFF" flags="DBObjHeaderFlags.HasId">
                 <field type="uint" name="Language" text="This should always be 1 for English"/>
-                <field type="byte" name="Unknown"/>
-                <field type="CompressedUInt" name="_numEntries"/>
-                <vector name="StringTableData" length="_numEntries" type="Dictionary" genericKey="uint"
-                        genericValue="StringTableData"/>
+                <vector name="StringTableData" type="HashTable">
+                    <field type="uint"/>
+                    <field type="StringTableData"/>
+                </vector>
             </type>
             <type name="LanguageInfo" text="DB_TYPE_STRING_STATE in the client." parent="DBObj" first="0x41000000"
                   last="0x41FFFFFF" flags="DBObjHeaderFlags.None">
@@ -4228,21 +4264,21 @@
                 <field type="ushort" name="NumDecimalDigits"/>
                 <field type="bool" name="LeadingZero" size="1"/>
                 <field type="ushort" name="GroupingSize"/>
-                <field type="ushortstring" name="Numerals"/>
-                <field type="ushortstring" name="DecimalSeperator"/>
-                <field type="ushortstring" name="GroupingSeperator"/>
-                <field type="ushortstring" name="NegativeNumberFormat"/>
+                <vector type="PStringBase" genericValue="ushort" name="Numerals"/>
+                <vector type="PStringBase" genericValue="ushort" name="DecimalSeperator"/>
+                <vector type="PStringBase" genericValue="ushort" name="GroupingSeperator"/>
+                <vector type="PStringBase" genericValue="ushort" name="NegativeNumberFormat"/>
                 <field type="bool" name="IsZeroSingular" size="1"/>
                 <field type="bool" name="IsOneSingular" size="1"/>
                 <field type="bool" name="IsNegativeOneSingular" size="1"/>
                 <field type="bool" name="IsTwoOrMoreSingular" size="1"/>
                 <field type="bool" name="IsNegativeTwoOrLessSingular" size="1"/>
                 <align size="4"/>
-                <field type="ushortstring" name="TreasurePrefixLetters"/>
-                <field type="ushortstring" name="TreasureMiddleLetters"/>
-                <field type="ushortstring" name="TreasureSuffixLetters"/>
-                <field type="ushortstring" name="MalePlayerLetters"/>
-                <field type="ushortstring" name="FemalePlayerLetters"/>
+                <vector type="PStringBase" genericValue="ushort" name="TreasurePrefixLetters"/>
+                <vector type="PStringBase" genericValue="ushort" name="TreasureMiddleLetters"/>
+                <vector type="PStringBase" genericValue="ushort" name="TreasureSuffixLetters"/>
+                <vector type="PStringBase" genericValue="ushort" name="MalePlayerLetters"/>
+                <vector type="PStringBase" genericValue="ushort" name="FemalePlayerLetters"/>
                 <field type="uint" name="IMEEnabledSetting"/>
                 <field type="uint" name="SymbolColor"/>
                 <field type="uint" name="SymbolColorText"/>
@@ -4261,7 +4297,7 @@
                 <field type="uint" name="CompColorText"/>
                 <field type="uint" name="OtherIME"/>
                 <field type="int" name="WordWrapOnSpace"/>
-                <field type="bytestring" name="AdditionalSettings"/>
+                <vector type="PStringBase" genericValue="ushort" name="AdditionalSettings"/>
                 <field type="uint" name="AdditionalFlags"/>
             </type>
         </dat>

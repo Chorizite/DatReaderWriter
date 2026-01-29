@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using DatReaderWriter.Enums;
+using DatReaderWriter.DBObjs;
 using DatReaderWriter.Lib;
 using DatReaderWriter.Lib.Attributes;
 using DatReaderWriter.Lib.IO;
@@ -17,7 +18,7 @@ namespace DatReaderWriter.Types {
         /// <inheritdoc />
         public override AnimationHookType HookType => AnimationHookType.SoundTweaked;
 
-        public uint SoundID;
+        public QualifiedDataId<Wave> SoundId = new();
 
         public float Priority;
 
@@ -28,7 +29,7 @@ namespace DatReaderWriter.Types {
         /// <inheritdoc />
         public override bool Unpack(DatBinReader reader) {
             base.Unpack(reader);
-            SoundID = reader.ReadUInt32();
+            SoundId = reader.ReadItem<QualifiedDataId<Wave>>();
             Priority = reader.ReadSingle();
             Probability = reader.ReadSingle();
             Volume = reader.ReadSingle();
@@ -38,7 +39,7 @@ namespace DatReaderWriter.Types {
         /// <inheritdoc />
         public override bool Pack(DatBinWriter writer) {
             base.Pack(writer);
-            writer.WriteUInt32(SoundID);
+            writer.WriteItem<QualifiedDataId<Wave>>(SoundId);
             writer.WriteSingle(Priority);
             writer.WriteSingle(Probability);
             writer.WriteSingle(Volume);

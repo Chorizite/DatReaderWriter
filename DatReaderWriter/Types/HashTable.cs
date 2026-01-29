@@ -17,7 +17,7 @@ namespace DatReaderWriter.Types {
 
         public bool Unpack(DatBinReader reader) {
             BucketSizeIndex = reader.ReadByte();
-            var numElements = reader.ReadByte();
+            var numElements = reader.ReadCompressedUInt();
             for (var i = 0; i < numElements; i++) {
                 var key = reader.ReadGeneric<TKey>();
                 var val = reader.ReadGeneric<TValue>();
@@ -28,7 +28,7 @@ namespace DatReaderWriter.Types {
 
         public bool Pack(DatBinWriter writer) {
             writer.WriteByte((byte)BucketSizeIndex);
-            writer.WriteByte((byte)this.Count);
+            writer.WriteCompressedUInt((uint)this.Count);
             
             var BucketSize = HashTableHelpers.BucketSizes[BucketSizeIndex];
             

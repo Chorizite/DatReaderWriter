@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using DatReaderWriter.Enums;
+using DatReaderWriter.DBObjs;
 using DatReaderWriter.Lib;
 using DatReaderWriter.Lib.Attributes;
 using DatReaderWriter.Lib.IO;
@@ -26,9 +27,9 @@ namespace DatReaderWriter.Types {
 
         public float TexVelocityY;
 
-        public uint DefaultGFXObjectId;
+        public QualifiedDataId<GfxObj> DefaultGfxObjectId = new();
 
-        public uint DefaultPESObjectId;
+        public QualifiedDataId<PhysicsScript> DefaultPesObjectId = new();
 
         public uint Properties;
 
@@ -40,8 +41,8 @@ namespace DatReaderWriter.Types {
             EndAngle = reader.ReadSingle();
             TexVelocityX = reader.ReadSingle();
             TexVelocityY = reader.ReadSingle();
-            DefaultGFXObjectId = reader.ReadUInt32();
-            DefaultPESObjectId = reader.ReadUInt32();
+            DefaultGfxObjectId = reader.ReadItem<QualifiedDataId<GfxObj>>();
+            DefaultPesObjectId = reader.ReadItem<QualifiedDataId<PhysicsScript>>();
             Properties = reader.ReadUInt32();
             return true;
         }
@@ -54,8 +55,8 @@ namespace DatReaderWriter.Types {
             writer.WriteSingle(EndAngle);
             writer.WriteSingle(TexVelocityX);
             writer.WriteSingle(TexVelocityY);
-            writer.WriteUInt32(DefaultGFXObjectId);
-            writer.WriteUInt32(DefaultPESObjectId);
+            writer.WriteItem<QualifiedDataId<GfxObj>>(DefaultGfxObjectId);
+            writer.WriteItem<QualifiedDataId<PhysicsScript>>(DefaultPesObjectId);
             writer.WriteUInt32(Properties);
             return true;
         }

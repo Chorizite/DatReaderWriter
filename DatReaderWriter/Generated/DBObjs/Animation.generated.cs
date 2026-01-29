@@ -18,7 +18,7 @@ namespace DatReaderWriter.DBObjs {
     /// <summary>
     /// DB_TYPE_ANIM in the client. Defines a complete animation (position + part transforms + hooks)
     /// </summary>
-    [DBObjType(typeof(Animation), DatFileType.Portal, DBObjType.Animation, DBObjHeaderFlags.HasId, 0x03000000, 0x0300FFFF, 0x00000000)]
+    [DBObjType(typeof(Animation), DatFileType.Portal, DBObjType.Animation, DBObjHeaderFlags.HasId, 0x03000000, 0x0300FFFF, 0x03000000)]
     public partial class Animation : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;

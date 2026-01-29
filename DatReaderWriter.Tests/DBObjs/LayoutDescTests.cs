@@ -15,7 +15,6 @@ namespace DatReaderWriter.Tests.DBObjs {
         public void CanReadEOR() {
             using var dat = new DatCollection(EORCommonData.DatDirectory);
 
-            return;
             var res = dat.TryGet<LayoutDesc>(0x21000000u, out var layout);
             Assert.IsTrue(res);
             Assert.IsNotNull(layout);
@@ -44,10 +43,10 @@ namespace DatReaderWriter.Tests.DBObjs {
         [TestCategory("EOR")]
         public void CanReadEORAndWriteIdentical() {
             using var dats = new DatCollection(EORCommonData.DatDirectory);
-            TestHelpers.CanReadAndWriteIdentical<LayoutDesc>("", 0x21000000u, dats.Local);
-            TestHelpers.CanReadAndWriteIdentical<LayoutDesc>("", 0x21000001u, dats.Local);
-            TestHelpers.CanReadAndWriteIdentical<LayoutDesc>("", 0x21000028u, dats.Local);
-            TestHelpers.CanReadAndWriteIdentical<LayoutDesc>("", 0x21000075u, dats.Local);
+            TestHelpers.CanReadAndWriteIdentical<LayoutDesc>(EORCommonData.DatDirectory, 0x21000000u, dats.Local);
+            TestHelpers.CanReadAndWriteIdentical<LayoutDesc>(EORCommonData.DatDirectory, 0x21000001u, dats.Local);
+            TestHelpers.CanReadAndWriteIdentical<LayoutDesc>(EORCommonData.DatDirectory, 0x21000028u, dats.Local);
+            TestHelpers.CanReadAndWriteIdentical<LayoutDesc>(EORCommonData.DatDirectory, 0x21000075u, dats.Local);
         }
     }
 }

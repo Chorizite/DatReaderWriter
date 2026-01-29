@@ -8,19 +8,20 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using DatReaderWriter.Enums;
+using DatReaderWriter.DBObjs;
 using DatReaderWriter.Lib;
 using DatReaderWriter.Lib.Attributes;
 using DatReaderWriter.Lib.IO;
 
 namespace DatReaderWriter.Types {
     public partial class CloSubPalEffect : IDatObjType {
-        public uint Icon;
+        public QualifiedDataId<RenderSurface> Icon = new();
 
         public List<CloSubPalette> CloSubPalettes = [];
 
         /// <inheritdoc />
         public bool Unpack(DatBinReader reader) {
-            Icon = reader.ReadUInt32();
+            Icon = reader.ReadItem<QualifiedDataId<RenderSurface>>();
             var _numCloSubPalettes = reader.ReadUInt32();
             for (var i=0; i < _numCloSubPalettes; i++) {
                 CloSubPalettes.Add(reader.ReadItem<CloSubPalette>());
@@ -30,7 +31,7 @@ namespace DatReaderWriter.Types {
 
         /// <inheritdoc />
         public bool Pack(DatBinWriter writer) {
-            writer.WriteUInt32(Icon);
+            writer.WriteItem<QualifiedDataId<RenderSurface>>(Icon);
             writer.WriteUInt32((uint)CloSubPalettes.Count());
             foreach (var item in CloSubPalettes) {
                 writer.WriteItem<CloSubPalette>(item);

@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using DatReaderWriter.Enums;
+using DatReaderWriter.DBObjs;
 using DatReaderWriter.Lib;
 using DatReaderWriter.Lib.Attributes;
 using DatReaderWriter.Lib.IO;
@@ -21,10 +22,7 @@ namespace DatReaderWriter.Types {
         /// </summary>
         public uint StringId;
 
-        /// <summary>
-        /// The StringTable (0x23) used to look up the StringId in
-        /// </summary>
-        public uint TableId;
+        public QualifiedDataId<StringTable> TableId = new();
 
         public StringInfoOverrideFlag Override;
 
@@ -36,7 +34,7 @@ namespace DatReaderWriter.Types {
         public bool Unpack(DatBinReader reader) {
             Token = reader.ReadByte();
             StringId = reader.ReadUInt32();
-            TableId = reader.ReadUInt32();
+            TableId = reader.ReadItem<QualifiedDataId<StringTable>>();
             Override = (StringInfoOverrideFlag)reader.ReadByte();
             English = reader.ReadByte();
             Comment = reader.ReadByte();
@@ -47,7 +45,7 @@ namespace DatReaderWriter.Types {
         public bool Pack(DatBinWriter writer) {
             writer.WriteByte(Token);
             writer.WriteUInt32(StringId);
-            writer.WriteUInt32(TableId);
+            writer.WriteItem<QualifiedDataId<StringTable>>(TableId);
             writer.WriteByte((byte)Override);
             writer.WriteByte(English);
             writer.WriteByte(Comment);

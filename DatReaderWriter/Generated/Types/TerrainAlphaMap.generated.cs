@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using DatReaderWriter.Enums;
+using DatReaderWriter.DBObjs;
 using DatReaderWriter.Lib;
 using DatReaderWriter.Lib.Attributes;
 using DatReaderWriter.Lib.IO;
@@ -16,19 +17,19 @@ namespace DatReaderWriter.Types {
     public partial class TerrainAlphaMap : IDatObjType {
         public uint TCode;
 
-        public uint TexGID;
+        public QualifiedDataId<SurfaceTexture> TextureId = new();
 
         /// <inheritdoc />
         public bool Unpack(DatBinReader reader) {
             TCode = reader.ReadUInt32();
-            TexGID = reader.ReadUInt32();
+            TextureId = reader.ReadItem<QualifiedDataId<SurfaceTexture>>();
             return true;
         }
 
         /// <inheritdoc />
         public bool Pack(DatBinWriter writer) {
             writer.WriteUInt32(TCode);
-            writer.WriteUInt32(TexGID);
+            writer.WriteItem<QualifiedDataId<SurfaceTexture>>(TextureId);
             return true;
         }
 

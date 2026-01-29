@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using DatReaderWriter.Enums;
+using DatReaderWriter.DBObjs;
 using DatReaderWriter.Lib;
 using DatReaderWriter.Lib.Attributes;
 using DatReaderWriter.Lib.IO;
@@ -16,7 +17,7 @@ namespace DatReaderWriter.Types {
     public partial class ObjDesc : IDatObjType {
         public byte UnknownByte;
 
-        public uint PaletteId;
+        public PackedQualifiedDataId<Palette> PaletteId = new();
 
         public List<SubPalette> SubPalettes = [];
 
@@ -32,7 +33,7 @@ namespace DatReaderWriter.Types {
             var _numTextureMapChanges = reader.ReadByte();
             var _numAnimPartChanges = reader.ReadByte();
             if (_numSubPalettes > 0) {
-                PaletteId = reader.ReadDataIdOfKnownType(0x04000000);
+                PaletteId = reader.ReadItem<PackedQualifiedDataId<Palette>>();
             }
             for (var i=0; i < _numSubPalettes; i++) {
                 SubPalettes.Add(reader.ReadItem<SubPalette>());
@@ -55,7 +56,7 @@ namespace DatReaderWriter.Types {
             writer.WriteByte((byte)TextureChanges.Count());
             writer.WriteByte((byte)AnimPartChanges.Count());
             if (SubPalettes != null && SubPalettes.Count() > 0) {
-                writer.WriteDataIdOfKnownType(PaletteId, 0x04000000);
+                writer.WriteItem<PackedQualifiedDataId<Palette>>(PaletteId);
             }
             foreach (var item in SubPalettes) {
                 writer.WriteItem<SubPalette>(item);

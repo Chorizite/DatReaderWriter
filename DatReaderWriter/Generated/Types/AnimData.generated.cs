@@ -8,13 +8,14 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using DatReaderWriter.Enums;
+using DatReaderWriter.DBObjs;
 using DatReaderWriter.Lib;
 using DatReaderWriter.Lib.Attributes;
 using DatReaderWriter.Lib.IO;
 
 namespace DatReaderWriter.Types {
     public partial class AnimData : IDatObjType {
-        public uint AnimId;
+        public QualifiedDataId<Animation> AnimId = new();
 
         public int LowFrame;
 
@@ -24,7 +25,7 @@ namespace DatReaderWriter.Types {
 
         /// <inheritdoc />
         public bool Unpack(DatBinReader reader) {
-            AnimId = reader.ReadUInt32();
+            AnimId = reader.ReadItem<QualifiedDataId<Animation>>();
             LowFrame = reader.ReadInt32();
             HighFrame = reader.ReadInt32();
             Framerate = reader.ReadSingle();
@@ -33,7 +34,7 @@ namespace DatReaderWriter.Types {
 
         /// <inheritdoc />
         public bool Pack(DatBinWriter writer) {
-            writer.WriteUInt32(AnimId);
+            writer.WriteItem<QualifiedDataId<Animation>>(AnimId);
             writer.WriteInt32(LowFrame);
             writer.WriteInt32(HighFrame);
             writer.WriteSingle(Framerate);

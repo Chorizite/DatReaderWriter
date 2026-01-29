@@ -18,7 +18,7 @@ namespace DatReaderWriter.DBObjs {
     /// <summary>
     /// DB_TYPE_GFXOBJ in the client. Main visual geometry object (mesh + surfaces + physics)
     /// </summary>
-    [DBObjType(typeof(GfxObj), DatFileType.Portal, DBObjType.GfxObj, DBObjHeaderFlags.HasId, 0x01000000, 0x0100FFFF, 0x00000000)]
+    [DBObjType(typeof(GfxObj), DatFileType.Portal, DBObjType.GfxObj, DBObjHeaderFlags.HasId, 0x01000000, 0x0100FFFF, 0x01000000)]
     public partial class GfxObj : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;

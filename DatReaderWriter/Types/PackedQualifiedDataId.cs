@@ -1,3 +1,4 @@
+using DatReaderWriter.Lib;
 using DatReaderWriter.Lib.IO;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -5,9 +6,9 @@ using System.Threading;
 using System.Threading.Tasks;
 
 namespace DatReaderWriter.Types {
-    public abstract class QualifiedDataId {
+    public abstract class PackedQualifiedDataId {
         // implicit conversion to uint
-        public static implicit operator uint(QualifiedDataId qualifiedDataId) => qualifiedDataId.DataId;
+        public static implicit operator uint(PackedQualifiedDataId qualifiedDataId) => qualifiedDataId.DataId;
         
         /// <summary>
         /// The id of the data object.
@@ -19,9 +20,9 @@ namespace DatReaderWriter.Types {
     /// A qualified data ID referencing a DBObj of type T.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class QualifiedDataId<T> : QualifiedDataId, IUnpackable, IPackable, IEquatable<uint> where T : DBObj {
-        public static implicit operator QualifiedDataId<T>(uint dataId) => new QualifiedDataId<T> { DataId = dataId };
-        public static implicit operator QualifiedDataId<T>(int dataId) => new QualifiedDataId<T> { DataId = (uint)dataId };
+    public class PackedQualifiedDataId<T> : PackedQualifiedDataId, IUnpackable, IPackable, IEquatable<uint> where T : DBObj {
+        public static implicit operator PackedQualifiedDataId<T>(uint dataId) => new PackedQualifiedDataId<T> { DataId = dataId };
+        public static implicit operator PackedQualifiedDataId<T>(int dataId) => new PackedQualifiedDataId<T> { DataId = (uint)dataId };
 
         /// <summary>
         /// Gets the data object for this qualified data ID from the given DatCollection.
@@ -60,13 +61,15 @@ namespace DatReaderWriter.Types {
 
         /// <inheritdoc />
         public bool Unpack(DatBinReader reader) {
-            DataId = reader.ReadUInt32();
+            var mask = DBObjAttributeCache.MaskFromType(typeof(T));
+            DataId = reader.ReadDataIdOfKnownType(mask);
             return true;
         }
 
         /// <inheritdoc />
         public bool Pack(DatBinWriter writer) {
-            writer.WriteUInt32(DataId);
+            var mask = DBObjAttributeCache.MaskFromType(typeof(T));
+            writer.WriteDataIdOfKnownType(DataId, mask);
             return true;
         }
 
@@ -93,12 +96,16 @@ namespace DatReaderWriter.Types {
                 return false;
             }
 
-            return Equals((QualifiedDataId<T>)obj);
+            return Equals((PackedQualifiedDataId<T>)obj);
         }
 
         public override int GetHashCode()
         {
             return (int)DataId;
+        }
+
+        public override string ToString() {
+            return $"0x{DataId:X8}({typeof(T).Name})";
         }
     }
 }

@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using DatReaderWriter.Enums;
+using DatReaderWriter.DBObjs;
 using DatReaderWriter.Lib;
 using DatReaderWriter.Lib.Attributes;
 using DatReaderWriter.Lib.IO;
@@ -16,7 +17,7 @@ namespace DatReaderWriter.Types {
     public partial class DayGroup : IDatObjType {
         public float ChanceOfOccur;
 
-        public string DayName;
+        public AC1LegacyPStringBase<byte> DayName = new();
 
         public List<SkyObject> SkyObjects = [];
 
@@ -25,7 +26,7 @@ namespace DatReaderWriter.Types {
         /// <inheritdoc />
         public bool Unpack(DatBinReader reader) {
             ChanceOfOccur = reader.ReadSingle();
-            DayName = reader.ReadString16L();
+            DayName = reader.ReadItem<AC1LegacyPStringBase<byte>>();
             reader.Align(4);
             var _numSkyObjects = reader.ReadUInt32();
             for (var i=0; i < _numSkyObjects; i++) {
@@ -41,7 +42,7 @@ namespace DatReaderWriter.Types {
         /// <inheritdoc />
         public bool Pack(DatBinWriter writer) {
             writer.WriteSingle(ChanceOfOccur);
-            writer.WriteString16L(DayName);
+            writer.WriteItem<AC1LegacyPStringBase<byte>>(DayName);
             writer.Align(4);
             writer.WriteUInt32((uint)SkyObjects.Count());
             foreach (var item in SkyObjects) {

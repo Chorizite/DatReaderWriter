@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using DatReaderWriter.Enums;
+using DatReaderWriter.DBObjs;
 using DatReaderWriter.Lib;
 using DatReaderWriter.Lib.Attributes;
 using DatReaderWriter.Lib.IO;
@@ -17,7 +18,7 @@ namespace DatReaderWriter.Types {
         /// <inheritdoc />
         public override AnimationHookType HookType => AnimationHookType.CreateParticle;
 
-        public uint EmitterInfoId;
+        public QualifiedDataId<ParticleEmitter> EmitterInfoId = new();
 
         public uint PartIndex;
 
@@ -28,7 +29,7 @@ namespace DatReaderWriter.Types {
         /// <inheritdoc />
         public override bool Unpack(DatBinReader reader) {
             base.Unpack(reader);
-            EmitterInfoId = reader.ReadUInt32();
+            EmitterInfoId = reader.ReadItem<QualifiedDataId<ParticleEmitter>>();
             PartIndex = reader.ReadUInt32();
             Offset = reader.ReadItem<Frame>();
             EmitterId = reader.ReadUInt32();
@@ -38,7 +39,7 @@ namespace DatReaderWriter.Types {
         /// <inheritdoc />
         public override bool Pack(DatBinWriter writer) {
             base.Pack(writer);
-            writer.WriteUInt32(EmitterInfoId);
+            writer.WriteItem<QualifiedDataId<ParticleEmitter>>(EmitterInfoId);
             writer.WriteUInt32(PartIndex);
             writer.WriteItem<Frame>(Offset);
             writer.WriteUInt32(EmitterId);

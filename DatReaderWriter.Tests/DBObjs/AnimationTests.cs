@@ -83,6 +83,19 @@ namespace DatReaderWriter.Tests.DBObjs {
             Assert.IsNotNull(soundTableHook);
             Assert.AreEqual(AnimationHookDir.Forward, soundTableHook.Direction);
             Assert.AreEqual(Sound.Death1, soundTableHook.SoundType);
+            
+            var res2 = dat.TryGet<Animation>(0x0300055B, out var anim2);
+            Assert.IsTrue(res2);
+            Assert.IsNotNull(anim2);
+            Assert.AreEqual(0x0300055Bu, anim2.Id);
+            foreach (var x in anim2.PartFrames) {
+                Console.WriteLine("- Part Frame - ");
+                foreach (var hook in x.Hooks) {
+                    if (hook is ReplaceObjectHook replace) {
+                        Console.WriteLine($"Replace: {replace.PartId}");
+                    }
+                }
+            }
 
             dat.Dispose();
         }

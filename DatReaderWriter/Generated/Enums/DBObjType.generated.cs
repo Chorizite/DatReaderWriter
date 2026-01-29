@@ -174,7 +174,7 @@ namespace DatReaderWriter.Enums {
         LanguageString,
 
         /// <summary>
-        /// DBObj ParticleEmitter - DB_TYPE_PARTICLE_EMITTER in the client.
+        /// DBObj ParticleEmitter - DB_TYPE_PARTICLE_EMITTER in the client. Defines parameters for a particle emitter system (how, when, and what particles are spawned).
         /// </summary>
         ParticleEmitter,
 

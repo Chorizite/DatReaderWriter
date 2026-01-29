@@ -8,13 +8,14 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using DatReaderWriter.Enums;
+using DatReaderWriter.DBObjs;
 using DatReaderWriter.Lib;
 using DatReaderWriter.Lib.Attributes;
 using DatReaderWriter.Lib.IO;
 
 namespace DatReaderWriter.Types {
     public partial class EyeStripCG : IDatObjType {
-        public uint IconId;
+        public QualifiedDataId<RenderSurface> IconId = new();
 
         public uint BaldIconId;
 
@@ -24,7 +25,7 @@ namespace DatReaderWriter.Types {
 
         /// <inheritdoc />
         public bool Unpack(DatBinReader reader) {
-            IconId = reader.ReadUInt32();
+            IconId = reader.ReadItem<QualifiedDataId<RenderSurface>>();
             BaldIconId = reader.ReadUInt32();
             ObjDesc = reader.ReadItem<ObjDesc>();
             BaldObjDesc = reader.ReadItem<ObjDesc>();
@@ -33,7 +34,7 @@ namespace DatReaderWriter.Types {
 
         /// <inheritdoc />
         public bool Pack(DatBinWriter writer) {
-            writer.WriteUInt32(IconId);
+            writer.WriteItem<QualifiedDataId<RenderSurface>>(IconId);
             writer.WriteUInt32(BaldIconId);
             writer.WriteItem<ObjDesc>(ObjDesc);
             writer.WriteItem<ObjDesc>(BaldObjDesc);

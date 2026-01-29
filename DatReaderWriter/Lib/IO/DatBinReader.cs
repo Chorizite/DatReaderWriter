@@ -409,5 +409,65 @@ namespace DatReaderWriter.Lib.IO {
             }
             return str.ToString();
         }
+        
+        /// <summary>
+        /// Reads a generic type from the current stream.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        /// <exception cref="NotSupportedException"></exception>
+        public T ReadGeneric<T>() {
+            var type = typeof(T);
+            if (type == typeof(uint)) return (T)(object)ReadUInt32();
+            if (type == typeof(int)) return (T)(object)ReadInt32();
+            if (type == typeof(ulong)) return (T)(object)ReadUInt64();
+            if (type == typeof(long)) return (T)(object)ReadInt64();
+            if (type == typeof(ushort)) return (T)(object)ReadUInt16();
+            if (type == typeof(short)) return (T)(object)ReadInt16();
+            if (type == typeof(byte)) return (T)(object)ReadByte();
+            if (type == typeof(sbyte)) return (T)(object)ReadSByte();
+            if (type == typeof(bool)) return (T)(object)ReadBool();
+            if (type == typeof(float)) return (T)(object)ReadSingle();
+            if (type == typeof(double)) return (T)(object)ReadDouble();
+            if (type == typeof(string)) return (T)(object)ReadString16L();
+            if (type == typeof(Guid)) return (T)(object)ReadGuid();
+            
+            // Check if this is an enum, get the underlying type or default to int
+            if (type.IsEnum) {
+                var underlyingType = Enum.GetUnderlyingType(type);
+                if (underlyingType == typeof(byte)) {
+                    var val = ReadByte();
+                    return (T)(object)Enum.ToObject(type, val);
+                }
+                else if (underlyingType == typeof(sbyte)) {
+                    var val = ReadSByte();
+                    return (T)(object)Enum.ToObject(type, val);
+                }
+                else if (underlyingType == typeof(ushort)) {
+                    var val = ReadUInt16();
+                    return (T)(object)Enum.ToObject(type, val);
+                }
+                else if (underlyingType == typeof(short)) {
+                    var val = ReadInt16();
+                    return (T)(object)Enum.ToObject(type, val);
+                }
+                else if (underlyingType == typeof(uint)) {
+                    var val = ReadUInt32();
+                    return (T)(object)Enum.ToObject(type, val);
+                }
+                else {
+                    var val = ReadInt32();
+                    return (T)(object)Enum.ToObject(type, val);
+                }
+            }
+
+            if (typeof(IUnpackable).IsAssignableFrom(type)) {
+                var item = (IUnpackable)Activator.CreateInstance(type);
+                item.Unpack(this);
+                return (T)item;
+            }
+
+            throw new NotSupportedException($"Type {type.Name} is not supported by ReadGeneric.");
+        }
     }
 }

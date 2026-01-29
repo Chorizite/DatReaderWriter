@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using DatReaderWriter.Enums;
+using DatReaderWriter.DBObjs;
 using DatReaderWriter.Lib;
 using DatReaderWriter.Lib.Attributes;
 using DatReaderWriter.Lib.IO;
@@ -18,21 +19,21 @@ namespace DatReaderWriter.Types {
 
         public uint Scale;
 
-        public uint SetupId;
+        public QualifiedDataId<Setup> SetupId = new();
 
-        public uint SoundTable;
+        public QualifiedDataId<SoundTable> SoundTable = new();
 
-        public uint IconId;
+        public QualifiedDataId<RenderSurface> IconId = new();
 
-        public uint BasePalette;
+        public QualifiedDataId<Palette> BasePalette = new();
 
-        public uint SkinPalSet;
+        public QualifiedDataId<PalSet> SkinPalSet = new();
 
-        public uint PhysicsTable;
+        public QualifiedDataId<PhysicsScriptTable> PhysicsTable = new();
 
-        public uint MotionTable;
+        public QualifiedDataId<MotionTable> MotionTable = new();
 
-        public uint CombatTable;
+        public QualifiedDataId<CombatTable> CombatTable = new();
 
         public ObjDesc BaseObjDesc;
 
@@ -62,14 +63,14 @@ namespace DatReaderWriter.Types {
         public bool Unpack(DatBinReader reader) {
             Name = reader.ReadString();
             Scale = reader.ReadUInt32();
-            SetupId = reader.ReadUInt32();
-            SoundTable = reader.ReadUInt32();
-            IconId = reader.ReadUInt32();
-            BasePalette = reader.ReadUInt32();
-            SkinPalSet = reader.ReadUInt32();
-            PhysicsTable = reader.ReadUInt32();
-            MotionTable = reader.ReadUInt32();
-            CombatTable = reader.ReadUInt32();
+            SetupId = reader.ReadItem<QualifiedDataId<Setup>>();
+            SoundTable = reader.ReadItem<QualifiedDataId<SoundTable>>();
+            IconId = reader.ReadItem<QualifiedDataId<RenderSurface>>();
+            BasePalette = reader.ReadItem<QualifiedDataId<Palette>>();
+            SkinPalSet = reader.ReadItem<QualifiedDataId<PalSet>>();
+            PhysicsTable = reader.ReadItem<QualifiedDataId<PhysicsScriptTable>>();
+            MotionTable = reader.ReadItem<QualifiedDataId<MotionTable>>();
+            CombatTable = reader.ReadItem<QualifiedDataId<CombatTable>>();
             BaseObjDesc = reader.ReadItem<ObjDesc>();
             var _numHairColors = reader.ReadCompressedUInt();
             for (var i=0; i < _numHairColors; i++) {
@@ -122,14 +123,14 @@ namespace DatReaderWriter.Types {
         public bool Pack(DatBinWriter writer) {
             writer.WriteString(Name);
             writer.WriteUInt32(Scale);
-            writer.WriteUInt32(SetupId);
-            writer.WriteUInt32(SoundTable);
-            writer.WriteUInt32(IconId);
-            writer.WriteUInt32(BasePalette);
-            writer.WriteUInt32(SkinPalSet);
-            writer.WriteUInt32(PhysicsTable);
-            writer.WriteUInt32(MotionTable);
-            writer.WriteUInt32(CombatTable);
+            writer.WriteItem<QualifiedDataId<Setup>>(SetupId);
+            writer.WriteItem<QualifiedDataId<SoundTable>>(SoundTable);
+            writer.WriteItem<QualifiedDataId<RenderSurface>>(IconId);
+            writer.WriteItem<QualifiedDataId<Palette>>(BasePalette);
+            writer.WriteItem<QualifiedDataId<PalSet>>(SkinPalSet);
+            writer.WriteItem<QualifiedDataId<PhysicsScriptTable>>(PhysicsTable);
+            writer.WriteItem<QualifiedDataId<MotionTable>>(MotionTable);
+            writer.WriteItem<QualifiedDataId<CombatTable>>(CombatTable);
             writer.WriteItem<ObjDesc>(BaseObjDesc);
             writer.WriteCompressedUInt((uint)HairColors.Count());
             foreach (var item in HairColors) {

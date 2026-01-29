@@ -23,7 +23,7 @@ namespace DatReaderWriter.Tests.DBObjs {
                 Id = 0x39000001u,
                 EnumMapper = new EnumMapperData() {
                     BaseEnumMap = 0x12345678,
-                    IdToStringMap = new Dictionary<uint, string>() {
+                    IdToStringMap = new () {
                         { 1, "test" },
                     },
                     Unknown = 0x12345678,
@@ -60,10 +60,7 @@ namespace DatReaderWriter.Tests.DBObjs {
         [TestMethod]
         [TestCategory("EOR")]
         public void CanReadEOR() {
-            using var dat = new DatDatabase(options => {
-                options.FilePath = Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat");
-                options.IndexCachingStrategy = IndexCachingStrategy.Never;
-            });
+            using var dat = new DatCollection(EORCommonData.DatDirectory);
 
             var res = dat.TryGet<MasterProperty>(0x39000001u, out var readObj);
             Assert.IsTrue(res);

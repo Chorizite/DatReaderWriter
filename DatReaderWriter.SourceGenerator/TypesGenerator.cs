@@ -46,6 +46,7 @@ namespace DatReaderWriter.SourceGenerator {
                     writer.WriteLine("using System.Linq;");
                     writer.WriteLine("using System.Collections.Generic;");
                     writer.WriteLine("using DatReaderWriter.Enums;");
+                    writer.WriteLine("using DatReaderWriter.DBObjs;");
                     writer.WriteLine("using DatReaderWriter.Lib;");
                     writer.WriteLine("using DatReaderWriter.Lib.Attributes;");
                     writer.WriteLine("using DatReaderWriter.Lib.IO;");

@@ -18,13 +18,13 @@ namespace DatReaderWriter.DBObjs {
     /// <summary>
     /// DB_TYPE_PARTICLE_EMITTER in the client. Defines parameters for a particle emitter system (how, when, and what particles are spawned).
     /// </summary>
-    [DBObjType(typeof(ParticleEmitter), DatFileType.Portal, DBObjType.ParticleEmitter, DBObjHeaderFlags.HasId, 0x32000000, 0x3200FFFF, 0x00000000)]
-    public partial class ParticleEmitter : DBObj {
+    [DBObjType(typeof(ParticleEmitterInfo), DatFileType.Portal, DBObjType.ParticleEmitterInfo, DBObjHeaderFlags.HasId, 0x32000000, 0x3200FFFF, 0x00000000)]
+    public partial class ParticleEmitterInfo : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;
 
         /// <inheritdoc />
-        public override DBObjType DBObjType => DBObjType.ParticleEmitter;
+        public override DBObjType DBObjType => DBObjType.ParticleEmitterInfo;
 
         public uint Unknown;
 

@@ -6,15 +6,15 @@ using System.Linq;
 
 namespace DatReaderWriter.Types {
     /// <summary>
-    /// A hash table that supports packing and unpacking. Sorts entries by hash key modulus bucket size.
+    /// A hash table that supports packing and unpacking. Does not sort entries when packing.
     /// </summary>
     /// <typeparam name="TKey"></typeparam>
     /// <typeparam name="TValue"></typeparam>
-    public class PackableHashTable<TKey, TValue> : Dictionary<TKey, TValue>, IUnpackable, IPackable {
+    public class PHashTable<TKey, TValue> : Dictionary<TKey, TValue>, IUnpackable, IPackable {
         /// <summary>
         /// The size of the hash table buckets.
         /// </summary>
-        public ushort BucketSize { get; set; } = 32;
+        public ushort BucketSize { get; set; } = 256;
 
         public bool Unpack(DatBinReader reader) {
             var numElements = reader.ReadUInt16();
@@ -31,11 +31,7 @@ namespace DatReaderWriter.Types {
             writer.WriteUInt16((ushort)this.Count);
             writer.WriteUInt16((ushort)BucketSize);
             
-            // Sort by key modulus bucketSize
-            var sortedItems = this
-                .OrderBy(x => HashTableHelpers.GetHashKey(x.Key) % (ulong)BucketSize);
-            
-            foreach (var kvp in sortedItems) {
+            foreach (var kvp in this) {
                 writer.WriteGeneric(kvp.Key);
                 writer.WriteGeneric(kvp.Value);
             }

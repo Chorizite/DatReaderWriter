@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using DatReaderWriter.Enums;
+using DatReaderWriter.DBObjs;
 using DatReaderWriter.Lib;
 using DatReaderWriter.Lib.Attributes;
 using DatReaderWriter.Lib.IO;
@@ -18,13 +19,13 @@ namespace DatReaderWriter.Types {
 
         public bool IsNight;
 
-        public string Name;
+        public AC1LegacyPStringBase<byte> Name = new();
 
         /// <inheritdoc />
         public bool Unpack(DatBinReader reader) {
             Start = reader.ReadSingle();
             IsNight = reader.ReadBool(4);
-            Name = reader.ReadString16L();
+            Name = reader.ReadItem<AC1LegacyPStringBase<byte>>();
             reader.Align(4);
             return true;
         }
@@ -33,7 +34,7 @@ namespace DatReaderWriter.Types {
         public bool Pack(DatBinWriter writer) {
             writer.WriteSingle(Start);
             writer.WriteBool(IsNight, 4);
-            writer.WriteString16L(Name);
+            writer.WriteItem<AC1LegacyPStringBase<byte>>(Name);
             writer.Align(4);
             return true;
         }

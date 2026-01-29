@@ -18,7 +18,7 @@ namespace DatReaderWriter.DBObjs {
     /// <summary>
     /// DB_TYPE_WAVE in the client - sound wave / audio sample data
     /// </summary>
-    [DBObjType(typeof(Wave), DatFileType.Portal, DBObjType.Wave, DBObjHeaderFlags.HasId, 0x0A000000, 0x0A00FFFF, 0x00000000)]
+    [DBObjType(typeof(Wave), DatFileType.Portal, DBObjType.Wave, DBObjHeaderFlags.HasId, 0x0A000000, 0x0A00FFFF, 0x0A000000)]
     public partial class Wave : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;

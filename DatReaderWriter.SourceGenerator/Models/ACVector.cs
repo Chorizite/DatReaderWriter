@@ -17,7 +17,7 @@ namespace DatReaderWriter.SourceGenerator.Models {
         public string GenericKey { get; set; }
         public string GenericValue { get; set; }
 
-        public bool IsGenericNonContainer => Type == "QualifiedDataId" || Type.Contains("PStringBase");
+        public bool IsGenericNonContainer => Type.Contains("QualifiedDataId") || Type.Contains("PStringBase");
 
         public string TypeDeclaration {
             get {

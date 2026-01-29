@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using DatReaderWriter.Enums;
+using DatReaderWriter.DBObjs;
 using DatReaderWriter.Lib;
 using DatReaderWriter.Lib.Attributes;
 using DatReaderWriter.Lib.IO;
@@ -16,19 +17,19 @@ namespace DatReaderWriter.Types {
     public partial class AnimationPartChange : IDatObjType {
         public byte PartIndex;
 
-        public uint PartId;
+        public PackedQualifiedDataId<GfxObj> PartId = new();
 
         /// <inheritdoc />
         public bool Unpack(DatBinReader reader) {
             PartIndex = reader.ReadByte();
-            PartId = reader.ReadDataIdOfKnownType(0x01000000);
+            PartId = reader.ReadItem<PackedQualifiedDataId<GfxObj>>();
             return true;
         }
 
         /// <inheritdoc />
         public bool Pack(DatBinWriter writer) {
             writer.WriteByte(PartIndex);
-            writer.WriteDataIdOfKnownType(PartId, 0x01000000);
+            writer.WriteItem<PackedQualifiedDataId<GfxObj>>(PartId);
             return true;
         }
 

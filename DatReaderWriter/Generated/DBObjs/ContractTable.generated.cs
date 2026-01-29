@@ -26,30 +26,19 @@ namespace DatReaderWriter.DBObjs {
         /// <inheritdoc />
         public override DBObjType DBObjType => DBObjType.ContractTable;
 
-        public Dictionary<uint, Contract> Contracts = [];
+        public PackableHashTable<uint, Contract> Contracts = [];
 
         /// <inheritdoc />
         public override bool Unpack(DatBinReader reader) {
             base.Unpack(reader);
-            var _numContracts = reader.ReadUInt16();
-            var _numBuckets = reader.ReadUInt16();
-            for (var i=0; i < _numContracts; i++) {
-                var _key = reader.ReadUInt32();
-                var _val = reader.ReadItem<Contract>();
-                Contracts.Add(_key, _val);
-            }
+            Contracts = reader.ReadItem<PackableHashTable<uint, Contract>>();
             return true;
         }
 
         /// <inheritdoc />
         public override bool Pack(DatBinWriter writer) {
             base.Pack(writer);
-            writer.WriteUInt16((ushort)Contracts.Count());
-            writer.WriteUInt16(4096);
-            foreach (var kv in Contracts) {
-                writer.WriteUInt32(kv.Key);
-                writer.WriteItem<Contract>(kv.Value);
-            }
+            writer.WriteItem<PackableHashTable<uint, Contract>>(Contracts);
             return true;
         }
     }

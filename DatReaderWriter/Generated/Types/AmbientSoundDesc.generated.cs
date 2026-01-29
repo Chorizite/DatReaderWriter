@@ -8,13 +8,14 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using DatReaderWriter.Enums;
+using DatReaderWriter.DBObjs;
 using DatReaderWriter.Lib;
 using DatReaderWriter.Lib.Attributes;
 using DatReaderWriter.Lib.IO;
 
 namespace DatReaderWriter.Types {
     public partial class AmbientSoundDesc : IDatObjType {
-        public uint SType;
+        public Sound SType;
 
         public float Volume;
 
@@ -26,7 +27,7 @@ namespace DatReaderWriter.Types {
 
         /// <inheritdoc />
         public bool Unpack(DatBinReader reader) {
-            SType = reader.ReadUInt32();
+            SType = (Sound)reader.ReadUInt32();
             Volume = reader.ReadSingle();
             BaseChance = reader.ReadSingle();
             MinRate = reader.ReadSingle();
@@ -36,7 +37,7 @@ namespace DatReaderWriter.Types {
 
         /// <inheritdoc />
         public bool Pack(DatBinWriter writer) {
-            writer.WriteUInt32(SType);
+            writer.WriteUInt32((uint)SType);
             writer.WriteSingle(Volume);
             writer.WriteSingle(BaseChance);
             writer.WriteSingle(MinRate);

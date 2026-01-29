@@ -8,13 +8,14 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using DatReaderWriter.Enums;
+using DatReaderWriter.DBObjs;
 using DatReaderWriter.Lib;
 using DatReaderWriter.Lib.Attributes;
 using DatReaderWriter.Lib.IO;
 
 namespace DatReaderWriter.Types {
     public partial class SubPalette : IDatObjType {
-        public uint SubId;
+        public PackedQualifiedDataId<Palette> SubId = new();
 
         public byte Offset;
 
@@ -22,7 +23,7 @@ namespace DatReaderWriter.Types {
 
         /// <inheritdoc />
         public bool Unpack(DatBinReader reader) {
-            SubId = reader.ReadDataIdOfKnownType(0x04000000);
+            SubId = reader.ReadItem<PackedQualifiedDataId<Palette>>();
             Offset = reader.ReadByte();
             NumColors = reader.ReadByte();
             return true;
@@ -30,7 +31,7 @@ namespace DatReaderWriter.Types {
 
         /// <inheritdoc />
         public bool Pack(DatBinWriter writer) {
-            writer.WriteDataIdOfKnownType(SubId, 0x04000000);
+            writer.WriteItem<PackedQualifiedDataId<Palette>>(SubId);
             writer.WriteByte(Offset);
             writer.WriteByte(NumColors);
             return true;

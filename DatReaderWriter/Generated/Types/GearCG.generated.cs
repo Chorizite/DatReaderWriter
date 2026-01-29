@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using DatReaderWriter.Enums;
+using DatReaderWriter.DBObjs;
 using DatReaderWriter.Lib;
 using DatReaderWriter.Lib.Attributes;
 using DatReaderWriter.Lib.IO;
@@ -16,14 +17,14 @@ namespace DatReaderWriter.Types {
     public partial class GearCG : IDatObjType {
         public string Name;
 
-        public uint ClothingTable;
+        public QualifiedDataId<ClothingTable> ClothingTable = new();
 
         public uint WeenieDefault;
 
         /// <inheritdoc />
         public bool Unpack(DatBinReader reader) {
             Name = reader.ReadString();
-            ClothingTable = reader.ReadUInt32();
+            ClothingTable = reader.ReadItem<QualifiedDataId<ClothingTable>>();
             WeenieDefault = reader.ReadUInt32();
             return true;
         }
@@ -31,7 +32,7 @@ namespace DatReaderWriter.Types {
         /// <inheritdoc />
         public bool Pack(DatBinWriter writer) {
             writer.WriteString(Name);
-            writer.WriteUInt32(ClothingTable);
+            writer.WriteItem<QualifiedDataId<ClothingTable>>(ClothingTable);
             writer.WriteUInt32(WeenieDefault);
             return true;
         }

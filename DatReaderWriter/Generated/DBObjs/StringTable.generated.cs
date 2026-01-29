@@ -31,21 +31,13 @@ namespace DatReaderWriter.DBObjs {
         /// </summary>
         public uint Language;
 
-        public byte Unknown;
-
-        public Dictionary<uint, StringTableData> StringTableData = [];
+        public HashTable<uint, StringTableData> StringTableData = [];
 
         /// <inheritdoc />
         public override bool Unpack(DatBinReader reader) {
             base.Unpack(reader);
             Language = reader.ReadUInt32();
-            Unknown = reader.ReadByte();
-            var _numEntries = reader.ReadCompressedUInt();
-            for (var i=0; i < _numEntries; i++) {
-                var _key = reader.ReadUInt32();
-                var _val = reader.ReadItem<StringTableData>();
-                StringTableData.Add(_key, _val);
-            }
+            StringTableData = reader.ReadItem<HashTable<uint, StringTableData>>();
             return true;
         }
 
@@ -53,12 +45,7 @@ namespace DatReaderWriter.DBObjs {
         public override bool Pack(DatBinWriter writer) {
             base.Pack(writer);
             writer.WriteUInt32(Language);
-            writer.WriteByte(Unknown);
-            writer.WriteCompressedUInt((uint)StringTableData.Count());
-            foreach (var kv in StringTableData) {
-                writer.WriteUInt32(kv.Key);
-                writer.WriteItem<StringTableData>(kv.Value);
-            }
+            writer.WriteItem<HashTable<uint, StringTableData>>(StringTableData);
             return true;
         }
     }

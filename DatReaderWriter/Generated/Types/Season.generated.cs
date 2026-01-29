@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using DatReaderWriter.Enums;
+using DatReaderWriter.DBObjs;
 using DatReaderWriter.Lib;
 using DatReaderWriter.Lib.Attributes;
 using DatReaderWriter.Lib.IO;
@@ -16,12 +17,12 @@ namespace DatReaderWriter.Types {
     public partial class Season : IDatObjType {
         public uint Start;
 
-        public string Name;
+        public AC1LegacyPStringBase<byte> Name = new();
 
         /// <inheritdoc />
         public bool Unpack(DatBinReader reader) {
             Start = reader.ReadUInt32();
-            Name = reader.ReadString16L();
+            Name = reader.ReadItem<AC1LegacyPStringBase<byte>>();
             reader.Align(4);
             return true;
         }
@@ -29,7 +30,7 @@ namespace DatReaderWriter.Types {
         /// <inheritdoc />
         public bool Pack(DatBinWriter writer) {
             writer.WriteUInt32(Start);
-            writer.WriteString16L(Name);
+            writer.WriteItem<AC1LegacyPStringBase<byte>>(Name);
             writer.Align(4);
             return true;
         }

@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using DatReaderWriter.Enums;
+using DatReaderWriter.DBObjs;
 using DatReaderWriter.Lib;
 using DatReaderWriter.Lib.Attributes;
 using DatReaderWriter.Lib.IO;
@@ -16,14 +17,14 @@ namespace DatReaderWriter.Types {
     public partial class SceneType : IDatObjType {
         public uint StbIndex;
 
-        public List<uint> Scenes = [];
+        public List<QualifiedDataId<Scene>> Scenes = [];
 
         /// <inheritdoc />
         public bool Unpack(DatBinReader reader) {
             StbIndex = reader.ReadUInt32();
             var _numScenes = reader.ReadUInt32();
             for (var i=0; i < _numScenes; i++) {
-                Scenes.Add(reader.ReadUInt32());
+                Scenes.Add(reader.ReadItem<QualifiedDataId<Scene>>());
             }
             return true;
         }
@@ -33,7 +34,7 @@ namespace DatReaderWriter.Types {
             writer.WriteUInt32(StbIndex);
             writer.WriteUInt32((uint)Scenes.Count());
             foreach (var item in Scenes) {
-                writer.WriteUInt32(item);
+                writer.WriteItem<QualifiedDataId<Scene>>(item);
             }
             return true;
         }

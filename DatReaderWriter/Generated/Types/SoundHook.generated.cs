@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using DatReaderWriter.Enums;
+using DatReaderWriter.DBObjs;
 using DatReaderWriter.Lib;
 using DatReaderWriter.Lib.Attributes;
 using DatReaderWriter.Lib.IO;
@@ -17,19 +18,19 @@ namespace DatReaderWriter.Types {
         /// <inheritdoc />
         public override AnimationHookType HookType => AnimationHookType.Sound;
 
-        public uint Id;
+        public QualifiedDataId<Wave> Id = new();
 
         /// <inheritdoc />
         public override bool Unpack(DatBinReader reader) {
             base.Unpack(reader);
-            Id = reader.ReadUInt32();
+            Id = reader.ReadItem<QualifiedDataId<Wave>>();
             return true;
         }
 
         /// <inheritdoc />
         public override bool Pack(DatBinWriter writer) {
             base.Pack(writer);
-            writer.WriteUInt32(Id);
+            writer.WriteItem<QualifiedDataId<Wave>>(Id);
             return true;
         }
 

@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using DatReaderWriter.Enums;
+using DatReaderWriter.DBObjs;
 using DatReaderWriter.Lib;
 using DatReaderWriter.Lib.Attributes;
 using DatReaderWriter.Lib.IO;
@@ -16,7 +17,7 @@ namespace DatReaderWriter.Types {
     public partial class CloSubPalette : IDatObjType {
         public List<CloSubPaletteRange> Ranges = [];
 
-        public uint PaletteSet;
+        public QualifiedDataId<PalSet> PaletteSet = new();
 
         /// <inheritdoc />
         public bool Unpack(DatBinReader reader) {
@@ -24,7 +25,7 @@ namespace DatReaderWriter.Types {
             for (var i=0; i < _numRanges; i++) {
                 Ranges.Add(reader.ReadItem<CloSubPaletteRange>());
             }
-            PaletteSet = reader.ReadUInt32();
+            PaletteSet = reader.ReadItem<QualifiedDataId<PalSet>>();
             return true;
         }
 
@@ -34,7 +35,7 @@ namespace DatReaderWriter.Types {
             foreach (var item in Ranges) {
                 writer.WriteItem<CloSubPaletteRange>(item);
             }
-            writer.WriteUInt32(PaletteSet);
+            writer.WriteItem<QualifiedDataId<PalSet>>(PaletteSet);
             return true;
         }
 

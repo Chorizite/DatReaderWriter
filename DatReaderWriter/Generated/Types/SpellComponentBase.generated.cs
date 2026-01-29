@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using DatReaderWriter.Enums;
+using DatReaderWriter.DBObjs;
 using DatReaderWriter.Lib;
 using DatReaderWriter.Lib.Attributes;
 using DatReaderWriter.Lib.IO;
@@ -21,7 +22,7 @@ namespace DatReaderWriter.Types {
 
         public uint Category;
 
-        public uint Icon;
+        public QualifiedDataId<RenderSurface> Icon = new();
 
         public ComponentType Type;
 
@@ -38,7 +39,7 @@ namespace DatReaderWriter.Types {
             Name = reader.ReadObfuscatedString();
             reader.Align(4);
             Category = reader.ReadUInt32();
-            Icon = reader.ReadUInt32();
+            Icon = reader.ReadItem<QualifiedDataId<RenderSurface>>();
             Type = (ComponentType)reader.ReadUInt32();
             Gesture = reader.ReadUInt32();
             Time = reader.ReadSingle();
@@ -53,7 +54,7 @@ namespace DatReaderWriter.Types {
             writer.WriteObfuscatedString(Name);
             writer.Align(4);
             writer.WriteUInt32(Category);
-            writer.WriteUInt32(Icon);
+            writer.WriteItem<QualifiedDataId<RenderSurface>>(Icon);
             writer.WriteUInt32((uint)Type);
             writer.WriteUInt32(Gesture);
             writer.WriteSingle(Time);

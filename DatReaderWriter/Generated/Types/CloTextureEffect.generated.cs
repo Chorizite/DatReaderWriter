@@ -8,27 +8,28 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using DatReaderWriter.Enums;
+using DatReaderWriter.DBObjs;
 using DatReaderWriter.Lib;
 using DatReaderWriter.Lib.Attributes;
 using DatReaderWriter.Lib.IO;
 
 namespace DatReaderWriter.Types {
     public partial class CloTextureEffect : IDatObjType {
-        public uint OldTexture;
+        public QualifiedDataId<SurfaceTexture> OldTexture = new();
 
-        public uint NewTexture;
+        public QualifiedDataId<SurfaceTexture> NewTexture = new();
 
         /// <inheritdoc />
         public bool Unpack(DatBinReader reader) {
-            OldTexture = reader.ReadUInt32();
-            NewTexture = reader.ReadUInt32();
+            OldTexture = reader.ReadItem<QualifiedDataId<SurfaceTexture>>();
+            NewTexture = reader.ReadItem<QualifiedDataId<SurfaceTexture>>();
             return true;
         }
 
         /// <inheritdoc />
         public bool Pack(DatBinWriter writer) {
-            writer.WriteUInt32(OldTexture);
-            writer.WriteUInt32(NewTexture);
+            writer.WriteItem<QualifiedDataId<SurfaceTexture>>(OldTexture);
+            writer.WriteItem<QualifiedDataId<SurfaceTexture>>(NewTexture);
             return true;
         }
 

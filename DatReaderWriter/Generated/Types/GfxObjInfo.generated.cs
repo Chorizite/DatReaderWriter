@@ -8,16 +8,14 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using DatReaderWriter.Enums;
+using DatReaderWriter.DBObjs;
 using DatReaderWriter.Lib;
 using DatReaderWriter.Lib.Attributes;
 using DatReaderWriter.Lib.IO;
 
 namespace DatReaderWriter.Types {
     public partial class GfxObjInfo : IDatObjType {
-        /// <summary>
-        /// Id of a GfxObj
-        /// </summary>
-        public uint Id;
+        public QualifiedDataId<GfxObj> Id = new();
 
         public uint DegradeMode;
 
@@ -29,7 +27,7 @@ namespace DatReaderWriter.Types {
 
         /// <inheritdoc />
         public bool Unpack(DatBinReader reader) {
-            Id = reader.ReadUInt32();
+            Id = reader.ReadItem<QualifiedDataId<GfxObj>>();
             DegradeMode = reader.ReadUInt32();
             MinDist = reader.ReadSingle();
             IdealDist = reader.ReadSingle();
@@ -39,7 +37,7 @@ namespace DatReaderWriter.Types {
 
         /// <inheritdoc />
         public bool Pack(DatBinWriter writer) {
-            writer.WriteUInt32(Id);
+            writer.WriteItem<QualifiedDataId<GfxObj>>(Id);
             writer.WriteUInt32(DegradeMode);
             writer.WriteSingle(MinDist);
             writer.WriteSingle(IdealDist);

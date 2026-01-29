@@ -18,7 +18,7 @@ namespace DatReaderWriter.DBObjs {
     /// <summary>
     /// DB_TYPE_SURFACE in the client. Main surface/material descriptor
     /// </summary>
-    [DBObjType(typeof(Surface), DatFileType.Portal, DBObjType.Surface, DBObjHeaderFlags.None, 0x08000000, 0x0800FFFF, 0x00000000)]
+    [DBObjType(typeof(Surface), DatFileType.Portal, DBObjType.Surface, DBObjHeaderFlags.None, 0x08000000, 0x0800FFFF, 0x08000000)]
     public partial class Surface : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.None;

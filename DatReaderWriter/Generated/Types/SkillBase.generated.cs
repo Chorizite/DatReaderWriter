@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using DatReaderWriter.Enums;
+using DatReaderWriter.DBObjs;
 using DatReaderWriter.Lib;
 using DatReaderWriter.Lib.Attributes;
 using DatReaderWriter.Lib.IO;
@@ -18,7 +19,7 @@ namespace DatReaderWriter.Types {
 
         public string Name;
 
-        public uint IconId;
+        public QualifiedDataId<RenderSurface> IconId = new();
 
         public int TrainedCost;
 
@@ -42,7 +43,7 @@ namespace DatReaderWriter.Types {
         public bool Unpack(DatBinReader reader) {
             Description = reader.ReadString16L();
             Name = reader.ReadString16L();
-            IconId = reader.ReadUInt32();
+            IconId = reader.ReadItem<QualifiedDataId<RenderSurface>>();
             TrainedCost = reader.ReadInt32();
             SpecializedCost = reader.ReadInt32();
             Category = (SkillCategory)reader.ReadUInt32();
@@ -59,7 +60,7 @@ namespace DatReaderWriter.Types {
         public bool Pack(DatBinWriter writer) {
             writer.WriteString16L(Description);
             writer.WriteString16L(Name);
-            writer.WriteUInt32(IconId);
+            writer.WriteItem<QualifiedDataId<RenderSurface>>(IconId);
             writer.WriteInt32(TrainedCost);
             writer.WriteInt32(SpecializedCost);
             writer.WriteUInt32((uint)Category);

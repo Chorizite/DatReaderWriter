@@ -24,7 +24,7 @@ namespace DatReaderWriter.Tests.DBObjs {
 
             var writeSpellTable = new SpellTable() {
                 Id = 0x0E00000E,
-                Spells = new Dictionary<uint, SpellBase>() {
+                Spells = new() {
                     { 1, new SpellBase() {
                         Name = "Test Spell",
                         Description = "Test Spell Description",

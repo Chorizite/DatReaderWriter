@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using DatReaderWriter.Enums;
+using DatReaderWriter.DBObjs;
 using DatReaderWriter.Lib;
 using DatReaderWriter.Lib.Attributes;
 using DatReaderWriter.Lib.IO;
@@ -22,7 +23,7 @@ namespace DatReaderWriter.Types {
 
         public uint DaysPerYear;
 
-        public string YearSpec;
+        public AC1LegacyPStringBase<byte> YearSpec = new();
 
         public List<TimeOfDay> TimesOfDay = [];
 
@@ -36,7 +37,7 @@ namespace DatReaderWriter.Types {
             ZeroYear = reader.ReadUInt32();
             DayLength = reader.ReadSingle();
             DaysPerYear = reader.ReadUInt32();
-            YearSpec = reader.ReadString16L();
+            YearSpec = reader.ReadItem<AC1LegacyPStringBase<byte>>();
             reader.Align(4);
             var _numTimesOfDay = reader.ReadUInt32();
             for (var i=0; i < _numTimesOfDay; i++) {
@@ -59,7 +60,7 @@ namespace DatReaderWriter.Types {
             writer.WriteUInt32(ZeroYear);
             writer.WriteSingle(DayLength);
             writer.WriteUInt32(DaysPerYear);
-            writer.WriteString16L(YearSpec);
+            writer.WriteItem<AC1LegacyPStringBase<byte>>(YearSpec);
             writer.Align(4);
             writer.WriteUInt32((uint)TimesOfDay.Count());
             foreach (var item in TimesOfDay) {
