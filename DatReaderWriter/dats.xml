@@ -3831,7 +3831,9 @@
                   last="0x15FFFFFF" flags="DBObjHeaderFlags.HasId | DBObjHeaderFlags.HasDataCategory">
                 <field type="TextureType" name="TextureType"/>
                 <field type="uint" name="_numSourceLevels"/>
-                <vector name="SourceLevels" length="_numSourceLevels" type="List" genericValue="uint"/>
+                <vector name="SourceLevels" length="_numSourceLevels" type="List">
+                    <vector type="QualifiedDataId" genericValue="RenderSurface"/>
+                </vector>
             </type>
             <type name="RenderMaterial" text="DB_TYPE_RENDERMATERIAL in the client" parent="DBObj" first="0x16000000"
                   last="0x16FFFFFF" flags="DBObjHeaderFlags.HasId">
