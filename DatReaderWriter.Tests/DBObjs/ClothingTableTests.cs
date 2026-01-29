@@ -10,7 +10,7 @@ using DatReaderWriter.Lib.IO;
 
 namespace DatReaderWriter.Tests.DBObjs {
     [TestClass]
-    public class ClothingTests {
+    public class ClothingTableTests {
         [TestMethod]
         public void CanInsertAndReadClothing() {
             var datFilePath = Path.GetTempFileName();
@@ -21,12 +21,12 @@ namespace DatReaderWriter.Tests.DBObjs {
 
             dat.BlockAllocator.InitNew(DatFileType.Portal, 0);
 
-            var writeObj = new Clothing() {
+            var writeObj = new ClothingTable() {
                 Id = 0x10000001,
-                ClothingBaseEffects = new Dictionary<uint, ClothingBaseEffect>() {
+                ClothingBaseEffects = new () {
                     { 1, new ClothingBaseEffect()}
                 },
-                ClothingSubPalEffects = new Dictionary<uint, CloSubPalEffect>() {
+                ClothingSubPalEffects = new () {
                     { 2, new CloSubPalEffect() }
                 }
             };
@@ -34,7 +34,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             var res = dat.TryWriteFile(writeObj);
             Assert.IsTrue(res);
 
-            var res2 = dat.TryGet<Clothing>(0x10000001, out var readObj);
+            var res2 = dat.TryGet<ClothingTable>(0x10000001, out var readObj);
             Assert.IsTrue(res2);
             Assert.IsNotNull(readObj);
 
@@ -53,13 +53,9 @@ namespace DatReaderWriter.Tests.DBObjs {
         [TestMethod]
         [TestCategory("EOR")]
         public void CanReadEORClothing() {
-            using var dat = new DatDatabase(options => {
-                options.FilePath = Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat");
-                options.IndexCachingStrategy = IndexCachingStrategy.Never;
-            });
+            using var dat = new DatCollection(EORCommonData.DatDirectory);
 
-
-            var res = dat.TryGet<Clothing>(0x10000064u, out var readObj);
+            var res = dat.TryGet<ClothingTable>(0x10000064u, out var readObj);
             Assert.IsTrue(res);
             Assert.IsNotNull(readObj);
             Assert.AreEqual(0x10000064u, readObj.Id);
@@ -75,8 +71,8 @@ namespace DatReaderWriter.Tests.DBObjs {
         [TestMethod]
         [TestCategory("EOR")]
         public void CanReadEORClothingAndWriteIdentical() {
-            TestHelpers.CanReadAndWriteIdentical<Clothing>(Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat"), 0x10000863);
-            TestHelpers.CanReadAndWriteIdentical<Clothing>(Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat"), 0x10000001);
+            TestHelpers.CanReadAndWriteIdentical<ClothingTable>(Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat"), 0x10000863);
+            TestHelpers.CanReadAndWriteIdentical<ClothingTable>(Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat"), 0x10000001);
         }
     }
 }

@@ -21,7 +21,7 @@ namespace DatReaderWriter.Tests.DBObjs {
 
             var writeAnim = new BadDataTable() {
                 Id = 0xE00001A,
-                BadIds = new Dictionary<uint, uint>() {
+                BadIds = new () {
                     { 1, 1 },
                     { 2, 2 }
                 }
@@ -47,10 +47,7 @@ namespace DatReaderWriter.Tests.DBObjs {
         [TestMethod]
         [TestCategory("EOR")]
         public void CanReadEORAnimations() {
-            using var dat = new DatDatabase(options => {
-                options.FilePath = Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat");
-                options.IndexCachingStrategy = IndexCachingStrategy.Never;
-            });
+            using var dat = new DatCollection(EORCommonData.DatDirectory);
 
 
             var res = dat.TryGet<BadDataTable>(0xE00001A, out var badData);

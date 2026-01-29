@@ -75,10 +75,7 @@ namespace DatReaderWriter.Tests.DBObjs {
         [TestMethod]
         [TestCategory("EOR")]
         public void CanReadEORSetup() {
-            using var dat = new DatDatabase(options => {
-                options.FilePath = Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat");
-                options.IndexCachingStrategy = IndexCachingStrategy.OnDemand;
-            });
+            using var dat = new DatCollection(EORCommonData.DatDirectory);
 
             var res = dat.TryGet<Setup>(0x02000108, out var setup1);
             Assert.IsTrue(res);
@@ -88,6 +85,10 @@ namespace DatReaderWriter.Tests.DBObjs {
 
             Assert.AreEqual(1, setup1.Parts.Count);
             Assert.AreEqual(0x010008ABu, setup1.Parts[0]);
+
+            var part = setup1.Parts.First().Get(dat);
+            Assert.IsNotNull(part);
+            Assert.AreEqual(setup1.Parts.First().DataId, part.Id);
 
             Assert.AreEqual(1, setup1.PlacementFrames.Count);
             Assert.AreEqual(0, setup1.PlacementFrames[Placement.Default].Hooks.Count);

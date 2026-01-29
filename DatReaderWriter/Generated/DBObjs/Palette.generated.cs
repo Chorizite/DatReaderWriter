@@ -16,7 +16,7 @@ using DatReaderWriter.Types;
 
 namespace DatReaderWriter.DBObjs {
     /// <summary>
-    /// DB_TYPE_PALETTE in the client.
+    /// DB_TYPE_PALETTE in the client. Defines a color lookup table
     /// </summary>
     [DBObjType(typeof(Palette), DatFileType.Portal, DBObjType.Palette, DBObjHeaderFlags.HasId, 0x04000000, 0x0400FFFF, 0x00000000)]
     public partial class Palette : DBObj {
@@ -26,6 +26,9 @@ namespace DatReaderWriter.DBObjs {
         /// <inheritdoc />
         public override DBObjType DBObjType => DBObjType.Palette;
 
+        /// <summary>
+        /// Array of 32-bit ARGB colors (0xAARRGGBB).
+        /// </summary>
         public List<ColorARGB> Colors = [];
 
         /// <inheritdoc />

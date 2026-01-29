@@ -5,14 +5,19 @@ using System.Linq;
 
 namespace DatReaderWriter.Types {
     /// <summary>
-    /// A hash table that can automatically grow and supports packing and unpacking.
+    /// A hash table that supports packing and unpacking.
     /// </summary>
     /// <typeparam name="TKey"></typeparam>
     /// <typeparam name="TValue"></typeparam>
-    public class AutoGrowHashTable<TKey, TValue> : Dictionary<TKey, TValue>, IUnpackable, IPackable {
+    public class HashTable<TKey, TValue> : Dictionary<TKey, TValue>, IUnpackable, IPackable {
+        /// <summary>
+        /// The size of the hash table buckets.
+        /// </summary>
+        public ushort BucketSizeIndex { get; set; } = 1;
+
         public bool Unpack(DatBinReader reader) {
-            _ = reader.ReadByte(); // bucket size index, not used
-            var numElements = reader.ReadCompressedUInt();
+            BucketSizeIndex = reader.ReadByte();
+            var numElements = reader.ReadByte();
             for (var i = 0; i < numElements; i++) {
                 var key = reader.ReadGeneric<TKey>();
                 var val = reader.ReadGeneric<TValue>();
@@ -22,15 +27,14 @@ namespace DatReaderWriter.Types {
         }
 
         public bool Pack(DatBinWriter writer) {
-            var bucketSizeIndex = HashTableHelpers.GetBucketSizeIndex(Count, true);
-            writer.WriteByte(bucketSizeIndex);
-            writer.WriteCompressedUInt((uint)this.Count);
+            writer.WriteByte((byte)BucketSizeIndex);
+            writer.WriteByte((byte)this.Count);
             
-            var bucketSize = HashTableHelpers.BucketSizes[bucketSizeIndex];
+            var BucketSize = HashTableHelpers.BucketSizes[BucketSizeIndex];
             
             // Sort by key modulus bucketSize
             var sortedItems = this
-                .OrderBy(x => HashTableHelpers.GetHashKey(x.Key) % (ulong)bucketSize);
+                 .OrderBy(x => HashTableHelpers.GetHashKey(x.Key) % (ulong)BucketSize);
             
             foreach (var kvp in sortedItems) {
                 writer.WriteGeneric(kvp.Key);

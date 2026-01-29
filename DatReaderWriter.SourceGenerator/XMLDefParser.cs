@@ -2,6 +2,7 @@
 using System.IO;
 using System.Xml.Linq;
 using System;
+using System.Xml;
 using System.Xml.XPath;
 using System.Linq;
 using DatReaderWriter.SourceGenerator.Models;
@@ -37,18 +38,28 @@ namespace DatReaderWriter.SourceGenerator {
         private void ParseDBObjs() {
             var nodes = Xml.XPathSelectElements("./dats/dat/type");
             foreach (var node in nodes) {
-                var acDataType = ACDBObj.FromXElement(ACDat.FromXElement(node.Parent), node);
-                ACDBObjs.Add(acDataType.Name, acDataType);
+                try {
+                    var acDataType = ACDBObj.FromXElement(ACDat.FromXElement(node.Parent), node);
+                    ACDBObjs.Add(acDataType.Name, acDataType);
+                }
+                catch (Exception ex) {
+                    throw new Exception($"Error parsing DBObj at line {((IXmlLineInfo)node).LineNumber}: {ex.Message}", ex);
+                }
             }
         }
 
         private void ParseTypes() {
             var nodes = Xml.XPathSelectElements("./types/type");
             foreach (var node in nodes) {
-                var acDataType = ACDataType.FromXElement(null, node);
-                ACDataTypes.Add(acDataType.Name, acDataType);
-                foreach (var child in acDataType.SubTypes) {
-                    ACDataTypes.Add(child.Name, child);
+                try {
+                    var acDataType = ACDataType.FromXElement(null, node);
+                    ACDataTypes.Add(acDataType.Name, acDataType);
+                    foreach (var child in acDataType.SubTypes) {
+                        ACDataTypes.Add(child.Name, child);
+                    }
+                }
+                catch (Exception ex) {
+                    throw new Exception($"Error parsing Type at line {((IXmlLineInfo)node).LineNumber}: {ex.Message}", ex);
                 }
             }
         }
@@ -56,8 +67,13 @@ namespace DatReaderWriter.SourceGenerator {
         private void ParseEnums() {
             var nodes = Xml.XPathSelectElements("./enums/enum");
             foreach (var node in nodes) {
-                var acEnum = new ACEnum(null, node);
-                ACEnums.Add(acEnum.Name, acEnum);
+                try {
+                    var acEnum = new ACEnum(null, node);
+                    ACEnums.Add(acEnum.Name, acEnum);
+                }
+                catch (Exception ex) {
+                    throw new Exception($"Error parsing Enum at line {((IXmlLineInfo)node).LineNumber}: {ex.Message}", ex);
+                }
             }
         }
     }

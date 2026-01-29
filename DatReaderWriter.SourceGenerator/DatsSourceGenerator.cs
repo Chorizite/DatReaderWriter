@@ -10,6 +10,19 @@ using System.Xml.Linq;
 namespace DatReaderWriter.SourceGenerator {
     [Generator]
     public class DatsSourceGenerator : IIncrementalGenerator {
+        private void ReportGenError(SourceProductionContext spc, string generatorName, Exception e) {
+            spc.ReportDiagnostic(Diagnostic.Create(
+                new DiagnosticDescriptor(
+                    "DRW002",
+                    "Error generating source",
+                    $"Error in {generatorName}: {{0}}",
+                    "SourceGenerator",
+                    DiagnosticSeverity.Error,
+                    true),
+                Location.None,
+                e.ToString()));
+        }
+
         public void Initialize(IncrementalGeneratorInitializationContext context) {
             var datsXmlFiles = context.AdditionalTextsProvider
                 .Where(file => Path.GetFileName(file.Path).Equals("dats.xml", StringComparison.OrdinalIgnoreCase));
@@ -34,28 +47,49 @@ namespace DatReaderWriter.SourceGenerator {
 
                 if (string.IsNullOrEmpty(content)) return;
 
+                XMLDefParser parser = null;
                 try {
-                    var doc = XDocument.Parse(content);
-                    var parser = new XMLDefParser(doc);
-
-                    EnumsGenerator.Generate(spc, parser);
-                    new TypesGenerator(parser).Generate(spc, parser);
-                    new DBObjsGenerator(parser).Generate(spc, parser);
-                    new DatabaseReadersGenerator(parser).Generate(spc, parser);
-                    new HashTableGenerator(parser).Generate(spc, parser);
+                    var doc = XDocument.Parse(content, LoadOptions.SetLineInfo);
+                    parser = new XMLDefParser(doc);
                 }
                 catch (Exception e) {
-                    spc.ReportDiagnostic(Diagnostic.Create(
+                     spc.ReportDiagnostic(Diagnostic.Create(
                         new DiagnosticDescriptor(
                             "DRW001",
-                            "Error generating source",
+                            "Error parsing dats.xml",
                             "Error parsing dats.xml: {0}",
                             "SourceGenerator",
                             DiagnosticSeverity.Error,
                             true),
                         Location.None,
                         e.ToString()));
+                    return;
                 }
+
+                try {
+                    EnumsGenerator.Generate(spc, parser);
+                }
+                catch (Exception e) { ReportGenError(spc, "EnumsGenerator", e); }
+
+                try {
+                    new TypesGenerator(parser).Generate(spc, parser);
+                }
+                catch (Exception e) { ReportGenError(spc, "TypesGenerator", e); }
+
+                try {
+                    new DBObjsGenerator(parser).Generate(spc, parser);
+                }
+                catch (Exception e) { ReportGenError(spc, "DBObjsGenerator", e); }
+
+                try {
+                    new DatabaseReadersGenerator(parser).Generate(spc, parser);
+                }
+                catch (Exception e) { ReportGenError(spc, "DatabaseReadersGenerator", e); }
+
+                try {
+                    new HashTableGenerator(parser).Generate(spc, parser);
+                }
+                catch (Exception e) { ReportGenError(spc, "HashTableGenerator", e); }
             });
         }
     }

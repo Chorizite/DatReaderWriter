@@ -29,12 +29,12 @@ namespace DatReaderWriter.Enums {
         Setup,
 
         /// <summary>
-        /// DBObj Animation - DB_TYPE_ANIM in the client.
+        /// DBObj Animation - DB_TYPE_ANIM in the client. Defines a complete animation (position + part transforms + hooks)
         /// </summary>
         Animation,
 
         /// <summary>
-        /// DBObj Palette - DB_TYPE_PALETTE in the client.
+        /// DBObj Palette - DB_TYPE_PALETTE in the client. Defines a color lookup table
         /// </summary>
         Palette,
 
@@ -49,27 +49,27 @@ namespace DatReaderWriter.Enums {
         RenderSurface,
 
         /// <summary>
-        /// DBObj Surface - DB_TYPE_SURFACE in the client.
+        /// DBObj Surface - DB_TYPE_SURFACE in the client. Main surface/material descriptor
         /// </summary>
         Surface,
 
         /// <summary>
-        /// DBObj MotionTable - DB_TYPE_MTABLE in the client.
+        /// DBObj MotionTable - DB_TYPE_MTABLE in the client. Main motion/animation transition table
         /// </summary>
         MotionTable,
 
         /// <summary>
-        /// DBObj Wave - DB_TYPE_WAVE in the client.
+        /// DBObj Wave - DB_TYPE_WAVE in the client - sound wave / audio sample data
         /// </summary>
         Wave,
 
         /// <summary>
-        /// DBObj Environment - DB_TYPE_ENVIRONMENT in the client.
+        /// DBObj Environment - DB_TYPE_ENVIRONMENT in the client. Represents an environment / landblock containing multiple cells
         /// </summary>
         Environment,
 
         /// <summary>
-        /// DBObj ChatPoseTable - DB_TYPE_CHAT_POSE_TABLE in the client.
+        /// DBObj ChatPoseTable - DB_TYPE_CHAT_POSE_TABLE in the client. Stores pose and emote command → animation mappings
         /// </summary>
         ChatPoseTable,
 
@@ -79,12 +79,12 @@ namespace DatReaderWriter.Enums {
         ObjectHierarchy,
 
         /// <summary>
-        /// DBObj BadDataTable - DB_TYPE_BADDATA in the client.
+        /// DBObj BadDataTable - DB_TYPE_BADDATA in the client. Not used?
         /// </summary>
         BadDataTable,
 
         /// <summary>
-        /// DBObj TabooTable - DB_TYPE_TABOO_TABLE in the client.
+        /// DBObj TabooTable - DB_TYPE_TABOO_TABLE in the client. Bad words and stuff.
         /// </summary>
         TabooTable,
 
@@ -94,14 +94,14 @@ namespace DatReaderWriter.Enums {
         NameFilterTable,
 
         /// <summary>
-        /// DBObj PaletteSet - DB_TYPE_PAL_SET in the client.
+        /// DBObj PalSet - DB_TYPE_PAL_SET in the client. Holds lists of Palette DataIds
         /// </summary>
-        PaletteSet,
+        PalSet,
 
         /// <summary>
-        /// DBObj Clothing - DB_TYPE_CLOTHING in the client.
+        /// DBObj ClothingTable - DB_TYPE_CLOTHING in the client.
         /// </summary>
-        Clothing,
+        ClothingTable,
 
         /// <summary>
         /// DBObj GfxObjDegradeInfo - DB_TYPE_DEGRADEINFO in the client.
@@ -114,7 +114,7 @@ namespace DatReaderWriter.Enums {
         Scene,
 
         /// <summary>
-        /// DBObj Region - DB_TYPE_REGION in the client.
+        /// DBObj Region - DB_TYPE_REGION in the client. Regions define things like skybox / terrain / game time.
         /// </summary>
         Region,
 

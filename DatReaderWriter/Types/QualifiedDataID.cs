@@ -5,19 +5,23 @@ using System.Threading;
 using System.Threading.Tasks;
 
 namespace DatReaderWriter.Types {
-    /// <summary>
-    /// A qualified data ID referencing a DBObj of type T.
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public class QualifiedDataId<T> : IUnpackable, IPackable, IEquatable<uint> where T : DBObj {
+    public abstract class QualifiedDataId {
         // implicit conversion to uint
-        public static implicit operator uint(QualifiedDataId<T> qualifiedDataId) => qualifiedDataId.DataId;
-        public static implicit operator QualifiedDataId<T>(uint dataId) => new QualifiedDataId<T> { DataId = dataId };
+        public static implicit operator uint(QualifiedDataId qualifiedDataId) => qualifiedDataId.DataId;
         
         /// <summary>
         /// The id of the data object.
         /// </summary>
         public uint DataId { get; set; }
+    }
+    
+    /// <summary>
+    /// A qualified data ID referencing a DBObj of type T.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public class QualifiedDataId<T> : QualifiedDataId, IUnpackable, IPackable, IEquatable<uint> where T : DBObj {
+        public static implicit operator QualifiedDataId<T>(uint dataId) => new QualifiedDataId<T> { DataId = dataId };
+        public static implicit operator QualifiedDataId<T>(int dataId) => new QualifiedDataId<T> { DataId = (uint)dataId };
 
         /// <summary>
         /// Gets the data object for this qualified data ID from the given DatCollection.

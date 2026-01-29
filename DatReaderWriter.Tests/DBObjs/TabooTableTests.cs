@@ -23,7 +23,7 @@ namespace DatReaderWriter.Tests.DBObjs {
 
             var writeObj = new TabooTable() {
                 Id = 0x0E00001Eu,
-                Entries = new Dictionary<uint, TabooTableEntry>() {
+                AudienceToBannedPatterns = new () {
                     { 1, new TabooTableEntry() { BannedPatterns = ["test", "test2"] } }
                 }
             };
@@ -37,9 +37,9 @@ namespace DatReaderWriter.Tests.DBObjs {
 
             Assert.AreEqual(0x0E00001Eu, readObj.Id);
 
-            Assert.AreEqual(1, readObj.Entries.Count);
-            Assert.AreEqual("test", readObj.Entries[1].BannedPatterns[0]);
-            Assert.AreEqual("test2", readObj.Entries[1].BannedPatterns[1]);
+            Assert.AreEqual(1, readObj.AudienceToBannedPatterns.Count);
+            Assert.AreEqual("test", readObj.AudienceToBannedPatterns[1u].BannedPatterns[0]);
+            Assert.AreEqual("test2", readObj.AudienceToBannedPatterns[1u].BannedPatterns[1]);
 
             dat.Dispose();
             File.Delete(datFilePath);
@@ -58,7 +58,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             Assert.IsNotNull(rt1);
             Assert.AreEqual(0x0E00001Eu, rt1.Id);
 
-            Assert.AreEqual(32, rt1.Entries.Count);
+            Assert.AreEqual(32, rt1.AudienceToBannedPatterns.Count);
 
             dat.Dispose();
         }

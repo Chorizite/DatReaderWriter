@@ -16,29 +16,38 @@ using DatReaderWriter.Types;
 
 namespace DatReaderWriter.DBObjs {
     /// <summary>
-    /// DB_TYPE_TABOO_TABLE in the client. Bad words and stuff.
+    /// DB_TYPE_PAL_SET in the client. Holds lists of Palette DataIds
     /// </summary>
-    [DBObjType(typeof(TabooTable), DatFileType.Portal, DBObjType.TabooTable, DBObjHeaderFlags.HasId, 0x0E00001E, 0x0E00001E, 0x00000000)]
-    public partial class TabooTable : DBObj {
+    [DBObjType(typeof(PalSet), DatFileType.Portal, DBObjType.PalSet, DBObjHeaderFlags.HasId, 0x0F000000, 0x0F00FFFF, 0x00000000)]
+    public partial class PalSet : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;
 
         /// <inheritdoc />
-        public override DBObjType DBObjType => DBObjType.TabooTable;
+        public override DBObjType DBObjType => DBObjType.PalSet;
 
-        public HashTable<uint, TabooTableEntry> AudienceToBannedPatterns = [];
+        /// <summary>
+        /// A list of Palette DataIds
+        /// </summary>
+        public List<QualifiedDataId<Palette>> Palettes = [];
 
         /// <inheritdoc />
         public override bool Unpack(DatBinReader reader) {
             base.Unpack(reader);
-            AudienceToBannedPatterns = reader.ReadItem<HashTable<uint, TabooTableEntry>>();
+            var _numPalettes = reader.ReadUInt32();
+            for (var i=0; i < _numPalettes; i++) {
+                Palettes.Add(reader.ReadItem<QualifiedDataId<Palette>>());
+            }
             return true;
         }
 
         /// <inheritdoc />
         public override bool Pack(DatBinWriter writer) {
             base.Pack(writer);
-            writer.WriteItem<HashTable<uint, TabooTableEntry>>(AudienceToBannedPatterns);
+            writer.WriteUInt32((uint)Palettes.Count());
+            foreach (var item in Palettes) {
+                writer.WriteItem<QualifiedDataId<Palette>>(item);
+            }
             return true;
         }
     }

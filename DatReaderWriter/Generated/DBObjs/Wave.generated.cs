@@ -16,7 +16,7 @@ using DatReaderWriter.Types;
 
 namespace DatReaderWriter.DBObjs {
     /// <summary>
-    /// DB_TYPE_WAVE in the client.
+    /// DB_TYPE_WAVE in the client - sound wave / audio sample data
     /// </summary>
     [DBObjType(typeof(Wave), DatFileType.Portal, DBObjType.Wave, DBObjHeaderFlags.HasId, 0x0A000000, 0x0A00FFFF, 0x00000000)]
     public partial class Wave : DBObj {
@@ -26,8 +26,14 @@ namespace DatReaderWriter.DBObjs {
         /// <inheritdoc />
         public override DBObjType DBObjType => DBObjType.Wave;
 
+        /// <summary>
+        /// Audio metadata / wave header
+        /// </summary>
         public byte[] Header = [];
 
+        /// <summary>
+        /// Waveform audio data
+        /// </summary>
         public byte[] Data = [];
 
         /// <inheritdoc />

@@ -16,7 +16,7 @@ using DatReaderWriter.Types;
 
 namespace DatReaderWriter.DBObjs {
     /// <summary>
-    /// DB_TYPE_BADDATA in the client.
+    /// DB_TYPE_BADDATA in the client. Not used?
     /// </summary>
     [DBObjType(typeof(BadDataTable), DatFileType.Portal, DBObjType.BadDataTable, DBObjHeaderFlags.HasId, 0x0E00001A, 0x0E00001A, 0x00000000)]
     public partial class BadDataTable : DBObj {
@@ -26,30 +26,22 @@ namespace DatReaderWriter.DBObjs {
         /// <inheritdoc />
         public override DBObjType DBObjType => DBObjType.BadDataTable;
 
-        public Dictionary<uint, uint> BadIds = [];
+        /// <summary>
+        /// Table of bad data Ids. The key is the id of this table. There is only one entry.
+        /// </summary>
+        public PackableHashTable<QualifiedDataId<BadDataTable>, uint> BadIds = [];
 
         /// <inheritdoc />
         public override bool Unpack(DatBinReader reader) {
             base.Unpack(reader);
-            var _numBadIds = reader.ReadUInt16();
-            var _numBadIdBuckets = reader.ReadUInt16();
-            for (var i=0; i < _numBadIds; i++) {
-                var _key = reader.ReadUInt32();
-                var _val = reader.ReadUInt32();
-                BadIds.Add(_key, _val);
-            }
+            BadIds = reader.ReadItem<PackableHashTable<QualifiedDataId<BadDataTable>, uint>>();
             return true;
         }
 
         /// <inheritdoc />
         public override bool Pack(DatBinWriter writer) {
             base.Pack(writer);
-            writer.WriteUInt16((ushort)BadIds.Count());
-            writer.WriteUInt16(32);
-            foreach (var kv in BadIds) {
-                writer.WriteUInt32(kv.Key);
-                writer.WriteUInt32(kv.Value);
-            }
+            writer.WriteItem<PackableHashTable<QualifiedDataId<BadDataTable>, uint>>(BadIds);
             return true;
         }
     }

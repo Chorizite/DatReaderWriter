@@ -3525,10 +3525,10 @@
 
                 <field type="SetupFlags" name="Flags"
                        text="Bitfield controlling optional data presence (parent indices, default scales, etc.)"/>
-                
-                <field type="uint" name="_numParts" 
+
+                <field type="uint" name="NumParts"
                        text="Number of GfxObj parts in this setup"/>
-                <vector name="Parts" length="_numParts" type="List" text="Array of part GfxObj ids">
+                <vector name="Parts" length="NumParts" type="List" text="Array of part GfxObj ids">
                     <vector type="QualifiedDataId" genericValue="GfxObj"/>
                 </vector>
 
@@ -3578,36 +3578,54 @@
                 <vector name="Lights" length="_numLights" type="Dictionary" genericKey="int" genericValue="LightInfo"
                         text="Dictionary of dynamic light sources attached to this setup"/>
 
-                <field type="uint" name="DefaultAnimation" text="Default animation ID (usually 0xFFFFFFFF = none)"/>
-                <field type="uint" name="DefaultScript" text="Default script ID (usually 0xFFFFFFFF = none)"/>
-                <field type="uint" name="DefaultMotionTable" text="Default motion table (animation state machine) ID"/>
-                <field type="uint" name="DefaultSoundTable" text="Default sound table ID"/>
-                <field type="uint" name="DefaultScriptTable"
-                       text="Default script table ID (usually physics / behavior scripts)"/>
+                <vector type="QualifiedDataId" genericValue="Animation" name="DefaultAnimation"
+                        text="Default Animation ID"/>
+                <vector type="QualifiedDataId" genericValue="PhysicsScript" name="DefaultScript"
+                        text="Default script ID"/>
+                <vector type="QualifiedDataId" genericValue="MotionTable" name="DefaultMotionTable"
+                        text="Default MotionTable ID"/>
+                <vector type="QualifiedDataId" genericValue="SoundTable" name="DefaultSoundTable"
+                        text="Default SoundTable ID"/>
+                <vector type="QualifiedDataId" genericValue="PhysicsScriptTable" name="DefaultScriptTable"
+                        text="Default PhysicsScript ID"/>
             </type>
-            <type name="Animation" text="DB_TYPE_ANIM in the client." parent="DBObj" first="0x3000000" last="0x300FFFF"
+            <type name="Animation"
+                  text="DB_TYPE_ANIM in the client. Defines a complete animation (position + part transforms + hooks)"
+                  parent="DBObj" first="0x3000000" last="0x300FFFF"
                   flags="DBObjHeaderFlags.HasId">
-                <field type="AnimationFlags" name="Flags"/>
-                <field type="uint" name="NumParts"/>
-                <field type="uint" name="_numFrames" lengthof="PartFrames"/>
+                <field type="AnimationFlags" name="Flags"
+                       text="Bit flags controlling which data is present (mainly whether position keyframes exist)"/>
+
+                <field type="uint" name="NumParts" text="Number of animated parts / bones in this animation"/>
+                <field type="uint" name="_numFrames" lengthof="PartFrames"
+                       text="Total number of keyframes in the animation (length of both tracks)"/>
+
                 <maskmap name="Flags">
                     <mask value="AnimationFlags.PosFrames">
-                        <vector name="PosFrames" length="_numFrames" type="List" genericValue="Frame"/>
+                        <vector name="PosFrames" length="_numFrames" type="List" genericValue="Frame"
+                                text="Per-frame root position keyframes (only exists if Flags &amp; PosFrames)"/>
                     </mask>
                 </maskmap>
-                <vector name="PartFrames" length="_numFrames" type="List" genericValue="AnimationFrame"/>
+
+                <vector name="PartFrames" length="_numFrames" type="List" genericValue="AnimationFrame"
+                        text="Per-frame array of per-part transforms + animation hooks"/>
             </type>
-            <type name="Palette" text="DB_TYPE_PALETTE in the client." parent="DBObj" first="0x4000000" last="0x400FFFF"
+            <type name="Palette" text="DB_TYPE_PALETTE in the client. Defines a color lookup table"
+                  parent="DBObj" first="0x4000000" last="0x400FFFF"
                   flags="DBObjHeaderFlags.HasId">
-                <field type="int" name="_numColors"/>
-                <vector name="Colors" length="_numColors" type="List" genericValue="ColorARGB"/>
+                <field type="int" name="_numColors"
+                       text="Number of colors stored in this palette (usually 256 or 2048)"/>
+                <vector name="Colors" length="_numColors" type="List" genericValue="ColorARGB"
+                        text="Array of 32-bit ARGB colors (0xAARRGGBB)."/>
             </type>
             <type name="SurfaceTexture" text="DB_TYPE_SURFACETEXTURE in the client." parent="DBObj" first="0x5000000"
                   last="0x5FFFFFF" flags="DBObjHeaderFlags.HasId | DBObjHeaderFlags.HasDataCategory">
                 <field type="TextureType" name="Type"
                        text="This seems to always be TextureType.Texture2D in the dats."/>
                 <field type="int" name="_numtextures"/>
-                <vector name="Textures" length="_numtextures" type="List" genericValue="uint"/>
+                <vector name="Textures" length="_numtextures" type="List" text="Array of RenderSurface IDs">
+                    <vector type="QualifiedDataId" genericValue="RenderSurface"/>
+                </vector>
             </type>
             <type name="RenderSurface" text="This holds raw texture data. DB_TYPE_RENDERSURFACE in the client."
                   parent="DBObj" first="0x6000000" last="0x7FFFFFF"
@@ -3624,100 +3642,139 @@
                     </case>
                 </switch>
             </type>
-            <type name="Surface" text="DB_TYPE_SURFACE in the client." parent="DBObj" first="0x8000000" last="0x800FFFF"
+            <type name="Surface" text="DB_TYPE_SURFACE in the client. Main surface/material descriptor" parent="DBObj" first="0x8000000" last="0x800FFFF"
                   flags="DBObjHeaderFlags.None">
-                <field type="SurfaceType" name="Type"/>
+                <field type="SurfaceType" name="Type" text="Bitfield controlling surface behavior"/>
                 <maskmap name="Type">
                     <mask value="SurfaceType.Base1Image | SurfaceType.Base1ClipMap">
-                        <field type="uint" name="OrigTextureId"/>
-                        <field type="uint" name="OrigPaletteId"/>
+                        <vector type="QualifiedDataId" genericValue="SurfaceTexture" name="OrigTextureId" text="Original SurfaceTexture DataId"/>
+                        <vector type="QualifiedDataId" genericValue="Palette" name="OrigPaletteId" text="Original Palette DataId"/>
                         <else>
-                            <field type="ColorARGB" name="ColorValue"/>
+                            <field type="ColorARGB" name="ColorValue" text="Solid color when no texture is used"/>
                         </else>
                     </mask>
                 </maskmap>
-                <field type="float" name="Translucency"/>
-                <field type="float" name="Luminosity"/>
-                <field type="float" name="Diffuse"/>
+                <field type="float" name="Translucency" text="0..1 opacity/transparency factor"/>
+                <field type="float" name="Luminosity" text="Self-illumination / emissive strength"/>
+                <field type="float" name="Diffuse" text="Diffuse lighting multiplier"/>
             </type>
-            <type name="MotionTable" text="DB_TYPE_MTABLE in the client." parent="DBObj" first="0x9000000"
-                  last="0x900FFFF" flags="DBObjHeaderFlags.HasId">
-                <field name="DefaultStyle" type="MotionCommand"/>
-                <field name="_numStyleDefaults" type="uint"/>
-                <vector name="StyleDefaults" length="_numStyleDefaults" type="Dictionary" genericKey="MotionCommand"
-                        genericValue="MotionCommand"/>
-                <field name="_numCycles" type="uint"/>
-                <vector name="Cycles" length="_numCycles" type="Dictionary" genericKey="int" genericValue="MotionData"/>
-                <field name="_numModifiers" type="uint"/>
-                <vector name="Modifiers" length="_numModifiers" type="Dictionary" genericKey="int"
-                        genericValue="MotionData"/>
-                <field name="_numLinks" type="uint"/>
-                <vector name="Links" length="_numLinks" type="Dictionary" genericKey="int"
-                        genericValue="MotionCommandData"/>
-            </type>
-            <type name="Wave" text="DB_TYPE_WAVE in the client." parent="DBObj" first="0xA000000" last="0xA00FFFF"
+            <type name="MotionTable"
+                  text="DB_TYPE_MTABLE in the client. Main motion/animation transition table"
+                  parent="DBObj"
+                  first="0x9000000"
+                  last="0x900FFFF"
                   flags="DBObjHeaderFlags.HasId">
-                <field name="_headerSize" type="int"/>
-                <field name="_dataSize" type="int"/>
-                <vector name="Header" length="_headerSize" type="byte"/>
-                <vector name="Data" length="_dataSize" type="byte"/>
+
+                <field name="DefaultStyle" type="MotionCommand"
+                       text="Default motion command / style ID used when no specific style match is found"/>
+
+                <field name="_numStyleDefaults" type="uint"
+                       text="Count of entries in StyleDefaults dictionary"/>
+
+                <vector name="StyleDefaults" length="_numStyleDefaults" type="Dictionary"
+                        genericKey="MotionCommand" genericValue="MotionCommand"
+                        text="Dictionary: style ID → default motion command (most common fallback table)"/>
+
+                <field name="_numCycles" type="uint"
+                       text="Number of cycle entries (persistent looping animations)"/>
+
+                <vector name="Cycles" length="_numCycles" type="Dictionary"
+                        genericKey="int" genericValue="MotionData"
+                        text="Dictionary: (style &lt;&lt; 16 | substate) → MotionData (main animation cycles)"/>
+
+                <field name="_numModifiers" type="uint"
+                       text="Number of modifier entries (overlay/secondary motions)"/>
+
+                <vector name="Modifiers" length="_numModifiers" type="Dictionary"
+                        genericKey="int" genericValue="MotionData"
+                        text="Dictionary: motion or (style &lt;&lt; 16 | motion) → MotionData (additive/overlay motions)"/>
+
+                <field name="_numLinks" type="uint"
+                       text="Number of link/transition tables"/>
+
+                <vector name="Links" length="_numLinks" type="Dictionary"
+                        genericKey="int" genericValue="MotionCommandData"
+                        text="Dictionary of transition tables: (style &lt;&lt; 16 | from substate) → sub-dictionary (to substate → transition MotionData)"/>
+
             </type>
-            <type name="Environment" text="DB_TYPE_ENVIRONMENT in the client." parent="DBObj" first="0xD000000"
+            <type name="Wave"
+                  text="DB_TYPE_WAVE in the client - sound wave / audio sample data"
+                  parent="DBObj"
+                  first="0xA000000"
+                  last="0xA00FFFF"
+                  flags="DBObjHeaderFlags.HasId">
+                <field name="_headerSize" type="int" text="Size of the header in bytes"/>
+                <field name="_dataSize" type="int" text="Size of the raw audio data in bytes"/>
+                <vector name="Header" length="_headerSize" type="byte" text="Audio metadata / wave header"/>
+                <vector name="Data" length="_dataSize" type="byte" text="Waveform audio data"/>
+            </type>
+            <type name="Environment" text="DB_TYPE_ENVIRONMENT in the client. Represents an environment / landblock containing multiple cells" parent="DBObj" first="0xD000000"
                   last="0xD00FFFF" flags="DBObjHeaderFlags.HasId">
-                <field type="uint" name="_cellCount"/>
+                <field type="uint" name="_cellCount" text="Number of cells contained in this landblock"/>
                 <vector name="Cells" length="_cellCount" type="Dictionary" genericKey="uint" genericValue="CellStruct"
-                        text="The cells in this environment"/>
+                        text="Dictionary of all cells in this landblock.">
+                </vector>
             </type>
-            <type name="ChatPoseTable" text="DB_TYPE_CHAT_POSE_TABLE in the client." parent="DBObj" first="0xE000007"
-                  last="0xE000007" flags="DBObjHeaderFlags.HasId">
-                <field name="_numChatPoseHashes" type="ushort"/>
-                <field name="_numChatPoseHashBuckets" type="ushort" value="32"/>
-                <vector name="ChatPoseHash" length="_numChatPoseHashes" type="Dictionary" genericKey="string"
-                        genericValue="string"/>
-                <field name="_numChatEmoteHashes" type="ushort"/>
-                <field name="_numChatEmoteHashBuckets" type="ushort" value="32"/>
-                <vector name="ChatEmoteHash" length="_numChatEmoteHashes" type="Dictionary" genericKey="string"
-                        genericValue="ChatEmoteData"/>
+            <!-- these need tests, and new string types? -->
+            <type name="ChatPoseTable"
+                  text="DB_TYPE_CHAT_POSE_TABLE in the client. Stores pose and emote command → animation mappings"
+                  parent="DBObj"
+                  first="0xE000007"
+                  last="0xE000007"
+                  flags="DBObjHeaderFlags.HasId">
+
+                <vector name="ChatPoses" type="PackableHashTable" text="command string → pose/animation string">
+                    <vector type="AC1LegacyPStringBase" genericValue="byte"/>
+                    <vector type="AC1LegacyPStringBase" genericValue="byte"/>
+                </vector>
+
+                <vector name="ChatEmotes" type="PackableHashTable" text="pose/animation string → ChatEmoteData (myEmote + otherEmote strings)">
+                    <vector type="AC1LegacyPStringBase" genericValue="byte"/>
+                    <field type="ChatEmoteData"/>
+                </vector>
             </type>
             <type name="ObjectHierarchy" text="DB_TYPE_OBJECT_HIERARCHY in the client." parent="DBObj" first="0xE00000D"
                   last="0xE00000D" flags="DBObjHeaderFlags.HasId">
                 <field type="ObjHierarchyNode" name="RootNode"/>
             </type>
-            <type name="BadDataTable" text="DB_TYPE_BADDATA in the client." parent="DBObj" first="0xE00001A"
+            <type name="BadDataTable" text="DB_TYPE_BADDATA in the client. Not used?" parent="DBObj" first="0xE00001A"
                   last="0xE00001A" flags="DBObjHeaderFlags.HasId">
-                <field name="_numBadIds" type="ushort"/>
-                <field name="_numBadIdBuckets" type="ushort" value="32"/>
-                <vector name="BadIds" length="_numBadIds" type="Dictionary" genericKey="uint" genericValue="uint"/>
+                <vector name="BadIds" type="PackableHashTable" text="Table of bad data Ids. The key is the id of this table. There is only one entry.">
+                    <vector type="QualifiedDataId" genericValue="BadDataTable"/>
+                    <field type="uint"/>
+                </vector>
             </type>
-            <type name="TabooTable" text="DB_TYPE_TABOO_TABLE in the client." parent="DBObj" first="0xE00001E"
+            <type name="TabooTable" text="DB_TYPE_TABOO_TABLE in the client. Bad words and stuff." parent="DBObj" first="0xE00001E"
                   last="0xE00001E" flags="DBObjHeaderFlags.HasId">
-                <field name="_numEntriesBuckets" type="byte" value="1"/>
-                <field name="_numEntries" type="byte"/>
-                <vector name="Entries" length="_numEntries" type="Dictionary" genericKey="uint"
-                        genericValue="TabooTableEntry"/>
+                <vector name="AudienceToBannedPatterns" type="HashTable">
+                    <field type="uint"/>
+                    <field type="TabooTableEntry"/>
+                </vector>
             </type>
             <type name="NameFilterTable" text="DB_TYPE_NAME_FILTER_TABLE in the client." parent="DBObj"
                   first="0xE000020" last="0xE000020" flags="DBObjHeaderFlags.HasId">
-                <field name="_numNameFilterLanguageDatas" type="byte"/>
-                <field name="_numNameFilterLanguageDataBuckets" type="byte" value="1"/>
-                <vector name="LanguageData" length="_numNameFilterLanguageDatas" type="Dictionary" genericKey="uint"
-                        genericValue="NameFilterLanguageData"/>
+                <vector name="LanguageData" type="HashTable">
+                    <field type="uint"/>
+                    <field type="NameFilterLanguageData"/>
+                </vector>
             </type>
-            <type name="PaletteSet" text="DB_TYPE_PAL_SET in the client." parent="DBObj" first="0xF000000"
+            <type name="PalSet" text="DB_TYPE_PAL_SET in the client. Holds lists of Palette DataIds" parent="DBObj" first="0xF000000"
                   last="0xF00FFFF" flags="DBObjHeaderFlags.HasId">
                 <field name="_numPalettes" type="uint"/>
-                <vector name="Palettes" length="_numPalettes" type="List" genericValue="uint"/>
+                <vector name="Palettes" length="_numPalettes" type="List" text="A list of Palette DataIds">
+                    <vector type="QualifiedDataId" genericValue="Palette"/>
+                </vector>
             </type>
-            <type name="Clothing" text="DB_TYPE_CLOTHING in the client." parent="DBObj" first="0x10000000"
+            <type name="ClothingTable" text="DB_TYPE_CLOTHING in the client." parent="DBObj" first="0x10000000"
                   last="0x1000FFFF" flags="DBObjHeaderFlags.HasId">
-                <field name="_numClothingBaseEffects" type="ushort"/>
-                <field name="_numClothingBaseEffectsBuckets" type="ushort" value="8"/>
-                <vector name="ClothingBaseEffects" length="_numClothingBaseEffects" type="Dictionary" genericKey="uint"
-                        genericValue="ClothingBaseEffect"/>
-                <field name="_numClothingSubPalEffects" type="ushort"/>
-                <field name="_numClothingSubPalEffectsBuckets" type="ushort" value="32"/>
-                <vector name="ClothingSubPalEffects" length="_numClothingSubPalEffects" type="Dictionary"
-                        genericKey="uint" genericValue="CloSubPalEffect"/>
+                <vector type="PackableHashTable" name="ClothingBaseEffects" text="A map of ClothingBaseEffects indexed by Setup DataIds">
+                    <vector type="QualifiedDataId" genericValue="Setup"/>
+                    <field type="ClothingBaseEffect"/>
+                </vector>
+                <vector type="PackableHashTable" name="ClothingSubPalEffects" text="A map of ClothingSubPalEffects">
+                    <field type="uint"/>
+                    <field type="CloSubPalEffect"/>
+                </vector>
             </type>
             <type name="GfxObjDegradeInfo" text="DB_TYPE_DEGRADEINFO in the client." parent="DBObj" first="0x11000000"
                   last="0x1100FFFF" flags="DBObjHeaderFlags.HasId">
@@ -3729,13 +3786,13 @@
                 <field name="_numObjects" type="uint"/>
                 <vector name="Objects" length="_numObjects" type="List" genericValue="ObjectDesc"/>
             </type>
-            <type name="Region" text="DB_TYPE_REGION in the client." parent="DBObj" first="0x13000000" last="0x1300FFFF"
+            <type name="Region" text="DB_TYPE_REGION in the client. Regions define things like skybox / terrain / game time." parent="DBObj" first="0x13000000" last="0x1300FFFF"
                   flags="DBObjHeaderFlags.HasId">
-                <field name="RegionNumber" type="uint"/>
-                <field name="Version" type="uint"/>
-                <field name="RegionName" type="string"/>
+                <field name="RegionNumber" type="uint" text="Region Number, default is 1. Regions should have unique numbers."/>
+                <field name="Version" type="uint" text="The region version, only used internally." />
+                <vector name="RegionName" type="AC1LegacyPStringBase" genericValue="byte" text="The name of the region, only used internally." />
                 <align type="uint"/>
-                <field name="LandDefs" type="LandDefs"/>
+                <field name="LandDefs" type="LandDefs" text="Terrain / Landscape size definitions" />
                 <field name="GameTime" type="GameTime"/>
                 <field name="PartsMask" type="PartsMask"/>
                 <maskmap name="PartsMask">
@@ -3758,7 +3815,7 @@
             </type>
             <type name="MasterInputMap" text="DB_TYPE_KEYMAP in the client." parent="DBObj" first="0x14000000"
                   last="0x1400FFFF" flags="DBObjHeaderFlags.HasId">
-                <field name="Name" type="rawstring" text="The name of the keymap"/>
+                <vector name="Name" type="PStringBase" genericValue="byte" text="The name of the keymap"/>
                 <field name="GuidMap" type="guid"/>
                 <field name="_numDeviceEntries" type="uint"/>
                 <vector name="Devices" length="_numDeviceEntries" type="List" genericValue="DeviceKeyMapEntry"

@@ -16,7 +16,7 @@ using DatReaderWriter.Types;
 
 namespace DatReaderWriter.DBObjs {
     /// <summary>
-    /// DB_TYPE_MTABLE in the client.
+    /// DB_TYPE_MTABLE in the client. Main motion/animation transition table
     /// </summary>
     [DBObjType(typeof(MotionTable), DatFileType.Portal, DBObjType.MotionTable, DBObjHeaderFlags.HasId, 0x09000000, 0x0900FFFF, 0x00000000)]
     public partial class MotionTable : DBObj {
@@ -26,14 +26,29 @@ namespace DatReaderWriter.DBObjs {
         /// <inheritdoc />
         public override DBObjType DBObjType => DBObjType.MotionTable;
 
+        /// <summary>
+        /// Default motion command / style ID used when no specific style match is found
+        /// </summary>
         public MotionCommand DefaultStyle;
 
+        /// <summary>
+        /// Dictionary: style ID → default motion command (most common fallback table)
+        /// </summary>
         public Dictionary<MotionCommand, MotionCommand> StyleDefaults = [];
 
+        /// <summary>
+        /// Dictionary: (style &lt;&lt; 16 | substate) → MotionData (main animation cycles)
+        /// </summary>
         public Dictionary<int, MotionData> Cycles = [];
 
+        /// <summary>
+        /// Dictionary: motion or (style &lt;&lt; 16 | motion) → MotionData (additive/overlay motions)
+        /// </summary>
         public Dictionary<int, MotionData> Modifiers = [];
 
+        /// <summary>
+        /// Dictionary of transition tables: (style &lt;&lt; 16 | from substate) → sub-dictionary (to substate → transition MotionData)
+        /// </summary>
         public Dictionary<int, MotionCommandData> Links = [];
 
         /// <inheritdoc />

@@ -26,49 +26,115 @@ namespace DatReaderWriter.DBObjs {
         /// <inheritdoc />
         public override DBObjType DBObjType => DBObjType.Setup;
 
+        /// <summary>
+        /// Bitfield controlling optional data presence (parent indices, default scales, etc.)
+        /// </summary>
         public SetupFlags Flags;
 
+        /// <summary>
+        /// Number of GfxObj parts in this setup
+        /// </summary>
         public uint NumParts;
 
-        public List<uint> Parts = [];
+        /// <summary>
+        /// Array of part GfxObj ids
+        /// </summary>
+        public List<QualifiedDataId<GfxObj>> Parts = [];
 
+        /// <summary>
+        /// For each part: index of its parent part (hierarchical skeleton)
+        /// </summary>
         public List<uint> ParentIndex = [];
 
+        /// <summary>
+        /// Per-part default scale factors (usually Vector3(1,1,1))
+        /// </summary>
         public List<Vector3> DefaultScale = [];
 
+        /// <summary>
+        /// Dictionary of weapon / clothing / spell attachment points (LocationType → data)
+        /// </summary>
         public Dictionary<ParentLocation, LocationType> HoldingLocations = [];
 
+        /// <summary>
+        /// Dictionary of connection points used for linking objects (hooks, missile launchers, etc.)
+        /// </summary>
         public Dictionary<ParentLocation, LocationType> ConnectionPoints = [];
 
+        /// <summary>
+        /// Dictionary of named animation placement frames (used for hooks, effects, etc.)
+        /// </summary>
         public Dictionary<Placement, AnimationFrame> PlacementFrames = [];
 
+        /// <summary>
+        /// Array of cylinder + sphere collision volumes
+        /// </summary>
         public List<CylSphere> CylSpheres = [];
 
+        /// <summary>
+        /// Array of simple bounding spheres for collision
+        /// </summary>
         public List<Sphere> Spheres = [];
 
+        /// <summary>
+        /// Approximate visual / physics height of the object
+        /// </summary>
         public float Height;
 
+        /// <summary>
+        /// Approximate radius / width of the object
+        /// </summary>
         public float Radius;
 
+        /// <summary>
+        /// Maximum step height this object can climb
+        /// </summary>
         public float StepUpHeight;
 
+        /// <summary>
+        /// Maximum step-down distance without falling
+        /// </summary>
         public float StepDownHeight;
 
+        /// <summary>
+        /// Sphere used for depth sorting / rendering order
+        /// </summary>
         public Sphere SortingSphere;
 
+        /// <summary>
+        /// Sphere used for mouse selection / picking
+        /// </summary>
         public Sphere SelectionSphere;
 
+        /// <summary>
+        /// Dictionary of dynamic light sources attached to this setup
+        /// </summary>
         public Dictionary<int, LightInfo> Lights = [];
 
-        public uint DefaultAnimation;
+        /// <summary>
+        /// Default Animation ID
+        /// </summary>
+        public QualifiedDataId<Animation> DefaultAnimation = new();
 
-        public uint DefaultScript;
+        /// <summary>
+        /// Default script ID
+        /// </summary>
+        public QualifiedDataId<PhysicsScript> DefaultScript = new();
 
-        public uint DefaultMotionTable;
+        /// <summary>
+        /// Default MotionTable ID
+        /// </summary>
+        public QualifiedDataId<MotionTable> DefaultMotionTable = new();
 
-        public uint DefaultSoundTable;
+        /// <summary>
+        /// Default SoundTable ID
+        /// </summary>
+        public QualifiedDataId<SoundTable> DefaultSoundTable = new();
 
-        public uint DefaultScriptTable;
+        /// <summary>
+        /// Default PhysicsScript ID
+        /// </summary>
+        public QualifiedDataId<PhysicsScriptTable> DefaultScriptTable = new();
 
         /// <inheritdoc />
         public override bool Unpack(DatBinReader reader) {
@@ -76,7 +142,7 @@ namespace DatReaderWriter.DBObjs {
             Flags = (SetupFlags)reader.ReadUInt32();
             var NumParts = reader.ReadUInt32();
             for (var i=0; i < NumParts; i++) {
-                Parts.Add(reader.ReadUInt32());
+                Parts.Add(reader.ReadItem<QualifiedDataId<GfxObj>>());
             }
             if (Flags.HasFlag(SetupFlags.HasParent)) {
                 for (var i=0; i < NumParts; i++) {
@@ -126,11 +192,11 @@ namespace DatReaderWriter.DBObjs {
                 var _val = reader.ReadItem<LightInfo>();
                 Lights.Add(_key, _val);
             }
-            DefaultAnimation = reader.ReadUInt32();
-            DefaultScript = reader.ReadUInt32();
-            DefaultMotionTable = reader.ReadUInt32();
-            DefaultSoundTable = reader.ReadUInt32();
-            DefaultScriptTable = reader.ReadUInt32();
+            DefaultAnimation = reader.ReadItem<QualifiedDataId<Animation>>();
+            DefaultScript = reader.ReadItem<QualifiedDataId<PhysicsScript>>();
+            DefaultMotionTable = reader.ReadItem<QualifiedDataId<MotionTable>>();
+            DefaultSoundTable = reader.ReadItem<QualifiedDataId<SoundTable>>();
+            DefaultScriptTable = reader.ReadItem<QualifiedDataId<PhysicsScriptTable>>();
             return true;
         }
 
@@ -140,7 +206,7 @@ namespace DatReaderWriter.DBObjs {
             writer.WriteUInt32((uint)Flags);
             writer.WriteUInt32((uint)Parts.Count());
             foreach (var item in Parts) {
-                writer.WriteUInt32(item);
+                writer.WriteItem<QualifiedDataId<GfxObj>>(item);
             }
             if (Flags.HasFlag(SetupFlags.HasParent)) {
                 foreach (var item in ParentIndex) {
@@ -186,11 +252,11 @@ namespace DatReaderWriter.DBObjs {
                 writer.WriteInt32(kv.Key);
                 writer.WriteItem<LightInfo>(kv.Value);
             }
-            writer.WriteUInt32(DefaultAnimation);
-            writer.WriteUInt32(DefaultScript);
-            writer.WriteUInt32(DefaultMotionTable);
-            writer.WriteUInt32(DefaultSoundTable);
-            writer.WriteUInt32(DefaultScriptTable);
+            writer.WriteItem<QualifiedDataId<Animation>>(DefaultAnimation);
+            writer.WriteItem<QualifiedDataId<PhysicsScript>>(DefaultScript);
+            writer.WriteItem<QualifiedDataId<MotionTable>>(DefaultMotionTable);
+            writer.WriteItem<QualifiedDataId<SoundTable>>(DefaultSoundTable);
+            writer.WriteItem<QualifiedDataId<PhysicsScriptTable>>(DefaultScriptTable);
             return true;
         }
     }

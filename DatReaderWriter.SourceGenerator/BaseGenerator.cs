@@ -94,7 +94,15 @@ namespace DatReaderWriter.SourceGenerator {
                 WriteVectorItemClassDefinition(writer, vector);
 
             WriteSummary(writer, vector.Text);
-            writer.WriteLine($"public {TypeGeneratorHelper.GetTypeDeclaration(vector, XMLDefParser)} {vector.Name} = [];");
+            if (vector.IsGenericNonContainer) {
+                writer.WriteLine(
+                    $"public {TypeGeneratorHelper.GetTypeDeclaration(vector, XMLDefParser)} {vector.Name} = new();");
+            }
+            else {
+                writer.WriteLine(
+                    $"public {TypeGeneratorHelper.GetTypeDeclaration(vector, XMLDefParser)} {vector.Name} = [];");
+            }
+
             writer.WriteLine("");
         }
 
@@ -235,7 +243,7 @@ namespace DatReaderWriter.SourceGenerator {
             bool areGenericArgs = vector.Children.Any(c => c is ACDataMember m && string.IsNullOrEmpty(m.Name)) ||
                                   vector.Children.Any(c => c is ACVector v && string.IsNullOrEmpty(v.Name));
 
-            if (areGenericArgs && string.IsNullOrEmpty(vector.Length) && string.IsNullOrEmpty(vector.LengthMod) && string.IsNullOrEmpty(vector.Skip)) {
+            if (vector.IsGenericNonContainer || areGenericArgs && string.IsNullOrEmpty(vector.Length) && string.IsNullOrEmpty(vector.LengthMod) && string.IsNullOrEmpty(vector.Skip)) {
                  writer.WriteLine($"{vector.Name} = reader.ReadItem<{TypeGeneratorHelper.GetTypeDeclaration(vector, XMLDefParser)}>();");
                  return;
             }
@@ -850,7 +858,7 @@ namespace DatReaderWriter.SourceGenerator {
             bool areGenericArgs = vector.Children.Any(c => c is ACDataMember m && string.IsNullOrEmpty(m.Name)) ||
                                   vector.Children.Any(c => c is ACVector v && string.IsNullOrEmpty(v.Name));
 
-            if (areGenericArgs && string.IsNullOrEmpty(vector.Length) && string.IsNullOrEmpty(vector.LengthMod) && string.IsNullOrEmpty(vector.Skip)) {
+            if (vector.IsGenericNonContainer || areGenericArgs && string.IsNullOrEmpty(vector.Length) && string.IsNullOrEmpty(vector.LengthMod) && string.IsNullOrEmpty(vector.Skip)) {
                  writer.WriteLine($"writer.WriteItem<{TypeGeneratorHelper.GetTypeDeclaration(vector, XMLDefParser)}>({vector.Name});");
                  return;
             }

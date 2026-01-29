@@ -16,7 +16,7 @@ using DatReaderWriter.Types;
 
 namespace DatReaderWriter.DBObjs {
     /// <summary>
-    /// DB_TYPE_ANIM in the client.
+    /// DB_TYPE_ANIM in the client. Defines a complete animation (position + part transforms + hooks)
     /// </summary>
     [DBObjType(typeof(Animation), DatFileType.Portal, DBObjType.Animation, DBObjHeaderFlags.HasId, 0x03000000, 0x0300FFFF, 0x00000000)]
     public partial class Animation : DBObj {
@@ -26,12 +26,24 @@ namespace DatReaderWriter.DBObjs {
         /// <inheritdoc />
         public override DBObjType DBObjType => DBObjType.Animation;
 
+        /// <summary>
+        /// Bit flags controlling which data is present (mainly whether position keyframes exist)
+        /// </summary>
         public AnimationFlags Flags;
 
+        /// <summary>
+        /// Number of animated parts / bones in this animation
+        /// </summary>
         public uint NumParts;
 
+        /// <summary>
+        /// Per-frame root position keyframes (only exists if Flags &amp; PosFrames)
+        /// </summary>
         public List<Frame> PosFrames = [];
 
+        /// <summary>
+        /// Per-frame array of per-part transforms + animation hooks
+        /// </summary>
         public List<AnimationFrame> PartFrames = [];
 
         /// <inheritdoc />

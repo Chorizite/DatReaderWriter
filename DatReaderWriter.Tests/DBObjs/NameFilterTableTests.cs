@@ -21,7 +21,7 @@ namespace DatReaderWriter.Tests.DBObjs {
 
             var writeObj = new NameFilterTable() {
                 Id = 0x0E000020u,
-                LanguageData = new Dictionary<uint, NameFilterLanguageData> {
+                LanguageData = new () {
                     { 1, new NameFilterLanguageData() {
                         ExtraAllowedCharacters = "asdf",
                         FirstNCharactersMustHaveAVowel = 1,

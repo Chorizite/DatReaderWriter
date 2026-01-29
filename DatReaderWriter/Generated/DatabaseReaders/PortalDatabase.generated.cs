@@ -224,28 +224,28 @@ namespace DatReaderWriter {
         public Task<NameFilterTable?> GetNameFilterTableAsync(uint id, CancellationToken ct = default) => GetAsync<NameFilterTable>(id, ct);
         #endif
         /// <summary>
-        /// Get a &lt;see cref=&quot;PaletteSet&quot;/&gt; entirely from the portal.dat
+        /// Get a &lt;see cref=&quot;PalSet&quot;/&gt; entirely from the portal.dat
         /// </summary>
-        public PaletteSet? GetPaletteSet(uint id) => Get<PaletteSet>(id);
+        public PalSet? GetPalSet(uint id) => Get<PalSet>(id);
         /// <summary>
-        /// Get a &lt;see cref=&quot;PaletteSet&quot;/&gt; entirely from the portal.dat asynchronously
+        /// Get a &lt;see cref=&quot;PalSet&quot;/&gt; entirely from the portal.dat asynchronously
         /// </summary>
         #if (NET8_0_OR_GREATER)
-        public ValueTask<PaletteSet?> GetPaletteSetAsync(uint id, CancellationToken ct = default) => GetAsync<PaletteSet>(id, ct);
+        public ValueTask<PalSet?> GetPalSetAsync(uint id, CancellationToken ct = default) => GetAsync<PalSet>(id, ct);
         #else
-        public Task<PaletteSet?> GetPaletteSetAsync(uint id, CancellationToken ct = default) => GetAsync<PaletteSet>(id, ct);
+        public Task<PalSet?> GetPalSetAsync(uint id, CancellationToken ct = default) => GetAsync<PalSet>(id, ct);
         #endif
         /// <summary>
-        /// Get a &lt;see cref=&quot;Clothing&quot;/&gt; entirely from the portal.dat
+        /// Get a &lt;see cref=&quot;ClothingTable&quot;/&gt; entirely from the portal.dat
         /// </summary>
-        public Clothing? GetClothing(uint id) => Get<Clothing>(id);
+        public ClothingTable? GetClothingTable(uint id) => Get<ClothingTable>(id);
         /// <summary>
-        /// Get a &lt;see cref=&quot;Clothing&quot;/&gt; entirely from the portal.dat asynchronously
+        /// Get a &lt;see cref=&quot;ClothingTable&quot;/&gt; entirely from the portal.dat asynchronously
         /// </summary>
         #if (NET8_0_OR_GREATER)
-        public ValueTask<Clothing?> GetClothingAsync(uint id, CancellationToken ct = default) => GetAsync<Clothing>(id, ct);
+        public ValueTask<ClothingTable?> GetClothingTableAsync(uint id, CancellationToken ct = default) => GetAsync<ClothingTable>(id, ct);
         #else
-        public Task<Clothing?> GetClothingAsync(uint id, CancellationToken ct = default) => GetAsync<Clothing>(id, ct);
+        public Task<ClothingTable?> GetClothingTableAsync(uint id, CancellationToken ct = default) => GetAsync<ClothingTable>(id, ct);
         #endif
         /// <summary>
         /// Get a &lt;see cref=&quot;GfxObjDegradeInfo&quot;/&gt; entirely from the portal.dat

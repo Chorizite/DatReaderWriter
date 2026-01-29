@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using DatReaderWriter.Lib.IO;
+using DatReaderWriter.Types;
 
 namespace DatReaderWriter.Lib {
     /// <summary>
@@ -51,6 +52,27 @@ namespace DatReaderWriter.Lib {
         public static byte GetBucketSizeIndex(int numEntries, bool isAutoGrow = false) {
             var bucketSize = GetBucketSize(numEntries, isAutoGrow);
             return (byte)Array.IndexOf(BucketSizes, bucketSize);
+        }
+        
+        public static ulong GetHashKey<TKey>(TKey key) {
+            unsafe {
+                if (key is QualifiedDataId qdid) {
+                    return qdid.DataId;
+                }
+
+                if (key is StringBase strKey) {
+                    return (ulong)strKey.GetHashCode();
+                }
+                
+                return sizeof(TKey) switch {
+                    1 => *(byte*)&key,
+                    2 => *(ushort*)&key,
+                    4 => *(uint*)&key,
+                    8 => *(ulong*)&key,
+                    _ => throw new System.NotSupportedException(
+                        $"Key type size {sizeof(TKey)} not supported for modulus operation")
+                };
+            }
         }
     }
 

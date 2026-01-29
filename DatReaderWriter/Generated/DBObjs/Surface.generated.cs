@@ -16,7 +16,7 @@ using DatReaderWriter.Types;
 
 namespace DatReaderWriter.DBObjs {
     /// <summary>
-    /// DB_TYPE_SURFACE in the client.
+    /// DB_TYPE_SURFACE in the client. Main surface/material descriptor
     /// </summary>
     [DBObjType(typeof(Surface), DatFileType.Portal, DBObjType.Surface, DBObjHeaderFlags.None, 0x08000000, 0x0800FFFF, 0x00000000)]
     public partial class Surface : DBObj {
@@ -26,18 +26,39 @@ namespace DatReaderWriter.DBObjs {
         /// <inheritdoc />
         public override DBObjType DBObjType => DBObjType.Surface;
 
+        /// <summary>
+        /// Bitfield controlling surface behavior
+        /// </summary>
         public SurfaceType Type;
 
-        public uint OrigTextureId;
+        /// <summary>
+        /// Original SurfaceTexture DataId
+        /// </summary>
+        public QualifiedDataId<SurfaceTexture> OrigTextureId = new();
 
-        public uint OrigPaletteId;
+        /// <summary>
+        /// Original Palette DataId
+        /// </summary>
+        public QualifiedDataId<Palette> OrigPaletteId = new();
 
+        /// <summary>
+        /// Solid color when no texture is used
+        /// </summary>
         public ColorARGB ColorValue;
 
+        /// <summary>
+        /// 0..1 opacity/transparency factor
+        /// </summary>
         public float Translucency;
 
+        /// <summary>
+        /// Self-illumination / emissive strength
+        /// </summary>
         public float Luminosity;
 
+        /// <summary>
+        /// Diffuse lighting multiplier
+        /// </summary>
         public float Diffuse;
 
         /// <inheritdoc />
@@ -45,8 +66,8 @@ namespace DatReaderWriter.DBObjs {
             base.Unpack(reader);
             Type = (SurfaceType)reader.ReadUInt32();
             if (Type.HasFlag(SurfaceType.Base1Image) || Type.HasFlag(SurfaceType.Base1ClipMap)) {
-                OrigTextureId = reader.ReadUInt32();
-                OrigPaletteId = reader.ReadUInt32();
+                OrigTextureId = reader.ReadItem<QualifiedDataId<SurfaceTexture>>();
+                OrigPaletteId = reader.ReadItem<QualifiedDataId<Palette>>();
             }
             else {
                 ColorValue = reader.ReadItem<ColorARGB>();
@@ -62,8 +83,8 @@ namespace DatReaderWriter.DBObjs {
             base.Pack(writer);
             writer.WriteUInt32((uint)Type);
             if (Type.HasFlag(SurfaceType.Base1Image) || Type.HasFlag(SurfaceType.Base1ClipMap)) {
-                writer.WriteUInt32(OrigTextureId);
-                writer.WriteUInt32(OrigPaletteId);
+                writer.WriteItem<QualifiedDataId<SurfaceTexture>>(OrigTextureId);
+                writer.WriteItem<QualifiedDataId<Palette>>(OrigPaletteId);
             }
             else {
                 writer.WriteItem<ColorARGB>(ColorValue);

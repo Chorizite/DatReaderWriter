@@ -211,7 +211,6 @@ namespace DatReaderWriter {
                     "Iteration is not a valid type to get from a dat file collection since it is used in all dat files. Use a specific dat like datCollection.Portal.Get<Iteration>()");
             }
 
-            Console.WriteLine($"Determining dat file type for {typeof(T).Name} is {TypeToDatFileType<T>()}");
             switch (TypeToDatFileType<T>()) {
                 case DatFileType.Cell:
                     return Cell.TryGet(fileId, out value);

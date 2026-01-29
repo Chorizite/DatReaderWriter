@@ -29,7 +29,7 @@ namespace DatReaderWriter.DBObjs {
         /// <summary>
         /// The name of the keymap
         /// </summary>
-        public string Name;
+        public PStringBase<byte> Name = new();
 
         public Guid GuidMap;
 
@@ -48,7 +48,7 @@ namespace DatReaderWriter.DBObjs {
         /// <inheritdoc />
         public override bool Unpack(DatBinReader reader) {
             base.Unpack(reader);
-            Name = reader.ReadString();
+            Name = reader.ReadItem<PStringBase<byte>>();
             GuidMap = reader.ReadGuid();
             var _numDeviceEntries = reader.ReadUInt32();
             for (var i=0; i < _numDeviceEntries; i++) {
@@ -70,7 +70,7 @@ namespace DatReaderWriter.DBObjs {
         /// <inheritdoc />
         public override bool Pack(DatBinWriter writer) {
             base.Pack(writer);
-            writer.WriteString(Name);
+            writer.WriteItem<PStringBase<byte>>(Name);
             writer.WriteGuid(GuidMap);
             writer.WriteUInt32((uint)Devices.Count());
             foreach (var item in Devices) {

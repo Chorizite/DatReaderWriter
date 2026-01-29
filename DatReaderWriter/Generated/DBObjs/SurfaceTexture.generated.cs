@@ -31,7 +31,10 @@ namespace DatReaderWriter.DBObjs {
         /// </summary>
         public TextureType Type;
 
-        public List<uint> Textures = [];
+        /// <summary>
+        /// Array of RenderSurface IDs
+        /// </summary>
+        public List<QualifiedDataId<RenderSurface>> Textures = [];
 
         /// <inheritdoc />
         public override bool Unpack(DatBinReader reader) {
@@ -39,7 +42,7 @@ namespace DatReaderWriter.DBObjs {
             Type = (TextureType)reader.ReadByte();
             var _numtextures = reader.ReadInt32();
             for (var i=0; i < _numtextures; i++) {
-                Textures.Add(reader.ReadUInt32());
+                Textures.Add(reader.ReadItem<QualifiedDataId<RenderSurface>>());
             }
             return true;
         }
@@ -50,7 +53,7 @@ namespace DatReaderWriter.DBObjs {
             writer.WriteByte((byte)Type);
             writer.WriteInt32((int)Textures.Count());
             foreach (var item in Textures) {
-                writer.WriteUInt32(item);
+                writer.WriteItem<QualifiedDataId<RenderSurface>>(item);
             }
             return true;
         }

@@ -51,7 +51,6 @@ namespace DatReaderWriter.Tests.DBObjs {
             
             var surface = env.Surfaces.First().Get(dat);
             Assert.IsNotNull(surface);
-            Console.WriteLine(JsonConvert.SerializeObject(surface));
             Assert.AreEqual(SurfaceType.Base1Image, surface.Type);
             Assert.AreEqual(0x05000FA0u, surface.OrigTextureId);
 

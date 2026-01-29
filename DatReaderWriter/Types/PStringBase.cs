@@ -12,17 +12,11 @@ namespace DatReaderWriter.Types {
     /// A base class for packed strings with elements of type TValue.
     /// </summary>
     /// <typeparam name="TValue"></typeparam>
-    public class PStringBase<TValue> : IUnpackable, IPackable, IEquatable<string> where TValue : unmanaged {
-        /// <summary>
-        /// The string value.
-        /// </summary>
-        public string Value { get; set; } = String.Empty;
-        
-        // implicit string conversion
-        public static implicit operator string(PStringBase<TValue> pString) => pString.Value;
+    public class PStringBase<TValue> : StringBase<TValue> where TValue : unmanaged {
         public static implicit operator PStringBase<TValue>(string str) => new() { Value = str };
         
-        public bool Unpack(DatBinReader reader) {
+        /// <inheritdoc />
+        public override bool Unpack(DatBinReader reader) {
             var length = (int)reader.ReadCompressedUInt();
             
             if (Marshal.SizeOf(typeof(TValue)) == 1) {
@@ -42,7 +36,8 @@ namespace DatReaderWriter.Types {
             return true;
         }
 
-        public bool Pack(DatBinWriter writer) {
+        /// <inheritdoc />
+        public override bool Pack(DatBinWriter writer) {
             if (Marshal.SizeOf(typeof(TValue)) == 1) {
                 var bytes = Encoding.Default.GetBytes(Value);
                 writer.WriteCompressedUInt((uint)bytes.Length);
@@ -61,11 +56,7 @@ namespace DatReaderWriter.Types {
             return true;
         }
 
-        public bool Equals(string other)
-        {
-            return Value == other;
-        }
-
+        /// <inheritdoc />
         public override bool Equals(object obj)
         {
             if (obj is null) {
@@ -85,11 +76,6 @@ namespace DatReaderWriter.Types {
             }
 
             return Equals((PStringBase<TValue>)obj);
-        }
-
-        public override int GetHashCode()
-        {
-            return (Value != null ? Value.GetHashCode() : 0);
         }
     }
 }

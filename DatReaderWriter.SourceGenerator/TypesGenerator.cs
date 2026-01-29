@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
@@ -23,158 +24,163 @@ namespace DatReaderWriter.SourceGenerator {
             };
 
             foreach (var kv in parser.ACDataTypes) {
-                if (ignoreList.Contains(kv.Key)) {
-                    continue;
-                }
-
-                // We only care about types that are NOT generics
-                if (!string.IsNullOrEmpty(kv.Value.GenericKey) || !string.IsNullOrEmpty(kv.Value.GenericValue)) {
-                    continue;
-                }
-
-                var writer = new SourceWriter();
-                var dataType = kv.Value;
-
-                if (dataType.IsTemplated)
-                    continue;
-
-                writer.WriteLine("using System;");
-                writer.WriteLine("using System.Numerics;");
-                writer.WriteLine("using System.IO;");
-                writer.WriteLine("using System.Linq;");
-                writer.WriteLine("using System.Collections.Generic;");
-                writer.WriteLine("using DatReaderWriter.Enums;");
-                writer.WriteLine("using DatReaderWriter.Lib;");
-                writer.WriteLine("using DatReaderWriter.Lib.Attributes;");
-                writer.WriteLine("using DatReaderWriter.Lib.IO;");
-                writer.WriteLine("");
-                writer.WriteLine("namespace DatReaderWriter.Types {");
-
-                using (writer.IndentScope()) {
-                    WriteSummary(writer, dataType.Text);
-
-                    if (dataType.IsAbstractImplementation) {
-                        writer.WriteLine("public" + (dataType.IsAbstract ? " abstract" : "") + " partial class " +
-                                         dataType.Name + " : " + dataType.ParentType + " {");
+                try {
+                    if (ignoreList.Contains(kv.Key)) {
+                        continue;
                     }
-                    else {
-                        var baseType = !string.IsNullOrEmpty(dataType.ParentType) ? dataType.ParentType : "IDatObjType";
-                        writer.WriteLine("public" + (dataType.IsAbstract ? " abstract" : "") + " partial class " +
-                                         dataType.Name + " : " + baseType + " {");
+
+                    // We only care about types that are NOT generics
+                    if (!string.IsNullOrEmpty(kv.Value.GenericKey) || !string.IsNullOrEmpty(kv.Value.GenericValue)) {
+                        continue;
                     }
+
+                    var writer = new SourceWriter();
+                    var dataType = kv.Value;
+
+                    if (dataType.IsTemplated)
+                        continue;
+
+                    writer.WriteLine("using System;");
+                    writer.WriteLine("using System.Numerics;");
+                    writer.WriteLine("using System.IO;");
+                    writer.WriteLine("using System.Linq;");
+                    writer.WriteLine("using System.Collections.Generic;");
+                    writer.WriteLine("using DatReaderWriter.Enums;");
+                    writer.WriteLine("using DatReaderWriter.Lib;");
+                    writer.WriteLine("using DatReaderWriter.Lib.Attributes;");
+                    writer.WriteLine("using DatReaderWriter.Lib.IO;");
+                    writer.WriteLine("");
+                    writer.WriteLine("namespace DatReaderWriter.Types {");
 
                     using (writer.IndentScope()) {
-                        var usedPropertyNames = new List<string>();
+                        WriteSummary(writer, dataType.Text);
 
                         if (dataType.IsAbstractImplementation) {
-                            WriteAbstractTypeGetter(writer, dataType);
-                        }
-
-                        foreach (var baseModel in dataType.AllChildren) {
-                            GenerateClassProperties(writer, baseModel, ref usedPropertyNames);
-                        }
-
-                        WriteParentContructor(writer, dataType);
-
-                        // define method that can parse from binary
-                        writer.WriteLine("/// <inheritdoc />");
-
-                        if (dataType.IsAbstractImplementation) {
-                            writer.WriteLine("public override bool Unpack(DatBinReader reader) {");
-                        }
-                        else if (dataType.IsAbstract) {
-                            writer.WriteLine("public virtual bool Unpack(DatBinReader reader) {");
+                            writer.WriteLine("public" + (dataType.IsAbstract ? " abstract" : "") + " partial class " +
+                                             dataType.Name + " : " + dataType.ParentType + " {");
                         }
                         else {
-                            writer.WriteLine("public bool Unpack(DatBinReader reader) {");
+                            var baseType = !string.IsNullOrEmpty(dataType.ParentType) ? dataType.ParentType : "IDatObjType";
+                            writer.WriteLine("public" + (dataType.IsAbstract ? " abstract" : "") + " partial class " +
+                                             dataType.Name + " : " + baseType + " {");
                         }
 
                         using (writer.IndentScope()) {
+                            var usedPropertyNames = new List<string>();
+
                             if (dataType.IsAbstractImplementation) {
-                                writer.WriteLine("base.Unpack(reader);");
+                                WriteAbstractTypeGetter(writer, dataType);
                             }
 
-                            foreach (var child in dataType.Children) {
-                                GenerateReaderContents(writer, child, 0);
+                            foreach (var baseModel in dataType.AllChildren) {
+                                GenerateClassProperties(writer, baseModel, ref usedPropertyNames);
                             }
 
-                            writer.WriteLine("return true;");
-                        }
+                            WriteParentContructor(writer, dataType);
 
-                        writer.WriteLine("}");
-                        writer.WriteLine("");
+                            // define method that can parse from binary
+                            writer.WriteLine("/// <inheritdoc />");
 
-                        // define method that can parse to binary
-                        writer.WriteLine("/// <inheritdoc />");
-                        if (dataType.IsAbstractImplementation) {
-                            writer.WriteLine("public override bool Pack(DatBinWriter writer) {");
-                        }
-                        else if (dataType.IsAbstract) {
-                            writer.WriteLine("public virtual bool Pack(DatBinWriter writer) {");
-                        }
-                        else {
-                            writer.WriteLine("public bool Pack(DatBinWriter writer) {");
-                        }
-
-                        using (writer.IndentScope()) {
                             if (dataType.IsAbstractImplementation) {
-                                writer.WriteLine("base.Pack(writer);");
+                                writer.WriteLine("public override bool Unpack(DatBinReader reader) {");
+                            }
+                            else if (dataType.IsAbstract) {
+                                writer.WriteLine("public virtual bool Unpack(DatBinReader reader) {");
+                            }
+                            else {
+                                writer.WriteLine("public bool Unpack(DatBinReader reader) {");
                             }
 
-                            foreach (var child in dataType.Children) {
-                                GenerateWriterContents(writer, child, 0);
-                            }
-
-                            writer.WriteLine("return true;");
-                        }
-
-                        writer.WriteLine("}");
-                        writer.WriteLine("");
-
-                        if (!string.IsNullOrEmpty(dataType.TypeSwitch)) {
-                            WriteSummary(writer, "Create a typed instance of this abstract class");
-                            // Calculate GetParameterType
-                            string paramType = "";
-                            var switchMember =
-                                dataType.AllChildren.FirstOrDefault(c =>
-                                    c is ACDataMember m && m.Name == dataType.TypeSwitch) as ACDataMember;
-                            if (switchMember != null) {
-                                if (XMLDefParser.ACEnums.ContainsKey(switchMember.MemberType))
-                                    paramType = switchMember.MemberType;
-                                else
-                                    paramType = TypeGeneratorHelper.SimplifyType(switchMember.MemberType);
-                            }
-
-                            writer.WriteLine(
-                                $"public static {dataType.Name}? Unpack(DatBinReader reader, {paramType} type) {{");
                             using (writer.IndentScope()) {
-                                writer.WriteLine($"{dataType.Name}? instance = null;");
-                                writer.WriteLine("switch(type) {");
-                                using (writer.IndentScope()) {
-                                    foreach (var subType in dataType.SubTypes) {
-                                        writer.WriteLine($"case {subType.Value}:");
-                                        using (writer.IndentScope()) {
-                                            writer.WriteLine($"instance = new {subType.Name}();");
-                                            writer.WriteLine("break;");
-                                        }
-                                    }
+                                if (dataType.IsAbstractImplementation) {
+                                    writer.WriteLine("base.Unpack(reader);");
                                 }
 
-                                writer.WriteLine("}");
-                                writer.WriteLine("instance?.Unpack(reader);");
-                                writer.WriteLine("return instance;");
+                                foreach (var child in dataType.Children) {
+                                    GenerateReaderContents(writer, child, 0);
+                                }
+
+                                writer.WriteLine("return true;");
                             }
 
                             writer.WriteLine("}");
+                            writer.WriteLine("");
+
+                            // define method that can parse to binary
+                            writer.WriteLine("/// <inheritdoc />");
+                            if (dataType.IsAbstractImplementation) {
+                                writer.WriteLine("public override bool Pack(DatBinWriter writer) {");
+                            }
+                            else if (dataType.IsAbstract) {
+                                writer.WriteLine("public virtual bool Pack(DatBinWriter writer) {");
+                            }
+                            else {
+                                writer.WriteLine("public bool Pack(DatBinWriter writer) {");
+                            }
+
+                            using (writer.IndentScope()) {
+                                if (dataType.IsAbstractImplementation) {
+                                    writer.WriteLine("base.Pack(writer);");
+                                }
+
+                                foreach (var child in dataType.Children) {
+                                    GenerateWriterContents(writer, child, 0);
+                                }
+
+                                writer.WriteLine("return true;");
+                            }
+
+                            writer.WriteLine("}");
+                            writer.WriteLine("");
+
+                            if (!string.IsNullOrEmpty(dataType.TypeSwitch)) {
+                                WriteSummary(writer, "Create a typed instance of this abstract class");
+                                // Calculate GetParameterType
+                                string paramType = "";
+                                var switchMember =
+                                    dataType.AllChildren.FirstOrDefault(c =>
+                                        c is ACDataMember m && m.Name == dataType.TypeSwitch) as ACDataMember;
+                                if (switchMember != null) {
+                                    if (XMLDefParser.ACEnums.ContainsKey(switchMember.MemberType))
+                                        paramType = switchMember.MemberType;
+                                    else
+                                        paramType = TypeGeneratorHelper.SimplifyType(switchMember.MemberType);
+                                }
+
+                                writer.WriteLine(
+                                    $"public static {dataType.Name}? Unpack(DatBinReader reader, {paramType} type) {{");
+                                using (writer.IndentScope()) {
+                                    writer.WriteLine($"{dataType.Name}? instance = null;");
+                                    writer.WriteLine("switch(type) {");
+                                    using (writer.IndentScope()) {
+                                        foreach (var subType in dataType.SubTypes) {
+                                            writer.WriteLine($"case {subType.Value}:");
+                                            using (writer.IndentScope()) {
+                                                writer.WriteLine($"instance = new {subType.Name}();");
+                                                writer.WriteLine("break;");
+                                            }
+                                        }
+                                    }
+
+                                    writer.WriteLine("}");
+                                    writer.WriteLine("instance?.Unpack(reader);");
+                                    writer.WriteLine("return instance;");
+                                }
+
+                                writer.WriteLine("}");
+                            }
                         }
+
+                        writer.WriteLine("}");
                     }
 
                     writer.WriteLine("}");
+
+                    spc.AddSource($"Types/{dataType.Name}.generated.cs", writer.ToString());
                 }
-
-                writer.WriteLine("}");
-
-                spc.AddSource($"Types/{dataType.Name}.generated.cs", writer.ToString());
+                catch (Exception ex) {
+                     throw new Exception($"Error generating type {kv.Key}: {ex.Message}", ex);
+                }
             }
         }
     }

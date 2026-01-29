@@ -26,30 +26,19 @@ namespace DatReaderWriter.DBObjs {
         /// <inheritdoc />
         public override DBObjType DBObjType => DBObjType.NameFilterTable;
 
-        public Dictionary<uint, NameFilterLanguageData> LanguageData = [];
+        public HashTable<uint, NameFilterLanguageData> LanguageData = [];
 
         /// <inheritdoc />
         public override bool Unpack(DatBinReader reader) {
             base.Unpack(reader);
-            var _numNameFilterLanguageDatas = reader.ReadByte();
-            var _numNameFilterLanguageDataBuckets = reader.ReadByte();
-            for (var i=0; i < _numNameFilterLanguageDatas; i++) {
-                var _key = reader.ReadUInt32();
-                var _val = reader.ReadItem<NameFilterLanguageData>();
-                LanguageData.Add(_key, _val);
-            }
+            LanguageData = reader.ReadItem<HashTable<uint, NameFilterLanguageData>>();
             return true;
         }
 
         /// <inheritdoc />
         public override bool Pack(DatBinWriter writer) {
             base.Pack(writer);
-            writer.WriteByte((byte)LanguageData.Count());
-            writer.WriteByte(1);
-            foreach (var kv in LanguageData) {
-                writer.WriteUInt32(kv.Key);
-                writer.WriteItem<NameFilterLanguageData>(kv.Value);
-            }
+            writer.WriteItem<HashTable<uint, NameFilterLanguageData>>(LanguageData);
             return true;
         }
     }

@@ -16,7 +16,7 @@ using DatReaderWriter.Types;
 
 namespace DatReaderWriter.DBObjs {
     /// <summary>
-    /// DB_TYPE_REGION in the client.
+    /// DB_TYPE_REGION in the client. Regions define things like skybox / terrain / game time.
     /// </summary>
     [DBObjType(typeof(Region), DatFileType.Portal, DBObjType.Region, DBObjHeaderFlags.HasId, 0x13000000, 0x1300FFFF, 0x00000000)]
     public partial class Region : DBObj {
@@ -26,12 +26,24 @@ namespace DatReaderWriter.DBObjs {
         /// <inheritdoc />
         public override DBObjType DBObjType => DBObjType.Region;
 
+        /// <summary>
+        /// Region Number, default is 1. Regions should have unique numbers.
+        /// </summary>
         public uint RegionNumber;
 
+        /// <summary>
+        /// The region version, only used internally.
+        /// </summary>
         public uint Version;
 
-        public string RegionName;
+        /// <summary>
+        /// The name of the region, only used internally.
+        /// </summary>
+        public AC1LegacyPStringBase<byte> RegionName = new();
 
+        /// <summary>
+        /// Terrain / Landscape size definitions
+        /// </summary>
         public LandDefs LandDefs;
 
         public GameTime GameTime;
@@ -53,7 +65,7 @@ namespace DatReaderWriter.DBObjs {
             base.Unpack(reader);
             RegionNumber = reader.ReadUInt32();
             Version = reader.ReadUInt32();
-            RegionName = reader.ReadString16L();
+            RegionName = reader.ReadItem<AC1LegacyPStringBase<byte>>();
             reader.Align(4);
             LandDefs = reader.ReadItem<LandDefs>();
             GameTime = reader.ReadItem<GameTime>();
@@ -79,7 +91,7 @@ namespace DatReaderWriter.DBObjs {
             base.Pack(writer);
             writer.WriteUInt32(RegionNumber);
             writer.WriteUInt32(Version);
-            writer.WriteString16L(RegionName);
+            writer.WriteItem<AC1LegacyPStringBase<byte>>(RegionName);
             writer.Align(4);
             writer.WriteItem<LandDefs>(LandDefs);
             writer.WriteItem<GameTime>(GameTime);
