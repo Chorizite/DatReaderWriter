@@ -15,7 +15,7 @@ using DatReaderWriter.Lib.IO;
 
 namespace DatReaderWriter.Types {
     public partial class GearCG : IDatObjType {
-        public string Name;
+        public PStringBase<byte> Name = new();
 
         public QualifiedDataId<ClothingTable> ClothingTable = new();
 
@@ -23,7 +23,7 @@ namespace DatReaderWriter.Types {
 
         /// <inheritdoc />
         public bool Unpack(DatBinReader reader) {
-            Name = reader.ReadString();
+            Name = reader.ReadItem<PStringBase<byte>>();
             ClothingTable = reader.ReadItem<QualifiedDataId<ClothingTable>>();
             WeenieDefault = reader.ReadUInt32();
             return true;
@@ -31,7 +31,7 @@ namespace DatReaderWriter.Types {
 
         /// <inheritdoc />
         public bool Pack(DatBinWriter writer) {
-            writer.WriteString(Name);
+            writer.WriteItem<PStringBase<byte>>(Name);
             writer.WriteItem<QualifiedDataId<ClothingTable>>(ClothingTable);
             writer.WriteUInt32(WeenieDefault);
             return true;

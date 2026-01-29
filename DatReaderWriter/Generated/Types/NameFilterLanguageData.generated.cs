@@ -23,7 +23,7 @@ namespace DatReaderWriter.Types {
 
         public uint VowelContainingSubstringLength;
 
-        public string ExtraAllowedCharacters;
+        public PStringBase<ushort> ExtraAllowedCharacters = new();
 
         public List<string> CompoundLetterGroups = [];
 
@@ -33,7 +33,7 @@ namespace DatReaderWriter.Types {
             MaximumVowelsInARow = reader.ReadUInt32();
             FirstNCharactersMustHaveAVowel = reader.ReadUInt32();
             VowelContainingSubstringLength = reader.ReadUInt32();
-            ExtraAllowedCharacters = reader.ReadUShortString();
+            ExtraAllowedCharacters = reader.ReadItem<PStringBase<ushort>>();
             var _numCompoundLetterGroups = reader.ReadUInt32();
             for (var i=0; i < _numCompoundLetterGroups; i++) {
                 CompoundLetterGroups.Add(reader.ReadUShortString());
@@ -47,7 +47,7 @@ namespace DatReaderWriter.Types {
             writer.WriteUInt32(MaximumVowelsInARow);
             writer.WriteUInt32(FirstNCharactersMustHaveAVowel);
             writer.WriteUInt32(VowelContainingSubstringLength);
-            writer.WriteUShortString(ExtraAllowedCharacters);
+            writer.WriteItem<PStringBase<ushort>>(ExtraAllowedCharacters);
             writer.WriteUInt32((uint)CompoundLetterGroups.Count());
             foreach (var item in CompoundLetterGroups) {
                 writer.WriteUShortString(item);

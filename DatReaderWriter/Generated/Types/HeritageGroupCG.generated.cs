@@ -18,7 +18,7 @@ namespace DatReaderWriter.Types {
     /// Information about a heritage group, used during character creation
     /// </summary>
     public partial class HeritageGroupCG : IDatObjType {
-        public string Name;
+        public PStringBase<byte> Name = new();
 
         public QualifiedDataId<RenderSurface> IconId = new();
 
@@ -54,7 +54,7 @@ namespace DatReaderWriter.Types {
 
         /// <inheritdoc />
         public bool Unpack(DatBinReader reader) {
-            Name = reader.ReadString();
+            Name = reader.ReadItem<PStringBase<byte>>();
             IconId = reader.ReadItem<QualifiedDataId<RenderSurface>>();
             SetupId = reader.ReadItem<QualifiedDataId<Setup>>();
             EnvironmentSetupId = reader.ReadItem<QualifiedDataId<Setup>>();
@@ -82,7 +82,7 @@ namespace DatReaderWriter.Types {
 
         /// <inheritdoc />
         public bool Pack(DatBinWriter writer) {
-            writer.WriteString(Name);
+            writer.WriteItem<PStringBase<byte>>(Name);
             writer.WriteItem<QualifiedDataId<RenderSurface>>(IconId);
             writer.WriteItem<QualifiedDataId<Setup>>(SetupId);
             writer.WriteItem<QualifiedDataId<Setup>>(EnvironmentSetupId);

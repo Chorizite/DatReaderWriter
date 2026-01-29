@@ -18,14 +18,14 @@ namespace DatReaderWriter.Types {
         /// <inheritdoc />
         public override MediaType MediaType => MediaType.Movie;
 
-        public string FileName;
+        public PStringBase<byte> FileName = new();
 
         public bool StretchToFullScreen;
 
         /// <inheritdoc />
         public override bool Unpack(DatBinReader reader) {
             base.Unpack(reader);
-            FileName = reader.ReadString16LByte();
+            FileName = reader.ReadItem<PStringBase<byte>>();
             StretchToFullScreen = reader.ReadBool(1);
             return true;
         }
@@ -33,7 +33,7 @@ namespace DatReaderWriter.Types {
         /// <inheritdoc />
         public override bool Pack(DatBinWriter writer) {
             base.Pack(writer);
-            writer.WriteString16LByte(FileName);
+            writer.WriteItem<PStringBase<byte>>(FileName);
             writer.WriteBool(StretchToFullScreen, 1);
             return true;
         }

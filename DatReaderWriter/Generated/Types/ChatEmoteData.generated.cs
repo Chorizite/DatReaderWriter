@@ -15,21 +15,21 @@ using DatReaderWriter.Lib.IO;
 
 namespace DatReaderWriter.Types {
     public partial class ChatEmoteData : IDatObjType {
-        public string MyEmote;
+        public AC1LegacyPStringBase<byte> MyEmote = new();
 
-        public string OtherEmote;
+        public AC1LegacyPStringBase<byte> OtherEmote = new();
 
         /// <inheritdoc />
         public bool Unpack(DatBinReader reader) {
-            MyEmote = reader.ReadString16L();
-            OtherEmote = reader.ReadString16L();
+            MyEmote = reader.ReadItem<AC1LegacyPStringBase<byte>>();
+            OtherEmote = reader.ReadItem<AC1LegacyPStringBase<byte>>();
             return true;
         }
 
         /// <inheritdoc />
         public bool Pack(DatBinWriter writer) {
-            writer.WriteString16L(MyEmote);
-            writer.WriteString16L(OtherEmote);
+            writer.WriteItem<AC1LegacyPStringBase<byte>>(MyEmote);
+            writer.WriteItem<AC1LegacyPStringBase<byte>>(OtherEmote);
             return true;
         }
 

@@ -19,27 +19,27 @@ namespace DatReaderWriter.Types {
 
         public uint ContractId;
 
-        public string ContractName;
+        public AC1LegacyPStringBase<byte> ContractName = new();
 
-        public string Description;
+        public AC1LegacyPStringBase<byte> Description = new();
 
-        public string DescriptionProgress;
+        public AC1LegacyPStringBase<byte> DescriptionProgress = new();
 
-        public string NameNPCStart;
+        public AC1LegacyPStringBase<byte> NameNPCStart = new();
 
-        public string NameNPCEnd;
+        public AC1LegacyPStringBase<byte> NameNPCEnd = new();
 
-        public string QuestflagStamped;
+        public AC1LegacyPStringBase<byte> QuestflagStamped = new();
 
-        public string QuestflagStarted;
+        public AC1LegacyPStringBase<byte> QuestflagStarted = new();
 
-        public string QuestflagFinished;
+        public AC1LegacyPStringBase<byte> QuestflagFinished = new();
 
-        public string QuestflagProgress;
+        public AC1LegacyPStringBase<byte> QuestflagProgress = new();
 
-        public string QuestflagTimer;
+        public AC1LegacyPStringBase<byte> QuestflagTimer = new();
 
-        public string QuestflagRepeatTime;
+        public AC1LegacyPStringBase<byte> QuestflagRepeatTime = new();
 
         public Position LocationNPCStart;
 
@@ -51,28 +51,17 @@ namespace DatReaderWriter.Types {
         public bool Unpack(DatBinReader reader) {
             Version = reader.ReadUInt32();
             ContractId = reader.ReadUInt32();
-            ContractName = reader.ReadString16L();
-            reader.Align(4);
-            Description = reader.ReadString16L();
-            reader.Align(4);
-            DescriptionProgress = reader.ReadString16L();
-            reader.Align(4);
-            NameNPCStart = reader.ReadString16L();
-            reader.Align(4);
-            NameNPCEnd = reader.ReadString16L();
-            reader.Align(4);
-            QuestflagStamped = reader.ReadString16L();
-            reader.Align(4);
-            QuestflagStarted = reader.ReadString16L();
-            reader.Align(4);
-            QuestflagFinished = reader.ReadString16L();
-            reader.Align(4);
-            QuestflagProgress = reader.ReadString16L();
-            reader.Align(4);
-            QuestflagTimer = reader.ReadString16L();
-            reader.Align(4);
-            QuestflagRepeatTime = reader.ReadString16L();
-            reader.Align(4);
+            ContractName = reader.ReadItem<AC1LegacyPStringBase<byte>>();
+            Description = reader.ReadItem<AC1LegacyPStringBase<byte>>();
+            DescriptionProgress = reader.ReadItem<AC1LegacyPStringBase<byte>>();
+            NameNPCStart = reader.ReadItem<AC1LegacyPStringBase<byte>>();
+            NameNPCEnd = reader.ReadItem<AC1LegacyPStringBase<byte>>();
+            QuestflagStamped = reader.ReadItem<AC1LegacyPStringBase<byte>>();
+            QuestflagStarted = reader.ReadItem<AC1LegacyPStringBase<byte>>();
+            QuestflagFinished = reader.ReadItem<AC1LegacyPStringBase<byte>>();
+            QuestflagProgress = reader.ReadItem<AC1LegacyPStringBase<byte>>();
+            QuestflagTimer = reader.ReadItem<AC1LegacyPStringBase<byte>>();
+            QuestflagRepeatTime = reader.ReadItem<AC1LegacyPStringBase<byte>>();
             LocationNPCStart = reader.ReadItem<Position>();
             LocationNPCEnd = reader.ReadItem<Position>();
             LocationQuestArea = reader.ReadItem<Position>();
@@ -83,28 +72,17 @@ namespace DatReaderWriter.Types {
         public bool Pack(DatBinWriter writer) {
             writer.WriteUInt32(Version);
             writer.WriteUInt32(ContractId);
-            writer.WriteString16L(ContractName);
-            writer.Align(4);
-            writer.WriteString16L(Description);
-            writer.Align(4);
-            writer.WriteString16L(DescriptionProgress);
-            writer.Align(4);
-            writer.WriteString16L(NameNPCStart);
-            writer.Align(4);
-            writer.WriteString16L(NameNPCEnd);
-            writer.Align(4);
-            writer.WriteString16L(QuestflagStamped);
-            writer.Align(4);
-            writer.WriteString16L(QuestflagStarted);
-            writer.Align(4);
-            writer.WriteString16L(QuestflagFinished);
-            writer.Align(4);
-            writer.WriteString16L(QuestflagProgress);
-            writer.Align(4);
-            writer.WriteString16L(QuestflagTimer);
-            writer.Align(4);
-            writer.WriteString16L(QuestflagRepeatTime);
-            writer.Align(4);
+            writer.WriteItem<AC1LegacyPStringBase<byte>>(ContractName);
+            writer.WriteItem<AC1LegacyPStringBase<byte>>(Description);
+            writer.WriteItem<AC1LegacyPStringBase<byte>>(DescriptionProgress);
+            writer.WriteItem<AC1LegacyPStringBase<byte>>(NameNPCStart);
+            writer.WriteItem<AC1LegacyPStringBase<byte>>(NameNPCEnd);
+            writer.WriteItem<AC1LegacyPStringBase<byte>>(QuestflagStamped);
+            writer.WriteItem<AC1LegacyPStringBase<byte>>(QuestflagStarted);
+            writer.WriteItem<AC1LegacyPStringBase<byte>>(QuestflagFinished);
+            writer.WriteItem<AC1LegacyPStringBase<byte>>(QuestflagProgress);
+            writer.WriteItem<AC1LegacyPStringBase<byte>>(QuestflagTimer);
+            writer.WriteItem<AC1LegacyPStringBase<byte>>(QuestflagRepeatTime);
             writer.WriteItem<Position>(LocationNPCStart);
             writer.WriteItem<Position>(LocationNPCEnd);
             writer.WriteItem<Position>(LocationQuestArea);

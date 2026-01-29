@@ -31,13 +31,13 @@ namespace DatReaderWriter.DBObjs {
         /// </summary>
         public uint Language;
 
-        public HashTable<uint, StringTableData> StringTableData = [];
+        public HashTable<uint, StringTableString> Strings = [];
 
         /// <inheritdoc />
         public override bool Unpack(DatBinReader reader) {
             base.Unpack(reader);
             Language = reader.ReadUInt32();
-            StringTableData = reader.ReadItem<HashTable<uint, StringTableData>>();
+            Strings = reader.ReadItem<HashTable<uint, StringTableString>>();
             return true;
         }
 
@@ -45,7 +45,7 @@ namespace DatReaderWriter.DBObjs {
         public override bool Pack(DatBinWriter writer) {
             base.Pack(writer);
             writer.WriteUInt32(Language);
-            writer.WriteItem<HashTable<uint, StringTableData>>(StringTableData);
+            writer.WriteItem<HashTable<uint, StringTableString>>(Strings);
             return true;
         }
     }

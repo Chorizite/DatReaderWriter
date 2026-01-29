@@ -18,13 +18,13 @@ namespace DatReaderWriter.Types {
     /// Information about a starting area available during character creation
     /// </summary>
     public partial class StartingArea : IDatObjType {
-        public string Name;
+        public PStringBase<byte> Name = new();
 
         public List<Position> Locations = [];
 
         /// <inheritdoc />
         public bool Unpack(DatBinReader reader) {
-            Name = reader.ReadString();
+            Name = reader.ReadItem<PStringBase<byte>>();
             var _numLocations = reader.ReadCompressedUInt();
             for (var i=0; i < _numLocations; i++) {
                 Locations.Add(reader.ReadItem<Position>());
@@ -34,7 +34,7 @@ namespace DatReaderWriter.Types {
 
         /// <inheritdoc />
         public bool Pack(DatBinWriter writer) {
-            writer.WriteString(Name);
+            writer.WriteItem<PStringBase<byte>>(Name);
             writer.WriteCompressedUInt((uint)Locations.Count());
             foreach (var item in Locations) {
                 writer.WriteItem<Position>(item);

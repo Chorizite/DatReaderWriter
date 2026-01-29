@@ -15,9 +15,9 @@ using DatReaderWriter.Lib.IO;
 
 namespace DatReaderWriter.Types {
     public partial class SkillBase : IDatObjType {
-        public string Description;
+        public AC1LegacyPStringBase<byte> Description = new();
 
-        public string Name;
+        public AC1LegacyPStringBase<byte> Name = new();
 
         public QualifiedDataId<RenderSurface> IconId = new();
 
@@ -41,8 +41,8 @@ namespace DatReaderWriter.Types {
 
         /// <inheritdoc />
         public bool Unpack(DatBinReader reader) {
-            Description = reader.ReadString16L();
-            Name = reader.ReadString16L();
+            Description = reader.ReadItem<AC1LegacyPStringBase<byte>>();
+            Name = reader.ReadItem<AC1LegacyPStringBase<byte>>();
             IconId = reader.ReadItem<QualifiedDataId<RenderSurface>>();
             TrainedCost = reader.ReadInt32();
             SpecializedCost = reader.ReadInt32();
@@ -58,8 +58,8 @@ namespace DatReaderWriter.Types {
 
         /// <inheritdoc />
         public bool Pack(DatBinWriter writer) {
-            writer.WriteString16L(Description);
-            writer.WriteString16L(Name);
+            writer.WriteItem<AC1LegacyPStringBase<byte>>(Description);
+            writer.WriteItem<AC1LegacyPStringBase<byte>>(Name);
             writer.WriteItem<QualifiedDataId<RenderSurface>>(IconId);
             writer.WriteInt32(TrainedCost);
             writer.WriteInt32(SpecializedCost);

@@ -27,7 +27,7 @@ namespace DatReaderWriter.Types {
 
         public List<TimeOfDay> TimesOfDay = [];
 
-        public List<string> DaysOfWeek = [];
+        public List<AC1LegacyPStringBase<byte>> DaysOfWeek = [];
 
         public List<Season> Seasons = [];
 
@@ -45,7 +45,7 @@ namespace DatReaderWriter.Types {
             }
             var _numDaysOfWeek = reader.ReadUInt32();
             for (var i=0; i < _numDaysOfWeek; i++) {
-                DaysOfWeek.Add(reader.ReadString16L());
+                DaysOfWeek.Add(reader.ReadItem<AC1LegacyPStringBase<byte>>());
             }
             var _numSeasons = reader.ReadUInt32();
             for (var i=0; i < _numSeasons; i++) {
@@ -68,7 +68,7 @@ namespace DatReaderWriter.Types {
             }
             writer.WriteUInt32((uint)DaysOfWeek.Count());
             foreach (var item in DaysOfWeek) {
-                writer.WriteString16L(item);
+                writer.WriteItem<AC1LegacyPStringBase<byte>>(item);
             }
             writer.WriteUInt32((uint)Seasons.Count());
             foreach (var item in Seasons) {

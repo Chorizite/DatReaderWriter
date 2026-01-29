@@ -2623,7 +2623,7 @@
                 </type>
                 <type name="ReplaceObjectHook" value="AnimationHookType.ReplaceObject">
                     <field name="PartIndex" type="ushort"/>
-                    <vector name="PartId" type="PackedQualifiedDataId" genericValue="GfxObj" />
+                    <vector name="PartId" type="PackedQualifiedDataId" genericValue="GfxObj"/>
                 </type>
                 <type name="EtherealHook" value="AnimationHookType.Ethereal">
                     <field name="Ethereal" type="bool"/>
@@ -2787,7 +2787,9 @@
             <field name="_numTimesOfDay" type="uint"/>
             <vector name="TimesOfDay" length="_numTimesOfDay" type="List" genericValue="TimeOfDay"/>
             <field name="_numDaysOfWeek" type="uint"/>
-            <vector name="DaysOfWeek" length="_numDaysOfWeek" type="List" genericValue="string" align="uint"/>
+            <vector name="DaysOfWeek" length="_numDaysOfWeek" type="List">
+                <vector type="AC1LegacyPStringBase" genericValue="byte"/>
+            </vector>
             <field name="_numSeasons" type="uint"/>
             <vector name="Seasons" length="_numSeasons" type="List" genericValue="Season"/>
         </type>
@@ -2884,7 +2886,7 @@
             <field name="LandSurfaces" type="LandSurf"/>
         </type>
         <type name="TerrainType">
-            <field name="TerrainName" type="string"/>
+            <vector name="TerrainName" type="AC1LegacyPStringBase" genericValue="byte"/>
             <align type="uint"/>
             <field name="TerrainColor" type="ColorARGB"/>
             <field name="_numSceneTypes" type="uint"/>
@@ -3055,13 +3057,14 @@
             <field name="NumColors" type="uint"/>
         </type>
         <type name="ChatEmoteData">
-            <field name="MyEmote" type="string"/>
-            <field name="OtherEmote" type="string"/>
+            <vector name="MyEmote" type="AC1LegacyPStringBase" genericValue="byte"/>
+            <vector name="OtherEmote" type="AC1LegacyPStringBase" genericValue="byte"/>
         </type>
         <type name="BannedPatterns">
-            <field name="_numPatterns" type="ushort"/>
-            <field name="_numPatternsBuckets" type="ushort" value="32"/>
-            <vector name="Patterns" length="_numPatterns" type="Dictionary" genericKey="uint" genericValue="string"/>
+            <vector name="Patterns" type="HashTable">
+                <field type="uint"/>
+                <vector type="PStringBase" genericValue="byte"/>
+            </vector>
         </type>
         <type name="PhysicsScriptData">
             <field name="StartTime" type="double"/>
@@ -3077,8 +3080,8 @@
             <field name="Attribute2" type="AttributeId" text="The second attribute to use."/>
         </type>
         <type name="SkillBase">
-            <field name="Description" type="string"/>
-            <field name="Name" type="string"/>
+            <vector name="Description" type="AC1LegacyPStringBase" genericValue="byte"/>
+            <vector name="Name" type="AC1LegacyPStringBase" genericValue="byte"/>
             <vector name="IconId" type="QualifiedDataId" genericValue="RenderSurface"/>
             <field name="TrainedCost" type="int"/>
             <field name="SpecializedCost" type="int"/>
@@ -3091,7 +3094,7 @@
             <field name="LearnMod" type="double"/>
         </type>
         <type name="StartingArea" text="Information about a starting area available during character creation">
-            <field name="Name" type="rawstring"/>
+            <vector name="Name" type="PStringBase" genericValue="byte"/>
             <field name="_numLocations" type="CompressedUInt"/>
             <vector name="Locations" length="_numLocations" type="List" genericValue="Position"/>
         </type>
@@ -3130,7 +3133,7 @@
             <field name="ObjDesc" type="ObjDesc"/>
         </type>
         <type name="GearCG">
-            <field name="Name" type="rawstring"/>
+            <vector name="Name" type="PStringBase" genericValue="byte"/>
             <vector name="ClothingTable" type="QualifiedDataId" genericValue="ClothingTable"/>
             <field name="WeenieDefault" type="uint"/>
         </type>
@@ -3149,7 +3152,7 @@
             <align type="uint"/>
         </type>
         <type name="SexCG">
-            <field name="Name" type="rawstring"/>
+            <vector name="Name" type="PStringBase" genericValue="byte"/>
             <field name="Scale" type="uint"/>
             <vector name="SetupId" type="QualifiedDataId" genericValue="Setup"/>
             <vector name="SoundTable" type="QualifiedDataId" genericValue="SoundTable"/>
@@ -3189,7 +3192,7 @@
             <field name="PrimaryCost" type="int"/>
         </type>
         <type name="TemplateCG">
-            <field name="Name" type="rawstring"/>
+            <vector name="Name" type="PStringBase" genericValue="byte"/>
             <vector name="IconId" type="QualifiedDataId" genericValue="RenderSurface"/>
             <field name="Title" type="uint"/>
             <field name="Strength" type="int"/>
@@ -3204,10 +3207,11 @@
             <vector name="PrimarySkills" length="_numPrimarySkills" type="List" genericValue="SkillId"/>
         </type>
         <type name="HeritageGroupCG" text="Information about a heritage group, used during character creation">
-            <field name="Name" type="rawstring"/>
+            <vector name="Name" type="PStringBase" genericValue="byte"/>
             <vector name="IconId" type="QualifiedDataId" genericValue="RenderSurface"/>
             <vector name="SetupId" type="QualifiedDataId" genericValue="Setup" text="Basic character model"/>
-            <vector name="EnvironmentSetupId" type="QualifiedDataId" genericValue="Setup" text="This is the background environment used during character creation"/>
+            <vector name="EnvironmentSetupId" type="QualifiedDataId" genericValue="Setup"
+                    text="This is the background environment used during character creation"/>
             <field name="AttributeCredits" type="uint" text="Starting attribute credits"/>
             <field name="SkillCredits" type="uint" text="Starting skill credits"/>
             <field name="_numPrimaryStartAreas" type="CompressedUInt"/>
@@ -3228,7 +3232,7 @@
             <field name="MaximumVowelsInARow" type="uint"/>
             <field name="FirstNCharactersMustHaveAVowel" type="uint"/>
             <field name="VowelContainingSubstringLength" type="uint"/>
-            <field name="ExtraAllowedCharacters" type="ushortstring"/>
+            <vector name="ExtraAllowedCharacters" type="PStringBase" genericValue="ushort"/>
             <field name="_numCompoundLetterGroups" type="uint"/>
             <vector name="CompoundLetterGroups" length="_numCompoundLetterGroups" type="List"
                     genericValue="ushortstring"/>
@@ -3284,16 +3288,15 @@
             <field type="sbyte" name="HorizontalOffsetAfter"/>
             <field type="sbyte" name="VerticalOffsetBefore"/>
         </type>
-        <type name="StringTableData">
-            <field type="ushort" name="_numVarNames"/>
-            <vector name="VarNames" length="_numVarNames" type="List" genericValue="ushortstring"/>
-            <field type="ushort" name="_numVars"/>
-            <vector name="Vars" length="_numVars" type="List" genericValue="ushortstring"/>
+        <type name="StringTableString">
+            <vector name="DataId" type="QualifiedDataId" genericValue="StringTable"/>
             <field type="uint" name="_numStrings"/>
-            <vector name="Strings" length="_numStrings" type="List" genericValue="ushortstring"/>
-            <field type="uint" name="_numComments"/>
-            <vector name="Comments" length="_numComments" type="List" genericValue="uint"/>
-            <field type="byte" name="Unknown"/>
+            <vector name="Strings" length="_numStrings" type="List">
+                <vector type="PStringBase" genericValue="ushort"/>
+            </vector>
+            <field type="uint" name="_numVariables"/>
+            <vector name="Variables" length="_numVariables" type="List" genericValue="uint"/>
+            <field type="bool" name="IsVarNameTableWorthPacking" size="1"/>
         </type>
         <type name="CombatManeuver">
             <field type="MotionStance" name="Style"/>
@@ -3305,28 +3308,17 @@
         <type name="Contract">
             <field type="uint" name="Version"/>
             <field type="uint" name="ContractId"/>
-            <field type="string" name="ContractName"/>
-            <align size="4"/>
-            <field type="string" name="Description"/>
-            <align size="4"/>
-            <field type="string" name="DescriptionProgress"/>
-            <align size="4"/>
-            <field type="string" name="NameNPCStart"/>
-            <align size="4"/>
-            <field type="string" name="NameNPCEnd"/>
-            <align size="4"/>
-            <field type="string" name="QuestflagStamped"/>
-            <align size="4"/>
-            <field type="string" name="QuestflagStarted"/>
-            <align size="4"/>
-            <field type="string" name="QuestflagFinished"/>
-            <align size="4"/>
-            <field type="string" name="QuestflagProgress"/>
-            <align size="4"/>
-            <field type="string" name="QuestflagTimer"/>
-            <align size="4"/>
-            <field type="string" name="QuestflagRepeatTime"/>
-            <align size="4"/>
+            <vector name="ContractName" type="AC1LegacyPStringBase" genericValue="byte"/>
+            <vector name="Description" type="AC1LegacyPStringBase" genericValue="byte"/>
+            <vector name="DescriptionProgress" type="AC1LegacyPStringBase" genericValue="byte"/>
+            <vector name="NameNPCStart" type="AC1LegacyPStringBase" genericValue="byte"/>
+            <vector name="NameNPCEnd" type="AC1LegacyPStringBase" genericValue="byte"/>
+            <vector name="QuestflagStamped" type="AC1LegacyPStringBase" genericValue="byte"/>
+            <vector name="QuestflagStarted" type="AC1LegacyPStringBase" genericValue="byte"/>
+            <vector name="QuestflagFinished" type="AC1LegacyPStringBase" genericValue="byte"/>
+            <vector name="QuestflagProgress" type="AC1LegacyPStringBase" genericValue="byte"/>
+            <vector name="QuestflagTimer" type="AC1LegacyPStringBase" genericValue="byte"/>
+            <vector name="QuestflagRepeatTime" type="AC1LegacyPStringBase" genericValue="byte"/>
             <field type="Position" name="LocationNPCStart"/>
             <field type="Position" name="LocationNPCEnd"/>
             <field type="Position" name="LocationQuestArea"/>
@@ -3335,7 +3327,9 @@
             <field type="uint" name="Key"/>
             <field type="ushort" name="Unknown2"/>
             <field type="uint" name="_numBannedPatterns"/>
-            <vector name="BannedPatterns" length="_numBannedPatterns" type="List" genericValue="rawstring"/>
+            <vector name="BannedPatterns" length="_numBannedPatterns" type="List">
+                <vector type="PStringBase" genericValue="byte"/>
+            </vector>
         </type>
         <type name="DeviceKeyMapEntry">
             <field type="DeviceType" name="Type"/>
@@ -3355,6 +3349,7 @@
             <vector name="Mappings" length="_numMappings" type="List" genericValue="QualifiedControl"/>
         </type>
         <type name="StringInfo">
+            <!-- TODO: this doesnt match dats -->
             <field type="byte" name="Token"/>
             <field type="uint" name="StringId" text="This is the hashed string value, which is the key in TableId"/>
             <vector name="TableId" type="QualifiedDataId" genericValue="StringTable"/>
@@ -3423,7 +3418,7 @@
             <field name="Type" type="MediaType"/>
             <typeswitch name="_mediaType">
                 <type name="MediaDescMovie" value="MediaType.Movie">
-                    <field name="FileName" type="bytestring"/>
+                    <vector name="FileName" type="PStringBase" genericValue="byte"/>
                     <field name="StretchToFullScreen" type="bool" size="1"/>
                 </type>
                 <type name="MediaDescAlpha" value="MediaType.Alpha">
@@ -4252,9 +4247,9 @@
             <type name="StringTable" text="DB_TYPE_STRING_TABLE in the client." parent="DBObj" first="0x23000000"
                   last="0x24FFFFFF" flags="DBObjHeaderFlags.HasId">
                 <field type="uint" name="Language" text="This should always be 1 for English"/>
-                <vector name="StringTableData" type="HashTable">
+                <vector name="Strings" type="HashTable">
                     <field type="uint"/>
-                    <field type="StringTableData"/>
+                    <field type="StringTableString"/>
                 </vector>
             </type>
             <type name="LanguageInfo" text="DB_TYPE_STRING_STATE in the client." parent="DBObj" first="0x41000000"

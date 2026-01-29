@@ -19,7 +19,7 @@ namespace DatReaderWriter.Types {
 
         public ushort Unknown2;
 
-        public List<string> BannedPatterns = [];
+        public List<PStringBase<byte>> BannedPatterns = [];
 
         /// <inheritdoc />
         public bool Unpack(DatBinReader reader) {
@@ -27,7 +27,7 @@ namespace DatReaderWriter.Types {
             Unknown2 = reader.ReadUInt16();
             var _numBannedPatterns = reader.ReadUInt32();
             for (var i=0; i < _numBannedPatterns; i++) {
-                BannedPatterns.Add(reader.ReadString());
+                BannedPatterns.Add(reader.ReadItem<PStringBase<byte>>());
             }
             return true;
         }
@@ -38,7 +38,7 @@ namespace DatReaderWriter.Types {
             writer.WriteUInt16(Unknown2);
             writer.WriteUInt32((uint)BannedPatterns.Count());
             foreach (var item in BannedPatterns) {
-                writer.WriteString(item);
+                writer.WriteItem<PStringBase<byte>>(item);
             }
             return true;
         }

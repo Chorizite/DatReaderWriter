@@ -15,7 +15,7 @@ using DatReaderWriter.Lib.IO;
 
 namespace DatReaderWriter.Types {
     public partial class TerrainType : IDatObjType {
-        public string TerrainName;
+        public AC1LegacyPStringBase<byte> TerrainName = new();
 
         public ColorARGB TerrainColor;
 
@@ -23,7 +23,7 @@ namespace DatReaderWriter.Types {
 
         /// <inheritdoc />
         public bool Unpack(DatBinReader reader) {
-            TerrainName = reader.ReadString16L();
+            TerrainName = reader.ReadItem<AC1LegacyPStringBase<byte>>();
             reader.Align(4);
             TerrainColor = reader.ReadItem<ColorARGB>();
             var _numSceneTypes = reader.ReadUInt32();
@@ -35,7 +35,7 @@ namespace DatReaderWriter.Types {
 
         /// <inheritdoc />
         public bool Pack(DatBinWriter writer) {
-            writer.WriteString16L(TerrainName);
+            writer.WriteItem<AC1LegacyPStringBase<byte>>(TerrainName);
             writer.Align(4);
             writer.WriteItem<ColorARGB>(TerrainColor);
             writer.WriteUInt32((uint)SceneTypes.Count());

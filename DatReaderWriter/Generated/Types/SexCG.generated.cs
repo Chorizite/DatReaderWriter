@@ -15,7 +15,7 @@ using DatReaderWriter.Lib.IO;
 
 namespace DatReaderWriter.Types {
     public partial class SexCG : IDatObjType {
-        public string Name;
+        public PStringBase<byte> Name = new();
 
         public uint Scale;
 
@@ -61,7 +61,7 @@ namespace DatReaderWriter.Types {
 
         /// <inheritdoc />
         public bool Unpack(DatBinReader reader) {
-            Name = reader.ReadString();
+            Name = reader.ReadItem<PStringBase<byte>>();
             Scale = reader.ReadUInt32();
             SetupId = reader.ReadItem<QualifiedDataId<Setup>>();
             SoundTable = reader.ReadItem<QualifiedDataId<SoundTable>>();
@@ -121,7 +121,7 @@ namespace DatReaderWriter.Types {
 
         /// <inheritdoc />
         public bool Pack(DatBinWriter writer) {
-            writer.WriteString(Name);
+            writer.WriteItem<PStringBase<byte>>(Name);
             writer.WriteUInt32(Scale);
             writer.WriteItem<QualifiedDataId<Setup>>(SetupId);
             writer.WriteItem<QualifiedDataId<SoundTable>>(SoundTable);
