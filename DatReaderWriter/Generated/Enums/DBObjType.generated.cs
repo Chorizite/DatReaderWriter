@@ -164,9 +164,9 @@ namespace DatReaderWriter.Enums {
         ActionMap,
 
         /// <summary>
-        /// DBObj DualDataIdMapper - DB_TYPE_DUAL_DID_MAPPER in the client.
+        /// DBObj DualEnumIDMap - DB_TYPE_DUAL_DID_MAPPER in the client.
         /// </summary>
-        DualDataIdMapper,
+        DualEnumIDMap,
 
         /// <summary>
         /// DBObj LanguageString - DB_TYPE_STRING in the client.

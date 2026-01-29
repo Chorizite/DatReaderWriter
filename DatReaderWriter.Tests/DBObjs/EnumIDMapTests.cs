@@ -21,14 +21,10 @@ namespace DatReaderWriter.Tests.DBObjs {
 
             var writeAnim = new EnumIDMap() {
                 Id = 0x25000014,
-                ClientIDNumberingType = NumberingType.Sequential,
-                ClientNameNumberingType = NumberingType.Sequential,
-                ServerIDNumberingType = NumberingType.Sequential,
-                ServerNameNumberingType = NumberingType.Sequential,
-                ClientEnumToID = new Dictionary<uint, uint>() { { 0, 0 }, { 1, 0x13000000 } },
-                ClientEnumToName = new Dictionary<uint, string>() { { 0, "test" }, { 1, "test2" } },
-                ServerEnumToID = new Dictionary<uint, uint>() { },
-                ServerEnumToName = new Dictionary<uint, string>() {},
+                ClientEnumToID = new() { { 0, 0 }, { 1, 0x13000000 } },
+                ClientEnumToName = new() { { 0, "test" }, { 1, "test2" } },
+                ServerEnumToID = new() { },
+                ServerEnumToName = new() {},
             };
 
             var res = dat.TryWriteFile(writeAnim);
@@ -39,10 +35,6 @@ namespace DatReaderWriter.Tests.DBObjs {
             Assert.IsNotNull(readDidMap);
 
             Assert.AreEqual(0x25000014u, readDidMap.Id);
-            Assert.AreEqual(NumberingType.Sequential, readDidMap.ClientIDNumberingType);
-            Assert.AreEqual(NumberingType.Sequential, readDidMap.ClientNameNumberingType);
-            Assert.AreEqual(NumberingType.Sequential, readDidMap.ServerIDNumberingType);
-            Assert.AreEqual(NumberingType.Sequential, readDidMap.ServerNameNumberingType);
 
             Assert.AreEqual(2, readDidMap.ClientEnumToID.Count);
             Assert.AreEqual(2, readDidMap.ClientEnumToName.Count);
@@ -77,10 +69,10 @@ namespace DatReaderWriter.Tests.DBObjs {
             Assert.IsNotNull(didMap);
             Assert.AreEqual(0x25000014u, didMap.Id);
 
-            Assert.AreEqual(NumberingType.Sequential, didMap.ClientIDNumberingType);
-            Assert.AreEqual(NumberingType.Sequential, didMap.ClientNameNumberingType);
-            Assert.AreEqual(NumberingType.Sequential, didMap.ServerIDNumberingType);
-            Assert.AreEqual(NumberingType.Sequential, didMap.ServerNameNumberingType);
+            Assert.AreEqual(1, didMap.ClientEnumToID.BucketSizeIndex);
+            Assert.AreEqual(1, didMap.ClientEnumToName.BucketSizeIndex);
+            Assert.AreEqual(1, didMap.ServerEnumToID.BucketSizeIndex);
+            Assert.AreEqual(1, didMap.ServerEnumToName.BucketSizeIndex);
 
             Assert.AreEqual(2, didMap.ClientEnumToID.Count);
             Assert.AreEqual(2, didMap.ClientEnumToName.Count);

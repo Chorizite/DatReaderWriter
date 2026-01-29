@@ -392,16 +392,16 @@ namespace DatReaderWriter {
         public Task<ActionMap?> GetActionMapAsync(uint id, CancellationToken ct = default) => GetAsync<ActionMap>(id, ct);
         #endif
         /// <summary>
-        /// Get a &lt;see cref=&quot;DualDataIdMapper&quot;/&gt; entirely from the portal.dat
+        /// Get a &lt;see cref=&quot;DualEnumIDMap&quot;/&gt; entirely from the portal.dat
         /// </summary>
-        public DualDataIdMapper? GetDualDataIdMapper(uint id) => Get<DualDataIdMapper>(id);
+        public DualEnumIDMap? GetDualEnumIDMap(uint id) => Get<DualEnumIDMap>(id);
         /// <summary>
-        /// Get a &lt;see cref=&quot;DualDataIdMapper&quot;/&gt; entirely from the portal.dat asynchronously
+        /// Get a &lt;see cref=&quot;DualEnumIDMap&quot;/&gt; entirely from the portal.dat asynchronously
         /// </summary>
         #if (NET8_0_OR_GREATER)
-        public ValueTask<DualDataIdMapper?> GetDualDataIdMapperAsync(uint id, CancellationToken ct = default) => GetAsync<DualDataIdMapper>(id, ct);
+        public ValueTask<DualEnumIDMap?> GetDualEnumIDMapAsync(uint id, CancellationToken ct = default) => GetAsync<DualEnumIDMap>(id, ct);
         #else
-        public Task<DualDataIdMapper?> GetDualDataIdMapperAsync(uint id, CancellationToken ct = default) => GetAsync<DualDataIdMapper>(id, ct);
+        public Task<DualEnumIDMap?> GetDualEnumIDMapAsync(uint id, CancellationToken ct = default) => GetAsync<DualEnumIDMap>(id, ct);
         #endif
         /// <summary>
         /// Get a &lt;see cref=&quot;LanguageString&quot;/&gt; entirely from the portal.dat

@@ -21,10 +21,10 @@ namespace DatReaderWriter.Tests.DBObjs {
 
             var writeObj = new SoundTable() {
                 Id = 0x20000001u,
-                Hashes = new Dictionary<uint, SoundHashData>() {
+                HashKey = 123,
+                Hashes = new () {
                     { 1, new SoundHashData() { Priority = 0f, Probability = 1f, Volume = 1f } }
                 },
-                Unknown = 1,
                 Sounds = new Dictionary<Sound, SoundData>() {
                     { Sound.ArrowLand, new SoundData() { Entries = new List<SoundEntry>() { new SoundEntry() { Id = 1, Priority = 0f, Probability = 1f, Volume = 1f } } } }
                 }
@@ -38,7 +38,9 @@ namespace DatReaderWriter.Tests.DBObjs {
             Assert.IsNotNull(readObj);
 
             Assert.AreEqual(0x20000001u, readObj.Id);
-
+            
+            Assert.AreEqual(123, readObj.HashKey);
+            
             Assert.AreEqual(1, readObj.Hashes.Count);
             Assert.AreEqual(0f, readObj.Hashes[1u].Priority);
             Assert.AreEqual(1f, readObj.Hashes[1u].Probability);
@@ -68,6 +70,8 @@ namespace DatReaderWriter.Tests.DBObjs {
             Assert.IsTrue(res);
             Assert.IsNotNull(readObj);
             Assert.AreEqual(0x20000001u, readObj.Id);
+            
+            Assert.AreEqual(0, readObj.HashKey);
 
             Assert.AreEqual(1, readObj.Hashes.Count);
             Assert.AreEqual(0f, readObj.Hashes[0u].Priority);
@@ -93,6 +97,8 @@ namespace DatReaderWriter.Tests.DBObjs {
             Assert.IsTrue(res2);
             Assert.IsNotNull(readObj2);
             Assert.AreEqual(0x200000A8u, readObj2.Id);
+            
+            Assert.AreEqual(0, readObj2.HashKey);
 
             Assert.AreEqual(1, readObj2.Hashes.Count);
             Assert.AreEqual(32, readObj2.Sounds.Count);

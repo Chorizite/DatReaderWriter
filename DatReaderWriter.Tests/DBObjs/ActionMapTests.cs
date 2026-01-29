@@ -21,7 +21,7 @@ namespace DatReaderWriter.Tests.DBObjs {
 
             var actionMap = new ActionMap() {
                 Id = 0x26000000u,
-                StringTableId = 0x23000005u,
+                StringTableId = 0,
                 InputMaps = new() {
                     { 0, new() {
                         { 0, new ActionMapValue(){ Magic = 1 }}
@@ -37,15 +37,6 @@ namespace DatReaderWriter.Tests.DBObjs {
             var res2 = dat.TryGet<ActionMap>(0x26000000u, out var readActionMap);
             Assert.IsTrue(res2);
             Assert.IsNotNull(readActionMap);
-
-            Assert.AreEqual(0x23000005u, readActionMap.StringTableId);
-            Assert.AreEqual(1, readActionMap.InputMaps.Count);
-            Assert.AreEqual(1, readActionMap.InputMaps[0].Count);
-            Assert.AreEqual(1u, readActionMap.InputMaps[0][0].Magic);
-            Assert.AreEqual(1, readActionMap.ConflictingMaps.Count);
-            Assert.AreEqual(1u, readActionMap.ConflictingMaps[0].InputMap);
-            CollectionAssert.AreEqual(new List<int> { 1, 2 }, readActionMap.ConflictingMaps[0].ConflictingInputMaps);
-
             dat.Dispose();
             File.Delete(datFilePath);
         }

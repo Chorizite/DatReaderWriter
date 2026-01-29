@@ -26,19 +26,19 @@ namespace DatReaderWriter.DBObjs {
         /// <inheritdoc />
         public override DBObjType DBObjType => DBObjType.LanguageString;
 
-        public string Value;
+        public PStringBase<byte> Value = new();
 
         /// <inheritdoc />
         public override bool Unpack(DatBinReader reader) {
             base.Unpack(reader);
-            Value = reader.ReadStringCompressed();
+            Value = reader.ReadItem<PStringBase<byte>>();
             return true;
         }
 
         /// <inheritdoc />
         public override bool Pack(DatBinWriter writer) {
             base.Pack(writer);
-            writer.WriteStringCompressed(Value);
+            writer.WriteItem<PStringBase<byte>>(Value);
             return true;
         }
     }

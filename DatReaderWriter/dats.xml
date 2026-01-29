@@ -2435,6 +2435,55 @@
             <value name="Overlay" value="0x2"/>
             <value name="Alphablend" value="0x3"/>
         </enum>
+        <enum name="RenderPassType" parent="uint" mask="true">
+            <value name="Default" value="0x0"/>
+            <value name="DirectionalLightDiffuseAndSpecular" value="0x1"/>
+            <value name="PointLightDiffuseAndSpecular" value="0x2"/>
+            <value name="PointLightDiffuseAndSpecularProjector" value="0x3"/>
+            <value name="AmbientLight_DirectionalLightDiffuseAndSpecular" value="0x4"/>
+            <value name="AmbientLight_PointLightDiffuseAndSpecular" value="0x5"/>
+            <value name="DistanceFog" value="0x6"/>
+            <value name="FixedFunctionGlow" value="0x7"/>
+            <value name="ShaderGlow" value="0x8"/>
+            <value name="LandscapeShadowMap" value="0x9"/>
+            <value name="AlphaBlend" value="0xA"/>
+            <value name="AL_0DL_0PL" value="0xB"/>
+            <value name="AL_0DL_1PL" value="0xC"/>
+            <value name="AL_0DL_2PL" value="0xD"/>
+            <value name="AL_0DL_3PL" value="0xE"/>
+            <value name="AL_0DL_4PL" value="0xF"/>
+            <value name="AL_0DL_5PL" value="0x10"/>
+            <value name="AL_0DL_6PL" value="0x11"/>
+            <value name="AL_0DL_7PL" value="0x12"/>
+            <value name="AL_0DL_8PL" value="0x13"/>
+            <value name="AL_1DL_0PL" value="0x14"/>
+            <value name="AL_1DL_1PL" value="0x15"/>
+            <value name="AL_1DL_2PL" value="0x16"/>
+            <value name="AL_1DL_3PL" value="0x17"/>
+            <value name="AL_1DL_4PL" value="0x18"/>
+            <value name="AL_1DL_5PL" value="0x19"/>
+            <value name="AL_1DL_6PL" value="0x1A"/>
+            <value name="AL_1DL_7PL" value="0x1B"/>
+            <value name="AL_0DL_0PL_Fog" value="0x1C"/>
+            <value name="AL_0DL_1PL_Fog" value="0x1D"/>
+            <value name="AL_0DL_2PL_Fog" value="0x1E"/>
+            <value name="AL_0DL_3PL_Fog" value="0x1F"/>
+            <value name="AL_0DL_4PL_Fog" value="0x20"/>
+            <value name="AL_0DL_5PL_Fog" value="0x21"/>
+            <value name="AL_0DL_6PL_Fog" value="0x22"/>
+            <value name="AL_0DL_7PL_Fog" value="0x23"/>
+            <value name="AL_0DL_8PL_Fog" value="0x24"/>
+            <value name="AL_1DL_0PL_Fog" value="0x25"/>
+            <value name="AL_1DL_1PL_Fog" value="0x26"/>
+            <value name="AL_1DL_2PL_Fog" value="0x27"/>
+            <value name="AL_1DL_3PL_Fog" value="0x28"/>
+            <value name="AL_1DL_4PL_Fog" value="0x29"/>
+            <value name="AL_1DL_5PL_Fog" value="0x2A"/>
+            <value name="AL_1DL_6PL_Fog" value="0x2B"/>
+            <value name="AL_1DL_7PL_Fog" value="0x2C"/>
+            <value name="MaxPasses" value="0x2D"/>
+            <value name="Invalid" value="0x2E"/>
+        </enum>
     </enums>
     <types>
         <type name="DBObj" abstract="true">
@@ -3642,13 +3691,16 @@
                     </case>
                 </switch>
             </type>
-            <type name="Surface" text="DB_TYPE_SURFACE in the client. Main surface/material descriptor" parent="DBObj" first="0x8000000" last="0x800FFFF"
+            <type name="Surface" text="DB_TYPE_SURFACE in the client. Main surface/material descriptor" parent="DBObj"
+                  first="0x8000000" last="0x800FFFF"
                   flags="DBObjHeaderFlags.None">
                 <field type="SurfaceType" name="Type" text="Bitfield controlling surface behavior"/>
                 <maskmap name="Type">
                     <mask value="SurfaceType.Base1Image | SurfaceType.Base1ClipMap">
-                        <vector type="QualifiedDataId" genericValue="SurfaceTexture" name="OrigTextureId" text="Original SurfaceTexture DataId"/>
-                        <vector type="QualifiedDataId" genericValue="Palette" name="OrigPaletteId" text="Original Palette DataId"/>
+                        <vector type="QualifiedDataId" genericValue="SurfaceTexture" name="OrigTextureId"
+                                text="Original SurfaceTexture DataId"/>
+                        <vector type="QualifiedDataId" genericValue="Palette" name="OrigPaletteId"
+                                text="Original Palette DataId"/>
                         <else>
                             <field type="ColorARGB" name="ColorValue" text="Solid color when no texture is used"/>
                         </else>
@@ -3708,14 +3760,15 @@
                 <vector name="Header" length="_headerSize" type="byte" text="Audio metadata / wave header"/>
                 <vector name="Data" length="_dataSize" type="byte" text="Waveform audio data"/>
             </type>
-            <type name="Environment" text="DB_TYPE_ENVIRONMENT in the client. Represents an environment / landblock containing multiple cells" parent="DBObj" first="0xD000000"
+            <type name="Environment"
+                  text="DB_TYPE_ENVIRONMENT in the client. Represents an environment / landblock containing multiple cells"
+                  parent="DBObj" first="0xD000000"
                   last="0xD00FFFF" flags="DBObjHeaderFlags.HasId">
                 <field type="uint" name="_cellCount" text="Number of cells contained in this landblock"/>
                 <vector name="Cells" length="_cellCount" type="Dictionary" genericKey="uint" genericValue="CellStruct"
                         text="Dictionary of all cells in this landblock.">
                 </vector>
             </type>
-            <!-- these need tests, and new string types? -->
             <type name="ChatPoseTable"
                   text="DB_TYPE_CHAT_POSE_TABLE in the client. Stores pose and emote command → animation mappings"
                   parent="DBObj"
@@ -3728,7 +3781,8 @@
                     <vector type="AC1LegacyPStringBase" genericValue="byte"/>
                 </vector>
 
-                <vector name="ChatEmotes" type="PackableHashTable" text="pose/animation string → ChatEmoteData (myEmote + otherEmote strings)">
+                <vector name="ChatEmotes" type="PackableHashTable"
+                        text="pose/animation string → ChatEmoteData (myEmote + otherEmote strings)">
                     <vector type="AC1LegacyPStringBase" genericValue="byte"/>
                     <field type="ChatEmoteData"/>
                 </vector>
@@ -3739,12 +3793,14 @@
             </type>
             <type name="BadDataTable" text="DB_TYPE_BADDATA in the client. Not used?" parent="DBObj" first="0xE00001A"
                   last="0xE00001A" flags="DBObjHeaderFlags.HasId">
-                <vector name="BadIds" type="PackableHashTable" text="Table of bad data Ids. The key is the id of this table. There is only one entry.">
+                <vector name="BadIds" type="PackableHashTable"
+                        text="Table of bad data Ids. The key is the id of this table. There is only one entry.">
                     <vector type="QualifiedDataId" genericValue="BadDataTable"/>
                     <field type="uint"/>
                 </vector>
             </type>
-            <type name="TabooTable" text="DB_TYPE_TABOO_TABLE in the client. Bad words and stuff." parent="DBObj" first="0xE00001E"
+            <type name="TabooTable" text="DB_TYPE_TABOO_TABLE in the client. Bad words and stuff." parent="DBObj"
+                  first="0xE00001E"
                   last="0xE00001E" flags="DBObjHeaderFlags.HasId">
                 <vector name="AudienceToBannedPatterns" type="HashTable">
                     <field type="uint"/>
@@ -3758,7 +3814,8 @@
                     <field type="NameFilterLanguageData"/>
                 </vector>
             </type>
-            <type name="PalSet" text="DB_TYPE_PAL_SET in the client. Holds lists of Palette DataIds" parent="DBObj" first="0xF000000"
+            <type name="PalSet" text="DB_TYPE_PAL_SET in the client. Holds lists of Palette DataIds" parent="DBObj"
+                  first="0xF000000"
                   last="0xF00FFFF" flags="DBObjHeaderFlags.HasId">
                 <field name="_numPalettes" type="uint"/>
                 <vector name="Palettes" length="_numPalettes" type="List" text="A list of Palette DataIds">
@@ -3767,7 +3824,8 @@
             </type>
             <type name="ClothingTable" text="DB_TYPE_CLOTHING in the client." parent="DBObj" first="0x10000000"
                   last="0x1000FFFF" flags="DBObjHeaderFlags.HasId">
-                <vector type="PackableHashTable" name="ClothingBaseEffects" text="A map of ClothingBaseEffects indexed by Setup DataIds">
+                <vector type="PackableHashTable" name="ClothingBaseEffects"
+                        text="A map of ClothingBaseEffects indexed by Setup DataIds">
                     <vector type="QualifiedDataId" genericValue="Setup"/>
                     <field type="ClothingBaseEffect"/>
                 </vector>
@@ -3786,13 +3844,17 @@
                 <field name="_numObjects" type="uint"/>
                 <vector name="Objects" length="_numObjects" type="List" genericValue="ObjectDesc"/>
             </type>
-            <type name="Region" text="DB_TYPE_REGION in the client. Regions define things like skybox / terrain / game time." parent="DBObj" first="0x13000000" last="0x1300FFFF"
+            <type name="Region"
+                  text="DB_TYPE_REGION in the client. Regions define things like skybox / terrain / game time."
+                  parent="DBObj" first="0x13000000" last="0x1300FFFF"
                   flags="DBObjHeaderFlags.HasId">
-                <field name="RegionNumber" type="uint" text="Region Number, default is 1. Regions should have unique numbers."/>
-                <field name="Version" type="uint" text="The region version, only used internally." />
-                <vector name="RegionName" type="AC1LegacyPStringBase" genericValue="byte" text="The name of the region, only used internally." />
+                <field name="RegionNumber" type="uint"
+                       text="Region Number, default is 1. Regions should have unique numbers."/>
+                <field name="Version" type="uint" text="The region version, only used internally."/>
+                <vector name="RegionName" type="AC1LegacyPStringBase" genericValue="byte"
+                        text="The name of the region, only used internally."/>
                 <align type="uint"/>
-                <field name="LandDefs" type="LandDefs" text="Terrain / Landscape size definitions" />
+                <field name="LandDefs" type="LandDefs" text="Terrain / Landscape size definitions"/>
                 <field name="GameTime" type="GameTime"/>
                 <field name="PartsMask" type="PartsMask"/>
                 <maskmap name="PartsMask">
@@ -3855,7 +3917,7 @@
             </type>
             <type name="SoundTable" text="DB_TYPE_STABLE in the client." parent="DBObj" first="0x20000000"
                   last="0x2000FFFF" flags="DBObjHeaderFlags.HasId">
-                <field name="Unknown" type="int"/>
+                <field name="HashKey" type="int"/>
                 <field name="_numHashes" type="int"/>
                 <vector name="Hashes" length="_numHashes" type="Dictionary" genericKey="uint"
                         genericValue="SoundHashData"/>
@@ -3873,48 +3935,48 @@
             </type>
             <type name="EnumIDMap" text="DB_TYPE_DID_MAPPER in the client." parent="DBObj" first="0x25000000"
                   last="0x25FFFFFF" flags="DBObjHeaderFlags.HasId">
-                <field name="ClientIDNumberingType" type="NumberingType"/>
-                <field name="_numClientEnumToIDs" type="CompressedUInt"/>
-                <vector name="ClientEnumToID" length="_numClientEnumToIDs" type="Dictionary" genericKey="uint"
-                        genericValue="uint"/>
-                <field name="ClientNameNumberingType" type="NumberingType"/>
-                <field name="_numClientEnumToNames" type="CompressedUInt"/>
-                <vector name="ClientEnumToName" length="_numClientEnumToNames" type="Dictionary" genericKey="uint"
-                        genericValue="bytestring"/>
-                <field name="ServerIDNumberingType" type="NumberingType"/>
-                <field name="_numServerEnumToIDs" type="CompressedUInt"/>
-                <vector name="ServerEnumToID" length="_numServerEnumToIDs" type="Dictionary" genericKey="uint"
-                        genericValue="uint"/>
-                <field name="ServerNameNumberingType" type="NumberingType"/>
-                <field name="_numServerEnumToNames" type="CompressedUInt"/>
-                <vector name="ServerEnumToName" length="_numServerEnumToNames" type="Dictionary" genericKey="uint"
-                        genericValue="bytestring"/>
+                <vector name="ClientEnumToID" type="IntrusiveHashTable">
+                    <field type="uint"/>
+                    <field type="uint"/>
+                </vector>
+                <vector name="ClientEnumToName" type="IntrusiveHashTable">
+                    <field type="uint"/>
+                    <vector type="PStringBase" genericValue="byte"/>
+                </vector>
+                <vector name="ServerEnumToID" type="IntrusiveHashTable">
+                    <field type="uint"/>
+                    <field type="uint"/>
+                </vector>
+                <vector name="ServerEnumToName" type="IntrusiveHashTable">
+                    <field type="uint"/>
+                    <vector type="PStringBase" genericValue="byte"/>
+                </vector>
             </type>
             <type name="ActionMap" text="DB_TYPE_ACTIONMAP in the client." parent="DBObj" first="0x26000000"
                   last="0x2600FFFF" flags="DBObjHeaderFlags.HasId">
             </type>
-            <type name="DualDataIdMapper" text="DB_TYPE_DUAL_DID_MAPPER in the client." parent="DBObj"
+            <type name="DualEnumIDMap" text="DB_TYPE_DUAL_DID_MAPPER in the client." parent="DBObj"
                   first="0x27000000" last="0x27FFFFFF" flags="DBObjHeaderFlags.HasId">
-                <field name="ClientIDNumberingType" type="NumberingType"/>
-                <field name="_numClientEnumToIDs" type="CompressedUInt"/>
-                <vector name="ClientEnumToID" length="_numClientEnumToIDs" type="Dictionary" genericKey="uint"
-                        genericValue="uint"/>
-                <field name="ClientNameNumberingType" type="NumberingType"/>
-                <field name="_numClientEnumToNames" type="CompressedUInt"/>
-                <vector name="ClientEnumToName" length="_numClientEnumToNames" type="Dictionary" genericKey="uint"
-                        genericValue="bytestring"/>
-                <field name="ServerIDNumberingType" type="NumberingType"/>
-                <field name="_numServerEnumToIDs" type="CompressedUInt"/>
-                <vector name="ServerEnumToID" length="_numServerEnumToIDs" type="Dictionary" genericKey="uint"
-                        genericValue="uint"/>
-                <field name="ServerNameNumberingType" type="NumberingType"/>
-                <field name="_numServerEnumToNames" type="CompressedUInt"/>
-                <vector name="ServerEnumToName" length="_numServerEnumToNames" type="Dictionary" genericKey="uint"
-                        genericValue="bytestring"/>
+                <vector name="ClientEnumToID" type="IntrusiveHashTable">
+                    <field type="uint"/>
+                    <field type="uint"/>
+                </vector>
+                <vector name="ClientEnumToName" type="IntrusiveHashTable">
+                    <field type="uint"/>
+                    <vector type="PStringBase" genericValue="byte"/>
+                </vector>
+                <vector name="ServerEnumToID" type="IntrusiveHashTable">
+                    <field type="uint"/>
+                    <field type="uint"/>
+                </vector>
+                <vector name="ServerEnumToName" type="IntrusiveHashTable">
+                    <field type="uint"/>
+                    <vector type="PStringBase" genericValue="byte"/>
+                </vector>
             </type>
             <type name="LanguageString" text="DB_TYPE_STRING in the client." parent="DBObj" first="0x31000000"
                   last="0x3100FFFF" flags="DBObjHeaderFlags.HasId">
-                <field name="Value" type="compressedstring"/>
+                <vector name="Value" type="PStringBase" genericValue="byte"/>
             </type>
             <type name="ParticleEmitter" text="DB_TYPE_PARTICLE_EMITTER in the client." parent="DBObj"
                   first="0x32000000" last="0x3200FFFF" flags="DBObjHeaderFlags.HasId">

@@ -26,7 +26,7 @@ namespace DatReaderWriter.DBObjs {
         /// <inheritdoc />
         public override DBObjType DBObjType => DBObjType.SoundTable;
 
-        public int Unknown;
+        public int HashKey;
 
         public Dictionary<uint, SoundHashData> Hashes = [];
 
@@ -35,7 +35,7 @@ namespace DatReaderWriter.DBObjs {
         /// <inheritdoc />
         public override bool Unpack(DatBinReader reader) {
             base.Unpack(reader);
-            Unknown = reader.ReadInt32();
+            HashKey = reader.ReadInt32();
             var _numHashes = reader.ReadInt32();
             for (var i=0; i < _numHashes; i++) {
                 var _key = reader.ReadUInt32();
@@ -54,7 +54,7 @@ namespace DatReaderWriter.DBObjs {
         /// <inheritdoc />
         public override bool Pack(DatBinWriter writer) {
             base.Pack(writer);
-            writer.WriteInt32(Unknown);
+            writer.WriteInt32(HashKey);
             writer.WriteInt32((int)Hashes.Count());
             foreach (var kv in Hashes) {
                 writer.WriteUInt32(kv.Key);
