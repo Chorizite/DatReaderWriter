@@ -6,6 +6,8 @@ using System.Buffers;
 using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace DatReaderWriter.Lib.IO.BlockAllocators {
     /// <summary>
@@ -39,7 +41,8 @@ namespace DatReaderWriter.Lib.IO.BlockAllocators {
         /// <inheritdoc/>
         public void InitNew(DatFileType type, uint subset, int blockSize = 1024, int numBlocksToAllocate = 1024) {
             if (!CanWrite) {
-                throw new Exception($"Attempted to write a new database, but MemoryMappedBlockAllocator.CanWrite is false");
+                throw new Exception(
+                    $"Attempted to write a new database, but MemoryMappedBlockAllocator.CanWrite is false");
             }
 
             var headerBlockCount = (int)Math.Ceiling((double)DatHeader.SIZE / blockSize);
@@ -64,10 +67,12 @@ namespace DatReaderWriter.Lib.IO.BlockAllocators {
         }
 
         /// <inheritdoc/>
-        public void SetVersion(string version, int engineVersion, int gameVersion, Guid majorVersion, uint minorVersion) {
+        public void SetVersion(string version, int engineVersion, int gameVersion, Guid majorVersion,
+            uint minorVersion) {
             if (version.Length > 255) {
                 throw new Exception($"Version string can only be 255 characters max (was {version.Length} characters)");
             }
+
             Header.Version = version;
             Header.EngineVersion = engineVersion;
             Header.GameVersion = gameVersion;
@@ -112,6 +117,7 @@ namespace DatReaderWriter.Lib.IO.BlockAllocators {
             if (Header.FreeBlockCount == 0) {
                 Header.FirstFreeBlock = offset;
             }
+
             Header.LastFreeBlock = Header.FileSize - Header.BlockSize;
             Header.FreeBlockCount += numBlocksToAllocate;
 
@@ -119,7 +125,15 @@ namespace DatReaderWriter.Lib.IO.BlockAllocators {
         }
 
         /// <inheritdoc/>
+        /// <inheritdoc/>
         public virtual int ReserveBlock() {
+            return ReserveBlockCore();
+        }
+
+        /// <summary>
+        /// Protected internal implementation of ReserveBlock without locking (or assumes lock held).
+        /// </summary>
+        protected int ReserveBlockCore() {
             if (Header.FreeBlockCount > 0) {
                 var freeBlockOffset = Header.FirstFreeBlock;
                 Header.FirstFreeBlock += Header.BlockSize;
@@ -132,15 +146,15 @@ namespace DatReaderWriter.Lib.IO.BlockAllocators {
             else {
                 // todo: we should maybe expand by num bytes or something instead
                 // of block size?
-                AllocateEmptyBlocks(2048);
-                return ReserveBlock();
+                AllocateEmptyBlocks(50);
+                return ReserveBlockCore();
             }
         }
 
         /// <summary>
         /// Write the header to the dat
         /// </summary>
-        protected void WriteHeader() {
+        protected virtual void WriteHeader() {
             var headerBuffer = SharedBytes.Rent(DatHeader.SIZE);
             Header.WriteEmptyTransaction();
             Header.Pack(new DatBinWriter(headerBuffer));
@@ -160,11 +174,19 @@ namespace DatReaderWriter.Lib.IO.BlockAllocators {
         /// <inheritdoc/>
         public abstract int WriteBlock(byte[] buffer, int numBytes, int startingBlock = -1);
 
+
         /// <inheritdoc/>
         public abstract void ReadBytes(byte[] buffer, int bufferOffset, int byteOffset, int numBytes);
 
         /// <inheritdoc/>
         public abstract void ReadBlock(byte[] buffer, int startingBlock);
+
+        /// <inheritdoc/>
+        public abstract ValueTask<int> WriteBlockAsync(byte[] buffer, int numBytes, int startingBlock = 0,
+            CancellationToken ct = default);
+
+        /// <inheritdoc/>
+        public abstract ValueTask ReadBlockAsync(byte[] buffer, int startingBlock, CancellationToken ct = default);
 
         /// <inheritdoc/>
         public abstract bool TryGetBlockOffsets(int startingBlock, out List<int> fileBlocks);

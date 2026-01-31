@@ -22,7 +22,7 @@ namespace DatReaderWriter.Tests.DBObjs {
 
             var writeSpellTable = new SpellComponentTable() {
                 Id = 0x0E00000F,
-                Components = new Dictionary<uint, SpellComponentBase>() {
+                Components = new() {
                     { 1, new SpellComponentBase() {
                         Name = "Test Spell",
                         Category = 1,
@@ -52,10 +52,7 @@ namespace DatReaderWriter.Tests.DBObjs {
         [TestMethod]
         [TestCategory("EOR")]
         public void CanReadEORSpellComponentTable() {
-            using var dat = new DatDatabase(options => {
-                options.FilePath = Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat");
-                options.IndexCachingStrategy = IndexCachingStrategy.Never;
-            });
+            using var dat = new DatCollection(EORCommonData.DatDirectory);
 
             var res = dat.TryGet<SpellComponentTable>(0x0E00000F, out var spellTable);
             Assert.IsTrue(res);

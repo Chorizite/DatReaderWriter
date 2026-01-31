@@ -147,6 +147,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             Assert.AreEqual("mn", rt1.MalePlayerLetters);
             Assert.AreEqual(",", rt1.GroupingSeperator);
             Assert.AreEqual(3u, rt1.GroupingSize);
+            Assert.AreEqual("01234567890ABCDEF", rt1.Numerals);
 
 
             dat.Dispose();

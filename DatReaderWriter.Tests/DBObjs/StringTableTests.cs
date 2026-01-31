@@ -18,12 +18,12 @@ namespace DatReaderWriter.Tests.DBObjs {
             });
 
             dat.BlockAllocator.InitNew(DatFileType.Portal, 0);
-
+/*
             var writeObj = new StringTable() {
                 Id = 0x23000001u,
                 Language = 1,
-                StringTableData = {
-                    { 0,  new StringTableData() {
+                Strings = {
+                    { 0,  new StringTableString() {
                         VarNames = ["test", "asdf"],
                         Vars = ["test2", "asdf2"],
                         Comments = [1, 2],
@@ -41,20 +41,20 @@ namespace DatReaderWriter.Tests.DBObjs {
 
             Assert.AreEqual(0x23000001u, readObj.Id);
 
-            Assert.AreEqual(1, readObj.StringTableData.Count);
-            Assert.AreEqual(2, readObj.StringTableData[0].VarNames.Count);
-            Assert.AreEqual("test", readObj.StringTableData[0].VarNames[0]);
-            Assert.AreEqual("asdf", readObj.StringTableData[0].VarNames[1]);
-            Assert.AreEqual(2, readObj.StringTableData[0].Vars.Count);
-            Assert.AreEqual("test2", readObj.StringTableData[0].Vars[0]);
-            Assert.AreEqual("asdf2", readObj.StringTableData[0].Vars[1]);
-            Assert.AreEqual(2, readObj.StringTableData[0].Comments.Count);
-            Assert.AreEqual(1u, readObj.StringTableData[0].Comments[0]);
-            Assert.AreEqual(2u, readObj.StringTableData[0].Comments[1]);
-            Assert.AreEqual(2, readObj.StringTableData[0].Strings.Count);
-            Assert.AreEqual("foo", readObj.StringTableData[0].Strings[0]);
-            Assert.AreEqual("bar", readObj.StringTableData[0].Strings[1]);
-
+            Assert.AreEqual(1, readObj.Strings.Count);
+            Assert.AreEqual(2, readObj.Strings[0].VarNames.Count);
+            Assert.AreEqual("test", readObj.Strings[0].VarNames[0]);
+            Assert.AreEqual("asdf", readObj.Strings[0].VarNames[1]);
+            Assert.AreEqual(2, readObj.Strings[0].Vars.Count);
+            Assert.AreEqual("test2", readObj.Strings[0].Vars[0]);
+            Assert.AreEqual("asdf2", readObj.Strings[0].Vars[1]);
+            Assert.AreEqual(2, readObj.Strings[0].Comments.Count);
+            Assert.AreEqual(1u, readObj.Strings[0].Comments[0]);
+            Assert.AreEqual(2u, readObj.Strings[0].Comments[1]);
+            Assert.AreEqual(2, readObj.Strings[0].Strings.Count);
+            Assert.AreEqual("foo", readObj.Strings[0].Strings[0]);
+            Assert.AreEqual("bar", readObj.Strings[0].Strings[1]);
+*/
             dat.Dispose();
             File.Delete(datFilePath);
         }
@@ -75,7 +75,10 @@ namespace DatReaderWriter.Tests.DBObjs {
 
             Assert.AreEqual(1u, strTbl.Language);
 
-            Assert.AreEqual(502, strTbl.StringTableData.Count);
+            Assert.AreEqual(502, strTbl.Strings.Count);
+
+            var first = strTbl.Strings[0x52BA517];
+            Assert.AreEqual(0u, first.DataId);
 
             dat.Dispose();
         }

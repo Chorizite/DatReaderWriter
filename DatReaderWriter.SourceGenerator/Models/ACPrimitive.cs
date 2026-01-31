@@ -1,0 +1,26 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Xml.Linq;
+using System.Xml.XPath;
+
+namespace DatReaderWriter.SourceGenerator.Models {
+    public class ACPrimitive : ACBaseModel {
+        public string Name { get; set; }
+        public ushort Size { get; set; }
+
+        public ACPrimitive(ACBaseModel parent, XElement element) : base(parent, element) {
+
+        }
+
+        public static ACPrimitive FromXElement(ACBaseModel parent, XElement element) {
+            ushort.TryParse((string)element.Attribute("size"), out var s);
+            return new ACPrimitive(parent, element) {
+                Name = (string)element.Attribute("name") ?? "",
+                Size = s,
+            };
+        }
+    }
+}

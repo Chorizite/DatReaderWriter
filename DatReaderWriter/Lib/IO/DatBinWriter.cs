@@ -262,73 +262,6 @@ namespace DatReaderWriter.Lib.IO {
             }
         }
 
-        public void WriteString16L(string value, int sizeOfLength = 2, bool align = true) {
-            var bytes = Encoding.Default.GetBytes(value);
-            switch (sizeOfLength) {
-                case 1:
-                    WriteByte((byte)bytes.Length);
-                    break;
-                case 2:
-                default:
-                    WriteUInt16((ushort)bytes.Length);
-                    break;
-            }
-            WriteBytes(bytes, bytes.Length);
-            if (align) Align(4);
-        }
-
-        public void WriteString16LByte(string value) {
-            WriteString16L(value, 1, false);
-        }
-
-        /// <summary>
-        /// Writes a string to a binary stream in an obfuscated format.
-        /// The string is stored as a length-prefixed sequence of bytes where each byte has been bit-rotated.
-        /// </summary>
-        public void WriteObfuscatedString(string value) {
-#if NET8_0_OR_GREATER
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-#endif
-            // Convert string to bytes using Windows-1252 encoding
-            byte[] bytes = Encoding.GetEncoding(1252).GetBytes(value);
-
-            // Write the string length as UInt16
-            WriteUInt16((ushort)bytes.Length);
-
-            // Obfuscate and write each byte
-            for (int i = 0; i < bytes.Length; i++) {
-                WriteByte((byte)(bytes[i] >> 4 | bytes[i] << 4));
-            }
-        }
-        private void WriteVariableLengthInt(int value) {
-            do {
-                byte byteToWrite = (byte)(value & 0x7F);
-                value >>= 7;
-
-                if (value > 0) {
-                    byteToWrite |= 0x80; // Set the continuation bit
-                }
-
-                WriteByte(byteToWrite);
-            }
-            while (value > 0);
-        }
-
-        /// <summary>
-        ///  Write a string from the current stream. The string is prefixed with the length,
-        //     encoded as an integer seven bits at a time.
-        /// </summary>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public void WriteString(string value) {
-#if NET8_0_OR_GREATER
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-#endif
-            var strBytes = Encoding.GetEncoding(1252).GetBytes(value);
-            WriteVariableLengthInt(strBytes.Length);
-            WriteBytes(strBytes, strBytes.Length);
-        }
-
         /// <summary>
         /// Writes a <see cref="Guid"/> and advance the buffer position accordingly.
         /// </summary>
@@ -338,28 +271,53 @@ namespace DatReaderWriter.Lib.IO {
         }
 
         /// <summary>
-        /// Writes a string from the current stream. The string is prefixed with a compressed uint length.
+        /// Writes a generic value to the stream based on its type.
         /// </summary>
         /// <param name="value"></param>
-        public void WriteStringCompressed(string value) {
-#if NET8_0_OR_GREATER
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-#endif
-            WriteCompressedUInt((uint)value.Length);
-            if (value.Length > 0) {
-                var strBytes = Encoding.GetEncoding(1252).GetBytes(value);
-                WriteBytes(strBytes, strBytes.Length);
+        /// <typeparam name="T"></typeparam>
+        /// <exception cref="NotSupportedException"></exception>
+        public void WriteGeneric<T>(T value) {
+            var type = typeof(T);
+            if (type == typeof(uint)) WriteUInt32((uint)(object)value);
+            else if (type == typeof(int)) WriteInt32((int)(object)value);
+            else if (type == typeof(ulong)) WriteUInt64((ulong)(object)value);
+            else if (type == typeof(long)) WriteInt64((long)(object)value);
+            else if (type == typeof(ushort)) WriteUInt16((ushort)(object)value);
+            else if (type == typeof(short)) WriteInt16((short)(object)value);
+            else if (type == typeof(byte)) WriteByte((byte)(object)value);
+            else if (type == typeof(sbyte)) WriteSByte((sbyte)(object)value);
+            else if (type == typeof(bool)) WriteBool((bool)(object)value);
+            else if (type == typeof(float)) WriteSingle((float)(object)value);
+            else if (type == typeof(double)) WriteDouble((double)(object)value);
+            else if (type == typeof(Guid)) WriteGuid((Guid)(object)value);
+            else if (value is IPackable packable) {
+                packable.Pack(this);
             }
-        }
-
-        /// <summary>
-        /// Writes a PStringBase[ushort] from the current stream
-        /// </summary>
-        /// <returns></returns>
-        public void WriteUShortString(string value) {
-            WriteCompressedUInt((uint)value.Length);
-            foreach (char c in value) {
-                WriteUInt16((ushort)c);
+            
+            // Check if this is an enum, get the underlying type or default to int
+            else if (type.IsEnum) {
+                var underlyingType = Enum.GetUnderlyingType(type);
+                if (underlyingType == typeof(byte)) {
+                    WriteByte((byte)(object)value);
+                }
+                else if (underlyingType == typeof(sbyte)) {
+                    WriteSByte((sbyte)(object)value);
+                }
+                else if (underlyingType == typeof(ushort)) {
+                    WriteUInt16((ushort)(object)value);
+                }
+                else if (underlyingType == typeof(short)) {
+                    WriteInt16((short)(object)value);
+                }
+                else if (underlyingType == typeof(uint)) {
+                    WriteUInt32((uint)(object)value);
+                }
+                else {
+                    WriteInt32((int)(object)value);
+                }
+            }
+            else {
+                throw new NotSupportedException($"Type {type.Name} is not supported by WriteGeneric.");
             }
         }
     }

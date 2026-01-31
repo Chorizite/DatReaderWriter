@@ -76,10 +76,7 @@ namespace DatReaderWriter.Tests.DBObjs {
         [TestMethod]
         [TestCategory("EOR")]
         public void CanReadEOR() {
-            using var dat = new PortalDatabase(options => {
-                options.FilePath = Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat");
-                options.IndexCachingStrategy = IndexCachingStrategy.Never;
-            });
+            using var dat = new DatCollection(EORCommonData.DatDirectory);
 
             var res = dat.TryGet<ContractTable>(0x0E00001Du, out var rt1);
             Assert.IsTrue(res);

@@ -43,11 +43,7 @@ namespace DatReaderWriter.Tests.DBObjs {
         [TestMethod]
         [TestCategory("EOR")]
         public void CanReadEORTextures() {
-            using var dat = new DatDatabase(options => {
-                options.FilePath = Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat");
-                options.IndexCachingStrategy = IndexCachingStrategy.OnDemand;
-            });
-
+            using var dat = new DatCollection(EORCommonData.DatDirectory);
 
             var res = dat.TryGet<SurfaceTexture>(0x0500330D, out var texture1);
             Assert.IsTrue(res);
@@ -55,7 +51,15 @@ namespace DatReaderWriter.Tests.DBObjs {
 
             Assert.AreEqual(0u, texture1.DataCategory);
             Assert.AreEqual(TextureType.Texture2D, texture1.Type);
-            CollectionAssert.AreEqual(new uint[] { 0x060074CD }, texture1.Textures);
+            Assert.AreEqual(1, texture1.Textures.Count);
+            Assert.AreEqual(0x060074CDu, texture1.Textures[0]);
+
+            var textureObj = texture1.Textures.First().Get(dat);
+            Assert.IsNotNull(textureObj);
+            Assert.AreEqual(0x060074CDu, textureObj.Id);
+            Assert.AreEqual(256, textureObj.Width);
+            Assert.AreEqual(256, textureObj.Height);
+            Assert.AreEqual(PixelFormat.PFID_R8G8B8, textureObj.Format);
 
             res = dat.TryGet<SurfaceTexture>(0x050023BF, out var texture2);
             Assert.IsTrue(res);
@@ -63,7 +67,9 @@ namespace DatReaderWriter.Tests.DBObjs {
 
             Assert.AreEqual(0u, texture2.DataCategory);
             Assert.AreEqual(TextureType.Texture2D, texture2.Type);
-            CollectionAssert.AreEqual(new uint[] { 0x06005731, 0x06005731 }, texture2.Textures);
+            Assert.AreEqual(2, texture2.Textures.Count);
+            Assert.AreEqual(0x06005731u, texture2.Textures[0]);
+            Assert.AreEqual(0x06005731u, texture2.Textures[1]);
 
             dat.Dispose();
         }

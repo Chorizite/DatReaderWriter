@@ -24,7 +24,7 @@ namespace DatReaderWriter.Tests.Types {
                 Direction = AnimationHookDir.Both,
                 Priority = 0.5f,
                 Probability = 0.4f,
-                SoundID = 1234,
+                SoundId = 1234,
                 Volume = 0.2f,
             };
 
@@ -39,7 +39,7 @@ namespace DatReaderWriter.Tests.Types {
             Assert.AreEqual(writeObj.Direction, readObj.Direction);
             Assert.AreEqual(writeObj.Priority, readObj.Priority);
             Assert.AreEqual(writeObj.Probability, readObj.Probability);
-            Assert.AreEqual(writeObj.SoundID, readObj.SoundID);
+            Assert.AreEqual(writeObj.SoundId, readObj.SoundId);
             Assert.AreEqual(writeObj.Volume, readObj.Volume);
         }
 
@@ -49,7 +49,7 @@ namespace DatReaderWriter.Tests.Types {
                 Direction = AnimationHookDir.Forward,
                 Priority = 0.5f,
                 Probability = 0.4f,
-                SoundID = 1234,
+                SoundId = 1234,
                 Volume = 0.2f,
             };
 
@@ -69,7 +69,7 @@ namespace DatReaderWriter.Tests.Types {
             Assert.AreEqual(writeHook.Direction, readHook.Direction);
             Assert.AreEqual(writeHook.Priority, readHook.Priority);
             Assert.AreEqual(writeHook.Probability, readHook.Probability);
-            Assert.AreEqual(writeHook.SoundID, readHook.SoundID);
+            Assert.AreEqual(writeHook.SoundId, readHook.SoundId);
             Assert.AreEqual(writeHook.Volume, readHook.Volume);
         }
     }

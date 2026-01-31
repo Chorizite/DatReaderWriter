@@ -41,10 +41,7 @@ namespace DatReaderWriter.Tests.DBObjs {
         [TestMethod]
         [TestCategory("EOR")]
         public void CanReadEORLanguageStrings() {
-            using var dat = new PortalDatabase(options => {
-                options.FilePath = Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat");
-                options.IndexCachingStrategy = IndexCachingStrategy.Never;
-            });
+            using var dat = new DatCollection(EORCommonData.DatDirectory);
 
             var res = dat.TryGet<LanguageString>(0x31000010, out var obj);
             Assert.IsTrue(res);

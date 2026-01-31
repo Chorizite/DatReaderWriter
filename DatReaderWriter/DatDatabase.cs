@@ -6,16 +6,19 @@ using DatReaderWriter.Lib.IO;
 using DatReaderWriter.Lib.IO.BlockAllocators;
 using DatReaderWriter.Lib.IO.DatBTree;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace DatReaderWriter {
     /// <summary>
     /// Provides read access to a dat database
     /// </summary>
     public partial class DatDatabase : IDisposable {
-        public Dictionary<uint, IDBObj> _fileCache = [];
+        public ConcurrentDictionary<uint, IDBObj> _fileCache = [];
 
         /// <summary>
         /// Block allocator
@@ -95,8 +98,9 @@ namespace DatReaderWriter {
         public IEnumerable<uint> GetAllIdsOfType<T>() where T : IDBObj {
             if (DBObjAttributeCache.TypeCache.TryGetValue(typeof(T), out var typeAttr)) {
                 if (typeAttr.IsSingular) {
-                    return [ typeAttr.FirstId ];
+                    return [typeAttr.FirstId];
                 }
+
                 return Tree.GetFilesInRange(typeAttr.FirstId, typeAttr.LastId).Select(f => f.Id);
             }
 
@@ -133,6 +137,23 @@ namespace DatReaderWriter {
             return false;
         }
 
+#if (NET8_0_OR_GREATER)
+        public async ValueTask<(bool Success, byte[]? Bytes)> TryGetFileBytesAsync(uint fileId,
+            CancellationToken ct = default) {
+#else
+        public async Task<(bool Success, byte[]? Bytes)> TryGetFileBytesAsync(uint fileId, CancellationToken ct =
+ default) {
+#endif
+            var (success, fileEntry) = await Tree.TryGetFileAsync(fileId, ct);
+            if (success) {
+                var bytes = new byte[fileEntry.Size];
+                await BlockAllocator.ReadBlockAsync(bytes, fileEntry.Offset, ct);
+                return (true, bytes);
+            }
+
+            return (false, null);
+        }
+
         /// <summary>
         /// Get the raw bytes of a file entry, this is never cached.
         /// </summary>
@@ -145,6 +166,7 @@ namespace DatReaderWriter {
                 BlockAllocator.ReadBlock(bytes, fileEntry.Offset);
                 return true;
             }
+
             bytesRead = 0;
             return false;
         }
@@ -162,10 +184,47 @@ namespace DatReaderWriter {
 
             var value = Get<T>(fileId);
             if (value is not null && !_fileCache.ContainsKey(fileId)) {
-                _fileCache.Add(fileId, value);
+                _fileCache.TryAdd(fileId, value);
             }
-            
+
             return value;
+        }
+
+        /// <summary>
+        /// Read a dat file asynchronously, and caches it.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="fileId"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+#if (NET8_0_OR_GREATER)
+        public async ValueTask<T?> GetCachedAsync<T>(uint fileId, CancellationToken ct = default) where T : IDBObj {
+#else
+        public async Task<T?> GetCachedAsync<T>(uint fileId, CancellationToken ct = default) where T : IDBObj {
+#endif
+            if (_fileCache.TryGetValue(fileId, out var cached) && cached is T t) {
+                return t;
+            }
+
+            var value = await GetAsync<T>(fileId, ct);
+            if (value is not null && !_fileCache.ContainsKey(fileId)) {
+                // Not thread safe yet!
+                _fileCache.TryAdd(fileId, value);
+            }
+
+            return value;
+        }
+
+        /// <summary>
+        /// Read a dat file asynchronously
+        /// </summary>
+#if (NET8_0_OR_GREATER)
+        public async ValueTask<T?> GetAsync<T>(uint fileId, CancellationToken ct = default) where T : IDBObj {
+#else
+        public async Task<T?> GetAsync<T>(uint fileId, CancellationToken ct = default) where T : IDBObj {
+#endif
+            var (success, value) = await TryGetAsync<T>(fileId, ct);
+            return success ? value : default;
         }
 
         /// <summary>
@@ -198,40 +257,77 @@ namespace DatReaderWriter {
                 }
             }
 
-            if (!TryGetFileBytes(fileId, out var bytes)) {
+            if (!Tree.TryGetFile(fileId, out var fileEntry)) {
                 value = default!;
                 return false;
             }
 
-            value = (T)Activator.CreateInstance(typeof(T));
+            var size = (int)fileEntry.Size;
+            var buffer = BaseBlockAllocator.SharedBytes.Rent(size);
+            try {
+                BlockAllocator.ReadBlock(buffer, fileEntry.Offset);
 
-            if (!value.Unpack(new DatBinReader(bytes, this))) {
-                value = default!;
-                return false;
+                value = Activator.CreateInstance<T>();
+
+                // Slice the buffer to the exact size to avoid reading garbage data
+                if (!value.Unpack(new DatBinReader(buffer.AsMemory(0, size), this))) {
+                    value = default!;
+                    return false;
+                }
+
+                if (Options.FileCachingStrategy == FileCachingStrategy.OnDemand) {
+                    _fileCache[fileId] = value;
+                }
+
+                return true;
             }
-
-            if (Options.FileCachingStrategy == FileCachingStrategy.OnDemand) {
-                _fileCache.Add(fileId, value);
+            finally {
+                BaseBlockAllocator.SharedBytes.Return(buffer);
             }
-
-            return true;
         }
 
-        /// <summary>
-        /// OBSOLETE: This has been replaced by <see cref="TryGet{T}(uint, out T)"/>!
-        /// </summary>
-        /// <typeparam name="T">The dat file type</typeparam>
-        /// <param name="fileId">The id of the file to get</param>
-        /// <param name="value">The unpacked file</param>
-        /// <returns></returns>
-        [Obsolete("This has been renamed to TryGet<T>(uint, out T)!")]
 #if (NET8_0_OR_GREATER)
-        public bool TryReadFile<T>(uint fileId, [MaybeNullWhen(false)] out T value) where T : IDBObj {
+        public async ValueTask<(bool Success, T? Value)> TryGetAsync<T>(uint fileId, CancellationToken ct = default)
+            where T : IDBObj {
 #else
-        public bool TryReadFile<T>(uint fileId, out T value) where T : IDBObj {
+        public async Task<(bool Success, T? Value)> TryGetAsync<T>(uint fileId, CancellationToken ct =
+ default) where T : IDBObj {
 #endif
-            return TryGet<T>(fileId, out value);
+            if (Options.FileCachingStrategy == FileCachingStrategy.OnDemand) {
+                if (_fileCache.TryGetValue(fileId, out var cached) && cached is T t) {
+                    return (true, t);
+                }
+            }
+
+            var (success, fileEntry) = await Tree.TryGetFileAsync(fileId, ct);
+            if (!success) {
+                return (false, default);
+            }
+
+            var size = (int)fileEntry.Size;
+            var buffer = BaseBlockAllocator.SharedBytes.Rent(size);
+            try {
+                await BlockAllocator.ReadBlockAsync(buffer, fileEntry.Offset, ct);
+
+                var value = Activator.CreateInstance<T>();
+
+                // Slice the buffer to the exact size to avoid reading garbage data
+                if (!value.Unpack(new DatBinReader(buffer.AsMemory(0, size), this))) {
+                    return (false, default);
+                }
+
+                if (Options.FileCachingStrategy == FileCachingStrategy.OnDemand) {
+                    _fileCache[fileId] = value;
+                }
+
+                return (true, value);
+            }
+            finally {
+                BaseBlockAllocator.SharedBytes.Return(buffer);
+            }
         }
+
+        // Removed obsolete TryReadFile
 
         /// <summary>
         /// Try and write a <see cref="IDBObj"/> to the dat.
@@ -291,6 +387,68 @@ namespace DatReaderWriter {
         }
 
         /// <summary>
+        /// Try and write a <see cref="IDBObj"/> to the dat asynchronously.
+        /// </summary>
+#if (NET8_0_OR_GREATER)
+        public async ValueTask<Result<T, string>> TryWriteFileAsync<T>(T value, int? iteration = null,
+            CancellationToken ct = default) where T : IDBObj {
+#else
+        public async Task<Result<T, string>> TryWriteFileAsync<T>(T value, int? iteration = null, CancellationToken ct =
+ default) where T : IDBObj {
+#endif
+            if (!BlockAllocator.CanWrite) {
+                return "Block allocator was opened as read only.";
+            }
+
+            int startingBlockId = 0;
+            uint existingFlags = 0x20000;
+            int existingIteration = 0;
+
+            var (found, existingFile) = await Tree.TryGetFileAsync(value.Id, ct);
+            if (found) {
+                startingBlockId = existingFile.Offset;
+                existingFlags = existingFile.Flags;
+                existingIteration = existingFile.Iteration;
+            }
+
+            // TODO: fix this static 5mb buffer...?
+            var buffer = BaseBlockAllocator.SharedBytes.Rent(1024 * 1024 * 5);
+            var writer = new DatBinWriter(buffer, this);
+
+            value.Pack(writer);
+            startingBlockId = await BlockAllocator.WriteBlockAsync(buffer, writer.Offset, startingBlockId, ct);
+
+            var newIteration = iteration ?? existingIteration;
+            var newEntry = new DatBTreeFile {
+                Flags = existingFlags,
+                Id = value.Id,
+                Size = (uint)writer.Offset,
+                Offset = startingBlockId,
+                Date = DateTime.UtcNow,
+                Iteration = newIteration
+            };
+            await Tree.InsertAsync(newEntry, ct);
+
+            // update dat iteration if needed
+            if (newIteration > Iteration.CurrentIteration) {
+                Iteration.CurrentIteration = newIteration;
+                var iterationUpdateRes = await TryWriteFileAsync(Iteration, null, ct);
+                if (!iterationUpdateRes) {
+                    BaseBlockAllocator.SharedBytes.Return(buffer);
+                    return iterationUpdateRes.Error ?? "Failed to update dat iteration.";
+                }
+            }
+
+            BaseBlockAllocator.SharedBytes.Return(buffer);
+
+            if (_fileCache.ContainsKey(value.Id)) {
+                _fileCache[value.Id] = value;
+            }
+
+            return value;
+        }
+
+        /// <summary>
         /// Try and write a <see cref="IDBObj"/> to the dat.
         /// </summary>
         /// <param name="id">The id of the file to write</param>
@@ -323,6 +481,55 @@ namespace DatReaderWriter {
             if (iteration > Iteration.CurrentIteration) {
                 Iteration.CurrentIteration = iteration;
                 var iterationUpdateRes = TryWriteFile(Iteration);
+                if (!iterationUpdateRes) {
+                    return iterationUpdateRes.Error ?? "Failed to update dat iteration.";
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Try and write a <see cref="IDBObj"/> to the dat asynchronously.
+        /// </summary>
+        /// <param name="id">The id of the file to write</param>
+        /// <param name="buffer">The value to write</param>
+        /// <param name="bytesToWrite">The number of bytes to write from the buffer.</param>
+        /// <param name="iteration">The iteration to use.</param>
+        /// <param name="ct">Cancellation token</param>
+#if (NET8_0_OR_GREATER)
+        public async ValueTask<Result<bool, string>> TryWriteFileBytesAsync(uint id, byte[] buffer, int bytesToWrite,
+            int iteration, CancellationToken ct = default) {
+#else
+        public async Task<Result<bool, string>> TryWriteFileBytesAsync(uint id, byte[] buffer, int bytesToWrite, int iteration, CancellationToken ct
+ = default) {
+#endif
+            if (!BlockAllocator.CanWrite) {
+                return "Block allocator was opened as read only.";
+            }
+
+            int startingBlockId = 0;
+            var (found, existingFile) = await Tree.TryGetFileAsync(id, ct);
+            if (found) {
+                startingBlockId = existingFile.Offset;
+            }
+
+            startingBlockId = await BlockAllocator.WriteBlockAsync(buffer, bytesToWrite, startingBlockId, ct);
+
+            var newEntry = new DatBTreeFile() {
+                Flags = existingFile.Flags,
+                Id = id,
+                Size = (uint)bytesToWrite,
+                Offset = startingBlockId,
+                Date = DateTime.UtcNow,
+                Iteration = iteration
+            };
+            await Tree.InsertAsync(newEntry, ct);
+
+            // update dat iteration if needed
+            if (iteration > Iteration.CurrentIteration) {
+                Iteration.CurrentIteration = iteration;
+                var iterationUpdateRes = await TryWriteFileAsync(Iteration, null, ct);
                 if (!iterationUpdateRes) {
                     return iterationUpdateRes.Error ?? "Failed to update dat iteration.";
                 }

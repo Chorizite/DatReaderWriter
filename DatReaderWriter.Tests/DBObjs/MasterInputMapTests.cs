@@ -67,39 +67,20 @@ namespace DatReaderWriter.Tests.DBObjs {
         [TestMethod]
         [TestCategory("EOR")]
         public void CanReadEORKeymaps() {
-            using var dat = new PortalDatabase(options => {
-                options.FilePath = Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat");
-                options.IndexCachingStrategy = IndexCachingStrategy.Never;
-            });
+            using var dat = new DatCollection(EORCommonData.DatDirectory);
 
-            dat.Tree.TryGetFile(0x14000000u, out var readObj);
-            Console.WriteLine($"{readObj.Id:X8}  (bytes: {readObj.Size})");
-
-            dat.TryGetFileBytes(readObj.Id, out var keymapBytes);
-            var inputMap = new MasterInputMap();
-            var reader = new DatBinReader(keymapBytes);
-            inputMap.Unpack(reader);
-
-            Console.WriteLine($"Name: {inputMap.Name}");
-            Console.WriteLine($"GUID: {inputMap.GuidMap}");
-            Console.WriteLine($"Device Count: {inputMap.Devices.Count}");
-            foreach (var device in inputMap.Devices) {
-                Console.WriteLine($"\tDevice: {device.Guid} {device.Type}");
-            }
-            Console.WriteLine($"Meta Key Count: {inputMap.MetaKeys.Count}");
-            foreach (var metaKey in inputMap.MetaKeys) {
-                Console.WriteLine($"\tMeta Key: {metaKey.Key} {metaKey.Modifier:X8}");
-            }
-            Console.WriteLine($"Section Count: {inputMap.InputMaps.Count}");
-
-            foreach (var section in inputMap.InputMaps) {
-                Console.WriteLine($"\tSection: {section.Key:X8}");
-                Console.WriteLine($"\t\t m_eInputMapID: {section.Value.Mappings.Count}");
-            }
-
-            Console.WriteLine($"Read {reader.Offset}/{reader.Length} bytes.");
-
-            dat.Dispose();
+            var inputMap = dat.Get<MasterInputMap>(0x14000000u);
+            Assert.IsNotNull(inputMap);
+            Assert.AreEqual(0x14000000u, inputMap.Id);
+            Assert.AreEqual("gmDefaultMap", inputMap.Name);
+            Assert.AreEqual(new Guid("451f8ccc-a7e9-4df4-9a6b-f4a7c706f300"), inputMap.GuidMap);
+            Assert.AreEqual(2, inputMap.Devices.Count);
+            
+            Assert.AreEqual(DeviceType.Keyboard, inputMap.Devices[0].Type);
+            Assert.AreEqual(DeviceType.Mouse, inputMap.Devices[1].Type);
+            
+            Assert.AreEqual(9, inputMap.MetaKeys.Count);
+            Assert.AreEqual(14, inputMap.InputMaps.Count);
         }
 
         [TestMethod]

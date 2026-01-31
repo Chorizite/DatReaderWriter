@@ -47,6 +47,20 @@ namespace DatReaderWriter.Lib {
             }
         }
 
+        public static DBObjType DBObjTypeFromType(Type type) {
+            if (TypeCache.TryGetValue(type, out var attr)) {
+                return attr.DBObjType;
+            }
+            return DBObjType.Unknown;
+        }
+
+        public static uint MaskFromType(Type type) {
+            if (TypeCache.TryGetValue(type, out var attr)) {
+                return attr.MaskId;
+            }
+            return 0x00000000;
+        }
+
         public static Type? TypeFromId(DatFileType datType, uint id) {
             switch (datType) {
                 case DatFileType.Cell:

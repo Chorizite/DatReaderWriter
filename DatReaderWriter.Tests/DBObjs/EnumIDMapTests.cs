@@ -1,0 +1,103 @@
+﻿using DatReaderWriter.Tests.Lib;
+using DatReaderWriter;
+using DatReaderWriter.Options;
+using DatReaderWriter.Enums;
+using DatReaderWriter.DBObjs;
+using DatReaderWriter.Types;
+using System.Numerics;
+
+namespace DatReaderWriter.Tests.DBObjs {
+    [TestClass]
+    public class EnumIDMapTests {
+        [TestMethod]
+        public void CanInsertAndReadDataIdMappers() {
+            var datFilePath = Path.GetTempFileName();
+            using var dat = new DatDatabase(options => {
+                options.FilePath = datFilePath;
+                options.AccessType = DatAccessType.ReadWrite;
+            });
+
+            dat.BlockAllocator.InitNew(DatFileType.Portal, 0);
+
+            var writeAnim = new EnumIDMap() {
+                Id = 0x25000014,
+                ClientEnumToID = new() { { 0, 0 }, { 1, 0x13000000 } },
+                ClientEnumToName = new() { { 0, "test" }, { 1, "test2" } },
+                ServerEnumToID = new() { },
+                ServerEnumToName = new() {},
+            };
+
+            var res = dat.TryWriteFile(writeAnim);
+            Assert.IsTrue(res);
+
+            var res2 = dat.TryGet<EnumIDMap>(0x25000014, out var readDidMap);
+            Assert.IsTrue(res2);
+            Assert.IsNotNull(readDidMap);
+
+            Assert.AreEqual(0x25000014u, readDidMap.Id);
+
+            Assert.AreEqual(2, readDidMap.ClientEnumToID.Count);
+            Assert.AreEqual(2, readDidMap.ClientEnumToName.Count);
+            Assert.AreEqual(0, readDidMap.ServerEnumToID.Count);
+            Assert.AreEqual(0, readDidMap.ServerEnumToName.Count);
+
+            Assert.AreEqual(0u, readDidMap.ClientEnumToID.First().Key);
+            Assert.AreEqual(0u, readDidMap.ClientEnumToID.First().Value);
+            Assert.AreEqual(1u, readDidMap.ClientEnumToID.Last().Key);
+            Assert.AreEqual(0x13000000u, readDidMap.ClientEnumToID.Last().Value);
+
+            Assert.AreEqual(0u, readDidMap.ClientEnumToName.First().Key);
+            Assert.AreEqual("test", readDidMap.ClientEnumToName.First().Value);
+            Assert.AreEqual(1u, readDidMap.ClientEnumToName.Last().Key);
+            Assert.AreEqual("test2", readDidMap.ClientEnumToName.Last().Value);
+
+            dat.Dispose();
+            File.Delete(datFilePath);
+        }
+
+        [TestMethod]
+        [TestCategory("EOR")]
+        public void CanReadEORDataIdMapper() {
+            using var dat = new DatDatabase(options => {
+                options.FilePath = Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat");
+                options.IndexCachingStrategy = IndexCachingStrategy.Never;
+            });
+
+
+            var res = dat.TryGet<EnumIDMap>(0x25000014, out var didMap);
+            Assert.IsTrue(res);
+            Assert.IsNotNull(didMap);
+            Assert.AreEqual(0x25000014u, didMap.Id);
+
+            Assert.AreEqual(1, didMap.ClientEnumToID.BucketSizeIndex);
+            Assert.AreEqual(1, didMap.ClientEnumToName.BucketSizeIndex);
+            Assert.AreEqual(1, didMap.ServerEnumToID.BucketSizeIndex);
+            Assert.AreEqual(1, didMap.ServerEnumToName.BucketSizeIndex);
+
+            Assert.AreEqual(2, didMap.ClientEnumToID.Count);
+            Assert.AreEqual(2, didMap.ClientEnumToName.Count);
+            Assert.AreEqual(0, didMap.ServerEnumToID.Count);
+            Assert.AreEqual(0, didMap.ServerEnumToName.Count);
+
+            Assert.AreEqual(0u, didMap.ClientEnumToID.First().Key);
+            Assert.AreEqual(0u, didMap.ClientEnumToID.First().Value);
+            Assert.AreEqual(1u, didMap.ClientEnumToID.Last().Key);
+            Assert.AreEqual(0x13000000u, didMap.ClientEnumToID.Last().Value);
+
+            Assert.AreEqual(0u, didMap.ClientEnumToName.First().Key);
+            Assert.AreEqual("Undef", didMap.ClientEnumToName.First().Value);
+            Assert.AreEqual(1u, didMap.ClientEnumToName.Last().Key);
+            Assert.AreEqual("Dereth", didMap.ClientEnumToName.Last().Value);
+
+            dat.Dispose();
+        }
+
+        [TestMethod]
+        [TestCategory("EOR")]
+        public void CanReadEORAndWriteIdentical() {
+            TestHelpers.CanReadAndWriteIdentical<EnumIDMap>(Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat"), 0x25000000);
+            TestHelpers.CanReadAndWriteIdentical<EnumIDMap>(Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat"), 0x2500000C);
+            TestHelpers.CanReadAndWriteIdentical<EnumIDMap>(Path.Combine(EORCommonData.DatDirectory, $"client_portal.dat"), 0x25000014);
+        }
+    }
+}
