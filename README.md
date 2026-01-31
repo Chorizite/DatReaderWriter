@@ -35,10 +35,7 @@ dotnet add package Chorizite.DatReaderWriter
 ## Core Concepts
 
 ### DatCollection
-The `DatCollection` class is the main entry point if you want to work with the standard set of AC dat files. It manages `Portal`, `Cell`, `Local`, and `HighRes` databases together, allowing for cross-reference lookups (though explicit database access is recommended for specific types).
-
-### Individual Databases
-You can also open individual dat files using `PortalDatabase`, `CellDatabase`, etc. This gives you more granular control and is often preferred when you know exactly which file you are modifying.
+The `DatCollection` class is the main entry point if you want to work with the standard set of AC dat files. It manages `Portal`, `Cell`, `Local`, and `HighRes` databases together, allowing for cross-reference lookups.
 
 ## Basic Usage
 
@@ -51,8 +48,7 @@ using DatReaderWriter.Options;
 using DatReaderWriter.DBObjs;
 
 // Open a set of dat file for reading. This will open all the eor dat files as a single collection.
-var datPath = @"C:\Turbing\Asheron's Call\";
-using var dats = new DatCollection(datPath, DatAccessType.Read);
+using var dats = new DatCollection(@"C:\Turbine\Asheron's Call\", DatAccessType.Read);
 
 // Read a file explicitly from the Portal database
 // We use the specific database (Portal) here for clarity and reliability
@@ -83,11 +79,10 @@ var surface = gfxObj.Surfaces.First().Get(dat);
 ### Update spell names and descriptions
 
 ```cs
-var portalPath = Path.Combine(datPath, "client_portal.dat");
-using var portalDat = new PortalDatabase(portalPath, DatAccessType.ReadWrite);
+var dats = new DatCollection(@"C:\Turbine\Asheron's Call\", DatAccessType.ReadWrite);
 
 // Access the SpellTable directly via the property on PortalDatabase
-var spellTable = portalDat.SpellTable ?? throw new Exception("Failed to read spell table");
+var spellTable = dats.SpellTable ?? throw new Exception("Failed to read spell table");
 
 // Update spell name / description
 // (Changes are in memory until validly written back)
@@ -96,24 +91,21 @@ if (spellTable.Spells.ContainsKey(1)) {
     spellTable.Spells[1].Description = "Increases the target's Strength by 10 points. (updated)";
 
     // Write the updated spell table back to the dat
-    if (!portalDat.TryWriteFile(spellTable)) {
+    if (!dats.TryWriteFile(spellTable)) {
         throw new Exception("Failed to write spell table");
     }
 }
+dats.Dispose();
 ```
 
 ### Rewrite all MotionTables to be 100x speed
 
-```cs  
-using DatReaderWriter.DBObjs;
-
-// ... (dats initialized as above)
-var portalPath = Path.Combine(datPath, "client_portal.dat");
-using var portalDat = new PortalDatabase(portalPath, DatAccessType.ReadWrite);
+```cs
+var dats = new DatCollection(@"C:\Turbine\Asheron's Call\", DatAccessType.ReadWrite);
 
 // Get all MotionTable IDs
 // (This scans the database for files matching the MotionTable type ID range)
-var motionTableIds = portalDat.GetAllIdsOfType<MotionTable>();
+var motionTableIds = dats.GetAllIdsOfType<MotionTable>();
 
 foreach (var id in motionTableIds) {
     // Read the file
@@ -133,8 +125,83 @@ foreach (var id in motionTableIds) {
         }
 
         // Write the updated MotionTable back
-        portalDat.TryWriteFile(mTable);
+        dats.TryWriteFile(mTable);
     }
+}
+```
+
+### Add a new title
+```cs
+static void Main(string[] args)
+{
+    // new title info
+    var enumId = "ID_CharacterTitle_MyNewTitle";
+    var titleString = "My New Title";
+    
+    // open the dat collection in write mode
+    var dats = new DatCollection(@"C:\Turbine\Asheron's Call\", DatAccessType.ReadWrite);
+
+    // load the relevant string table and enum mapper
+    if (!dats.TryGet<StringTable>(0x2300000E, out var stringTableTitles))
+    {
+        throw new Exception($"Failed to get titles StringTable 0x2300000E");
+    }
+
+    if (!dats.TryGet<EnumMapper>(0x22000041, out var enumTitles))
+    {
+        throw new  Exception($"Failed to get titles enum mapper 0x22000041");
+    }
+    
+    // check if the enum already exists
+    if (enumTitles.IdToStringMap.ContainsValue(enumId)) 
+    {
+        var existingId = enumTitles.IdToStringMap.First(kv => kv.Value == enumId).Key;
+        Console.WriteLine($"Enum ID '{enumId}' already exists with key {existingId}.");
+        return;
+    }
+    
+    // first we add a new enum mapper for the new title, at the next available ID
+    var newEnumId = enumTitles.IdToStringMap.Keys.Max() + 1;
+    enumTitles.IdToStringMap[newEnumId] = enumId;
+    
+    // now we compute the hash based on the enum string, and add it to the string table
+    var newEnumHash = ComputeHash(enumId);
+    stringTableTitles.StringTableData[newEnumHash] = new StringTableData()
+    {
+        Strings = [titleString]
+    };
+    
+    // save the changes back to the dats (no iteration increase, just overwrite)
+    if (!dats.Portal.TryWriteFile(enumTitles) || !dats.Local.TryWriteFile(stringTableTitles))
+    {
+        Console.WriteLine("Failed to write updates back to dat.");
+        return;
+    }
+    
+    dats.Dispose();
+    
+    Console.WriteLine($"Added new title enum {newEnumId} with hash {newEnumHash:X8} and string '{titleString}'");
+}
+
+public static uint ComputeHash(string strToHash)
+{
+    long result = 0;
+
+    if (strToHash.Length > 0)
+    {
+        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+        byte[] str = Encoding.GetEncoding(1252).GetBytes(strToHash);
+
+        foreach (sbyte c in str)                
+        {
+            result = c + (result << 4);
+
+            if ((result & 0xF0000000) != 0)
+                result = (result ^ ((result & 0xF0000000) >> 24)) & 0x0FFFFFFF;
+        }
+    }
+
+    return (uint)result;
 }
 ```
 
