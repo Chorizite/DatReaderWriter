@@ -292,86 +292,6 @@ namespace DatReaderWriter.Lib.IO {
             return knownType + value;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public string ReadString16L(int sizeOfLength = 2, bool align = true) {
-            int stringlength;
-            switch (sizeOfLength) {
-                case 1:
-                    stringlength = ReadByte();
-                    break;
-                case 2:
-                default:
-                    stringlength = ReadUInt16();
-                    break;
-            }
-
-            byte[] thestring = ReadBytes(stringlength);
-            if (align) Align(4);
-            return Encoding.Default.GetString(thestring);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public string ReadString16LByte() {
-            return ReadString16L(1, false);
-        }
-
-        /// <summary>
-        /// Reads an obfuscated string from a binary stream.
-        /// The string is stored as a length-prefixed sequence of bytes where each byte has been bit-rotated.
-        /// </summary>
-        /// <returns>The deobfuscated string</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public string ReadObfuscatedString() {
-#if NET8_0_OR_GREATER
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-#endif
-            // Read the string length (stored as UInt16)
-            int stringLength = ReadUInt16();
-
-            // Read the obfuscated bytes
-            byte[] obfuscatedBytes = ReadBytes(stringLength);
-
-            // Deobfuscate each byte by rotating the bits
-            for (int i = 0; i < stringLength; i++) {
-                obfuscatedBytes[i] = (byte)(obfuscatedBytes[i] >> 4 | obfuscatedBytes[i] << 4);
-            }
-
-            // Convert bytes to string using Windows-1252 encoding
-            return Windows1252.GetString(obfuscatedBytes);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private int ReadVariableLengthInt() {
-            int result = 0;
-            int shift = 0;
-            byte byteRead;
-
-            do {
-                byteRead = ReadByte();
-                result |= (byteRead & 0x7F) << shift;
-                shift += 7;
-            }
-            while ((byteRead & 0x80) != 0);
-
-            return result;
-        }
-
-        /// <summary>
-        ///  Reads a string from the current stream. The string is prefixed with the length,
-        //     encoded as an integer seven bits at a time.
-        /// </summary>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public string ReadString() {
-#if NET8_0_OR_GREATER
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-#endif
-            var length = ReadVariableLengthInt();
-            var bytes = ReadBytes(length);
-            return Windows1252.GetString(bytes);
-        }
-
         /// <summary>
         /// Reads a <see cref="Guid"/> from the current stream.
         /// </summary>
@@ -381,35 +301,6 @@ namespace DatReaderWriter.Lib.IO {
             return new Guid(ReadBytes(16));
         }
 
-        /// <summary>
-        /// Reads a string from the current stream. The string is prefixed with the compressed uint length.,
-        /// </summary>
-        /// <returns></returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public string ReadStringCompressed() {
-#if NET8_0_OR_GREATER
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-#endif
-            var length = ReadCompressedUInt();
-            if (length == 0) return string.Empty;
-            var bytes = ReadBytes((int)length);
-            return Windows1252.GetString(bytes);
-        }
-
-        /// <summary>
-        /// Reads a PStringBase[ushort] from the current stream
-        /// </summary>
-        /// <returns></returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public string ReadUShortString() {
-            var length = ReadCompressedUInt();
-            var str = new StringBuilder();
-            for (int i = 0; i < length; i++) {
-                str.Append(Convert.ToChar(ReadUInt16()));
-            }
-            return str.ToString();
-        }
-        
         /// <summary>
         /// Reads a generic type from the current stream.
         /// </summary>
@@ -429,7 +320,6 @@ namespace DatReaderWriter.Lib.IO {
             if (type == typeof(bool)) return (T)(object)ReadBool();
             if (type == typeof(float)) return (T)(object)ReadSingle();
             if (type == typeof(double)) return (T)(object)ReadDouble();
-            if (type == typeof(string)) return (T)(object)ReadString16L();
             if (type == typeof(Guid)) return (T)(object)ReadGuid();
             
             // Check if this is an enum, get the underlying type or default to int

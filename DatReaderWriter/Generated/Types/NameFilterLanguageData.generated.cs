@@ -25,7 +25,7 @@ namespace DatReaderWriter.Types {
 
         public PStringBase<ushort> ExtraAllowedCharacters = new();
 
-        public List<string> CompoundLetterGroups = [];
+        public List<PStringBase<ushort>> CompoundLetterGroups = [];
 
         /// <inheritdoc />
         public bool Unpack(DatBinReader reader) {
@@ -36,7 +36,7 @@ namespace DatReaderWriter.Types {
             ExtraAllowedCharacters = reader.ReadItem<PStringBase<ushort>>();
             var _numCompoundLetterGroups = reader.ReadUInt32();
             for (var i=0; i < _numCompoundLetterGroups; i++) {
-                CompoundLetterGroups.Add(reader.ReadUShortString());
+                CompoundLetterGroups.Add(reader.ReadItem<PStringBase<ushort>>());
             }
             return true;
         }
@@ -50,7 +50,7 @@ namespace DatReaderWriter.Types {
             writer.WriteItem<PStringBase<ushort>>(ExtraAllowedCharacters);
             writer.WriteUInt32((uint)CompoundLetterGroups.Count());
             foreach (var item in CompoundLetterGroups) {
-                writer.WriteUShortString(item);
+                writer.WriteItem<PStringBase<ushort>>(item);
             }
             return true;
         }

@@ -15,7 +15,7 @@ using DatReaderWriter.Lib.IO;
 
 namespace DatReaderWriter.Types {
     public partial class ObjHierarchyNode : IDatObjType {
-        public string MenuName;
+        public ObfuscatedPStringBase MenuName;
 
         public uint WCID;
 
@@ -26,7 +26,7 @@ namespace DatReaderWriter.Types {
 
         /// <inheritdoc />
         public bool Unpack(DatBinReader reader) {
-            MenuName = reader.ReadObfuscatedString();
+            MenuName = reader.ReadItem<ObfuscatedPStringBase>();
             reader.Align(4);
             WCID = reader.ReadUInt32();
             var _numChildren = reader.ReadInt32();
@@ -39,7 +39,7 @@ namespace DatReaderWriter.Types {
 
         /// <inheritdoc />
         public bool Pack(DatBinWriter writer) {
-            writer.WriteObfuscatedString(MenuName);
+            writer.WriteItem<ObfuscatedPStringBase>(MenuName);
             writer.Align(4);
             writer.WriteUInt32(WCID);
             writer.WriteInt32((int)Children.Count());

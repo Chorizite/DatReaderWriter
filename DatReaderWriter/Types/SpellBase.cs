@@ -23,12 +23,12 @@ namespace DatReaderWriter.Types {
         /// <summary>
         /// Name of the spell
         /// </summary>
-        public string Name = "";
+        public ObfuscatedPStringBase Name = "";
 
         /// <summary>
         /// Description of the spell
         /// </summary>
-        public string Description = "";
+        public ObfuscatedPStringBase Description = "";
 
         /// <summary>
         /// A list of component ids. You can look these up in the <see cref="SpellComponentTable"/>.
@@ -202,9 +202,9 @@ namespace DatReaderWriter.Types {
 
         /// <inheritdoc />
         public bool Unpack(DatBinReader reader) {
-            Name = reader.ReadObfuscatedString();
+            Name = reader.ReadItem<ObfuscatedPStringBase>();
             reader.Align(4);
-            Description = reader.ReadObfuscatedString();
+            Description = reader.ReadItem<ObfuscatedPStringBase>();
             reader.Align(4);
             School = (MagicSchool)reader.ReadInt32();
             Icon = reader.ReadUInt32();
@@ -248,10 +248,8 @@ namespace DatReaderWriter.Types {
 
         /// <inheritdoc />
         public bool Pack(DatBinWriter writer) {
-            writer.WriteObfuscatedString(Name);
-            writer.Align(4);
-            writer.WriteObfuscatedString(Description);
-            writer.Align(4);
+            writer.WriteItem(Name);
+            writer.WriteItem(Description);
             writer.WriteInt32((int)School);
             writer.WriteUInt32(Icon);
             writer.WriteUInt32((uint)Category);

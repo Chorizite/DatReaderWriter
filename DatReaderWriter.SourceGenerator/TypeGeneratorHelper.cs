@@ -7,7 +7,6 @@ namespace DatReaderWriter.SourceGenerator {
         public static string SimplifyType(string type) {
             return type switch {
                 "ObjectId" or "PackedDWORD" or "LandcellId" or "DataId" => "uint",
-                "WString" or "bytestring" or "obfuscatedstring" or "rawstring" or "compressedstring" or "ushortstring" => "string",
                 "CompressedUInt" => "uint",
                 "DataIdOfKnownType" => "uint",
                 "guid" => "Guid",
@@ -76,19 +75,12 @@ namespace DatReaderWriter.SourceGenerator {
                 "bool" => $"reader.ReadBool({size})",
                 "byte" => "reader.ReadByte()",
                 "sbyte" => "reader.ReadSByte()",
-                "string" => "reader.ReadString16L()",
-                "bytestring" => "reader.ReadString16LByte()",
-                "compressedstring" => "reader.ReadStringCompressed()",
-                "WString" => "reader.ReadString32L()",
                 "PackedWORD" => "reader.ReadPackedWORD()",
                 "Vector3" => "reader.ReadVector3()",
                 "Quaternion" => "reader.ReadQuaternion()",
                 "DataID" or "DataId" or "PackedDWORD" => "reader.ReadPackedDWORD()",
                 "CompressedUInt" => "reader.ReadCompressedUInt()",
                 "DataIdOfKnownType" => $"reader.ReadDataIdOfKnownType({size})",
-                "obfuscatedstring" => "reader.ReadObfuscatedString()",
-                "rawstring" => "reader.ReadString()",
-                "ushortstring" => "reader.ReadUShortString()",
                 "guid" => "reader.ReadGuid()",
                 _ => $"reader.ReadItem<{type}>()"
             };
@@ -107,17 +99,10 @@ namespace DatReaderWriter.SourceGenerator {
                 "bool" => "WriteBool",
                 "byte" => "WriteByte",
                 "sbyte" => "WriteSByte",
-                "ushortstring" => "WriteUShortString",
-                "rawstring" => "WriteString",
-                "string" => "WriteString16L",
-                "compressedstring" => "WriteStringCompressed",
-                "bytestring" => "WriteString16LByte",
-                "WString" => "WriteString32L",
                 "Vector3" => "WriteVector3",
                 "Quaternion" => "WriteQuaternion",
                 "CompressedUInt" => "WriteCompressedUInt",
                 "DataIdOfKnownType" => "WriteDataIdOfKnownType",
-                "obfuscatedstring" => "WriteObfuscatedString",
                 "guid" => "WriteGuid",
                 _ => $"WriteItem<{type}>"
             };

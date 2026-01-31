@@ -381,14 +381,6 @@ namespace DatReaderWriter.SourceGenerator {
                 case "bool":
                     writer.WriteLine($"{type} {child.Name} = false;");
                     break;
-                case "string":
-                case "bytestring":
-                case "rawstring":
-                case "compressedstring":
-                case "ushortstring":
-                case "WString":
-                    writer.WriteLine($"{type} {child.Name} = \"\";");
-                    break;
                 default:
                     writer.WriteLine($"{type} {child.Name} = new();");
                     break;

@@ -2953,9 +2953,9 @@
             <vector name="Spells" length="_numSpells" type="List" genericValue="uint"/>
         </type>
         <type name="SpellBase" text="Information about a spell">
-            <field name="Name" type="obfuscatedstring" text="The name of the spell"/>
+            <field name="Name" type="ObfuscatedPStringBase" text="The name of the spell"/>
             <align size="4"/>
-            <field name="Description" type="obfuscatedstring" text="The description of the spell"/>
+            <field name="Description" type="ObfuscatedPStringBase"/>
             <align size="4"/>
             <field name="School" type="MagicSchool" text="The magic school the spell belongs to"/>
             <vector name="Icon" type="QualifiedDataId" genericValue="RenderSurface"/>
@@ -3001,14 +3001,14 @@
                     genericValue="SpellSetTiers"/>
         </type>
         <type name="SpellComponentBase" text="Information about a spell component">
-            <field name="Name" type="obfuscatedstring"/>
+            <field name="Name" type="ObfuscatedPStringBase"/>
             <align size="4"/>
             <field name="Category" type="uint"/>
             <vector name="Icon" type="QualifiedDataId" genericValue="RenderSurface"/>
             <field name="Type" type="ComponentType"/>
             <field name="Gesture" type="uint"/>
             <field name="Time" type="float"/>
-            <field name="Text" type="obfuscatedstring"/>
+            <field name="Text" type="ObfuscatedPStringBase"/>
             <align size="4"/>
             <field name="CDM" type="float"/>
         </type>
@@ -3234,11 +3234,12 @@
             <field name="VowelContainingSubstringLength" type="uint"/>
             <vector name="ExtraAllowedCharacters" type="PStringBase" genericValue="ushort"/>
             <field name="_numCompoundLetterGroups" type="uint"/>
-            <vector name="CompoundLetterGroups" length="_numCompoundLetterGroups" type="List"
-                    genericValue="ushortstring"/>
+            <vector name="CompoundLetterGroups" length="_numCompoundLetterGroups" type="List">
+                <vector type="PStringBase" genericValue="ushort"/>
+            </vector>
         </type>
         <type name="ObjHierarchyNode">
-            <field type="obfuscatedstring" name="MenuName"/>
+            <field name="MenuName" type="ObfuscatedPStringBase"/>
             <align type="uint"/>
             <field type="uint" name="WCID"/>
             <field type="int" name="_numChildren"/>

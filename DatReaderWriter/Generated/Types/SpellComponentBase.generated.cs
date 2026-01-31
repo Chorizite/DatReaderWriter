@@ -18,7 +18,7 @@ namespace DatReaderWriter.Types {
     /// Information about a spell component
     /// </summary>
     public partial class SpellComponentBase : IDatObjType {
-        public string Name;
+        public ObfuscatedPStringBase Name;
 
         public uint Category;
 
@@ -30,20 +30,20 @@ namespace DatReaderWriter.Types {
 
         public float Time;
 
-        public string Text;
+        public ObfuscatedPStringBase Text;
 
         public float CDM;
 
         /// <inheritdoc />
         public bool Unpack(DatBinReader reader) {
-            Name = reader.ReadObfuscatedString();
+            Name = reader.ReadItem<ObfuscatedPStringBase>();
             reader.Align(4);
             Category = reader.ReadUInt32();
             Icon = reader.ReadItem<QualifiedDataId<RenderSurface>>();
             Type = (ComponentType)reader.ReadUInt32();
             Gesture = reader.ReadUInt32();
             Time = reader.ReadSingle();
-            Text = reader.ReadObfuscatedString();
+            Text = reader.ReadItem<ObfuscatedPStringBase>();
             reader.Align(4);
             CDM = reader.ReadSingle();
             return true;
@@ -51,14 +51,14 @@ namespace DatReaderWriter.Types {
 
         /// <inheritdoc />
         public bool Pack(DatBinWriter writer) {
-            writer.WriteObfuscatedString(Name);
+            writer.WriteItem<ObfuscatedPStringBase>(Name);
             writer.Align(4);
             writer.WriteUInt32(Category);
             writer.WriteItem<QualifiedDataId<RenderSurface>>(Icon);
             writer.WriteUInt32((uint)Type);
             writer.WriteUInt32(Gesture);
             writer.WriteSingle(Time);
-            writer.WriteObfuscatedString(Text);
+            writer.WriteItem<ObfuscatedPStringBase>(Text);
             writer.Align(4);
             writer.WriteSingle(CDM);
             return true;
