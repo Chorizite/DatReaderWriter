@@ -28,7 +28,7 @@ namespace DatReaderWriter.Types {
         /// </summary>
         /// <param name="datCollection"></param>
         /// <returns></returns>
-        public T Get(DatCollection datCollection) {
+        public T? Get(DatCollection datCollection) {
             return datCollection.Get<T>(DataId);
         }
 
@@ -40,20 +40,19 @@ namespace DatReaderWriter.Types {
         /// <param name="value">The unpacked file</param>
         /// <returns></returns>
 #if (NET8_0_OR_GREATER)
-        public bool TryGet<T>(DatCollection datCollection, [MaybeNullWhen(false)] out T value) where T : IDBObj {
+        public bool TryGet(DatCollection datCollection, [MaybeNullWhen(false)] out T value) {
 #else
-        public bool TryGet<T>(DatCollection datCollection, out T value) where T : IDBObj {
+        public bool TryGet(DatCollection datCollection, out T value) {
 #endif
             return datCollection.TryGet<T>(DataId, out value);
         }
         
         
 #if (NET8_0_OR_GREATER)
-        public async ValueTask<(bool Success, T? Value)> TryGetAsync<T>(DatCollection datCollection, CancellationToken ct = default)
-            where T : IDBObj {
+        public async ValueTask<(bool Success, T? Value)> TryGetAsync(DatCollection datCollection, CancellationToken ct = default) {
 #else
-        public async Task<(bool Success, T Value)> TryGetAsync<T>(DatCollection datCollection, CancellationToken ct =
-            default) where T : IDBObj {
+        public async Task<(bool Success, T? Value)> TryGetAsync(DatCollection datCollection, CancellationToken ct =
+            default) {
 #endif
                 return await datCollection.TryGetAsync<T>(DataId, ct).ConfigureAwait(false);
         }
@@ -75,7 +74,7 @@ namespace DatReaderWriter.Types {
             return DataId == other;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj is null) {
                 return false;
@@ -98,7 +97,7 @@ namespace DatReaderWriter.Types {
 
         public override int GetHashCode()
         {
-            return (int)DataId;
+            return (int)DataId.GetHashCode();
         }
 
         public override string ToString() {

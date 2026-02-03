@@ -76,7 +76,7 @@ namespace DatReaderWriter.Lib.IO {
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T ReadItem<T>(params object[] p) where T : IUnpackable {
-            var item = (T)Activator.CreateInstance(typeof(T), p ?? []);
+            var item = (T)Activator.CreateInstance(typeof(T), p ?? [])!;
             item.Unpack(this);
             return item;
         }
@@ -352,7 +352,7 @@ namespace DatReaderWriter.Lib.IO {
             }
 
             if (typeof(IUnpackable).IsAssignableFrom(type)) {
-                var item = (IUnpackable)Activator.CreateInstance(type);
+                var item = (IUnpackable)Activator.CreateInstance(type)!;
                 item.Unpack(this);
                 return (T)item;
             }

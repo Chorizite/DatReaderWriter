@@ -39,6 +39,9 @@ namespace DatReaderWriter.SourceGenerator {
 
                     if (dataType.IsTemplated)
                         continue;
+                    
+                    writer.WriteLine("#nullable enable");
+                    writer.WriteWarningPragmas();
 
                     writer.WriteLine("using System;");
                     writer.WriteLine("using System.Numerics;");

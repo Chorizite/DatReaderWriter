@@ -41,6 +41,7 @@ namespace DatReaderWriter.Types {
         /// Create a typed instance of this abstract class, used for MasterProperties
         /// </summary>
         /// <param name="reader"></param>
+        /// <param name="type"></param>
         /// <returns></returns>
         public static BaseProperty? UnpackGenericMasterProperty(DatBinReader reader, BasePropertyType type) {
             return UnpackInstanceFromType(reader, type, false, 0);
@@ -49,7 +50,7 @@ namespace DatReaderWriter.Types {
         /// <summary>
         /// Create a typed instance of this abstract class
         /// </summary>
-        public static BaseProperty? UnpackGeneric(DatBinReader reader) {
+        public static BaseProperty UnpackGeneric(DatBinReader reader) {
             MasterProperty? masterProperty = null;
             if (masterProperty is null && reader.Database is not null && reader.Database is PortalDatabase portalDatabase) {
                 masterProperty = portalDatabase.MasterProperty;
@@ -66,7 +67,7 @@ namespace DatReaderWriter.Types {
             return UnpackInstanceFromType(reader, type, true, key);
         }
 
-        private static BaseProperty? UnpackInstanceFromType(DatBinReader reader, BasePropertyType type, bool shouldPackType, uint key) {
+        private static BaseProperty UnpackInstanceFromType(DatBinReader reader, BasePropertyType type, bool shouldPackType, uint key) {
             BaseProperty? instance = null;
 
             switch (type) {

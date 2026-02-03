@@ -17,6 +17,8 @@ namespace DatReaderWriter.SourceGenerator {
                     continue;
 
                 var writer = new SourceWriter();
+                writer.WriteLine("#nullable enable");
+                writer.WriteWarningPragmas();
 
                 writer.WriteLine("using System;");
                 writer.WriteLine("using System.IO;");

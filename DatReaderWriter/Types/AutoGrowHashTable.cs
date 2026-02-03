@@ -9,7 +9,7 @@ namespace DatReaderWriter.Types {
     /// </summary>
     /// <typeparam name="TKey"></typeparam>
     /// <typeparam name="TValue"></typeparam>
-    public class AutoGrowHashTable<TKey, TValue> : Dictionary<TKey, TValue>, IUnpackable, IPackable {
+    public class AutoGrowHashTable<TKey, TValue> : Dictionary<TKey, TValue>, IUnpackable, IPackable where TKey : notnull {
         public bool Unpack(DatBinReader reader) {
             _ = reader.ReadByte(); // bucket size index, not used
             var numElements = reader.ReadCompressedUInt();

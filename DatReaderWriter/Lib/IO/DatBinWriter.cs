@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Buffers.Binary;
-using System.Drawing;
-using System.IO;
 using System.Numerics;
-using System.Runtime.InteropServices.ComTypes;
-using System.Text;
 
 namespace DatReaderWriter.Lib.IO {
     /// <summary>
@@ -278,18 +274,18 @@ namespace DatReaderWriter.Lib.IO {
         /// <exception cref="NotSupportedException"></exception>
         public void WriteGeneric<T>(T value) {
             var type = typeof(T);
-            if (type == typeof(uint)) WriteUInt32((uint)(object)value);
-            else if (type == typeof(int)) WriteInt32((int)(object)value);
-            else if (type == typeof(ulong)) WriteUInt64((ulong)(object)value);
-            else if (type == typeof(long)) WriteInt64((long)(object)value);
-            else if (type == typeof(ushort)) WriteUInt16((ushort)(object)value);
-            else if (type == typeof(short)) WriteInt16((short)(object)value);
-            else if (type == typeof(byte)) WriteByte((byte)(object)value);
-            else if (type == typeof(sbyte)) WriteSByte((sbyte)(object)value);
-            else if (type == typeof(bool)) WriteBool((bool)(object)value);
-            else if (type == typeof(float)) WriteSingle((float)(object)value);
-            else if (type == typeof(double)) WriteDouble((double)(object)value);
-            else if (type == typeof(Guid)) WriteGuid((Guid)(object)value);
+            if (type == typeof(uint)) WriteUInt32((uint)(object)value!);
+            else if (type == typeof(int)) WriteInt32((int)(object)value!);
+            else if (type == typeof(ulong)) WriteUInt64((ulong)(object)value!);
+            else if (type == typeof(long)) WriteInt64((long)(object)value!);
+            else if (type == typeof(ushort)) WriteUInt16((ushort)(object)value!);
+            else if (type == typeof(short)) WriteInt16((short)(object)value!);
+            else if (type == typeof(byte)) WriteByte((byte)(object)value!);
+            else if (type == typeof(sbyte)) WriteSByte((sbyte)(object)value!);
+            else if (type == typeof(bool)) WriteBool((bool)(object)value!);
+            else if (type == typeof(float)) WriteSingle((float)(object)value!);
+            else if (type == typeof(double)) WriteDouble((double)(object)value!);
+            else if (type == typeof(Guid)) WriteGuid((Guid)(object)value!);
             else if (value is IPackable packable) {
                 packable.Pack(this);
             }
@@ -298,22 +294,22 @@ namespace DatReaderWriter.Lib.IO {
             else if (type.IsEnum) {
                 var underlyingType = Enum.GetUnderlyingType(type);
                 if (underlyingType == typeof(byte)) {
-                    WriteByte((byte)(object)value);
+                    WriteByte((byte)(object)value!);
                 }
                 else if (underlyingType == typeof(sbyte)) {
-                    WriteSByte((sbyte)(object)value);
+                    WriteSByte((sbyte)(object)value!);
                 }
                 else if (underlyingType == typeof(ushort)) {
-                    WriteUInt16((ushort)(object)value);
+                    WriteUInt16((ushort)(object)value!);
                 }
                 else if (underlyingType == typeof(short)) {
-                    WriteInt16((short)(object)value);
+                    WriteInt16((short)(object)value!);
                 }
                 else if (underlyingType == typeof(uint)) {
-                    WriteUInt32((uint)(object)value);
+                    WriteUInt32((uint)(object)value!);
                 }
                 else {
-                    WriteInt32((int)(object)value);
+                    WriteInt32((int)(object)value!);
                 }
             }
             else {

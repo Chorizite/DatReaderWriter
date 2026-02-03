@@ -32,7 +32,7 @@ namespace DatReaderWriter.DBObjs {
             for (var i = 0; i < _numProperties; i++) {
                 var _key = reader.ReadUInt32();
                 var _val = BaseProperty.UnpackGeneric(reader);
-                Properties.Add(_key, _val);
+                Properties.Add(_key, _val!);
             }
             return true;
         }

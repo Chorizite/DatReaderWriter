@@ -12,7 +12,7 @@ namespace DatReaderWriter.Types {
         public static implicit operator string(StringBase pString) => pString.Value;
         
         /// <inheritdoc />
-        public bool Equals(string other)
+        public bool Equals(string? other)
         {
             return Value == other;
         }

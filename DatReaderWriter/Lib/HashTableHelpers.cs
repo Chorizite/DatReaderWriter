@@ -62,6 +62,7 @@ namespace DatReaderWriter.Lib {
                 if (key is StringBase strKey) {
                     return (ulong)strKey.GetHashCode();
                 }
+#pragma warning disable CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
                 return sizeof(TKey) switch {
                     1 => *(byte*)&key,
                     2 => *(ushort*)&key,
@@ -70,6 +71,7 @@ namespace DatReaderWriter.Lib {
                     _ => throw new System.NotSupportedException(
                         $"Key type size {sizeof(TKey)} not supported for modulus operation")
                 };
+#pragma warning restore CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
             }
         }
     }

@@ -18,6 +18,7 @@ namespace DatReaderWriter.SourceGenerator {
                 var dbObj = kv.Value;
 
                 writer.WriteLine("#nullable enable");
+                writer.WriteWarningPragmas();
                 writer.WriteLine("using System;");
                 writer.WriteLine("using System.Collections.Generic;");
                 writer.WriteLine("using System.IO;");

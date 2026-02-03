@@ -22,7 +22,7 @@ namespace DatReaderWriter.Types {
             var _numValues = reader.ReadUInt32();
 
             for (var i = 0; i < _numValues; i++) {
-                Value.Add(BaseProperty.UnpackGeneric(reader));
+                Value.Add(BaseProperty.UnpackGeneric(reader)!);
             }
             return true;
         }

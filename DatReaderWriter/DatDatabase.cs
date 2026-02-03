@@ -6,7 +6,6 @@ using DatReaderWriter.Lib.IO;
 using DatReaderWriter.Lib.IO.BlockAllocators;
 using DatReaderWriter.Lib.IO.DatBTree;
 using System;
-using System.IO;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -58,14 +57,14 @@ namespace DatReaderWriter {
         /// <summary>
         /// The dat collection this dat database belongs to, if any
         /// </summary>
-        public DatCollection DatCollection { get; internal set; }
+        public DatCollection? DatCollection { get; internal set; }
 
         /// <summary>
         /// Create a new DatDatabase
         /// </summary>
         /// <param name="options">Options configuration action</param>
         /// <param name="blockAllocator">Block allocator instance to use</param>
-        public DatDatabase(Action<DatDatabaseOptions> options = null, IDatBlockAllocator blockAllocator = null) {
+        public DatDatabase(Action<DatDatabaseOptions>? options = null, IDatBlockAllocator? blockAllocator = null) {
             Options = new DatDatabaseOptions();
             options?.Invoke(Options);
 
@@ -300,9 +299,9 @@ namespace DatReaderWriter {
         /// <param name="ct"></param>
         /// <returns></returns>
 #if (NET8_0_OR_GREATER)
-        public async ValueTask<T> GetCachedAsync<T>(uint fileId, CancellationToken ct = default) where T : IDBObj {
+        public async ValueTask<T?> GetCachedAsync<T>(uint fileId, CancellationToken ct = default) where T : IDBObj {
 #else
-        public async Task<T> GetCachedAsync<T>(uint fileId, CancellationToken ct = default) where T : IDBObj {
+        public async Task<T?> GetCachedAsync<T>(uint fileId, CancellationToken ct = default) where T : IDBObj {
 #endif
             if (_fileCache.TryGetValue(fileId, out var cached) && cached is T t) {
                 return t;
@@ -321,9 +320,9 @@ namespace DatReaderWriter {
         /// Read a dat file asynchronously
         /// </summary>
 #if (NET8_0_OR_GREATER)
-        public async ValueTask<T> GetAsync<T>(uint fileId, CancellationToken ct = default) where T : IDBObj {
+        public async ValueTask<T?> GetAsync<T>(uint fileId, CancellationToken ct = default) where T : IDBObj {
 #else
-        public async Task<T> GetAsync<T>(uint fileId, CancellationToken ct = default) where T : IDBObj {
+        public async Task<T?> GetAsync<T>(uint fileId, CancellationToken ct = default) where T : IDBObj {
 #endif
             var (success, value) = await TryGetAsync<T>(fileId, ct);
             return success ? value : default;
@@ -394,10 +393,10 @@ namespace DatReaderWriter {
         }
 
 #if (NET8_0_OR_GREATER)
-        public async ValueTask<(bool Success, T Value)> TryGetAsync<T>(uint fileId, CancellationToken ct = default)
+        public async ValueTask<(bool Success, T? Value)> TryGetAsync<T>(uint fileId, CancellationToken ct = default)
             where T : IDBObj {
 #else
-        public async Task<(bool Success, T Value)> TryGetAsync<T>(uint fileId, CancellationToken ct =
+        public async Task<(bool Success, T? Value)> TryGetAsync<T>(uint fileId, CancellationToken ct =
          default) where T : IDBObj {
 #endif
             if (Options.FileCachingStrategy == FileCachingStrategy.OnDemand) {
