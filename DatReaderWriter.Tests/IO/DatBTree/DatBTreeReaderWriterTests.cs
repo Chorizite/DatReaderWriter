@@ -19,8 +19,7 @@ namespace DatReaderWriter.Tests.IO.DatBTree {
         public void SetUp() {
             _datFilePath = Path.GetTempFileName();
             _allocator = new MemoryMappedBlockAllocator(new DatDatabaseOptions() {
-                FilePath = _datFilePath,
-                AccessType = DatAccessType.ReadWrite
+                FilePath = _datFilePath, AccessType = DatAccessType.ReadWrite
             });
 
             _allocator.InitNew(DatFileType.Portal, 0);
@@ -34,7 +33,6 @@ namespace DatReaderWriter.Tests.IO.DatBTree {
             _allocator.Dispose();
             File.Delete(_datFilePath);
         }
-
 
 
         [TestMethod]
@@ -117,9 +115,7 @@ namespace DatReaderWriter.Tests.IO.DatBTree {
         public void Insert_ShouldHandleMultipleInsertionsCorrectly() {
             // Arrange
             var files = new[] {
-                new DatBTreeFile { Id = 1 },
-                new DatBTreeFile { Id = 50 },
-                new DatBTreeFile { Id = 100 },
+                new DatBTreeFile { Id = 1 }, new DatBTreeFile { Id = 50 }, new DatBTreeFile { Id = 100 },
                 new DatBTreeFile { Id = 75 }
             };
 
@@ -152,8 +148,7 @@ namespace DatReaderWriter.Tests.IO.DatBTree {
         public void CanInsertFileEntries([DataValues(1, 10, 100, 1000)] int entryCount) {
             var datFilePath = Path.GetTempFileName();
             var allocator = new MemoryMappedBlockAllocator(new DatDatabaseOptions() {
-                FilePath = datFilePath,
-                AccessType = DatAccessType.ReadWrite
+                FilePath = datFilePath, AccessType = DatAccessType.ReadWrite
             });
 
             allocator.InitNew(DatFileType.Portal, 0);
@@ -196,7 +191,8 @@ namespace DatReaderWriter.Tests.IO.DatBTree {
                 Assert.IsTrue(result, $"Result {(i + 1) * 3} was false");
                 Assert.IsNotNull(retrievedFile);
                 //Assert.AreEqual(now, retrievedFile.Date);
-                Assert.AreEqual(0x20000u, retrievedFile.Flags);
+                Assert.AreEqual(2, retrievedFile.Version);
+                Assert.AreEqual(0, (ushort)retrievedFile.Flags);
                 Assert.AreEqual((uint)(i + 1) * 3, retrievedFile.Id);
                 Assert.AreEqual(i, retrievedFile.Iteration);
                 Assert.AreEqual((uint)i * 2, retrievedFile.Size);
@@ -213,8 +209,7 @@ namespace DatReaderWriter.Tests.IO.DatBTree {
         public void CanIterateRangedFileEntries([DataValues(1, 10, 60, 61, 62, 100, 1000)] int entryCount) {
             var datFilePath = Path.GetTempFileName();
             var allocator = new MemoryMappedBlockAllocator(new DatDatabaseOptions() {
-                FilePath = datFilePath,
-                AccessType = DatAccessType.ReadWrite
+                FilePath = datFilePath, AccessType = DatAccessType.ReadWrite
             });
 
             allocator.InitNew(DatFileType.Portal, 0);
@@ -226,17 +221,13 @@ namespace DatReaderWriter.Tests.IO.DatBTree {
 
             var files = new List<DatBTreeFile>();
             for (var i = 0; i < entryCount; i++) {
-                files.Add(new DatBTreeFile() {
-                    Id = (uint)(i + 1)
-                });
+                files.Add(new DatBTreeFile() { Id = (uint)(i + 1) });
             }
 
             // insert ids that will be higher than our range request to
             // ensure they are not included in the request
             for (var i = 0; i < entryCount; i++) {
-                files.Add(new DatBTreeFile() {
-                    Id = (uint)(10 * entryCount) + (uint)(i + 1)
-                });
+                files.Add(new DatBTreeFile() { Id = (uint)(10 * entryCount) + (uint)(i + 1) });
             }
 
             foreach (var file in files) {
@@ -260,8 +251,7 @@ namespace DatReaderWriter.Tests.IO.DatBTree {
         public void CanDeleteFileEntries([DataValues(1, 10, 100, 1000)] int entryCount) {
             var datFilePath = Path.GetTempFileName();
             var allocator = new MemoryMappedBlockAllocator(new DatDatabaseOptions() {
-                FilePath = datFilePath,
-                AccessType = DatAccessType.ReadWrite
+                FilePath = datFilePath, AccessType = DatAccessType.ReadWrite
             });
 
             allocator.InitNew(DatFileType.Portal, 0);
@@ -304,7 +294,8 @@ namespace DatReaderWriter.Tests.IO.DatBTree {
                 Assert.IsTrue(result, $"Result {id} was false");
                 Assert.IsNotNull(deletedFile);
                 //Assert.AreEqual(now, deletedFile.Date);
-                Assert.AreEqual(0x20000u, deletedFile.Flags);
+                Assert.AreEqual(2, deletedFile.Version);
+                Assert.AreEqual(0, (ushort)deletedFile.Flags);
                 Assert.AreEqual((uint)(i + 1) * 3, deletedFile.Id);
                 Assert.AreEqual(i, deletedFile.Iteration);
                 Assert.AreEqual((uint)i * 2, deletedFile.Size);
@@ -329,8 +320,7 @@ namespace DatReaderWriter.Tests.IO.DatBTree {
         public void CanAddFileEntryWithNoExistingRoot() {
             var file = Path.GetTempFileName();
             var allocator = new MemoryMappedBlockAllocator(new DatDatabaseOptions() {
-                FilePath = file,
-                AccessType = DatAccessType.ReadWrite
+                FilePath = file, AccessType = DatAccessType.ReadWrite
             });
 
             allocator.InitNew(DatFileType.Portal, 0);
@@ -358,7 +348,8 @@ namespace DatReaderWriter.Tests.IO.DatBTree {
             Assert.IsTrue(result);
             Assert.IsNotNull(retrievedFile);
             //Assert.AreEqual(now, retrievedFile.Date);
-            Assert.AreEqual(0x20000u, retrievedFile.Flags);
+            Assert.AreEqual(2, retrievedFile.Version);
+            Assert.AreEqual(0, (ushort)retrievedFile.Flags);
             Assert.AreEqual(0x12341234u, retrievedFile.Id);
             Assert.AreEqual(1, retrievedFile.Iteration);
             Assert.AreEqual(56789u, retrievedFile.Size);
@@ -370,13 +361,14 @@ namespace DatReaderWriter.Tests.IO.DatBTree {
         }
 
         #region EOR Tests
+
         [TestMethod]
         [TestCategory("EOR")]
         [CombinatorialData]
         public void CanReadEORRootNodes(
-            [DataValues(EORDBType.Portal, EORDBType.Cell, EORDBType.Local, EORDBType.HighRes)] EORDBType dbType
-            ) {
-
+            [DataValues(EORDBType.Portal, EORDBType.Cell, EORDBType.Local, EORDBType.HighRes)]
+            EORDBType dbType
+        ) {
             using var tree = new DatBTreeReaderWriter(new MemoryMappedBlockAllocator(new DatDatabaseOptions() {
                 FilePath = EORCommonData.GetDatPath(dbType)
             }));
@@ -405,8 +397,9 @@ namespace DatReaderWriter.Tests.IO.DatBTree {
         [TestCategory("EOR")]
         [CombinatorialData]
         public void HasKnownEORPortalFiles(
-            [DataValues(0x010022A8u, 0x06004A07u, 0x08001947u, 0x0A0005ACu, 0x33000421u)] uint fileId
-            ) {
+            [DataValues(0x010022A8u, 0x06004A07u, 0x08001947u, 0x0A0005ACu, 0x33000421u)]
+            uint fileId
+        ) {
             using var tree = new DatBTreeReaderWriter(new MemoryMappedBlockAllocator(new DatDatabaseOptions() {
                 FilePath = EORCommonData.GetDatPath(EORDBType.Portal)
             }));
@@ -422,8 +415,9 @@ namespace DatReaderWriter.Tests.IO.DatBTree {
         [TestCategory("EOR")]
         [CombinatorialData]
         public void HasKnownEORCellFiles(
-            [DataValues(0x040FFFFFu, 0xFEFBFFFFu, 0x0001FFFEu, 0x9682FFFEu, 0x00010100u, 0x5644012Bu)] uint fileId
-            ) {
+            [DataValues(0x040FFFFFu, 0xFEFBFFFFu, 0x0001FFFEu, 0x9682FFFEu, 0x00010100u, 0x5644012Bu)]
+            uint fileId
+        ) {
             using var tree = new DatBTreeReaderWriter(new MemoryMappedBlockAllocator(new DatDatabaseOptions() {
                 FilePath = EORCommonData.GetDatPath(EORDBType.Cell)
             }));
@@ -439,8 +433,9 @@ namespace DatReaderWriter.Tests.IO.DatBTree {
         [TestCategory("EOR")]
         [CombinatorialData]
         public void DoesntFindInvalidPortalEntries(
-            [DataValues(0x06001C4Cu, 0x04001737u, 0x0A000999u)] uint fileId
-            ) {
+            [DataValues(0x06001C4Cu, 0x04001737u, 0x0A000999u)]
+            uint fileId
+        ) {
             using var tree = new DatBTreeReaderWriter(new MemoryMappedBlockAllocator(new DatDatabaseOptions() {
                 FilePath = EORCommonData.GetDatPath(EORDBType.Portal)
             }));
@@ -454,8 +449,9 @@ namespace DatReaderWriter.Tests.IO.DatBTree {
         [TestCategory("EOR")]
         [CombinatorialData]
         public void DoesntFindInvalidCellEntries(
-            [DataValues(0xFFFFFFFFu, 0xFCFCFFFEu, 0x00010088u)] uint fileId
-            ) {
+            [DataValues(0xFFFFFFFFu, 0xFCFCFFFEu, 0x00010088u)]
+            uint fileId
+        ) {
             using var tree = new DatBTreeReaderWriter(new MemoryMappedBlockAllocator(new DatDatabaseOptions() {
                 FilePath = EORCommonData.GetDatPath(EORDBType.Cell)
             }));
@@ -485,8 +481,9 @@ namespace DatReaderWriter.Tests.IO.DatBTree {
         [TestCategory("EOR")]
         [CombinatorialData]
         public void CanIterateOverEORDatsInSortedFileOrder(
-            [DataValues(EORDBType.Portal, EORDBType.Cell, EORDBType.Local, EORDBType.HighRes)] EORDBType dbType
-            ) {
+            [DataValues(EORDBType.Portal, EORDBType.Cell, EORDBType.Local, EORDBType.HighRes)]
+            EORDBType dbType
+        ) {
             return;
 
             using var tree = new DatBTreeReaderWriter(new MemoryMappedBlockAllocator(new DatDatabaseOptions() {
@@ -496,7 +493,8 @@ namespace DatReaderWriter.Tests.IO.DatBTree {
             var fileCount = 0;
             var lastFile = 0u;
             foreach (var fileEntry in tree) {
-                Assert.IsTrue(lastFile < fileEntry.Id, $"Current file {fileEntry.Id:X8} should be less than previous file {lastFile:X8}");
+                Assert.IsTrue(lastFile < fileEntry.Id,
+                    $"Current file {fileEntry.Id:X8} should be less than previous file {lastFile:X8}");
 
                 lastFile = fileEntry.Id;
                 fileCount++;
@@ -509,8 +507,9 @@ namespace DatReaderWriter.Tests.IO.DatBTree {
         [TestCategory("EOR")]
         [CombinatorialData]
         public void CanIterateOverRetailDatsWithoutDoubleEntryReading(
-            [DataValues(EORDBType.Portal, EORDBType.Cell, EORDBType.Local, EORDBType.HighRes)] EORDBType dbType
-            ) {
+            [DataValues(EORDBType.Portal, EORDBType.Cell, EORDBType.Local, EORDBType.HighRes)]
+            EORDBType dbType
+        ) {
             return;
 
             using var tree = new DatBTreeReaderWriter(new MemoryMappedBlockAllocator(new DatDatabaseOptions() {
@@ -519,11 +518,13 @@ namespace DatReaderWriter.Tests.IO.DatBTree {
 
             var knownFiles = new Dictionary<uint, bool>();
             foreach (var fileEntry in tree) {
-                Assert.IsFalse(knownFiles.ContainsKey(fileEntry.Id), $"Current file {fileEntry.Id:X8} was already iterated over");
+                Assert.IsFalse(knownFiles.ContainsKey(fileEntry.Id),
+                    $"Current file {fileEntry.Id:X8} was already iterated over");
 
                 knownFiles.Add(fileEntry.Id, true);
             }
         }
+
         #endregion
     }
 }
