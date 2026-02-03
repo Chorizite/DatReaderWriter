@@ -17,7 +17,7 @@ namespace DatReaderWriter.Lib.IO.BlockAllocators {
         private readonly FileStream _datStream;
         private readonly SemaphoreSlim _mmLock = new(1, 1);
         private MemoryMappedFile _mappedFile;
-        private MemoryMappedViewAccessor _view;
+        private MemoryMappedViewAccessor? _view;
         private byte* _viewPtr;
 
         /// <summary>

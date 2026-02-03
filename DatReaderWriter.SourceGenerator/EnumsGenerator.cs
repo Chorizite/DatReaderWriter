@@ -16,6 +16,8 @@ namespace DatReaderWriter.SourceGenerator {
 
                 var writer = new SourceWriter();
                 var enumDef = kv.Value;
+                writer.WriteLine("#nullable enable");
+                writer.WriteWarningPragmas();
 
                 writer.WriteLine("using System;");
                 writer.WriteLine("namespace DatReaderWriter.Enums {");

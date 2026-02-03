@@ -10,7 +10,7 @@ namespace DatReaderWriter.Types {
     /// </summary>
     /// <typeparam name="TKey"></typeparam>
     /// <typeparam name="TValue"></typeparam>
-    public class PackableHashTable<TKey, TValue> : Dictionary<TKey, TValue>, IUnpackable, IPackable {
+    public class PackableHashTable<TKey, TValue> : Dictionary<TKey, TValue>, IUnpackable, IPackable where TKey : notnull {
         /// <summary>
         /// The size of the hash table buckets.
         /// </summary>

@@ -40,7 +40,7 @@ namespace DatReaderWriter.SourceGenerator {
                         "Generator Running",
                         "DatsSourceGenerator is running. Content length: {0}",
                         "SourceGenerator",
-                        DiagnosticSeverity.Warning,
+                        DiagnosticSeverity.Info,
                         true),
                     Location.None,
                     content?.Length ?? -1));

@@ -38,7 +38,7 @@ namespace DatReaderWriter.Types {
             for (var i = 0; i < _numMedia; i++) {
                 var _peekedValue = (MediaType)reader.ReadInt32();
                 reader.Skip(-sizeof(MediaType));
-                Media.Add(MediaDesc.Unpack(reader, _peekedValue));
+                Media.Add(MediaDesc.Unpack(reader, _peekedValue)!);
             }
             return true;
         }

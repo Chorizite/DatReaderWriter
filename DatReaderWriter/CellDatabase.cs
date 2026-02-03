@@ -1,15 +1,7 @@
-﻿using DatReaderWriter.DBObjs;
-using DatReaderWriter.Enums;
-using DatReaderWriter.Lib;
+﻿using DatReaderWriter.Enums;
 using DatReaderWriter.Lib.IO.BlockAllocators;
 using DatReaderWriter.Options;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace DatReaderWriter {
     /// <summary>

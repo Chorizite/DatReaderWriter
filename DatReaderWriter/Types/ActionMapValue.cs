@@ -31,7 +31,7 @@ namespace DatReaderWriter.Types {
         /// </summary>
         public uint DummyListLength { get; set; }
 
-        public UserBindingData UserBinding { get; set; }
+        public UserBindingData UserBinding { get; set; } = new();
 
         /// <inheritdoc />
         public bool Unpack(DatBinReader reader) {

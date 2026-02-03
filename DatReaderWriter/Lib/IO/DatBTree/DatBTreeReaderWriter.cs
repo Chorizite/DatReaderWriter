@@ -776,7 +776,7 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
                     else {
                         Debug.Assert(rightSibling != null, "Node should have at least one sibling");
                         childNode.Files.Add(parentNode.Files[subtreeIndexInNode]);
-                        childNode.Files.AddRange(rightSibling.Files);
+                        childNode.Files.AddRange(rightSibling!.Files);
                         if (!rightSibling.IsLeaf) {
                             childNode.Branches.AddRange(rightSibling.Branches);
                         }

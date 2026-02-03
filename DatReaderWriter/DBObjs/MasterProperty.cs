@@ -21,7 +21,7 @@ namespace DatReaderWriter.DBObjs {
         /// <inheritdoc />
         public override DBObjType DBObjType => DBObjType.MasterProperty;
 
-        public EnumMapperData EnumMapper;
+        public EnumMapperData EnumMapper = new();
 
         public Dictionary<uint, BasePropertyDesc> Properties = [];
 

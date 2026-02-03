@@ -743,7 +743,7 @@ namespace DatReaderWriter.SourceGenerator {
             }
         }
 
-        public void GenerateWriterContents(SourceWriter writer, ACBaseModel model, int depth, ACBaseModel parent = null,
+        public void GenerateWriterContents(SourceWriter writer, ACBaseModel model, int depth, ACBaseModel? parent = null,
             string pre = "") {
             switch (model) {
                 case ACDataMember member:

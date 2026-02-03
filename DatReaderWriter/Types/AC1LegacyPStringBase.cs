@@ -88,8 +88,12 @@ namespace DatReaderWriter.Types {
             return true;
         }
 
+        public override int GetHashCode() {
+            return base.GetHashCode();
+        }
+
         /// <inheritdoc />
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj is null) {
                 return false;

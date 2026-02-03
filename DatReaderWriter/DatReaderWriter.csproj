@@ -9,8 +9,9 @@
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<IsPackable>True</IsPackable>
 		<OutputPath>..\bin\</OutputPath>
-		<NoWarn>1591</NoWarn>
+		<NoWarn>1591;CS1711;CS0169</NoWarn>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <Nullable>enable</Nullable>
 	</PropertyGroup>
 
 	<PropertyGroup>

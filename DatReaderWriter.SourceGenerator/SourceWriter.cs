@@ -64,5 +64,14 @@ namespace DatReaderWriter.SourceGenerator {
                 _writer.Unindent();
             }
         }
+
+        public void WriteWarningPragmas() {
+            WriteLine("#pragma warning disable CS8618");
+            WriteLine("#pragma warning disable CS8602");
+            WriteLine("#pragma warning disable CS8604");
+            WriteLine("#pragma warning disable CS0414");
+            WriteLine("#pragma warning disable CS8601");
+            
+        }
     }
 }
