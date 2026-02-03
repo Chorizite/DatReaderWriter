@@ -6,6 +6,7 @@ using DatReaderWriter.Lib.IO;
 using DatReaderWriter.Lib.IO.BlockAllocators;
 using DatReaderWriter.Lib.IO.DatBTree;
 using System;
+using System.IO;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -155,14 +156,26 @@ namespace DatReaderWriter {
 #endif
             var (success, fileEntry) = await Tree.TryGetFileAsync(fileId, ct);
             if (success) {
-                var bytes = new byte[fileEntry.Size];
-                await BlockAllocator.ReadBlockAsync(bytes, fileEntry.Offset, ct);
+                var size = (int)fileEntry.Size;
+                var buffer = BaseBlockAllocator.SharedBytes.Rent(size);
+                try {
+                    await BlockAllocator.ReadBlockAsync(buffer, fileEntry.Offset, ct);
 
-                if (fileEntry.Flags.HasFlag(DatBTreeFileFlags.IsCompressed)) {
-                    bytes = Decompress(bytes);
+                    if (fileEntry.Flags.HasFlag(DatBTreeFileFlags.IsCompressed)) {
+                        var uncompressedSize = BitConverter.ToUInt32(buffer, 0);
+                        var decompressedBytes = new byte[uncompressedSize];
+                        Decompress(buffer.AsSpan(0, size), decompressedBytes);
+                        return (true, decompressedBytes);
+                    }
+                    else {
+                        var bytes = new byte[size];
+                        buffer.AsSpan(0, size).CopyTo(bytes);
+                        return (true, bytes);
+                    }
                 }
-
-                return (true, bytes);
+                finally {
+                    BaseBlockAllocator.SharedBytes.Return(buffer);
+                }
             }
 
             return (false, null);
@@ -175,17 +188,79 @@ namespace DatReaderWriter {
         /// <param name="bytes">The raw bytes (ref: potentially resized or updated)</param>
         /// <param name="bytesRead">The number of bytes read</param>
         /// <returns>True if the file was found, false otherwise</returns>
+        public bool TryGetFileBytes(uint fileId, Span<byte> bytes, out int bytesRead) {
+            if (Tree.TryGetFile(fileId, out var fileEntry)) {
+                bytesRead = (int)fileEntry.Size;
+
+                // If the caller provided buffer is too small, we can't do much but fail or read what fits?
+                // The pattern (out bytesRead) usually implies we read up to fit.
+                // But DatBinReader expects full file. 
+                // Let's assume we try to read full file.
+
+                var size = (int)fileEntry.Size;
+                var buffer = BaseBlockAllocator.SharedBytes.Rent(size);
+                try {
+                    BlockAllocator.ReadBlock(buffer, fileEntry.Offset);
+
+                    if (fileEntry.Flags.HasFlag(DatBTreeFileFlags.IsCompressed)) {
+                        // We need uncompressed size to know if 'bytes' is big enough?
+                        // Decompress will throw or fail if dest is too small?
+                        // Decompress now takes Span, so it will fill what it can.
+                        bytesRead = Decompress(buffer.AsSpan(0, size), bytes);
+                    }
+                    else {
+                        var toRead = Math.Min(bytes.Length, size);
+                        buffer.AsSpan(0, toRead).CopyTo(bytes);
+                        bytesRead = toRead;
+                    }
+
+                    return true;
+                }
+                finally {
+                    BaseBlockAllocator.SharedBytes.Return(buffer);
+                }
+            }
+
+            bytesRead = 0;
+            return false;
+        }
+
+        /// <summary>
+        /// Get the raw bytes of a file entry, this is never cached.
+        /// </summary>
+        /// <param name="fileId">The id of the file to get</param>
+        /// <param name="bytes">The raw bytes (ref: potentially resized or updated)</param>
+        /// <param name="bytesRead">The number of bytes read</param>
+        /// <returns>True if the file was found, false otherwise</returns>
         public bool TryGetFileBytes(uint fileId, ref byte[] bytes, out int bytesRead) {
             if (Tree.TryGetFile(fileId, out var fileEntry)) {
                 bytesRead = (int)fileEntry.Size;
-                BlockAllocator.ReadBlock(bytes, fileEntry.Offset);
-
-                if (fileEntry.Flags.HasFlag(DatBTreeFileFlags.IsCompressed)) {
-                    bytes = Decompress(bytes.Take(bytesRead).ToArray());
-                    bytesRead = bytes.Length;
+                if (bytes.Length < bytesRead) {
+                    Array.Resize(ref bytes, bytesRead);
                 }
 
-                return true;
+                var size = (int)fileEntry.Size;
+                var buffer = BaseBlockAllocator.SharedBytes.Rent(size);
+                try {
+                    BlockAllocator.ReadBlock(buffer, fileEntry.Offset);
+
+                    if (fileEntry.Flags.HasFlag(DatBTreeFileFlags.IsCompressed)) {
+                        var uncompressedSize = BitConverter.ToUInt32(buffer, 0);
+                        if (bytes.Length < uncompressedSize) {
+                            Array.Resize(ref bytes, (int)uncompressedSize);
+                        }
+
+                        bytesRead = Decompress(buffer.AsSpan(0, size), bytes.AsSpan());
+                    }
+                    else {
+                        buffer.AsSpan(0, size).CopyTo(bytes);
+                    }
+
+                    return true;
+                }
+                finally {
+                    BaseBlockAllocator.SharedBytes.Return(buffer);
+                }
             }
 
             bytesRead = 0;
@@ -332,12 +407,16 @@ namespace DatReaderWriter {
 
             var size = (int)fileEntry.Size;
             var buffer = BaseBlockAllocator.SharedBytes.Rent(size);
+            byte[]? decompressedBuffer = null;
             try {
                 await BlockAllocator.ReadBlockAsync(buffer, fileEntry.Offset, ct);
 
-                var data = buffer.AsMemory(0, size);
+                Memory<byte> data = buffer.AsMemory(0, size);
                 if (fileEntry.Flags.HasFlag(DatBTreeFileFlags.IsCompressed)) {
-                    data = Decompress(data.ToArray());
+                    var uncompressedSize = BitConverter.ToUInt32(buffer, 0);
+                    decompressedBuffer = BaseBlockAllocator.SharedBytes.Rent((int)uncompressedSize);
+                    var decompressedSize = Decompress(buffer.AsSpan(0, size), decompressedBuffer);
+                    data = decompressedBuffer.AsMemory(0, decompressedSize);
                 }
 
                 var value = Activator.CreateInstance<T>();
@@ -355,6 +434,8 @@ namespace DatReaderWriter {
             }
             finally {
                 BaseBlockAllocator.SharedBytes.Return(buffer);
+                if (decompressedBuffer != null)
+                    BaseBlockAllocator.SharedBytes.Return(decompressedBuffer);
             }
         }
 
@@ -401,48 +482,58 @@ namespace DatReaderWriter {
             // TODO: fix this static 5mb buffer...?
             // we dont know how big the file will be, so we need to make sure we have enough space
             var buffer = BaseBlockAllocator.SharedBytes.Rent(1024 * 1024 * 5);
-            var writer = new DatBinWriter(buffer, this);
+            byte[]? compressedBuffer = null;
+            try {
+                var writer = new DatBinWriter(buffer, this);
 
-            value.Pack(writer);
+                value.Pack(writer);
 
-            var writeData = buffer.Take(writer.Offset).ToArray();
-            if (compress) {
-                writeData = AttemptToCompress(writeData, out var compressed);
-                if (compressed) {
-                    existingFlags |= DatBTreeFileFlags.IsCompressed;
+                byte[] writeData = buffer;
+                int writeLen = writer.Offset;
+
+                if (compress) {
+                    compressedBuffer = BaseBlockAllocator.SharedBytes.Rent(writeLen + 1024);
+                    if (AttemptToCompress(buffer, writeLen, compressedBuffer, out var compressedLen)) {
+                        writeData = compressedBuffer;
+                        writeLen = compressedLen;
+                        existingFlags |= DatBTreeFileFlags.IsCompressed;
+                    }
+                    else {
+                        existingFlags &= ~DatBTreeFileFlags.IsCompressed;
+                    }
                 }
                 else {
                     existingFlags &= ~DatBTreeFileFlags.IsCompressed;
                 }
-            }
-            else {
-                existingFlags &= ~DatBTreeFileFlags.IsCompressed;
-            }
 
-            startingBlockId = Tree.BlockAllocator.WriteBlock(writeData, writeData.Length, startingBlockId);
+                startingBlockId = Tree.BlockAllocator.WriteBlock(writeData, writeLen, startingBlockId);
 
-            var newIteration = iteration ?? existingIteration;
-            var newEntry = new DatBTreeFile {
-                Flags = existingFlags,
-                Version = existingVersion,
-                Id = value.Id,
-                Size = (uint)writeData.Length,
-                Offset = startingBlockId,
-                Date = DateTime.UtcNow,
-                Iteration = newIteration
-            };
-            Tree.Insert(newEntry);
+                var newIteration = iteration ?? existingIteration;
+                var newEntry = new DatBTreeFile {
+                    Flags = existingFlags,
+                    Version = existingVersion,
+                    Id = value.Id,
+                    Size = (uint)writeLen,
+                    Offset = startingBlockId,
+                    Date = DateTime.UtcNow,
+                    Iteration = newIteration
+                };
+                Tree.Insert(newEntry);
 
-            // update dat iteration if needed
-            if (newIteration > Iteration.CurrentIteration) {
-                Iteration.CurrentIteration = newIteration;
-                var iterationUpdateRes = TryWriteFile(Iteration);
-                if (!iterationUpdateRes) {
-                    return iterationUpdateRes.Error ?? "Failed to update dat iteration.";
+                // update dat iteration if needed
+                if (newIteration > Iteration.CurrentIteration) {
+                    Iteration.CurrentIteration = newIteration;
+                    var iterationUpdateRes = TryWriteFile(Iteration);
+                    if (!iterationUpdateRes) {
+                        return iterationUpdateRes.Error ?? "Failed to update dat iteration.";
+                    }
                 }
             }
-
-            BaseBlockAllocator.SharedBytes.Return(buffer);
+            finally {
+                BaseBlockAllocator.SharedBytes.Return(buffer);
+                if (compressedBuffer != null)
+                    BaseBlockAllocator.SharedBytes.Return(compressedBuffer);
+            }
 
             if (_fileCache.ContainsKey(value.Id)) {
                 _fileCache[value.Id] = value;
@@ -511,49 +602,58 @@ namespace DatReaderWriter {
 
             // TODO: fix this static 5mb buffer...?
             var buffer = BaseBlockAllocator.SharedBytes.Rent(1024 * 1024 * 5);
-            var writer = new DatBinWriter(buffer, this);
+            byte[]? compressedBuffer = null;
+            try {
+                var writer = new DatBinWriter(buffer, this);
 
-            value.Pack(writer);
+                value.Pack(writer);
 
-            var writeData = buffer.Take(writer.Offset).ToArray();
-            if (compress) {
-                writeData = AttemptToCompress(writeData, out var compressed);
-                if (compressed) {
-                    existingFlags |= DatBTreeFileFlags.IsCompressed;
+                byte[] writeData = buffer;
+                int writeLen = writer.Offset;
+
+                if (compress) {
+                    compressedBuffer = BaseBlockAllocator.SharedBytes.Rent(writeLen + 1024);
+                    if (AttemptToCompress(buffer, writeLen, compressedBuffer, out var compressedLen)) {
+                        writeData = compressedBuffer;
+                        writeLen = compressedLen;
+                        existingFlags |= DatBTreeFileFlags.IsCompressed;
+                    }
+                    else {
+                        existingFlags &= ~DatBTreeFileFlags.IsCompressed;
+                    }
                 }
                 else {
                     existingFlags &= ~DatBTreeFileFlags.IsCompressed;
                 }
-            }
-            else {
-                existingFlags &= ~DatBTreeFileFlags.IsCompressed;
-            }
 
-            startingBlockId = await BlockAllocator.WriteBlockAsync(writeData, writeData.Length, startingBlockId, ct);
+                startingBlockId = await BlockAllocator.WriteBlockAsync(writeData, writeLen, startingBlockId, ct);
 
-            var newIteration = iteration ?? existingIteration;
-            var newEntry = new DatBTreeFile {
-                Flags = existingFlags,
-                Version = existingVersion,
-                Id = value.Id,
-                Size = (uint)writeData.Length,
-                Offset = startingBlockId,
-                Date = DateTime.UtcNow,
-                Iteration = newIteration
-            };
-            await Tree.InsertAsync(newEntry, ct);
+                var newIteration = iteration ?? existingIteration;
+                var newEntry = new DatBTreeFile {
+                    Flags = existingFlags,
+                    Version = existingVersion,
+                    Id = value.Id,
+                    Size = (uint)writeLen,
+                    Offset = startingBlockId,
+                    Date = DateTime.UtcNow,
+                    Iteration = newIteration
+                };
+                await Tree.InsertAsync(newEntry, ct);
 
-            // update dat iteration if needed
-            if (newIteration > Iteration.CurrentIteration) {
-                Iteration.CurrentIteration = newIteration;
-                var iterationUpdateRes = await TryWriteFileAsync(Iteration, null, ct);
-                if (!iterationUpdateRes) {
-                    BaseBlockAllocator.SharedBytes.Return(buffer);
-                    return iterationUpdateRes.Error ?? "Failed to update dat iteration.";
+                // update dat iteration if needed
+                if (newIteration > Iteration.CurrentIteration) {
+                    Iteration.CurrentIteration = newIteration;
+                    var iterationUpdateRes = await TryWriteFileAsync(Iteration, null, ct);
+                    if (!iterationUpdateRes) {
+                        return iterationUpdateRes.Error ?? "Failed to update dat iteration.";
+                    }
                 }
             }
-
-            BaseBlockAllocator.SharedBytes.Return(buffer);
+            finally {
+                BaseBlockAllocator.SharedBytes.Return(buffer);
+                if (compressedBuffer != null)
+                    BaseBlockAllocator.SharedBytes.Return(compressedBuffer);
+            }
 
             if (_fileCache.ContainsKey(value.Id)) {
                 _fileCache[value.Id] = value;
@@ -600,27 +700,38 @@ namespace DatReaderWriter {
                 existingVersion = existingFile.Version;
             }
 
-            var writeData = buffer.Take(bytesToWrite).ToArray();
-            if (compress) {
-                writeData = AttemptToCompress(writeData, out var compressed);
-                if (compressed) {
-                    existingFlags |= DatBTreeFileFlags.IsCompressed;
+            byte[] writeData = buffer;
+            int writeLen = bytesToWrite;
+            byte[]? compressedBuffer = null;
+
+            try {
+                if (compress) {
+                    compressedBuffer = BaseBlockAllocator.SharedBytes.Rent(writeLen + 1024);
+                    if (AttemptToCompress(buffer, writeLen, compressedBuffer, out var compressedLen)) {
+                        writeData = compressedBuffer;
+                        writeLen = compressedLen;
+                        existingFlags |= DatBTreeFileFlags.IsCompressed;
+                    }
+                    else {
+                        existingFlags &= ~DatBTreeFileFlags.IsCompressed;
+                    }
                 }
                 else {
                     existingFlags &= ~DatBTreeFileFlags.IsCompressed;
                 }
-            }
-            else {
-                existingFlags &= ~DatBTreeFileFlags.IsCompressed;
-            }
 
-            startingBlockId = Tree.BlockAllocator.WriteBlock(writeData, writeData.Length, startingBlockId);
+                startingBlockId = Tree.BlockAllocator.WriteBlock(writeData, writeLen, startingBlockId);
+            }
+            finally {
+                if (compressedBuffer != null)
+                    BaseBlockAllocator.SharedBytes.Return(compressedBuffer);
+            }
 
             var newEntry = new DatBTreeFile() {
                 Flags = existingFlags,
                 Version = existingVersion,
                 Id = id,
-                Size = (uint)writeData.Length,
+                Size = (uint)writeLen,
                 Offset = startingBlockId,
                 Date = DateTime.UtcNow,
                 Iteration = iteration
@@ -738,57 +849,85 @@ namespace DatReaderWriter {
             return true;
         }
 
-        private byte[] AttemptToCompress(byte[] data, out bool compressed) {
-            compressed = false;
-            if (data.Length < 16) return data;
+        private bool AttemptToCompress(byte[] data, int validLen, byte[] dest, out int destLen) {
+            destLen = 0;
+            if (validLen < 16) return false;
 
 #if (NET8_0_OR_GREATER)
-            using System.IO.MemoryStream outputStream = new System.IO.MemoryStream();
+            using var outputStream = new System.IO.MemoryStream(dest);
+            // Reserve 4 bytes for size
+            outputStream.Position = 4;
 
-            using ZLibStream zlibStream = new ZLibStream(outputStream, CompressionLevel.SmallestSize, true);
-            zlibStream.Write(data, 0, data.Length);
-
-            return outputStream.Length + 4 < data.Length ? outputStream.ToArray() : data;
-#else
-            var destSize = (int)(data.Length * 1.1) + 12;
-            var dest = new byte[destSize];
-            var zlib = new ZLibDotNet.ZLib();
-            if (zlib.Compress(dest, out int destLen, data, data.Length, 9) == 0) {
-                if (destLen + 4 < data.Length) {
-                    compressed = true;
-                    var result = new byte[destLen + 4];
-                    
-                    var writer = new DatBinWriter(result);
-                    writer.WriteUInt32((uint)data.Length);
-                    writer.WriteBytes(dest, destLen);
-                    return result;
-                }
+            using (var zlibStream = new ZLibStream(outputStream, CompressionLevel.SmallestSize, true)) {
+                zlibStream.Write(data, 0, validLen);
             }
+
+            var compressedLen = (int)outputStream.Position;
+            if (compressedLen < validLen) {
+                // Write size at beginning
+                System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(dest.AsSpan(0, 4), (uint)validLen);
+                destLen = compressedLen;
+                return true;
+            }
+
+            return false;
+#else
+            var zlib = new ZLibDotNet.ZLib();
+            // Use temp buffer to avoid offset complexity with unknown API
+            var tempDest = new byte[dest.Length];
+            int zlibLen;
+            if (zlib.Compress(tempDest, out zlibLen, data, validLen, 9) == 0) {
+                 if (zlibLen + 4 < validLen) {
+                     Array.Copy(tempDest, 0, dest, 4, zlibLen);
+                     System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(dest.AsSpan(0, 4), (uint)validLen);
+                     destLen = zlibLen + 4;
+                     return true;
+                 }
+            }
+            return false;
+#endif
+        }
+
+        private byte[] AttemptToCompress(byte[] data, out bool compressed) {
+            compressed = false;
+            var dest = new byte[(int)(data.Length * 1.1) + 12];
+            if (AttemptToCompress(data, data.Length, dest, out var len)) {
+                compressed = true;
+                return dest.AsSpan(0, len).ToArray();
+            }
+
             return data;
+        }
+
+        private int Decompress(ReadOnlySpan<byte> data, Span<byte> destination) {
+            if (data.Length < 4) {
+                data.CopyTo(destination);
+                return data.Length;
+            }
+
+            var uncompressedSize = System.Buffers.Binary.BinaryPrimitives.ReadUInt32LittleEndian(data);
+
+#if (NET8_0_OR_GREATER)
+            using var outputStream = new System.IO.MemoryStream(data.Slice(4).ToArray());
+            using var zlibStream = new ZLibStream(outputStream, CompressionMode.Decompress);
+            return zlibStream.Read(destination);
+#else
+            var zlib = new ZLibDotNet.ZLib();
+            var dataArray = data.ToArray(); 
+            var destArray = new byte[destination.Length]; 
+            int outSize;
+            zlib.Uncompress(destArray, out outSize, dataArray.AsSpan(4).ToArray(), out _);
+            destArray.AsSpan(0, outSize).CopyTo(destination);
+            return outSize;
 #endif
         }
 
         private byte[] Decompress(byte[] data) {
             if (data.Length < 4) return data;
-            
-            var reader = new DatBinReader(data);
-            var uncompressedSize = reader.ReadUInt32();
-            var compressedData = data.AsSpan(4);
+            var uncompressedSize = BitConverter.ToUInt32(data, 0);
             var dest = new byte[uncompressedSize];
-
-#if (NET8_0_OR_GREATER)
-            using var outputStream = new System.IO.MemoryStream(compressedData.ToArray());
-            using var zlibStream = new ZLibStream(outputStream, CompressionLevel.SmallestSize, true);
-            _ = zlibStream.Read(dest, 0, data.Length - 4);
+            Decompress(data.AsSpan(), dest);
             return dest;
-#else
-            var zlib = new ZLibDotNet.ZLib();
-            if (zlib.Uncompress(dest, out _, compressedData, out _) == 0) {
-                return dest;
-            }
-
-            return data;
-#endif
         }
 
         /// <inheritdoc/>
