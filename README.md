@@ -32,6 +32,8 @@ Install the `Chorizite.DatReaderWriter` package from NuGet:
 dotnet add package Chorizite.DatReaderWriter
 ```
 
+*Note:* If you want some helpers for writing dats, with an easier interface, use the `Chorizite.DatReaderWriter.Extensions` nuget package. You can find details [here](https://github.com/Chorizite/DatReaderWriter.Extensions).
+
 ## Core Concepts
 
 ### DatCollection
@@ -127,81 +129,6 @@ foreach (var id in motionTableIds) {
         // Write the updated MotionTable back
         dats.TryWriteFile(mTable);
     }
-}
-```
-
-### Add a new title
-```cs
-static void Main(string[] args)
-{
-    // new title info
-    var enumId = "ID_CharacterTitle_MyNewTitle";
-    var titleString = "My New Title";
-    
-    // open the dat collection in write mode
-    var dats = new DatCollection(@"C:\Turbine\Asheron's Call\", DatAccessType.ReadWrite);
-
-    // load the relevant string table and enum mapper
-    if (!dats.TryGet<StringTable>(0x2300000E, out var stringTableTitles))
-    {
-        throw new Exception($"Failed to get titles StringTable 0x2300000E");
-    }
-
-    if (!dats.TryGet<EnumMapper>(0x22000041, out var enumTitles))
-    {
-        throw new  Exception($"Failed to get titles enum mapper 0x22000041");
-    }
-    
-    // check if the enum already exists
-    if (enumTitles.IdToStringMap.ContainsValue(enumId)) 
-    {
-        var existingId = enumTitles.IdToStringMap.First(kv => kv.Value == enumId).Key;
-        Console.WriteLine($"Enum ID '{enumId}' already exists with key {existingId}.");
-        return;
-    }
-    
-    // first we add a new enum mapper for the new title, at the next available ID
-    var newEnumId = enumTitles.IdToStringMap.Keys.Max() + 1;
-    enumTitles.IdToStringMap[newEnumId] = enumId;
-    
-    // now we compute the hash based on the enum string, and add it to the string table
-    var newEnumHash = ComputeHash(enumId);
-    stringTableTitles.StringTableData[newEnumHash] = new StringTableData()
-    {
-        Strings = [titleString]
-    };
-    
-    // save the changes back to the dats (no iteration increase, just overwrite)
-    if (!dats.Portal.TryWriteFile(enumTitles) || !dats.Local.TryWriteFile(stringTableTitles))
-    {
-        Console.WriteLine("Failed to write updates back to dat.");
-        return;
-    }
-    
-    dats.Dispose();
-    
-    Console.WriteLine($"Added new title enum {newEnumId} with hash {newEnumHash:X8} and string '{titleString}'");
-}
-
-public static uint ComputeHash(string strToHash)
-{
-    long result = 0;
-
-    if (strToHash.Length > 0)
-    {
-        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-        byte[] str = Encoding.GetEncoding(1252).GetBytes(strToHash);
-
-        foreach (sbyte c in str)                
-        {
-            result = c + (result << 4);
-
-            if ((result & 0xF0000000) != 0)
-                result = (result ^ ((result & 0xF0000000) >> 24)) & 0x0FFFFFFF;
-        }
-    }
-
-    return (uint)result;
 }
 ```
 

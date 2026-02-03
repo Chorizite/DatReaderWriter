@@ -1,5 +1,4 @@
 ﻿using DatReaderWriter.Lib.Extensions;
-using DatReaderWriter.Lib.IO;
 using System;
 using System.Text;
 
@@ -15,9 +14,14 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
         public static readonly int SIZE = 24;
 
         /// <summary>
-        /// Some kind of flags?
+        /// Flags for this file entry
         /// </summary>
-        public uint Flags { get; set; }
+        public DatBTreeFileFlags Flags { get; set; }
+
+        /// <summary>
+        /// The version of this file entry
+        /// </summary>
+        public ushort Version { get; set; }
 
         /// <summary>
         /// The id of the file this entry points to. These are dat file ids like
@@ -46,16 +50,16 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
         /// </summary>
         public int Iteration { get; set; }
 
-        /// <inheritdoc/>
         public int GetSize() => SIZE;
 
         public DatBTreeFile() {
-            Flags = 0x20000;
+            Flags = 0;
+            Version = 2;
         }
 
-        /// <inheritdoc/>
         public bool Unpack(DatBinReader reader) {
-            Flags = reader.ReadUInt32();
+            Flags = (DatBTreeFileFlags)reader.ReadUInt16();
+            Version = reader.ReadUInt16();
             Id = reader.ReadUInt32();
             Offset = reader.ReadInt32();
             Size = reader.ReadUInt32();
@@ -65,14 +69,9 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
             return true;
         }
 
-        /// <inheritdoc/>
         public bool Pack(DatBinWriter writer) {
-            if (Flags != 0) {
-                writer.WriteUInt32(Flags);
-            }
-            else {
-                writer.WriteUInt32(0x20000);
-            }
+            writer.WriteUInt16((ushort)Flags);
+            writer.WriteUInt16(Version);
             writer.WriteUInt32(Id);
             writer.WriteInt32(Offset);
             writer.WriteUInt32(Size);
@@ -82,12 +81,12 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
             return true;
         }
 
-        /// <inheritdoc/>
         public override string ToString() {
             var str = new StringBuilder();
             str.AppendLine($"DatFileEntry:");
             str.AppendLine($"\t Id: {Id:X8}");
-            str.AppendLine($"\t Flags: {Flags:X8}");
+            str.AppendLine($"\t Flags: {Flags} ({(ushort)Flags:X4})");
+            str.AppendLine($"\t Version: {Version:X4}");
             str.AppendLine($"\t Offset: {Offset:X8}");
             str.AppendLine($"\t Size: {Size:N0}");
             str.AppendLine($"\t Date: {Date}");
