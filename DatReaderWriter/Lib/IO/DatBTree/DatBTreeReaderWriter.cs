@@ -59,11 +59,77 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
             }
         }
 
+        private readonly LRUCache<int, DatBTreeNode> _nodeCache = new(500);
+
+        private class LRUCache<K, V> where K : notnull {
+            private readonly int _capacity;
+            private readonly Dictionary<K, LinkedListNode<(K Key, V Value)>> _cache;
+            private readonly LinkedList<(K Key, V Value)> _lruList;
+
+            public LRUCache(int capacity) {
+                _capacity = capacity;
+                _cache = new Dictionary<K, LinkedListNode<(K Key, V Value)>>(capacity);
+                _lruList = new LinkedList<(K Key, V Value)>();
+            }
+
+#if (NET8_0_OR_GREATER)
+            public bool TryGetValue(K key, [MaybeNullWhen(false)] out V value) {
+#else
+            public bool TryGetValue(K key, out V value) {
+#endif
+                lock (_cache) {
+                    if (_cache.TryGetValue(key, out var node)) {
+                        _lruList.Remove(node);
+                        _lruList.AddLast(node);
+                        value = node.Value.Value;
+                        return true;
+                    }
+                    value = default!;
+                    return false;
+                }
+            }
+
+            public void Add(K key, V value) {
+                lock (_cache) {
+                    if (_cache.TryGetValue(key, out var existingNode)) {
+                        _lruList.Remove(existingNode);
+                        _lruList.AddLast(existingNode);
+                        existingNode.Value = (key, value);
+                    }
+                    else {
+                        if (_cache.Count >= _capacity) {
+                            var first = _lruList.First;
+                            if (first != null) {
+                                _lruList.RemoveFirst();
+                                _cache.Remove(first.Value.Key);
+                            }
+                        }
+                        var newNode = new LinkedListNode<(K Key, V Value)>((key, value));
+                        _lruList.AddLast(newNode);
+                        _cache[key] = newNode;
+                    }
+                }
+            }
+
+            public void Remove(K key) {
+                lock (_cache) {
+                    if (_cache.TryGetValue(key, out var node)) {
+                        _lruList.Remove(node);
+                        _cache.Remove(key);
+                    }
+                }
+            }
+        }
+
 #if (NET8_0_OR_GREATER)
         private bool TryGetNode(int blockOffset, [MaybeNullWhen(false)] out DatBTreeNode result) {
 #else
         private bool TryGetNode(int blockOffset, out DatBTreeNode result) {
 #endif
+            if (_nodeCache.TryGetValue(blockOffset, out result)) {
+                return true;
+            }
+
             var buffer = BaseBlockAllocator.SharedBytes.Rent(DatBTreeNode.SIZE);
 
             BlockAllocator.ReadBlock(buffer, blockOffset);
@@ -71,6 +137,10 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
             var success = result.Unpack(new DatBinReader(buffer));
 
             BaseBlockAllocator.SharedBytes.Return(buffer);
+
+            if (success) {
+                _nodeCache.Add(blockOffset, result);
+            }
 
             return success;
         }
@@ -82,6 +152,10 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
         private async Task<(bool Success, DatBTreeNode? Node)> TryGetNodeAsync(int blockOffset, CancellationToken ct =
  default) {
 #endif
+            if (_nodeCache.TryGetValue(blockOffset, out var cachedResult)) {
+                return (true, cachedResult);
+            }
+
             var buffer = BaseBlockAllocator.SharedBytes.Rent(DatBTreeNode.SIZE);
 
             await BlockAllocator.ReadBlockAsync(buffer, blockOffset, ct);
@@ -89,6 +163,10 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
             var success = result.Unpack(new DatBinReader(buffer));
 
             BaseBlockAllocator.SharedBytes.Return(buffer);
+
+            if (success) {
+                _nodeCache.Add(blockOffset, result);
+            }
 
             return (success, result);
         }
@@ -103,6 +181,7 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
             node.Pack(writer);
             node.Offset = BlockAllocator.WriteBlock(buffer, DatBTreeNode.SIZE, node.Offset);
             BaseBlockAllocator.SharedBytes.Return(buffer);
+            _nodeCache.Add(node.Offset, node);
         }
 
         private async ValueTask WriteNodeAsync(DatBTreeNode node, CancellationToken ct = default) {
@@ -111,6 +190,7 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
             node.Pack(writer);
             node.Offset = await BlockAllocator.WriteBlockAsync(buffer, DatBTreeNode.SIZE, node.Offset, ct);
             BaseBlockAllocator.SharedBytes.Return(buffer);
+            _nodeCache.Add(node.Offset, node);
         }
 
 #if (NET8_0_OR_GREATER)
@@ -507,21 +587,35 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
                 return false;
             }
 
-            var idx = node.Files.FindIndex(f => f.Id == file.Id);
-            if (idx >= 0) {
-                replacedFile = node.Files[idx];
-                node.Files[idx] = file;
-                WriteNode(node);
-                return true;
+            var left = 0;
+            var right = node.Files.Count - 1;
+            var i = 0;
+
+            // binary search on keys
+            while (left <= right) {
+                i = (left + right) / 2;
+                var currentFile = node.Files[i];
+
+                if (file.Id == currentFile.Id) {
+                    replacedFile = currentFile;
+                    node.Files[i] = file;
+                    WriteNode(node);
+                    return true;
+                }
+                else if (file.Id < currentFile.Id)
+                    right = i - 1;
+                else
+                    left = i + 1;
             }
 
             // Search children
             if (!node.IsLeaf) {
-                foreach (var branchOffset in node.Branches) {
-                    if (TryGetNode(branchOffset, out var child)) {
-                        if (TryFindParentAndUpdate(child, file, out replacedFile)) {
-                            return true;
-                        }
+                if (file.Id > node.Files[i].Id)
+                    i++;
+
+                if (i < node.Branches.Count && TryGetNode(node.Branches[i], out var child)) {
+                    if (TryFindParentAndUpdate(child, file, out replacedFile)) {
+                        return true;
                     }
                 }
             }
@@ -541,18 +635,34 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
                 return (false, default);
             }
 
-            var idx = node.Files.FindIndex(f => f.Id == file.Id);
-            if (idx >= 0) {
-                var replaced = node.Files[idx];
-                node.Files[idx] = file;
-                await WriteNodeAsync(node, ct);
-                return (true, replaced);
+            var left = 0;
+            var right = node.Files.Count - 1;
+            var i = 0;
+
+            // binary search on keys
+            while (left <= right) {
+                i = (left + right) / 2;
+                var currentFile = node.Files[i];
+
+                if (file.Id == currentFile.Id) {
+                    var replaced = node.Files[i];
+                    node.Files[i] = file;
+                    await WriteNodeAsync(node, ct);
+                    return (true, replaced);
+                }
+                else if (file.Id < currentFile.Id)
+                    right = i - 1;
+                else
+                    left = i + 1;
             }
 
             // Search children
             if (!node.IsLeaf) {
-                foreach (var branchOffset in node.Branches) {
-                    var (success, child) = await TryGetNodeAsync(branchOffset, ct);
+                if (file.Id > node.Files[i].Id)
+                    i++;
+
+                if (i < node.Branches.Count) {
+                    var (success, child) = await TryGetNodeAsync(node.Branches[i], ct);
                     if (success && child is not null) {
                         var (found, replaced) = await TryFindParentAndUpdateAsync(child, file, ct);
                         if (found) {

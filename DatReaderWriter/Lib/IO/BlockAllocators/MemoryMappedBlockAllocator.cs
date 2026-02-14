@@ -15,7 +15,6 @@ namespace DatReaderWriter.Lib.IO.BlockAllocators {
     /// </summary>
     unsafe public class MemoryMappedBlockAllocator : BaseBlockAllocator {
         private readonly FileStream _datStream;
-        private readonly SemaphoreSlim _mmLock = new(1, 1);
         private MemoryMappedFile _mappedFile;
         private MemoryMappedViewAccessor? _view;
         private byte* _viewPtr;
@@ -45,25 +44,13 @@ namespace DatReaderWriter.Lib.IO.BlockAllocators {
 
         /// <inheritdoc/>
         public override int ReserveBlock() {
-            _mmLock.Wait();
-            try {
-                return base.ReserveBlock();
-            }
-            finally {
-                _mmLock.Release();
-            }
+            return base.ReserveBlock();
         }
 
         /// <inheritdoc/>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override void WriteBytes(byte[] buffer, int byteOffset, int numBytes) {
-            _mmLock.Wait();
-            try {
-                WriteBytesInternal(buffer, byteOffset, numBytes);
-            }
-            finally {
-                _mmLock.Release();
-            }
+            WriteBytesInternal(buffer, byteOffset, numBytes);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -92,47 +79,41 @@ namespace DatReaderWriter.Lib.IO.BlockAllocators {
             int bufferIndex = 0;
             int blockDataSize = Header.BlockSize - 4;
 
-            _mmLock.Wait();
-            try {
-                if (startingBlock <= 0) {
-                    startingBlock = ReserveBlockCore();
-                    currentBlock = startingBlock;
+            if (startingBlock <= 0) {
+                startingBlock = ReserveBlockCore();
+                currentBlock = startingBlock;
+            }
+
+            while (bufferIndex < numBytes) {
+                int size = Math.Min(blockDataSize, numBytes - bufferIndex);
+
+                fixed (byte* dataPtr = &buffer[bufferIndex]) {
+                    // Write data to current block (skip first 4 bytes for next pointer)
+                    Buffer.MemoryCopy(dataPtr, _viewPtr + currentBlock + 4, size, size);
                 }
 
-                while (bufferIndex < numBytes) {
-                    int size = Math.Min(blockDataSize, numBytes - bufferIndex);
+                bufferIndex += size;
 
-                    fixed (byte* dataPtr = &buffer[bufferIndex]) {
-                        // Write data to current block (skip first 4 bytes for next pointer)
-                        Buffer.MemoryCopy(dataPtr, _viewPtr + currentBlock + 4, size, size);
+                // Determine next block
+                int nextBlock;
+                if (bufferIndex < numBytes) {
+                    // Read existing next block pointer
+                    nextBlock = *(int*)(_viewPtr + currentBlock);
+
+                    if (nextBlock <= 0) {
+                        nextBlock = ReserveBlockCore();
                     }
-
-                    bufferIndex += size;
-
-                    // Determine next block
-                    int nextBlock;
-                    if (bufferIndex < numBytes) {
-                        // Read existing next block pointer
-                        nextBlock = *(int*)(_viewPtr + currentBlock);
-
-                        if (nextBlock <= 0) {
-                            nextBlock = ReserveBlockCore();
-                        }
-                    }
-                    else {
-                        nextBlock = 0;
-                    }
-
-                    // Write next block pointer
-                    *(int*)(_viewPtr + currentBlock) = nextBlock;
-                    currentBlock = nextBlock;
+                }
+                else {
+                    nextBlock = 0;
                 }
 
-                WriteHeader();
+                // Write next block pointer
+                *(int*)(_viewPtr + currentBlock) = nextBlock;
+                currentBlock = nextBlock;
             }
-            finally {
-                _mmLock.Release();
-            }
+
+            WriteHeader();
 
             return startingBlock;
         }
@@ -147,47 +128,34 @@ namespace DatReaderWriter.Lib.IO.BlockAllocators {
         /// <inheritdoc/>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override void ReadBytes(byte[] buffer, int bufferOffset, int byteOffset, int numBytes) {
-            _mmLock.Wait();
-            try {
-                fixed (byte* bufferPtr = &buffer[bufferOffset]) {
-                    Buffer.MemoryCopy(_viewPtr + byteOffset, bufferPtr, numBytes, numBytes);
-                }
-            }
-            finally {
-                _mmLock.Release();
+            fixed (byte* bufferPtr = &buffer[bufferOffset]) {
+                Buffer.MemoryCopy(_viewPtr + byteOffset, bufferPtr, numBytes, numBytes);
             }
         }
 
-        /// <inheritdoc/>
         /// <inheritdoc/>
         public override void ReadBlock(byte[] buffer, int startingBlock) {
             int bufferOffset = 0;
             int blockDataSize = Header.BlockSize - 4;
             int bufferLength = buffer.Length;
 
-            _mmLock.Wait();
-            try {
-                fixed (byte* bufferPtr = buffer) {
-                    while (startingBlock != 0 && bufferOffset < bufferLength) {
-                        int bytesToRead = Math.Min(blockDataSize, bufferLength - bufferOffset);
+            fixed (byte* bufferPtr = buffer) {
+                while (startingBlock != 0 && bufferOffset < bufferLength) {
+                    int bytesToRead = Math.Min(blockDataSize, bufferLength - bufferOffset);
 
-                        // Copy data from block (skip first 4 bytes)
-                        Buffer.MemoryCopy(_viewPtr + startingBlock + 4, bufferPtr + bufferOffset, bytesToRead,
-                            bytesToRead);
+                    // Copy data from block (skip first 4 bytes)
+                    Buffer.MemoryCopy(_viewPtr + startingBlock + 4, bufferPtr + bufferOffset, bytesToRead,
+                        bytesToRead);
 
-                        bufferOffset += bytesToRead;
+                    bufferOffset += bytesToRead;
 
-                        if (bufferOffset >= bufferLength) {
-                            return;
-                        }
-
-                        // Read next block pointer directly
-                        startingBlock = *(int*)(_viewPtr + startingBlock);
+                    if (bufferOffset >= bufferLength) {
+                        return;
                     }
+
+                    // Read next block pointer directly
+                    startingBlock = *(int*)(_viewPtr + startingBlock);
                 }
-            }
-            finally {
-                _mmLock.Release();
             }
         }
 
@@ -206,15 +174,9 @@ namespace DatReaderWriter.Lib.IO.BlockAllocators {
         public override bool TryGetBlockOffsets(int startingBlock, out List<int> fileBlocks) {
             fileBlocks = new List<int>();
 
-            _mmLock.Wait();
-            try {
-                while (startingBlock != 0) {
-                    fileBlocks.Add(startingBlock);
-                    startingBlock = *(int*)(_viewPtr + startingBlock);
-                }
-            }
-            finally {
-                _mmLock.Release();
+            while (startingBlock != 0) {
+                fileBlocks.Add(startingBlock);
+                startingBlock = *(int*)(_viewPtr + startingBlock);
             }
 
             return true;
@@ -287,7 +249,6 @@ namespace DatReaderWriter.Lib.IO.BlockAllocators {
                 }
 
                 _datStream.Dispose();
-                _mmLock.Dispose();
             }
         }
     }
