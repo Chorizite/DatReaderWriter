@@ -1,4 +1,4 @@
-﻿using DatReaderWriter.Options;
+using DatReaderWriter.Options;
 using DatReaderWriter.Lib.IO;
 using System;
 using System.Buffers.Binary;
@@ -13,7 +13,6 @@ namespace DatReaderWriter.Lib.IO.BlockAllocators {
     /// </summary>
     public class StreamBlockAllocator : BaseBlockAllocator {
         private readonly FileStream _datStream;
-        private readonly SemaphoreSlim _streamLock = new(1, 1);
 
         /// <summary>
         /// Create a new stream block allocator from an existing dat file.
@@ -38,25 +37,13 @@ namespace DatReaderWriter.Lib.IO.BlockAllocators {
 
         /// <inheritdoc/>
         public override int ReserveBlock() {
-            _streamLock.Wait();
-            try {
-                return base.ReserveBlock();
-            }
-            finally {
-                _streamLock.Release();
-            }
+            return base.ReserveBlock();
         }
 
         /// <inheritdoc/>
         public override void WriteBytes(byte[] buffer, int byteOffset, int numBytes) {
-            _streamLock.Wait();
-            try {
-                WriteBytesInternal(buffer, 0, numBytes);
-                _datStream.Flush();
-            }
-            finally {
-                _streamLock.Release();
-            }
+            WriteBytesInternal(buffer, 0, numBytes);
+            _datStream.Flush();
         }
 
         private void WriteBytesInternal(byte[] buffer, int offset, int count) {
@@ -81,56 +68,45 @@ namespace DatReaderWriter.Lib.IO.BlockAllocators {
             var currentBlock = startingBlock;
             var bufferIndex = 0;
 
-            _streamLock.Wait();
-            try {
-                if (startingBlock <= 0) {
-                    startingBlock = ReserveBlockCore();
-                    currentBlock = startingBlock;
-                }
+            if (startingBlock <= 0) {
+                startingBlock = ReserveBlockCore();
+                currentBlock = startingBlock;
+            }
 
-                while (bufferIndex < numBytes) {
-                    var size = Math.Min(Header.BlockSize - 4, numBytes - bufferIndex);
+            while (bufferIndex < numBytes) {
+                var size = Math.Min(Header.BlockSize - 4, numBytes - bufferIndex);
 
-                    // Write the block data
-                    _datStream.Position = currentBlock + 4;
-                    _datStream.Write(buffer, bufferIndex, size);
+                // Write the block data
+                _datStream.Position = currentBlock + 4;
+                _datStream.Write(buffer, bufferIndex, size);
 
-                    bufferIndex += size;
+                bufferIndex += size;
 
-                    // Prepare next block pointer
-                    var oldOffset = currentBlock;
-                    if (bufferIndex < numBytes) {
-                        _datStream.Position = currentBlock;
-                        _datStream.Read(nextBlockBuffer, 0, 4);
-                        var nextBlock = BinaryPrimitives.ReadInt32LittleEndian(nextBlockBuffer);
+                // Prepare next block pointer
+                var oldOffset = currentBlock;
+                if (bufferIndex < numBytes) {
+                    _datStream.Position = currentBlock;
+                    _datStream.Read(nextBlockBuffer, 0, 4);
+                    var nextBlock = BinaryPrimitives.ReadInt32LittleEndian(nextBlockBuffer);
 
-                        if (nextBlock <= 0) {
-                            // Release lock before reserving new block to avoid deadlock if ReserveBlock needs lock (e.g. for Expand)
-                            // We use ReserveBlockCore which assumes lock is held (or safe to call)
-                            // But ReserveBlockCore calls AllocateEmptyBlocks -> Expand. 
-                            // Expand in StreamBlockAllocator no longer locks.
-                            // So we DO NOT need to release lock IF we use ReserveBlockCore and Expand is lock-free!
-                            currentBlock = ReserveBlockCore();
-                        }
-                        else {
-                            currentBlock = nextBlock;
-                        }
+                    if (nextBlock <= 0) {
+                        currentBlock = ReserveBlockCore();
                     }
                     else {
-                        currentBlock = 0;
+                        currentBlock = nextBlock;
                     }
-
-                    // Write pointer to next block
-                    BinaryPrimitives.WriteInt32LittleEndian(nextBlockBuffer, currentBlock);
-                    _datStream.Position = oldOffset;
-                    _datStream.Write(nextBlockBuffer, 0, 4);
+                }
+                else {
+                    currentBlock = 0;
                 }
 
-                _datStream.Flush();
+                // Write pointer to next block
+                BinaryPrimitives.WriteInt32LittleEndian(nextBlockBuffer, currentBlock);
+                _datStream.Position = oldOffset;
+                _datStream.Write(nextBlockBuffer, 0, 4);
             }
-            finally {
-                _streamLock.Release();
-            }
+
+            _datStream.Flush();
 
             WriteHeader();
             return startingBlock;
@@ -145,63 +121,57 @@ namespace DatReaderWriter.Lib.IO.BlockAllocators {
             var currentBlock = startingBlock;
             var bufferIndex = 0;
 
-            await _streamLock.WaitAsync(ct);
-            try {
-                if (startingBlock <= 0) {
-                    startingBlock = ReserveBlockCore();
-                    currentBlock = startingBlock;
-                }
+            if (startingBlock <= 0) {
+                startingBlock = ReserveBlockCore();
+                currentBlock = startingBlock;
+            }
 
-                while (bufferIndex < numBytes) {
-                    var size = Math.Min(Header.BlockSize - 4, numBytes - bufferIndex);
+            while (bufferIndex < numBytes) {
+                var size = Math.Min(Header.BlockSize - 4, numBytes - bufferIndex);
 
-                    // Write the block data
-                    _datStream.Position = currentBlock + 4;
+                // Write the block data
+                _datStream.Position = currentBlock + 4;
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP
-                    await _datStream.WriteAsync(buffer.AsMemory(bufferIndex, size), ct);
+                await _datStream.WriteAsync(buffer.AsMemory(bufferIndex, size), ct);
 #else
-                    await _datStream.WriteAsync(buffer, bufferIndex, size, ct);
+                await _datStream.WriteAsync(buffer, bufferIndex, size, ct);
 #endif
 
-                    bufferIndex += size;
+                bufferIndex += size;
 
-                    // Prepare next block pointer
-                    var oldOffset = currentBlock;
-                    if (bufferIndex < numBytes) {
-                        _datStream.Position = currentBlock;
+                // Prepare next block pointer
+                var oldOffset = currentBlock;
+                if (bufferIndex < numBytes) {
+                    _datStream.Position = currentBlock;
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP
-                        await _datStream.ReadAsync(nextBlockBuffer.AsMemory(0, 4), ct);
+                    await _datStream.ReadAsync(nextBlockBuffer.AsMemory(0, 4), ct);
 #else
-                         await _datStream.ReadAsync(nextBlockBuffer, 0, 4, ct);
+                    await _datStream.ReadAsync(nextBlockBuffer, 0, 4, ct);
 #endif
-                        var nextBlock = BinaryPrimitives.ReadInt32LittleEndian(nextBlockBuffer);
+                    var nextBlock = BinaryPrimitives.ReadInt32LittleEndian(nextBlockBuffer);
 
-                        if (nextBlock <= 0) {
-                            currentBlock = ReserveBlockCore();
-                        }
-                        else {
-                            currentBlock = nextBlock;
-                        }
+                    if (nextBlock <= 0) {
+                        currentBlock = ReserveBlockCore();
                     }
                     else {
-                        currentBlock = 0;
+                        currentBlock = nextBlock;
                     }
-
-                    // Write pointer to next block
-                    BinaryPrimitives.WriteInt32LittleEndian(nextBlockBuffer, currentBlock);
-                    _datStream.Position = oldOffset;
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP
-                    await _datStream.WriteAsync(nextBlockBuffer.AsMemory(0, 4), ct);
-#else
-                    await _datStream.WriteAsync(nextBlockBuffer, 0, 4, ct);
-#endif
+                }
+                else {
+                    currentBlock = 0;
                 }
 
-                await _datStream.FlushAsync(ct);
+                // Write pointer to next block
+                BinaryPrimitives.WriteInt32LittleEndian(nextBlockBuffer, currentBlock);
+                _datStream.Position = oldOffset;
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP
+                await _datStream.WriteAsync(nextBlockBuffer.AsMemory(0, 4), ct);
+#else
+                await _datStream.WriteAsync(nextBlockBuffer, 0, 4, ct);
+#endif
             }
-            finally {
-                _streamLock.Release();
-            }
+
+            await _datStream.FlushAsync(ct);
 
             WriteHeader();
             return startingBlock;
@@ -209,23 +179,17 @@ namespace DatReaderWriter.Lib.IO.BlockAllocators {
 
         /// <inheritdoc/>
         public override void ReadBytes(byte[] buffer, int bufferOffset, int byteOffset, int numBytes) {
-            _streamLock.Wait();
-            try {
-                _datStream.Position = byteOffset;
+            _datStream.Position = byteOffset;
 #if NET7_0_OR_GREATER
-                _datStream.ReadExactly(buffer, bufferOffset, numBytes);
+            _datStream.ReadExactly(buffer, bufferOffset, numBytes);
 #else
-                int totalRead = 0;
-                while (totalRead < numBytes) {
-                    var read = _datStream.Read(buffer, bufferOffset + totalRead, numBytes - totalRead);
-                    if (read == 0) throw new EndOfStreamException();
-                    totalRead += read;
-                }
+            int totalRead = 0;
+            while (totalRead < numBytes) {
+                var read = _datStream.Read(buffer, bufferOffset + totalRead, numBytes - totalRead);
+                if (read == 0) throw new EndOfStreamException();
+                totalRead += read;
+            }
 #endif
-            }
-            finally {
-                _streamLock.Release();
-            }
         }
 
         /// <inheritdoc/>
@@ -234,46 +198,40 @@ namespace DatReaderWriter.Lib.IO.BlockAllocators {
             var currentBlock = startingBlock;
             var totalRead = 0;
 
-            _streamLock.Wait();
-            try {
-                while (currentBlock != 0 && totalRead < buffer.Length) {
-                    var bytesToRead = Math.Min(Header.BlockSize - 4, buffer.Length - totalRead);
+            while (currentBlock != 0 && totalRead < buffer.Length) {
+                var bytesToRead = Math.Min(Header.BlockSize - 4, buffer.Length - totalRead);
 
-                    // Read block data
-                    _datStream.Position = currentBlock + 4;
+                // Read block data
+                _datStream.Position = currentBlock + 4;
 #if NET7_0_OR_GREATER
-                    _datStream.ReadExactly(buffer, totalRead, bytesToRead);
+                _datStream.ReadExactly(buffer, totalRead, bytesToRead);
 #else
-                    int blockRead = 0;
-                    while (blockRead < bytesToRead) {
-                        var read = _datStream.Read(buffer, totalRead + blockRead, bytesToRead - blockRead);
-                        if (read == 0) throw new EndOfStreamException();
-                        blockRead += read;
-                    }
-#endif
-                    totalRead += bytesToRead;
-
-                    if (totalRead >= buffer.Length) {
-                        return;
-                    }
-
-                    // Get next block pointer
-                    _datStream.Position = currentBlock;
-#if NET7_0_OR_GREATER
-                    _datStream.ReadExactly(nextBlockBuffer, 0, 4);
-#else
-                    int ptrRead = 0;
-                    while (ptrRead < 4) {
-                        var read = _datStream.Read(nextBlockBuffer, ptrRead, 4 - ptrRead);
-                        if (read == 0) throw new EndOfStreamException();
-                        ptrRead += read;
-                    }
-#endif
-                    currentBlock = BinaryPrimitives.ReadInt32LittleEndian(nextBlockBuffer);
+                int blockRead = 0;
+                while (blockRead < bytesToRead) {
+                    var read = _datStream.Read(buffer, totalRead + blockRead, bytesToRead - blockRead);
+                    if (read == 0) throw new EndOfStreamException();
+                    blockRead += read;
                 }
-            }
-            finally {
-                _streamLock.Release();
+#endif
+                totalRead += bytesToRead;
+
+                if (totalRead >= buffer.Length) {
+                    return;
+                }
+
+                // Get next block pointer
+                _datStream.Position = currentBlock;
+#if NET7_0_OR_GREATER
+                _datStream.ReadExactly(nextBlockBuffer, 0, 4);
+#else
+                int ptrRead = 0;
+                while (ptrRead < 4) {
+                    var read = _datStream.Read(nextBlockBuffer, ptrRead, 4 - ptrRead);
+                    if (read == 0) throw new EndOfStreamException();
+                    ptrRead += read;
+                }
+#endif
+                currentBlock = BinaryPrimitives.ReadInt32LittleEndian(nextBlockBuffer);
             }
         }
 
@@ -284,48 +242,42 @@ namespace DatReaderWriter.Lib.IO.BlockAllocators {
             var currentBlock = startingBlock;
             var totalRead = 0;
 
-            await _streamLock.WaitAsync(ct);
-            try {
-                while (currentBlock != 0 && totalRead < buffer.Length) {
-                    var bytesToRead = Math.Min(Header.BlockSize - 4, buffer.Length - totalRead);
+            while (currentBlock != 0 && totalRead < buffer.Length) {
+                var bytesToRead = Math.Min(Header.BlockSize - 4, buffer.Length - totalRead);
 
-                    // Read block data
-                    _datStream.Position = currentBlock + 4;
+                // Read block data
+                _datStream.Position = currentBlock + 4;
 
 #if NET7_0_OR_GREATER
-                    await _datStream.ReadExactlyAsync(buffer.AsMemory(totalRead, bytesToRead), ct);
+                await _datStream.ReadExactlyAsync(buffer.AsMemory(totalRead, bytesToRead), ct);
 #else
-                    int blockRead = 0;
-                    while (blockRead < bytesToRead) {
-                        var read =
+                int blockRead = 0;
+                while (blockRead < bytesToRead) {
+                    var read =
  await _datStream.ReadAsync(buffer, totalRead + blockRead, bytesToRead - blockRead, ct);
-                        if (read == 0) throw new EndOfStreamException();
-                        blockRead += read;
-                    }
-#endif
-                    totalRead += bytesToRead;
-
-                    if (totalRead >= buffer.Length) {
-                        return;
-                    }
-
-                    // Get next block pointer
-                    _datStream.Position = currentBlock;
-#if NET7_0_OR_GREATER
-                    await _datStream.ReadExactlyAsync(nextBlockBuffer.AsMemory(0, 4), ct);
-#else
-                    int ptrRead = 0;
-                    while (ptrRead < 4) {
-                        var read = await _datStream.ReadAsync(nextBlockBuffer, ptrRead, 4 - ptrRead, ct);
-                        if (read == 0) throw new EndOfStreamException();
-                        ptrRead += read;
-                    }
-#endif
-                    currentBlock = BinaryPrimitives.ReadInt32LittleEndian(nextBlockBuffer);
+                    if (read == 0) throw new EndOfStreamException();
+                    blockRead += read;
                 }
-            }
-            finally {
-                _streamLock.Release();
+#endif
+                totalRead += bytesToRead;
+
+                if (totalRead >= buffer.Length) {
+                    return;
+                }
+
+                // Get next block pointer
+                _datStream.Position = currentBlock;
+#if NET7_0_OR_GREATER
+                await _datStream.ReadExactlyAsync(nextBlockBuffer.AsMemory(0, 4), ct);
+#else
+                int ptrRead = 0;
+                while (ptrRead < 4) {
+                    var read = await _datStream.ReadAsync(nextBlockBuffer, ptrRead, 4 - ptrRead, ct);
+                    if (read == 0) throw new EndOfStreamException();
+                    ptrRead += read;
+                }
+#endif
+                currentBlock = BinaryPrimitives.ReadInt32LittleEndian(nextBlockBuffer);
             }
         }
 
@@ -335,27 +287,21 @@ namespace DatReaderWriter.Lib.IO.BlockAllocators {
             var nextBlockBuffer = new byte[4];
             var currentBlock = startingBlock;
 
-            _streamLock.Wait();
-            try {
-                while (currentBlock != 0) {
-                    fileBlocks.Add(currentBlock);
+            while (currentBlock != 0) {
+                fileBlocks.Add(currentBlock);
 
-                    _datStream.Position = currentBlock;
+                _datStream.Position = currentBlock;
 #if NET7_0_OR_GREATER
-                    _datStream.ReadExactly(nextBlockBuffer, 0, 4);
+                _datStream.ReadExactly(nextBlockBuffer, 0, 4);
 #else
-                    int ptrRead = 0;
-                    while (ptrRead < 4) {
-                        var read = _datStream.Read(nextBlockBuffer, ptrRead, 4 - ptrRead);
-                        if (read == 0) throw new EndOfStreamException();
-                        ptrRead += read;
-                    }
-#endif
-                    currentBlock = BinaryPrimitives.ReadInt32LittleEndian(nextBlockBuffer);
+                int ptrRead = 0;
+                while (ptrRead < 4) {
+                    var read = _datStream.Read(nextBlockBuffer, ptrRead, 4 - ptrRead);
+                    if (read == 0) throw new EndOfStreamException();
+                    ptrRead += read;
                 }
-            }
-            finally {
-                _streamLock.Release();
+#endif
+                currentBlock = BinaryPrimitives.ReadInt32LittleEndian(nextBlockBuffer);
             }
 
             return true;
@@ -393,7 +339,6 @@ namespace DatReaderWriter.Lib.IO.BlockAllocators {
                 }
 
                 _datStream.Dispose();
-                _streamLock.Dispose();
             }
         }
     }
