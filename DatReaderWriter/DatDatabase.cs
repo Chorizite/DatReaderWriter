@@ -385,6 +385,8 @@ namespace DatReaderWriter {
                     _fileCache[fileId] = value;
                 }
 
+                value.Id = fileId;
+
                 return true;
             }
             finally {
@@ -434,6 +436,8 @@ namespace DatReaderWriter {
                 if (Options.FileCachingStrategy == FileCachingStrategy.OnDemand) {
                     _fileCache[fileId] = value;
                 }
+
+                value.Id = fileId;
 
                 return (true, value);
             }
