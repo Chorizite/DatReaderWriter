@@ -52,7 +52,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             Assert.IsTrue(res2);
             Assert.IsNotNull(readSurface1);
 
-            Assert.AreEqual(0u, readSurface1.Id); // Ids of surfaces dont get written!
+            Assert.AreEqual(0x05000001u, readSurface1.Id); // Ids of surfaces dont get written!
             Assert.AreEqual(SurfaceType.Base1Image, readSurface1.Type);
             Assert.AreEqual(1u, readSurface1.OrigTextureId);
             Assert.AreEqual(2u, readSurface1.OrigPaletteId);
@@ -65,7 +65,7 @@ namespace DatReaderWriter.Tests.DBObjs {
             Assert.IsTrue(res2);
             Assert.IsNotNull(readSurface2);
 
-            Assert.AreEqual(0u, readSurface2.Id); // Ids of surfaces dont get written!
+            Assert.AreEqual(0x05000002u, readSurface2.Id); // Ids of surfaces dont get written!
             Assert.AreEqual(SurfaceType.Base1Solid | SurfaceType.Alpha, readSurface2.Type);
             Assert.AreEqual(0u, readSurface2.OrigTextureId);
             Assert.AreEqual(0u, readSurface2.OrigPaletteId);
