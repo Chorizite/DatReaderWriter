@@ -68,6 +68,7 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
             private readonly int _capacity;
             private readonly Dictionary<K, LinkedListNode<(K Key, V Value)>> _cache;
             private readonly LinkedList<(K Key, V Value)> _lruList;
+            private readonly object _lock = new object();
 
             public LRUCache(int capacity) {
                 _capacity = capacity;
@@ -80,40 +81,46 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
 #else
             public bool TryGetValue(K key, out V value) {
 #endif
-                if (_cache.TryGetValue(key, out var node)) {
-                    _lruList.Remove(node);
-                    _lruList.AddLast(node);
-                    value = node.Value.Value;
-                    return true;
+                lock (_lock) {
+                    if (_cache.TryGetValue(key, out var node)) {
+                        _lruList.Remove(node);
+                        _lruList.AddLast(node);
+                        value = node.Value.Value;
+                        return true;
+                    }
                 }
                 value = default!;
                 return false;
             }
 
             public void Add(K key, V value) {
-                if (_cache.TryGetValue(key, out var existingNode)) {
-                    _lruList.Remove(existingNode);
-                    _lruList.AddLast(existingNode);
-                    existingNode.Value = (key, value);
-                }
-                else {
-                    if (_cache.Count >= _capacity) {
-                        var first = _lruList.First;
-                        if (first != null) {
-                            _lruList.RemoveFirst();
-                            _cache.Remove(first.Value.Key);
-                        }
+                lock (_lock) {
+                    if (_cache.TryGetValue(key, out var existingNode)) {
+                        _lruList.Remove(existingNode);
+                        _lruList.AddLast(existingNode);
+                        existingNode.Value = (key, value);
                     }
-                    var newNode = new LinkedListNode<(K Key, V Value)>((key, value));
-                    _lruList.AddLast(newNode);
-                    _cache[key] = newNode;
+                    else {
+                        if (_cache.Count >= _capacity) {
+                            var first = _lruList.First;
+                            if (first != null) {
+                                _lruList.RemoveFirst();
+                                _cache.Remove(first.Value.Key);
+                            }
+                        }
+                        var newNode = new LinkedListNode<(K Key, V Value)>((key, value));
+                        _lruList.AddLast(newNode);
+                        _cache[key] = newNode;
+                    }
                 }
             }
 
             public void Remove(K key) {
-                if (_cache.TryGetValue(key, out var node)) {
-                    _lruList.Remove(node);
-                    _cache.Remove(key);
+                lock (_lock) {
+                    if (_cache.TryGetValue(key, out var node)) {
+                        _lruList.Remove(node);
+                        _cache.Remove(key);
+                    }
                 }
             }
         }
