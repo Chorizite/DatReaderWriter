@@ -19,7 +19,8 @@ namespace DatReaderWriter.Tests.IO.DatBTree {
         public void SetUp() {
             _datFilePath = Path.GetTempFileName();
             _allocator = new MemoryMappedBlockAllocator(new DatDatabaseOptions() {
-                FilePath = _datFilePath, AccessType = DatAccessType.ReadWrite
+                FilePath = _datFilePath,
+                AccessType = DatAccessType.ReadWrite
             });
 
             _allocator.InitNew(DatFileType.Portal, 0);
@@ -45,7 +46,7 @@ namespace DatReaderWriter.Tests.IO.DatBTree {
 
             // Assert
             Assert.IsNotNull(_btree.Root);
-            Assert.AreEqual(1, _btree.Root.Files.Count);
+            Assert.AreEqual(1, _btree.Root.FileCount);
             Assert.AreEqual(file, _btree.Root.Files[0]);
         }
 
@@ -59,8 +60,8 @@ namespace DatReaderWriter.Tests.IO.DatBTree {
             // Act
             // Check if root was split
             Assert.IsNotNull(_btree.Root);
-            Assert.AreEqual(1, _btree.Root.Files.Count);
-            Assert.IsTrue(_btree.Root.Branches.Count > 0);
+            Assert.AreEqual(1, _btree.Root.FileCount);
+            Assert.IsTrue(_btree.Root.BranchCount > 0);
         }
 
         [TestMethod]
@@ -139,8 +140,8 @@ namespace DatReaderWriter.Tests.IO.DatBTree {
 
             // Act - Check if root and branches exist
             Assert.IsNotNull(_btree.Root);
-            Assert.IsTrue(_btree.Root.Files.Count > 1);
-            Assert.IsTrue(_btree.Root.Branches.Count > 0);
+            Assert.IsTrue(_btree.Root.FileCount > 1);
+            Assert.IsTrue(_btree.Root.BranchCount > 0);
         }
 
         [TestMethod]
@@ -148,7 +149,8 @@ namespace DatReaderWriter.Tests.IO.DatBTree {
         public void CanInsertFileEntries([DataValues(1, 10, 100, 1000)] int entryCount) {
             var datFilePath = Path.GetTempFileName();
             var allocator = new MemoryMappedBlockAllocator(new DatDatabaseOptions() {
-                FilePath = datFilePath, AccessType = DatAccessType.ReadWrite
+                FilePath = datFilePath,
+                AccessType = DatAccessType.ReadWrite
             });
 
             allocator.InitNew(DatFileType.Portal, 0);
@@ -209,7 +211,8 @@ namespace DatReaderWriter.Tests.IO.DatBTree {
         public void CanIterateRangedFileEntries([DataValues(1, 10, 60, 61, 62, 100, 1000)] int entryCount) {
             var datFilePath = Path.GetTempFileName();
             var allocator = new MemoryMappedBlockAllocator(new DatDatabaseOptions() {
-                FilePath = datFilePath, AccessType = DatAccessType.ReadWrite
+                FilePath = datFilePath,
+                AccessType = DatAccessType.ReadWrite
             });
 
             allocator.InitNew(DatFileType.Portal, 0);
@@ -251,7 +254,8 @@ namespace DatReaderWriter.Tests.IO.DatBTree {
         public void CanDeleteFileEntries([DataValues(1, 10, 100, 1000)] int entryCount) {
             var datFilePath = Path.GetTempFileName();
             var allocator = new MemoryMappedBlockAllocator(new DatDatabaseOptions() {
-                FilePath = datFilePath, AccessType = DatAccessType.ReadWrite
+                FilePath = datFilePath,
+                AccessType = DatAccessType.ReadWrite
             });
 
             allocator.InitNew(DatFileType.Portal, 0);
@@ -320,7 +324,8 @@ namespace DatReaderWriter.Tests.IO.DatBTree {
         public void CanAddFileEntryWithNoExistingRoot() {
             var file = Path.GetTempFileName();
             var allocator = new MemoryMappedBlockAllocator(new DatDatabaseOptions() {
-                FilePath = file, AccessType = DatAccessType.ReadWrite
+                FilePath = file,
+                AccessType = DatAccessType.ReadWrite
             });
 
             allocator.InitNew(DatFileType.Portal, 0);

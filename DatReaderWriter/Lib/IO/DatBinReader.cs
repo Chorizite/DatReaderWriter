@@ -76,7 +76,13 @@ namespace DatReaderWriter.Lib.IO {
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T ReadItem<T>(params object[] p) where T : IUnpackable {
-            var item = (T)Activator.CreateInstance(typeof(T), p ?? [])!;
+            T item;
+            if (p == null || p.Length == 0) {
+                item = (T)ObjectFactory.GetFactory(typeof(T))();
+            }
+            else {
+                item = (T)Activator.CreateInstance(typeof(T), p)!;
+            }
             item.Unpack(this);
             return item;
         }
@@ -321,7 +327,7 @@ namespace DatReaderWriter.Lib.IO {
             if (type == typeof(float)) return (T)(object)ReadSingle();
             if (type == typeof(double)) return (T)(object)ReadDouble();
             if (type == typeof(Guid)) return (T)(object)ReadGuid();
-            
+
             // Check if this is an enum, get the underlying type or default to int
             if (type.IsEnum) {
                 var underlyingType = Enum.GetUnderlyingType(type);
@@ -352,7 +358,7 @@ namespace DatReaderWriter.Lib.IO {
             }
 
             if (typeof(IUnpackable).IsAssignableFrom(type)) {
-                var item = (IUnpackable)Activator.CreateInstance(type)!;
+                var item = (IUnpackable)ObjectFactory.GetFactory(type)();
                 item.Unpack(this);
                 return (T)item;
             }

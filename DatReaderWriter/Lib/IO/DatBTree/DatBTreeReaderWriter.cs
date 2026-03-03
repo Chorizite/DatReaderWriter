@@ -61,6 +61,9 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
 
         private readonly LRUCache<int, DatBTreeNode> _nodeCache = new(500);
 
+        // Flat index for O(1) lookups when built via BuildFlatIndex()
+        private Dictionary<uint, DatBTreeFile>? _flatIndex;
+
         private class LRUCache<K, V> where K : notnull {
             private readonly int _capacity;
             private readonly Dictionary<K, LinkedListNode<(K Key, V Value)>> _cache;
@@ -77,46 +80,40 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
 #else
             public bool TryGetValue(K key, out V value) {
 #endif
-                lock (_cache) {
-                    if (_cache.TryGetValue(key, out var node)) {
-                        _lruList.Remove(node);
-                        _lruList.AddLast(node);
-                        value = node.Value.Value;
-                        return true;
-                    }
-                    value = default!;
-                    return false;
+                if (_cache.TryGetValue(key, out var node)) {
+                    _lruList.Remove(node);
+                    _lruList.AddLast(node);
+                    value = node.Value.Value;
+                    return true;
                 }
+                value = default!;
+                return false;
             }
 
             public void Add(K key, V value) {
-                lock (_cache) {
-                    if (_cache.TryGetValue(key, out var existingNode)) {
-                        _lruList.Remove(existingNode);
-                        _lruList.AddLast(existingNode);
-                        existingNode.Value = (key, value);
-                    }
-                    else {
-                        if (_cache.Count >= _capacity) {
-                            var first = _lruList.First;
-                            if (first != null) {
-                                _lruList.RemoveFirst();
-                                _cache.Remove(first.Value.Key);
-                            }
+                if (_cache.TryGetValue(key, out var existingNode)) {
+                    _lruList.Remove(existingNode);
+                    _lruList.AddLast(existingNode);
+                    existingNode.Value = (key, value);
+                }
+                else {
+                    if (_cache.Count >= _capacity) {
+                        var first = _lruList.First;
+                        if (first != null) {
+                            _lruList.RemoveFirst();
+                            _cache.Remove(first.Value.Key);
                         }
-                        var newNode = new LinkedListNode<(K Key, V Value)>((key, value));
-                        _lruList.AddLast(newNode);
-                        _cache[key] = newNode;
                     }
+                    var newNode = new LinkedListNode<(K Key, V Value)>((key, value));
+                    _lruList.AddLast(newNode);
+                    _cache[key] = newNode;
                 }
             }
 
             public void Remove(K key) {
-                lock (_cache) {
-                    if (_cache.TryGetValue(key, out var node)) {
-                        _lruList.Remove(node);
-                        _cache.Remove(key);
-                    }
+                if (_cache.TryGetValue(key, out var node)) {
+                    _lruList.Remove(node);
+                    _cache.Remove(key);
                 }
             }
         }
@@ -202,7 +199,7 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
             while (startingBlock != 0 && startingBlock != unchecked((int)0xCDCDCDCD)) {
                 if (TryGetNode(startingBlock, out var node)) {
                     var left = 0;
-                    var right = node.Files.Count - 1;
+                    var right = node.FileCount - 1;
                     var i = 0;
 
                     // binary search on keys
@@ -251,7 +248,7 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
                 var (success, node) = await TryGetNodeAsync(startingBlock, ct);
                 if (success && node is not null) {
                     var left = 0;
-                    var right = node.Files.Count - 1;
+                    var right = node.FileCount - 1;
                     var i = 0;
 
                     // binary search on keys
@@ -295,13 +292,6 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
         private async ValueTask SetNewRootAsync(DatBTreeNode rootBlock, CancellationToken ct = default) {
             Root = rootBlock;
             await WriteNodeAsync(rootBlock, ct);
-            // BlockAllocator.SetRootBlock modifies the header, usually synchronous/fast.
-            // But if we want to be fully async, BlockAllocator logic might need async header write?
-            // Currently BlockAllocator.SetRootBlock is sync.
-            // Header is small and usually cached/memory mapped IO is fast.
-            // We can keep it sync or add SetRootBlockAsync to Allocator interface?
-            // Allocator interface doesn't have Async SetRootBlock.
-            // Keeping it sync for now as it's just a header update.
             BlockAllocator.SetRootBlock(rootBlock.Offset);
         }
 
@@ -309,25 +299,32 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
         /// Split a child node of <paramref name="parent"/>, where the child node
         /// is full
         /// </summary>
-        /// <param name="parent">The parent node containing th full node</param>
+        /// <param name="parent">The parent node containing the full node</param>
         /// <param name="child">The full node</param>
         private void SplitChild(DatBTreeNode parent, DatBTreeNode child) {
             var newNode = new DatBTreeNode(BlockAllocator.ReserveBlock());
-            var childIdx = parent.Branches.FindIndex(f => f == child.Offset);
+
+            // Find child index in parent branches
+            int childIdx = -1;
+            for (int i = 0; i < parent.BranchCount; i++) {
+                if (parent.Branches[i] == child.Offset) {
+                    childIdx = i;
+                    break;
+                }
+            }
 
             // Insert the middle entry from the full child into the parent
-            parent.Files.Insert(childIdx, child.Files[Degree - 1]);
-            parent.Branches.Insert(childIdx + 1, newNode.Offset);
+            parent.InsertFile(childIdx, child.Files[Degree - 1]);
+            parent.InsertBranch(childIdx + 1, newNode.Offset);
 
             // Transfer second half of files from child to new node
-            // Correcting ranges to ensure split aligns with degree and doesn't leave empty branches.
-            newNode.Files.AddRange(child.Files.Skip(Degree).Take(Degree - 1));
-            child.Files.RemoveRange(Degree - 1, Degree);
+            newNode.AppendFilesFrom(child, Degree, Degree - 1);
+            child.RemoveFileRange(Degree - 1, Degree);
 
             // If not a leaf, also split the branches
             if (!child.IsLeaf) {
-                newNode.Branches.AddRange(child.Branches.GetRange(Degree, child.Branches.Count - Degree));
-                child.Branches.RemoveRange(Degree, child.Branches.Count - Degree);
+                newNode.AppendBranchesFrom(child, Degree, child.BranchCount - Degree);
+                child.RemoveBranchRange(Degree, child.BranchCount - Degree);
             }
 
             // Write nodes back to ensure the changes are persisted in the tree structure
@@ -339,22 +336,27 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
         private async ValueTask SplitChildAsync(DatBTreeNode parent, DatBTreeNode child,
             CancellationToken ct = default) {
             var newNode = new DatBTreeNode(BlockAllocator.ReserveBlock());
-            // ReserveBlock is sync, but we fixed it to be thread safe.
 
-            var childIdx = parent.Branches.FindIndex(f => f == child.Offset);
+            int childIdx = -1;
+            for (int i = 0; i < parent.BranchCount; i++) {
+                if (parent.Branches[i] == child.Offset) {
+                    childIdx = i;
+                    break;
+                }
+            }
 
             // Insert the middle entry from the full child into the parent
-            parent.Files.Insert(childIdx, child.Files[Degree - 1]);
-            parent.Branches.Insert(childIdx + 1, newNode.Offset);
+            parent.InsertFile(childIdx, child.Files[Degree - 1]);
+            parent.InsertBranch(childIdx + 1, newNode.Offset);
 
             // Transfer second half of files from child to new node
-            newNode.Files.AddRange(child.Files.Skip(Degree).Take(Degree - 1));
-            child.Files.RemoveRange(Degree - 1, Degree);
+            newNode.AppendFilesFrom(child, Degree, Degree - 1);
+            child.RemoveFileRange(Degree - 1, Degree);
 
             // If not a leaf, also split the branches
             if (!child.IsLeaf) {
-                newNode.Branches.AddRange(child.Branches.GetRange(Degree, child.Branches.Count - Degree));
-                child.Branches.RemoveRange(Degree, child.Branches.Count - Degree);
+                newNode.AppendBranchesFrom(child, Degree, child.BranchCount - Degree);
+                child.RemoveBranchRange(Degree, child.BranchCount - Degree);
             }
 
             // Write nodes back
@@ -366,7 +368,7 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
         private IEnumerable<DatBTreeFile> GetFilesRecursive(DatBTreeNode? node) {
             if (node is not null) {
                 int i;
-                for (i = 0; i < node.Files.Count; i++) {
+                for (i = 0; i < node.FileCount; i++) {
                     if (!node.IsLeaf) {
                         if (TryGetNode(node.Branches[i], out var branch)) {
                             var files = GetFilesRecursive(branch);
@@ -414,6 +416,15 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
         /// <param name="maxId">The maximum file ID (inclusive)</param>
         /// <returns>An enumerable of files within the range</returns>
         public IEnumerable<DatBTreeFile> GetFilesInRange(uint minId, uint maxId) {
+            if (_flatIndex is not null) {
+                foreach (var kvp in _flatIndex) {
+                    if (kvp.Key >= minId && kvp.Key <= maxId) {
+                        yield return kvp.Value;
+                    }
+                }
+                yield break;
+            }
+
             if (Root is null) {
                 yield break;
             }
@@ -427,13 +438,13 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
             int i = 0;
 
             // Skip entries less than minId
-            while (i < node.Files.Count && node.Files[i].Id < minId) {
+            while (i < node.FileCount && node.Files[i].Id < minId) {
                 i++;
             }
 
             if (!node.IsLeaf) {
                 // Check the leftmost qualifying subtree
-                if (i < node.Branches.Count && TryGetNode(node.Branches[i], out var child)) {
+                if (i < node.BranchCount && TryGetNode(node.Branches[i], out var child)) {
                     foreach (var file in GetFilesInRangeRecursive(child, minId, maxId)) {
                         yield return file;
                     }
@@ -441,12 +452,12 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
             }
 
             // Return entries from this node that are in range
-            while (i < node.Files.Count && node.Files[i].Id <= maxId) {
+            while (i < node.FileCount && node.Files[i].Id <= maxId) {
                 yield return node.Files[i];
 
                 if (!node.IsLeaf) {
                     // Check the right subtree for this entry
-                    if (i + 1 < node.Branches.Count && TryGetNode(node.Branches[i + 1], out var child)) {
+                    if (i + 1 < node.BranchCount && TryGetNode(node.Branches[i + 1], out var child)) {
                         foreach (var file in GetFilesInRangeRecursive(child, minId, maxId)) {
                             yield return file;
                         }
@@ -454,6 +465,17 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
                 }
 
                 i++;
+            }
+        }
+
+        /// <summary>
+        /// Build a flat dictionary index from all BTree entries for O(1) lookups.
+        /// Call this for read-only databases to bypass BTree traversal entirely.
+        /// </summary>
+        public void BuildFlatIndex() {
+            _flatIndex = new Dictionary<uint, DatBTreeFile>();
+            foreach (var file in GetFilesRecursive(Root)) {
+                _flatIndex[file.Id] = file;
             }
         }
 
@@ -468,6 +490,9 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
 #else
         public bool TryGetFile(uint fileId, out DatBTreeFile file) {
 #endif
+            if (_flatIndex is not null) {
+                return _flatIndex.TryGetValue(fileId, out file);
+            }
             return TryGetFileInternal(fileId, BlockAllocator.Header.RootBlock, out file);
         }
 
@@ -484,6 +509,10 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
         public async Task<(bool Success, DatBTreeFile File)> TryGetFileAsync(uint fileId, CancellationToken ct =
  default) {
 #endif
+            if (_flatIndex is not null) {
+                var found = _flatIndex.TryGetValue(fileId, out var file);
+                return (found, file);
+            }
             return await TryGetFileInternalAsync(fileId, BlockAllocator.Header.RootBlock, ct);
         }
 
@@ -507,6 +536,10 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
             if (TryGetFile(file.Id, out var foundFile)) {
                 // Find the parent node and update the file in place
                 if (TryFindParentAndUpdate(Root, file, out var replacedFile)) {
+                    // Update flat index if present
+                    if (_flatIndex is not null) {
+                        _flatIndex[file.Id] = file;
+                    }
                     return replacedFile;
                 }
 
@@ -516,22 +549,24 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
             // if root is null, create a new root node and add the file there
             if (Root is null) {
                 var rootBlock = new DatBTreeNode(BlockAllocator.ReserveBlock());
-                rootBlock.Files.Add(file);
+                rootBlock.AddFile(file);
                 SetNewRoot(rootBlock);
+                if (_flatIndex != null && !_flatIndex.ContainsKey(file.Id)) _flatIndex[file.Id] = file;
                 return null;
             }
 
             // check if root node is full, if so create a new root node before insertion
-            if (Root.Files.Count == MaxItems) {
+            if (Root.FileCount == MaxItems) {
                 var oldRoot = Root;
                 var newRoot = new DatBTreeNode(BlockAllocator.ReserveBlock());
                 SetNewRoot(newRoot);
 
-                newRoot.Branches.Add(oldRoot.Offset);
+                newRoot.AddBranch(oldRoot.Offset);
                 SplitChild(newRoot, oldRoot);
             }
 
             InsertNonFull(Root, file);
+            if (_flatIndex != null && !_flatIndex.ContainsKey(file.Id)) _flatIndex[file.Id] = file;
             return null;
         }
 
@@ -553,6 +588,9 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
                 // Find the parent node and update the file in place
                 var (success, replacedFile) = await TryFindParentAndUpdateAsync(Root, file, ct);
                 if (success) {
+                    if (_flatIndex is not null) {
+                        _flatIndex[file.Id] = file;
+                    }
                     return replacedFile;
                 }
 
@@ -562,22 +600,24 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
             // if root is null, create a new root node and add the file there
             if (Root is null) {
                 var rootBlock = new DatBTreeNode(BlockAllocator.ReserveBlock());
-                rootBlock.Files.Add(file);
+                rootBlock.AddFile(file);
                 await SetNewRootAsync(rootBlock, ct);
+                if (_flatIndex != null && !_flatIndex.ContainsKey(file.Id)) _flatIndex[file.Id] = file;
                 return null;
             }
 
             // check if root node is full, if so create a new root node before insertion
-            if (Root.Files.Count == MaxItems) {
+            if (Root.FileCount == MaxItems) {
                 var oldRoot = Root;
                 var newRoot = new DatBTreeNode(BlockAllocator.ReserveBlock());
                 await SetNewRootAsync(newRoot, ct);
 
-                newRoot.Branches.Add(oldRoot.Offset);
+                newRoot.AddBranch(oldRoot.Offset);
                 await SplitChildAsync(newRoot, oldRoot, ct);
             }
 
             await InsertNonFullAsync(Root, file, ct);
+            if (_flatIndex != null && !_flatIndex.ContainsKey(file.Id)) _flatIndex[file.Id] = file;
             return null;
         }
 
@@ -588,7 +628,7 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
             }
 
             var left = 0;
-            var right = node.Files.Count - 1;
+            var right = node.FileCount - 1;
             var i = 0;
 
             // binary search on keys
@@ -613,7 +653,7 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
                 if (file.Id > node.Files[i].Id)
                     i++;
 
-                if (i < node.Branches.Count && TryGetNode(node.Branches[i], out var child)) {
+                if (i < node.BranchCount && TryGetNode(node.Branches[i], out var child)) {
                     if (TryFindParentAndUpdate(child, file, out replacedFile)) {
                         return true;
                     }
@@ -636,7 +676,7 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
             }
 
             var left = 0;
-            var right = node.Files.Count - 1;
+            var right = node.FileCount - 1;
             var i = 0;
 
             // binary search on keys
@@ -661,11 +701,11 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
                 if (file.Id > node.Files[i].Id)
                     i++;
 
-                if (i < node.Branches.Count) {
+                if (i < node.BranchCount) {
                     var (success, child) = await TryGetNodeAsync(node.Branches[i], ct);
                     if (success && child is not null) {
-                        var (found, replaced) = await TryFindParentAndUpdateAsync(child, file, ct);
-                        if (found) {
+                        var (foundResult, replaced) = await TryFindParentAndUpdateAsync(child, file, ct);
+                        if (foundResult) {
                             return (true, replaced);
                         }
                     }
@@ -676,11 +716,15 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
         }
 
         private void InsertNonFull(DatBTreeNode node, DatBTreeFile file) {
-            int positionToInsert = node.Files.TakeWhile(entry => file.Id.CompareTo(entry.Id) >= 0).Count();
+            // Replace LINQ TakeWhile().Count() with simple for loop
+            int positionToInsert = 0;
+            while (positionToInsert < node.FileCount && file.Id.CompareTo(node.Files[positionToInsert].Id) >= 0) {
+                positionToInsert++;
+            }
 
             if (node.IsLeaf) {
                 // Directly insert into the leaf node at the calculated position.
-                node.Files.Insert(positionToInsert, file);
+                node.InsertFile(positionToInsert, file);
                 WriteNode(node);
                 return;
             }
@@ -691,7 +735,7 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
             }
 
             // Check if the child node is full
-            if (child.Files.Count == MaxItems) {
+            if (child.FileCount == MaxItems) {
                 // Split the child node
                 SplitChild(node, child);
 
@@ -712,11 +756,14 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
 
         private async ValueTask
             InsertNonFullAsync(DatBTreeNode node, DatBTreeFile file, CancellationToken ct = default) {
-            int positionToInsert = node.Files.TakeWhile(entry => file.Id.CompareTo(entry.Id) >= 0).Count();
+            int positionToInsert = 0;
+            while (positionToInsert < node.FileCount && file.Id.CompareTo(node.Files[positionToInsert].Id) >= 0) {
+                positionToInsert++;
+            }
 
             if (node.IsLeaf) {
                 // Directly insert into the leaf node at the calculated position.
-                node.Files.Insert(positionToInsert, file);
+                node.InsertFile(positionToInsert, file);
                 await WriteNodeAsync(node, ct);
                 return;
             }
@@ -728,7 +775,7 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
             }
 
             // Check if the child node is full
-            if (child.Files.Count == MaxItems) {
+            if (child.FileCount == MaxItems) {
                 // Split the child node
                 await SplitChildAsync(node, child, ct);
 
@@ -771,9 +818,11 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
             DeleteInternal(Root, fileId);
 
             // if root's last entry was moved to a child node, remove it
-            if (Root.Files.Count == 0 && !Root.IsLeaf && TryGetNode(Root.Branches[0], out var branch)) {
+            if (Root.FileCount == 0 && !Root.IsLeaf && TryGetNode(Root.Branches[0], out var branch)) {
                 SetNewRoot(branch);
             }
+
+            _flatIndex?.Remove(fileId);
 
             return true;
         }
@@ -784,10 +833,14 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
         /// <param name="node">Node to use to start search for the key.</param>
         /// <param name="fileId">The id of the file to delete</param>
         private void DeleteInternal(DatBTreeNode node, uint fileId) {
-            int i = node.Files.TakeWhile(entry => fileId.CompareTo(entry.Id) > 0).Count();
+            // Replace LINQ TakeWhile().Count() with simple for loop
+            int i = 0;
+            while (i < node.FileCount && fileId.CompareTo(node.Files[i].Id) > 0) {
+                i++;
+            }
 
             // found key in node, so delete if from it
-            if (i < node.Files.Count && node.Files[i].Id.CompareTo(fileId) == 0) {
+            if (i < node.FileCount && node.Files[i].Id.CompareTo(fileId) == 0) {
                 DeleteKeyFromNode(node, fileId, i);
             }
 
@@ -812,7 +865,7 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
             // node has reached min # of entries, and removing any from it will break the btree property,
             // so this block makes sure that the "child" has at least "degree" # of nodes by moving an 
             // entry from a sibling node or merging nodes
-            if (childNode.Files.Count == MinItems) {
+            if (childNode.FileCount == MinItems) {
                 int leftIndex = subtreeIndexInNode - 1;
                 int rightIndex = subtreeIndexInNode + 1;
                 DatBTreeNode? leftSibling = null;
@@ -825,39 +878,39 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
                     }
                 }
 
-                if (subtreeIndexInNode < parentNode.Branches.Count - 1) {
+                if (subtreeIndexInNode < parentNode.BranchCount - 1) {
                     if (!TryGetNode(parentNode.Branches[rightIndex], out rightSibling)) {
                         Debug.Assert(false, "Unable to lookup rightSibling node!");
                         return;
                     }
                 }
 
-                if (leftSibling is not null && leftSibling.Files.Count > Degree - 1) {
+                if (leftSibling is not null && leftSibling.FileCount > Degree - 1) {
                     // left sibling has a node to spare, so this moves one node from left sibling 
                     // into parent's node and one node from parent into this current node ("child")
-                    childNode.Files.Insert(0, parentNode.Files[subtreeIndexInNode]);
-                    parentNode.Files[subtreeIndexInNode] = leftSibling.Files.Last();
-                    leftSibling.Files.RemoveAt(leftSibling.Files.Count - 1);
+                    childNode.InsertFile(0, parentNode.Files[subtreeIndexInNode]);
+                    parentNode.Files[subtreeIndexInNode] = leftSibling.Files[leftSibling.FileCount - 1];
+                    leftSibling.RemoveFileAt(leftSibling.FileCount - 1);
 
                     if (!leftSibling.IsLeaf) {
-                        childNode.Branches.Insert(0, leftSibling.Branches.Last());
-                        leftSibling.Branches.RemoveAt(leftSibling.Branches.Count - 1);
+                        childNode.InsertBranch(0, leftSibling.Branches[leftSibling.BranchCount - 1]);
+                        leftSibling.RemoveBranchAt(leftSibling.BranchCount - 1);
                     }
 
                     WriteNode(childNode);
                     WriteNode(parentNode);
                     WriteNode(leftSibling);
                 }
-                else if (rightSibling != null && rightSibling.Files.Count > Degree - 1) {
+                else if (rightSibling != null && rightSibling.FileCount > Degree - 1) {
                     // right sibling has a node to spare, so this moves one node from right sibling 
                     // into parent's node and one node from parent into this current node ("child")
-                    childNode.Files.Add(parentNode.Files[subtreeIndexInNode]);
-                    parentNode.Files[subtreeIndexInNode] = rightSibling.Files.First();
-                    rightSibling.Files.RemoveAt(0);
+                    childNode.AddFile(parentNode.Files[subtreeIndexInNode]);
+                    parentNode.Files[subtreeIndexInNode] = rightSibling.Files[0];
+                    rightSibling.RemoveFileAt(0);
 
                     if (!rightSibling.IsLeaf) {
-                        childNode.Branches.Add(rightSibling.Branches.First());
-                        rightSibling.Branches.RemoveAt(0);
+                        childNode.AddBranch(rightSibling.Branches[0]);
+                        rightSibling.RemoveBranchAt(0);
                     }
 
                     WriteNode(childNode);
@@ -867,32 +920,31 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
                 else {
                     // this block merges either left or right sibling into the current node "child"
                     if (leftSibling != null) {
-                        childNode.Files.Insert(0, parentNode.Files[subtreeIndexInNode]);
-                        var oldEntries = childNode.Files;
-                        childNode.Files = leftSibling.Files;
-                        childNode.Files.AddRange(oldEntries);
+                        childNode.InsertFile(0, parentNode.Files[subtreeIndexInNode]);
+                        // Prepend leftSibling's files before childNode's existing files
+                        // We need: leftSibling.Files + [parentFile] + childNode.Files
+                        // childNode already has parentFile at position 0, so we prepend leftSibling
+                        childNode.PrependFilesFrom(leftSibling);
                         if (!leftSibling.IsLeaf) {
-                            var oldChildren = childNode.Branches;
-                            childNode.Branches = leftSibling.Branches;
-                            childNode.Branches.AddRange(oldChildren);
+                            childNode.PrependBranchesFrom(leftSibling);
                         }
 
-                        parentNode.Branches.RemoveAt(leftIndex);
-                        parentNode.Files.RemoveAt(subtreeIndexInNode);
+                        parentNode.RemoveBranchAt(leftIndex);
+                        parentNode.RemoveFileAt(subtreeIndexInNode);
 
                         WriteNode(childNode);
                         WriteNode(parentNode);
                     }
                     else {
                         Debug.Assert(rightSibling != null, "Node should have at least one sibling");
-                        childNode.Files.Add(parentNode.Files[subtreeIndexInNode]);
-                        childNode.Files.AddRange(rightSibling!.Files);
+                        childNode.AddFile(parentNode.Files[subtreeIndexInNode]);
+                        childNode.AppendFilesFrom(rightSibling!, 0, rightSibling!.FileCount);
                         if (!rightSibling.IsLeaf) {
-                            childNode.Branches.AddRange(rightSibling.Branches);
+                            childNode.AppendBranchesFrom(rightSibling, 0, rightSibling.BranchCount);
                         }
 
-                        parentNode.Branches.RemoveAt(rightIndex);
-                        parentNode.Files.RemoveAt(subtreeIndexInNode);
+                        parentNode.RemoveBranchAt(rightIndex);
+                        parentNode.RemoveFileAt(subtreeIndexInNode);
 
                         WriteNode(childNode);
                         WriteNode(parentNode);
@@ -917,7 +969,7 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
             // if leaf, just remove it from the list of entries (we're guaranteed to have
             // at least "degree" # of entries, to BTree property is maintained
             if (node.IsLeaf) {
-                node.Files.RemoveAt(keyIndexInNode);
+                node.RemoveFileAt(keyIndexInNode);
                 WriteNode(node);
                 return;
             }
@@ -928,7 +980,7 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
                 return;
             }
 
-            if (predecessorChild.Files.Count >= Degree) {
+            if (predecessorChild.FileCount >= Degree) {
                 var predecessor = DeletePredecessor(predecessorChild);
                 node.Files[keyIndexInNode] = predecessor;
                 WriteNode(node);
@@ -939,18 +991,18 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
                     return;
                 }
 
-                if (successorChild.Files.Count >= Degree) {
+                if (successorChild.FileCount >= Degree) {
                     var successor = DeleteSuccessor(predecessorChild);
                     node.Files[keyIndexInNode] = successor;
                     WriteNode(node);
                 }
                 else {
-                    predecessorChild.Files.Add(node.Files[keyIndexInNode]);
-                    predecessorChild.Files.AddRange(successorChild.Files);
-                    predecessorChild.Branches.AddRange(successorChild.Branches);
+                    predecessorChild.AddFile(node.Files[keyIndexInNode]);
+                    predecessorChild.AppendFilesFrom(successorChild, 0, successorChild.FileCount);
+                    predecessorChild.AppendBranchesFrom(successorChild, 0, successorChild.BranchCount);
 
-                    node.Files.RemoveAt(keyIndexInNode);
-                    node.Branches.RemoveAt(keyIndexInNode + 1);
+                    node.RemoveFileAt(keyIndexInNode);
+                    node.RemoveBranchAt(keyIndexInNode + 1);
 
                     WriteNode(node);
                     WriteNode(predecessorChild);
@@ -967,15 +1019,15 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
         /// <returns>Predecessor entry that got deleted.</returns>
         private DatBTreeFile DeletePredecessor(DatBTreeNode node) {
             if (node.IsLeaf) {
-                var result = node.Files[node.Files.Count - 1];
-                node.Files.RemoveAt(node.Files.Count - 1);
+                var result = node.Files[node.FileCount - 1];
+                node.RemoveFileAt(node.FileCount - 1);
                 WriteNode(node);
 
                 return result;
             }
 
 
-            if (!TryGetNode(node.Branches.Last(), out var predecessor)) {
+            if (!TryGetNode(node.Branches[node.BranchCount - 1], out var predecessor)) {
                 throw new Exception($"Failed to look up predecessor");
             }
 
@@ -990,12 +1042,12 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
         private DatBTreeFile DeleteSuccessor(DatBTreeNode node) {
             if (node.IsLeaf) {
                 var result = node.Files[0];
-                node.Files.RemoveAt(0);
+                node.RemoveFileAt(0);
                 WriteNode(node);
                 return result;
             }
 
-            if (!TryGetNode(node.Branches.First(), out var predecessor)) {
+            if (!TryGetNode(node.Branches[0], out var predecessor)) {
                 throw new Exception($"Failed to look up predecessor");
             }
 
@@ -1022,21 +1074,21 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
             str.AppendLine(
                 $"{tabs}\tNode: {node.Offset:X8} (Leaf: {node.IsLeaf}, Root: {node.Offset == Root?.Offset})");
             str.AppendLine($"{tabs}\t\tFiles:");
-            foreach (var file in node.Files) {
-                str.AppendLine($"{tabs}\t\t\t{file.Id:X8}");
+            for (int i = 0; i < node.FileCount; i++) {
+                str.AppendLine($"{tabs}\t\t\t{node.Files[i].Id:X8}");
             }
 
             str.AppendLine($"{tabs}\t\tChildren:");
-            if (node.Branches.Count == 0) {
+            if (node.BranchCount == 0) {
                 str.AppendLine($"{tabs}\t\t\tNone!");
             }
             else {
-                foreach (var child in node.Branches) {
-                    if (TryGetNode(child, out var childNode)) {
+                for (int i = 0; i < node.BranchCount; i++) {
+                    if (TryGetNode(node.Branches[i], out var childNode)) {
                         WriteTree(str, childNode, depth + 2);
                     }
                     else {
-                        str.AppendLine($"{tabs}\t\t\t!! Unknown branch: {child:X8}");
+                        str.AppendLine($"{tabs}\t\t\t!! Unknown branch: {node.Branches[i]:X8}");
                     }
                 }
             }
