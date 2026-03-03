@@ -78,6 +78,11 @@ namespace DatReaderWriter {
 
             Tree = new DatBTreeReaderWriter(BlockAllocator);
 
+            // Build flat index for O(1) lookups when using Upfront caching
+            if (Options.IndexCachingStrategy == IndexCachingStrategy.Upfront) {
+                Tree.BuildFlatIndex();
+            }
+
             if (TryGet<Iteration>(0xFFFF0001, out var iteration)) {
                 Iteration = iteration;
 
@@ -373,7 +378,7 @@ namespace DatReaderWriter {
                     data = Decompress(data.ToArray());
                 }
 
-                value = Activator.CreateInstance<T>();
+                value = Lib.IO.ObjectFactory.CreateInstance<T>();
 
                 // Slice the buffer to the exact size to avoid reading garbage data
                 if (!value.Unpack(new DatBinReader(data, this))) {
@@ -426,7 +431,7 @@ namespace DatReaderWriter {
                     data = decompressedBuffer.AsMemory(0, decompressedSize);
                 }
 
-                var value = Activator.CreateInstance<T>();
+                var value = Lib.IO.ObjectFactory.CreateInstance<T>();
 
                 // Slice the buffer to the exact size to avoid reading garbage data
                 if (!value.Unpack(new DatBinReader(data, this))) {

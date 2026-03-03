@@ -41,9 +41,17 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
         public uint Size { get; set; }
 
         /// <summary>
+        /// Raw unix timestamp for this file entry's date
+        /// </summary>
+        public uint RawDate;
+
+        /// <summary>
         /// The date this was last updated (maybe added?)
         /// </summary>
-        public DateTime Date { get; set; }
+        public DateTime Date {
+            get => DateTimeOffset.FromUnixTimeSeconds(RawDate).UtcDateTime;
+            set => RawDate = value.ToUnixTimestamp();
+        }
 
         /// <summary>
         /// The iteration of this file entry
@@ -63,7 +71,7 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
             Id = reader.ReadUInt32();
             Offset = reader.ReadInt32();
             Size = reader.ReadUInt32();
-            Date = DateTimeOffset.FromUnixTimeSeconds(reader.ReadUInt32()).UtcDateTime;
+            RawDate = reader.ReadUInt32();
             Iteration = reader.ReadInt32();
 
             return true;
@@ -75,7 +83,7 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
             writer.WriteUInt32(Id);
             writer.WriteInt32(Offset);
             writer.WriteUInt32(Size);
-            writer.WriteUInt32(Date.ToUnixTimestamp());
+            writer.WriteUInt32(RawDate);
             writer.WriteInt32(Iteration);
 
             return true;
