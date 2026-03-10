@@ -12,7 +12,7 @@ namespace DatReaderWriter.DBObjs {
     /// <summary>
     /// DB_TYPE_ACTIONMAP in the client.
     /// </summary>
-    [DBObjType(typeof(DBProperties), DatFileType.Portal, DBObjType.DBProperties, DBObjHeaderFlags.HasId, 0x26000000, 0x2600FFFF, 0x00000000)]
+    [DBObjType(typeof(ActionMap), DatFileType.Portal, DBObjType.ActionMap, DBObjHeaderFlags.HasId, 0x26000000, 0x2600FFFF, 0x00000000)]
     public class ActionMap : DBObj {
         /// <inheritdoc />
         public override DBObjHeaderFlags HeaderFlags => DBObjHeaderFlags.HasId;
