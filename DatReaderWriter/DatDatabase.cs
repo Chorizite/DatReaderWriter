@@ -399,6 +399,56 @@ namespace DatReaderWriter {
             }
         }
 
+        /// <summary>
+        /// Unpack a <see cref="IDBObj"/> and immediately convert it to <typeparamref name="TResult"/> via
+        /// <paramref name="converter"/>, without storing the intermediate object in the file cache.
+        /// Use this overload when the caller manages its own cache (e.g. via a ResourceCacheManager) to
+        /// avoid double-caching the raw DAT object alongside the converted result.
+        /// </summary>
+        /// <typeparam name="T">The dat file type to unpack</typeparam>
+        /// <typeparam name="TResult">The result type produced by the converter</typeparam>
+        /// <param name="fileId">The id of the file to get</param>
+        /// <param name="converter">A function that converts the unpacked <typeparamref name="T"/> to <typeparamref name="TResult"/></param>
+        /// <param name="result">The converted result, or default if not found</param>
+        /// <returns>true if the file was found and converted successfully</returns>
+#if (NET8_0_OR_GREATER)
+        public bool TryGet<T, TResult>(uint fileId, Func<T, TResult> converter, [MaybeNullWhen(false)] out TResult result)
+            where T : IDBObj {
+#else
+        public bool TryGet<T, TResult>(uint fileId, Func<T, TResult> converter, out TResult result)
+            where T : IDBObj {
+#endif
+            if (!Tree.TryGetFile(fileId, out var fileEntry)) {
+                result = default!;
+                return false;
+            }
+
+            var size = (int)fileEntry.Size;
+            var buffer = BaseBlockAllocator.SharedBytes.Rent(size);
+            try {
+                BlockAllocator.ReadBlock(buffer, fileEntry.Offset);
+
+                var data = buffer.AsMemory(0, size);
+                if (fileEntry.Flags.HasFlag(DatBTreeFileFlags.IsCompressed)) {
+                    data = Decompress(data.ToArray());
+                }
+
+                var value = Lib.IO.ObjectFactory.CreateInstance<T>();
+
+                if (!value.Unpack(new DatBinReader(data, this))) {
+                    result = default!;
+                    return false;
+                }
+
+                value.Id = fileId;
+                result = converter(value);
+                return true;
+            }
+            finally {
+                BaseBlockAllocator.SharedBytes.Return(buffer);
+            }
+        }
+
 #if (NET8_0_OR_GREATER)
         public async ValueTask<(bool Success, T? Value)> TryGetAsync<T>(uint fileId, CancellationToken ct = default)
             where T : IDBObj {

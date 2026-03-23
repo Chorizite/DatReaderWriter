@@ -98,6 +98,16 @@ namespace DatReaderWriter.Lib.IO {
         }
 
         /// <summary>
+        /// Read bytes into a caller-provided span and advance the buffer position accordingly.
+        /// Use this overload to avoid heap allocation when the destination buffer is already available.
+        /// </summary>
+        /// <param name="destination">The span to copy bytes into. Reads exactly <c>destination.Length</c> bytes.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void ReadBytes(Span<byte> destination) {
+            ReadBytesInternal(destination.Length).CopyTo(destination);
+        }
+
+        /// <summary>
         /// Read a byte and advance the buffer position accordingly
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
