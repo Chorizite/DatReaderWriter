@@ -365,6 +365,94 @@ namespace DatReaderWriter.Tests.IO.DatBTree {
             File.Delete(file);
         }
 
+        #region Leaf sentinel bug tests
+
+        [TestMethod]
+        public void LeafNodeWithEntries_PacksZeroIntoAllBranchSlots() {
+            // Arrange: leaf node with one file entry (BranchCount == 0, FileCount == 1)
+            var node = new DatBTreeNode();
+            node.Files[0] = new DatBTreeFile { Id = 0xABCD1234 };
+            node.FileCount = 1;
+            // BranchCount stays 0 → IsLeaf is true
+
+            var buffer = new byte[DatBTreeNode.SIZE];
+            var writer = new DatBinWriter(buffer);
+
+            // Act
+            node.Pack(writer);
+
+            // Assert: all 62 branch slots (first 248 bytes) must be zero
+            for (int i = 0; i < DatBTreeNode.MAX_BRANCHES * 4; i++) {
+                Assert.AreEqual(0, buffer[i],
+                    $"Branch slot byte at offset {i} should be 0 (was 0x{buffer[i]:X2})");
+            }
+        }
+
+        [TestMethod]
+        public void LeafNodeWithEntries_RoundTripsCorrectly() {
+            // Arrange
+            var node = new DatBTreeNode();
+            node.Files[0] = new DatBTreeFile { Id = 0xABCD1234, Size = 100, Iteration = 7 };
+            node.FileCount = 1;
+
+            var buffer = new byte[DatBTreeNode.SIZE];
+            var writer = new DatBinWriter(buffer);
+            node.Pack(writer);
+
+            // Act: unpack into a new node
+            var reader = new DatBinReader(buffer);
+            var readNode = new DatBTreeNode();
+            readNode.Unpack(reader);
+
+            // Assert
+            Assert.AreEqual(0, readNode.BranchCount);
+            Assert.IsTrue(readNode.IsLeaf);
+            Assert.AreEqual(1, readNode.FileCount);
+            Assert.AreEqual(0xABCD1234u, readNode.Files[0].Id);
+            Assert.AreEqual(100u, readNode.Files[0].Size);
+            Assert.AreEqual(7, readNode.Files[0].Iteration);
+        }
+
+        [TestMethod]
+        public void EmptyLeafNode_PacksZeroIntoAllBranchSlots() {
+            // FileCount == 0 was the old happy path; verify it still writes zeros
+            var node = new DatBTreeNode();
+
+            var buffer = new byte[DatBTreeNode.SIZE];
+            var writer = new DatBinWriter(buffer);
+            node.Pack(writer);
+
+            for (int i = 0; i < DatBTreeNode.MAX_BRANCHES * 4; i++) {
+                Assert.AreEqual(0, buffer[i],
+                    $"Branch slot byte at offset {i} should be 0 (was 0x{buffer[i]:X2})");
+            }
+        }
+
+        [TestMethod]
+        public void InternalNode_PacksActualBranchOffsets() {
+            // Internal node: BranchCount == FileCount + 1
+            var node = new DatBTreeNode();
+            node.Branches[0] = 0x00001000;
+            node.Branches[1] = 0x00002000;
+            node.BranchCount = 2;
+            node.Files[0] = new DatBTreeFile { Id = 0x00000042 };
+            node.FileCount = 1;
+
+            var buffer = new byte[DatBTreeNode.SIZE];
+            var writer = new DatBinWriter(buffer);
+            node.Pack(writer);
+
+            // First branch slot must be non-zero
+            int slot0 = System.Buffers.Binary.BinaryPrimitives.ReadInt32LittleEndian(buffer.AsSpan(0, 4));
+            int slot1 = System.Buffers.Binary.BinaryPrimitives.ReadInt32LittleEndian(buffer.AsSpan(4, 4));
+            int slot2 = System.Buffers.Binary.BinaryPrimitives.ReadInt32LittleEndian(buffer.AsSpan(8, 4));
+            Assert.AreEqual(0x00001000, slot0);
+            Assert.AreEqual(0x00002000, slot1);
+            Assert.AreEqual(0, slot2, "Unused branch slot after BranchCount must be 0");
+        }
+
+        #endregion
+
         #region EOR Tests
 
         [TestMethod]
