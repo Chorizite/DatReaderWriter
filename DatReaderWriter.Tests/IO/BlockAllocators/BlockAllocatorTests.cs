@@ -1,6 +1,7 @@
 ﻿using DatReaderWriter.Options;
 using DatReaderWriter.Tests.Lib;
 using System;
+using System.Buffers.Binary;
 using System.Text;
 using System.Threading.Tasks;
 using DatReaderWriter;
@@ -408,6 +409,128 @@ namespace DatReaderWriter.Tests.IO.BlockAllocators {
 
         [TestMethod]
         [CombinatorialData]
+        public void AllocateEmptyBlocksWritesInBandPointers(
+            [DataValues(256, 1024)] int blockSize,
+            [DataValues(BlockAllocatorType.MemoryMapped, BlockAllocatorType.Stream)] BlockAllocatorType allocatorType
+            ) {
+            var file = Path.GetTempFileName();
+            var allocator = GetBlockAllocator(allocatorType, file);
+
+            allocator.InitNew(DatFileType.Portal, 0, blockSize, 3);
+
+            var firstBlock = allocator.Header.FirstFreeBlock;
+            var ptrBuf = new byte[4];
+
+            // Block 0: should point to block 1 with high free-marker bit
+            allocator.ReadBytes(ptrBuf, 0, firstBlock, 4);
+            var ptr0 = BinaryPrimitives.ReadInt32LittleEndian(ptrBuf);
+            Assert.AreEqual((firstBlock + blockSize) | unchecked((int)0x80000000), ptr0,
+                "Block 0 in-band pointer should point to block 1 with high bit set");
+
+            // Block 1: should point to block 2 with high bit
+            allocator.ReadBytes(ptrBuf, 0, firstBlock + blockSize, 4);
+            var ptr1 = BinaryPrimitives.ReadInt32LittleEndian(ptrBuf);
+            Assert.AreEqual((firstBlock + 2 * blockSize) | unchecked((int)0x80000000), ptr1,
+                "Block 1 in-band pointer should point to block 2 with high bit set");
+
+            // Block 2 (last): end-of-chain marker
+            allocator.ReadBytes(ptrBuf, 0, firstBlock + 2 * blockSize, 4);
+            var ptr2 = BinaryPrimitives.ReadInt32LittleEndian(ptrBuf);
+            Assert.AreEqual(unchecked((int)0x80000000), ptr2,
+                "Last block in-band pointer should be end-of-chain marker 0x80000000");
+
+            allocator.Dispose();
+            File.Delete(file);
+        }
+
+        [TestMethod]
+        [CombinatorialData]
+        public void AllocateEmptyBlocksChainsToExistingFreeList(
+            [DataValues(256, 1024)] int blockSize,
+            [DataValues(BlockAllocatorType.MemoryMapped, BlockAllocatorType.Stream)] BlockAllocatorType allocatorType
+            ) {
+            var file = Path.GetTempFileName();
+            var allocator = GetBlockAllocator(allocatorType, file);
+
+            // Start with 2 blocks, then add 2 more — the old tail must chain into the new head.
+            allocator.InitNew(DatFileType.Portal, 0, blockSize, 2);
+            var block0 = allocator.Header.FirstFreeBlock;
+            var block1 = block0 + blockSize;
+
+            allocator.AllocateEmptyBlocks(2);
+            var block2 = block1 + blockSize;
+            var block3 = block2 + blockSize;
+
+            Assert.AreEqual(4, allocator.Header.FreeBlockCount);
+            Assert.AreEqual(block0, allocator.Header.FirstFreeBlock);
+            Assert.AreEqual(block3, allocator.Header.LastFreeBlock);
+
+            // Old tail (block1) should now point to block2
+            var ptrBuf = new byte[4];
+            allocator.ReadBytes(ptrBuf, 0, block1, 4);
+            var ptr1 = BinaryPrimitives.ReadInt32LittleEndian(ptrBuf);
+            Assert.AreEqual(block2 | unchecked((int)0x80000000), ptr1,
+                "Old last block should chain to new chain head with high bit");
+
+            // New tail (block3) should have end-of-chain marker
+            allocator.ReadBytes(ptrBuf, 0, block3, 4);
+            var ptr3 = BinaryPrimitives.ReadInt32LittleEndian(ptrBuf);
+            Assert.AreEqual(unchecked((int)0x80000000), ptr3,
+                "New last block should be end-of-chain marker");
+
+            allocator.Dispose();
+            File.Delete(file);
+        }
+
+        [TestMethod]
+        [CombinatorialData]
+        public void ReserveBlockFollowsFragmentedLinkedList(
+            [DataValues(256, 1024)] int blockSize,
+            [DataValues(BlockAllocatorType.MemoryMapped, BlockAllocatorType.Stream)] BlockAllocatorType allocatorType
+            ) {
+            var file = Path.GetTempFileName();
+            var allocator = GetBlockAllocator(allocatorType, file);
+
+            // Allocate 8 contiguous blocks to have enough file space.
+            allocator.InitNew(DatFileType.Portal, 0, blockSize, 8);
+
+            var blockA = allocator.Header.FirstFreeBlock;
+            var blockB = blockA + 3 * blockSize; // non-contiguous gap
+            var blockC = blockA + 7 * blockSize; // non-contiguous gap
+
+            // Overwrite the in-band pointers to form a fragmented chain A → B → C → end.
+            var ptrBuf = new byte[4];
+            BinaryPrimitives.WriteInt32LittleEndian(ptrBuf, blockB | unchecked((int)0x80000000));
+            allocator.WriteBytes(ptrBuf, blockA, 4);
+
+            BinaryPrimitives.WriteInt32LittleEndian(ptrBuf, blockC | unchecked((int)0x80000000));
+            allocator.WriteBytes(ptrBuf, blockB, 4);
+
+            BinaryPrimitives.WriteInt32LittleEndian(ptrBuf, unchecked((int)0x80000000));
+            allocator.WriteBytes(ptrBuf, blockC, 4);
+
+            // Patch the in-memory header to reflect the fragmented free list.
+            allocator.Header.FirstFreeBlock = blockA;
+            allocator.Header.LastFreeBlock = blockC;
+            allocator.Header.FreeBlockCount = 3;
+
+            // Reserve 3 blocks — must follow the linked list, not a stride.
+            var r1 = allocator.ReserveBlock();
+            var r2 = allocator.ReserveBlock();
+            var r3 = allocator.ReserveBlock();
+
+            Assert.AreEqual(blockA, r1, "First reservation should return block A");
+            Assert.AreEqual(blockB, r2, "Second reservation should return block B");
+            Assert.AreEqual(blockC, r3, "Third reservation should return block C");
+            Assert.AreEqual(0, allocator.Header.FreeBlockCount, "Free block count should be 0 after consuming all");
+            Assert.AreEqual(0, allocator.Header.FirstFreeBlock, "FirstFreeBlock should be 0 after consuming all");
+
+            allocator.Dispose();
+            File.Delete(file);
+        }
+
+        [TestMethod]
+        [CombinatorialData]
         public void CanExpandDatToWriteBlocks([DataValues(256, 1024)] int blockSize,
             [DataValues(BlockAllocatorType.MemoryMapped, BlockAllocatorType.Stream)] BlockAllocatorType allocatorType) {
             var file = Path.GetTempFileName();
@@ -488,12 +611,20 @@ namespace DatReaderWriter.Tests.IO.BlockAllocators {
             Assert.AreEqual(allocatedBlockCount, allocator.Header.FreeBlockCount);
 
             var firstFree = allocator.Header.FirstFreeBlock;
+            var reservedOffsets = new List<int>(blocksToReserve);
             for (var i = 0; i < blocksToReserve; i++) {
-                allocator.ReserveBlock();
+                reservedOffsets.Add(allocator.ReserveBlock());
+            }
 
-                var exp = firstFree + ((i + 1) * allocator.Header.BlockSize);
-                var cFree = allocator.Header.FirstFreeBlock;
-                Assert.AreEqual(exp, cFree, $"Expected {exp:X8} to be same as free: {cFree:X8}");
+            // Every returned offset must be unique — no block handed out twice.
+            Assert.AreEqual(blocksToReserve, reservedOffsets.Distinct().Count(),
+                "ReserveBlock must never return the same offset twice");
+
+            // With a sequential free-list chain, offsets are issued in stride order.
+            for (var i = 0; i < blocksToReserve; i++) {
+                var exp = firstFree + i * blockSize;
+                Assert.AreEqual(exp, reservedOffsets[i],
+                    $"Expected block {i} offset {exp:X8} but got {reservedOffsets[i]:X8}");
             }
 
             allocator.Dispose();

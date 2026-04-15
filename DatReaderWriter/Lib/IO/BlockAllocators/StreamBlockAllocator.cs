@@ -42,7 +42,7 @@ namespace DatReaderWriter.Lib.IO.BlockAllocators {
 
         /// <inheritdoc/>
         public override void WriteBytes(byte[] buffer, int byteOffset, int numBytes) {
-            WriteBytesInternal(buffer, 0, numBytes);
+            WriteBytesInternal(buffer, byteOffset, numBytes);
             _datStream.Flush();
         }
 
