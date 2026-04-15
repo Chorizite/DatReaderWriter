@@ -62,7 +62,7 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
         /// Create a new node
         /// </summary>
         /// <param name="blockOffset">The offset of this node</param>
-        internal DatBTreeNode(int blockOffset = 0) {
+        public DatBTreeNode(int blockOffset = 0) {
             Offset = blockOffset;
         }
 
@@ -266,11 +266,8 @@ namespace DatReaderWriter.Lib.IO.DatBTree {
                 if (i < BranchCount) {
                     writer.WriteInt32(Branches[i]);
                 }
-                else if (FileCount == 0) {
-                    writer.WriteInt32(0);
-                }
                 else {
-                    writer.WriteInt32(unchecked((int)0xCDCDCDCD));
+                    writer.WriteInt32(0);
                 }
             }
 
