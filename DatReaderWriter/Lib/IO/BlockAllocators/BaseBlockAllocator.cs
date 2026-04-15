@@ -111,14 +111,41 @@ namespace DatReaderWriter.Lib.IO.BlockAllocators {
                 Header.FileSize = firstBlockOffset;
             }
 
-            var offset = Header.FileSize;
+            var hadFreeBlocks = Header.FreeBlockCount > 0;
+            var oldLastFreeBlock = Header.LastFreeBlock;
+            var chainHead = Header.FileSize;
+
             Expand(Header.FileSize + numBlocksToAllocate * Header.BlockSize);
 
-            if (Header.FreeBlockCount == 0) {
-                Header.FirstFreeBlock = offset;
+            // Write in-band next-pointers for each newly appended block.
+            // Format: (nextOffset | 0x80000000); the last block uses 0x80000000 (next=0, free marker).
+            var ptrBuf = SharedBytes.Rent(4);
+            for (int i = 0; i < numBlocksToAllocate; i++) {
+                var blockOffset = chainHead + i * Header.BlockSize;
+                int nextPtr;
+                if (i < numBlocksToAllocate - 1) {
+                    nextPtr = (chainHead + (i + 1) * Header.BlockSize) | unchecked((int)0x80000000);
+                }
+                else {
+                    nextPtr = unchecked((int)0x80000000); // end-of-chain: next=0, free marker
+                }
+                BinaryPrimitives.WriteInt32LittleEndian(ptrBuf, nextPtr);
+                WriteBytes(ptrBuf, blockOffset, 4);
             }
 
-            Header.LastFreeBlock = Header.FileSize - Header.BlockSize;
+            if (hadFreeBlocks) {
+                // Link the old tail of the free list to the new chain's head.
+                int linkPtr = chainHead | unchecked((int)0x80000000);
+                BinaryPrimitives.WriteInt32LittleEndian(ptrBuf, linkPtr);
+                WriteBytes(ptrBuf, oldLastFreeBlock, 4);
+            }
+            else {
+                Header.FirstFreeBlock = chainHead;
+            }
+
+            SharedBytes.Return(ptrBuf);
+
+            Header.LastFreeBlock = chainHead + (numBlocksToAllocate - 1) * Header.BlockSize;
             Header.FreeBlockCount += numBlocksToAllocate;
 
             WriteHeader();
@@ -136,7 +163,15 @@ namespace DatReaderWriter.Lib.IO.BlockAllocators {
         protected int ReserveBlockCore() {
             if (Header.FreeBlockCount > 0) {
                 var freeBlockOffset = Header.FirstFreeBlock;
-                Header.FirstFreeBlock += Header.BlockSize;
+
+                // Read the in-band next-pointer from the first 4 bytes of the free block.
+                // Format: (nextOffset | 0x80000000); strip the high free-marker bit.
+                var ptrBuf = SharedBytes.Rent(4);
+                ReadBytes(ptrBuf, 0, freeBlockOffset, 4);
+                var next = BinaryPrimitives.ReadInt32LittleEndian(ptrBuf) & 0x7FFFFFFF;
+                SharedBytes.Return(ptrBuf);
+
+                Header.FirstFreeBlock = next;
                 Header.FreeBlockCount--;
 
                 WriteHeader();
@@ -144,8 +179,6 @@ namespace DatReaderWriter.Lib.IO.BlockAllocators {
                 return freeBlockOffset;
             }
             else {
-                // todo: we should maybe expand by num bytes or something instead
-                // of block size?
                 AllocateEmptyBlocks(50);
                 return ReserveBlockCore();
             }

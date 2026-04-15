@@ -38,7 +38,7 @@ namespace DatReaderWriter.Benchmarks {
     [SimpleJob(RuntimeMoniker.Net80, baseline: true)]
     [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
     public class DatFileIteration {
-        private static string DatDirectory = (Environment.GetEnvironmentVariable("EOR_DAT_DIR") ?? @"/media/trevis/projects/ac/dats/EoR");
+        private static string DatDirectory = (Environment.GetEnvironmentVariable("EOR_DAT_DIR") ?? @"/media/trevis/Backups/ac/dats/EoR");
         private const string PortalFile = "portal";
         private const string CellFile = "cell_1";
         private const string LanguageFile = "local_English";
@@ -68,7 +68,7 @@ namespace DatReaderWriter.Benchmarks {
     [SimpleJob(RuntimeMoniker.Net80, baseline: true)]
     [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
     public class CellDatFileFetching {
-        private static string CellFile = (Environment.GetEnvironmentVariable("EOR_DAT_DIR") ?? @"/media/trevis/projects/ac/dats/EoR") + "/client_cell_1.dat";
+        private static string CellFile = (Environment.GetEnvironmentVariable("EOR_DAT_DIR") ?? @"/media/trevis/Backups/ac/dats/EoR") + "/client_cell_1.dat";
 
         public uint[] FileIds => [
             0xFB7CFFFEu, 0x1890FFFFu, 0x0001FFFEu, 0xFEFEFFFFu, 0x0390FFFEu, 0xB784FFFFu, 0xB5A4FFFEu, 0x8686FFFFu
@@ -103,7 +103,7 @@ namespace DatReaderWriter.Benchmarks {
     [SimpleJob(RuntimeMoniker.Net80, baseline: true)]
     [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
     public class PortalDatFileFetching {
-        private static string PortalFile = (Environment.GetEnvironmentVariable("EOR_DAT_DIR") ?? @"/media/trevis/projects/ac/dats/EoR") + "/client_portal.dat";
+        private static string PortalFile = (Environment.GetEnvironmentVariable("EOR_DAT_DIR") ?? @"/media/trevis/Backups/ac/dats/EoR") + "/client_portal.dat";
 
         public uint[] FileIds => [
             0x01000001u, 0x06007569u, 0x0A00001Au, 0x340000CFu, 0x1000057Au, 0x22000033u, 0x0300004Bu, 0x0900002Du
