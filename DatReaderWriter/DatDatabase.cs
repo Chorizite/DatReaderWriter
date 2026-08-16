@@ -1055,7 +1055,16 @@ namespace DatReaderWriter {
 #if (NET8_0_OR_GREATER)
             using var outputStream = new System.IO.MemoryStream(data.Slice(4).ToArray());
             using var zlibStream = new ZLibStream(outputStream, CompressionMode.Decompress);
-            return zlibStream.Read(destination);
+            // Stream.Read may return fewer bytes than requested; loop until the
+            // stream is drained or the destination is full, or large records
+            // come back truncated.
+            var totalRead = 0;
+            int read;
+            while (totalRead < destination.Length &&
+                   (read = zlibStream.Read(destination.Slice(totalRead))) > 0) {
+                totalRead += read;
+            }
+            return totalRead;
 #else
             var zlib = new ZLibDotNet.ZLib();
             var dataArray = data.ToArray(); 
