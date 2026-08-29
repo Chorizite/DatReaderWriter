@@ -35,6 +35,11 @@ namespace DatReaderWriter.Enums {
         BpIN = 0x4270494E,
 
         /// <summary>
+        /// "BpIn". Client node variant with no child nodes.
+        /// </summary>
+        BpIn = 0x4270496E,
+
+        /// <summary>
         /// "BpnN"
         /// </summary>
         BpnN = 0x42706E4E,

@@ -79,6 +79,8 @@ namespace DatReaderWriter.Types {
                             PosNode = reader.ReadItem<PhysicsBSPNode>();
                             NegNode = reader.ReadItem<PhysicsBSPNode>();
                             break;
+                        case BSPNodeType.BpIn:
+                            break;
                         default:
                             break;
                     }
