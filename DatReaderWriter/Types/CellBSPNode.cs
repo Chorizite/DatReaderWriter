@@ -53,6 +53,8 @@ namespace DatReaderWriter.Types {
                             PosNode = reader.ReadItem<CellBSPNode>();
                             NegNode = reader.ReadItem<CellBSPNode>();
                             break;
+                        case BSPNodeType.BpIn:
+                            break;
                         default:
                             break;
                     }
